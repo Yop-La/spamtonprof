@@ -10,7 +10,7 @@ class Slack
 
 {
 
-    const LogLbc = "log-lbc", Log = "log", Abonnement = "abonnement", Invoicing = "invoicing";
+    const LogLbc = "log-lbc", Log = "log", Abonnement = "abonnement", Invoicing = "invoicing", MessagEleve = "message-eleve";
 
     private $slack;
 

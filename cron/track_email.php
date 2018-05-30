@@ -1,5 +1,7 @@
 <?php
 
+use spamtonprof\slack\Slack;
+
 /**
  *  pour la boite de seb - adaption possible sur d'autres boites ( voir la "Tracking - Labels gmail api" dans evernote pour mise en place )
  *  il ne traque que les emails d'élève ( pas les mails des étudiants et des parents )
@@ -24,6 +26,8 @@ error_reporting(E_ALL);
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
+
+$slack = new Slack();
 
 $gmailManager = new spamtonprof\gmailManager\GmailManager("profdemathsenligne@gmail.com");
 
@@ -52,7 +56,6 @@ foreach ($messages as $message) {
     // récupération du compte
     
     $mailExpe = $email->getMail_expe();
-
     
     $matches = array();
     $account;
@@ -78,6 +81,8 @@ foreach ($messages as $message) {
     
     
     if ($account) {
+        
+        $slack -> sendMessages($slack::MessagEleve, array("nouveau message de " . $account->eleve()->adresse_mail()));
         
         echo("account id ".$account->ref_compte(). "<br>");
         
