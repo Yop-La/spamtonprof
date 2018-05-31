@@ -85,76 +85,77 @@ function resetCompteTest()
     echo ("reset des comptes de test over ! ");
 }
 
-/** 
- * 
+/**
+ *
  * @param Object $object
- *  pour bien indenter en json l'objet à l'écran
+ *            pour bien indenter en json l'objet à l'écran
  */
-
 function prettyPrint($object)
 {
-    
     header('Content-Type: application/json');
     
     echo (json_encode($object, JSON_PRETTY_PRINT));
     
-    exit(0);        
-    
+    exit(0);
 }
 
-function serializeTemp($object){
+function serializeTemp($object, $file = "/tempo/tempoObject")
+{
     $s = serialize($object);
-    
-    file_put_contents(dirname(__FILE__)."/tempo/tempoObject", $s);
-    
+    file_put_contents(dirname(__FILE__) . $file, $s);
 }
 
-function unserializeTemp(){
-    $s = file_get_contents(dirname(__FILE__)."/tempo/tempoObject");
-    $a = unserialize($s);
-    return($a);
+function unserializeTemp($file = "/tempo/tempoObject")
+{
+    $file = dirname(__FILE__) . $file;
+    if (file_exists($file)) {
+        $s = file_get_contents($file);
+        $a = unserialize($s);
+        return ($a);
+    } else {
+        return (false);
+    }
 }
 
 function toUtf8(array $arr)
 {
-    for ($i = 0 ; $i < count($arr) ; $i++) {
+    for ($i = 0; $i < count($arr); $i ++) {
         $value = $arr[$i];
         $encoding = mb_detect_encoding($value, 'UTF-8', true);
         
-        if ( ! $encoding) {
+        if (! $encoding) {
             $arr[$i] = utf8_encode($value);
         }
     }
-    return($arr);
+    return ($arr);
 }
 
 function prettyPrintArray(array $arr)
 {
-    
-    echo("<pre>");
+    echo ("<pre>");
     
     print_r($arr);
     
-    echo("</pre>");
+    echo ("</pre>");
     
     exit(0);
-    
 }
 
-function saveArrayAsCsv($array, $filename = "export.csv", $delimiter=";") {
+function saveArrayAsCsv($array, $filename = "export.csv", $delimiter = ";")
+{
     // open raw memory as file so no temp files needed, you might run out of memory though
-    
-    $filename = dirname(__FILE__)."/tempo/".$filename;
+    $filename = dirname(__FILE__) . "/tempo/" . $filename;
     
     $f = fopen($filename, 'w');
-    
     
     // loop over the input array
     foreach ($array as $line) {
         
-        if(is_object ($line)){
+        if (is_object($line)) {
             $line = $line->__toString();
-            $line = array($line);
+            $line = array(
+                $line
+            );
         }
         // generate csv lines from the inner arrays
         
@@ -162,18 +163,12 @@ function saveArrayAsCsv($array, $filename = "export.csv", $delimiter=";") {
     }
     
     fclose($f);
-
 }
 
-
-function call($url,$http_method = 'GET', $params = array(),$async=null)
+function call($url, $http_method = 'GET', $params = array(), $async = null)
 {
-    
-
-    
-      
     if ($http_method == 'GET') {
-        $url = $url . "?" . http_build_query ($params) ;
+        $url = $url . "?" . http_build_query($params);
     }
     
     $params = json_encode($params);
@@ -187,7 +182,7 @@ function call($url,$http_method = 'GET', $params = array(),$async=null)
         CURLOPT_USERAGENT => 'SpamTonProf'
     );
     
-    if($async){
+    if ($async) {
         $options[CURLOPT_TIMEOUT_MS] = 1000;
     }
     
@@ -201,7 +196,7 @@ function call($url,$http_method = 'GET', $params = array(),$async=null)
     curl_setopt_array($curl, $options);
     $response = json_decode(curl_exec($curl));
     curl_close($curl);
-    return (object)$response;
+    return (object) $response;
 }
 
 /* pour décoder le body des messages de gmail */

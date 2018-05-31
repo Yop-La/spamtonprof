@@ -34,7 +34,11 @@ $mailEleveMg = new \spamtonprof\stp_api\EmailManager();
 
 $accountMg = new \spamtonprof\stp_api\AccountManager();
 
-$last = $mailEleveMg->getLastEmail();
+$last = unserializeTemp("/tempo/historyId");
+
+if (! $last) {
+    $last = $mailEleveMg->getLastEmail();
+}
 
 $hitories = $gmailManager->listHistory($last->getHistory_id());
 
@@ -50,6 +54,8 @@ foreach ($hitories as $hitory) {
     
     $messageId = $hitory->messages[0]->id;
     
+    echo("message id : " . $messageId. "<br>");
+    
     try {
         
         $message = $gmailManager->getMessage($messageId);
@@ -61,6 +67,11 @@ foreach ($hitories as $hitory) {
     $email = new \spamtonprof\stp_api\Email(array(
         "message" => $message
     ));
+    
+    
+    echo($email->getDate_reception()->format(PG_DATETIME_FORMAT). "<br>");
+    
+    serializeTemp($email, "/tempo/historyId");
     
     $indexMessage = $indexMessage + 1;
     
@@ -92,8 +103,7 @@ foreach ($hitories as $hitory) {
     if ($account) {
         
         echo ("ref gmail : " . $email->getRef_gmail() . "<br>");
-        echo ("account id " . $account->ref_compte() . "<br>". "<br>");
-        
+        echo ("account id " . $account->ref_compte() . "<br>" . "<br>");
         
         $email->setRef_compte($account->ref_compte());
         
@@ -101,28 +111,32 @@ foreach ($hitories as $hitory) {
         
         // add le mail dans la base
         
-        
-        $mailEleve = $mailEleveMg->get(array("ref_gmail" =>$email->getRef_gmail()));
-        if($mailEleve){
-            if(is_null($mailEleve->getHistory_id())){
+        $mailEleve = $mailEleveMg->get(array(
+            "ref_gmail" => $email->getRef_gmail()
+        ));
+        if ($mailEleve) {
+            if (is_null($mailEleve->getHistory_id())) {
                 $mailEleveMg->updateHistoryId($email);
                 $slack->sendMessages($slack::MessagEleve, array(
                     "maj de l'history id du message de " . $account->eleve()
-                    ->adresse_mail(),"envoyé le " . $email->getDate_reception()->format(PG_DATETIME_FORMAT), 
-                    "ref gmail : " . $email->getRef_gmail() ,
+                        ->adresse_mail(),
+                    "envoyé le " . $email->getDate_reception()
+                        ->format(PG_DATETIME_FORMAT),
+                    "ref gmail : " . $email->getRef_gmail(),
                     "------"
                 ));
             }
-        }else{
+        } else {
             $mailEleveMg->add($email);
             $slack->sendMessages($slack::MessagEleve, array(
                 "nouveau message de " . $account->eleve()
-                ->adresse_mail(),"envoyé le " . $email->getDate_reception()->format(PG_DATETIME_FORMAT), 
-                "ref gmail : " . $email->getRef_gmail() ,
+                    ->adresse_mail(),
+                "envoyé le " . $email->getDate_reception()
+                    ->format(PG_DATETIME_FORMAT),
+                "ref gmail : " . $email->getRef_gmail(),
                 "------"
             ));
         }
-        
         
         // attribution des labels
         
@@ -135,6 +149,8 @@ foreach ($hitories as $hitory) {
         $account->setLast_contact_eleve($email->getDate_reception());
         
         $accountMg->updateLastContactEleve($account);
+    }else{
+        echo("<br>");
     }
     
     $indexMessage = $indexMessage + 1;
