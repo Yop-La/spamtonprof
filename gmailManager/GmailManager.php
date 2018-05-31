@@ -46,14 +46,13 @@ class GmailManager
         
         $accessToken;
         
-        if(!$prof){
-            echo("ajouté : " . $gmailAdress . " à la table prof <br><br><br>");
+        if (! $prof) {
+            echo ("ajouté : " . $gmailAdress . " à la table prof <br><br><br>");
         }
         
-        if (  !is_null($prof->getGmail_credential())  ) {
+        if (! is_null($prof->getGmail_credential())) {
             
             $accessToken = json_decode($prof->getGmail_credential(), true);
-
         } else {
             // Request authorization from the user.
             $authUrl = $client->createAuthUrl();
@@ -98,7 +97,7 @@ class GmailManager
         $messages = array();
         $opt_param = array(
             "q" => $searchOperator,
-            "maxResults" => 100
+            "maxResults" => 10
         );
         do {
             try {
@@ -185,20 +184,17 @@ class GmailManager
         
         foreach ($labels as $label) {
             
-            echo ($label->getNom_label() . "de couleur : ".$label->getColor_label()."<br>");
+            echo ($label->getNom_label() . "de couleur : " . $label->getColor_label() . "<br>");
             
             $this->createLabel($label->getNom_label(), $label->getColor_label());
         }
     }
-    
-    function resetStpLabels(){
-        
+
+    function resetStpLabels()
+    {
         $this->deleteStpLabels();
         
         $this->createStpLabels();
-        
-        
-        
     }
 
     /**
@@ -267,8 +263,8 @@ class GmailManager
         return $labels;
     }
 
-    public function getLabelsIds(array $labelNames){
-        
+    public function getLabelsIds(array $labelNames)
+    {
         $labels = $this->getLabelsList();
         
         foreach ($labels as $label) {
@@ -279,9 +275,8 @@ class GmailManager
         }
         
         return ($labelsIds);
-        
     }
-    
+
     public function getCustomLabelsToAdd(spamtonprof\stp_api\Account $account)
     {
         $labelsNameToAdd = [];
@@ -301,6 +296,37 @@ class GmailManager
         }
         
         return ($labelsIdToAdd);
+    }
+
+    function listHistory($startHistoryId, $historyTypes = "messageAdded")
+    {
+        $userId = $this->userId;
+        $service = $this->service;
+        $opt_param = array(
+            'startHistoryId' => $startHistoryId,
+            'historyTypes' => $historyTypes,
+            'maxResults' => '100'
+        );
+        $pageToken = NULL;
+        $histories = array();
+        
+        do {
+            try {
+                if ($pageToken) {
+                    $opt_param['pageToken'] = $pageToken;
+                }
+                $historyResponse = $service->users_history->listUsersHistory($userId, $opt_param);
+                $pageToken = false; // à enlever si on veut itérer sur plusieurs pages et décommenter en dessous aussi
+                                    // if ($historyResponse->getHistory()) {
+                $histories = array_merge($histories, $historyResponse->getHistory());
+                // $pageToken = $historyResponse->getNextPageToken();
+                // }
+            } catch (Exception $e) {
+                print 'An error occurred: ' . $e->getMessage();
+            }
+        } while ($pageToken);
+        
+        return $histories;
     }
 }
 

@@ -1,18 +1,17 @@
 <?php
-
 use spamtonprof\slack\Slack;
 
 /**
- *  pour la boite de seb - adaption possible sur d'autres boites ( voir la "Tracking - Labels gmail api" dans evernote pour mise en place )
- *  il ne traque que les emails d'élève ( pas les mails des étudiants et des parents )
- *  
- * ce script sert : 
- *   - à stocker dans mail eleve - les messages des élèves 
- *   - à attribuer des libellées aux emails
- *   - il tourne tous les 5 minutes
+ * pour la boite de seb - adaption possible sur d'autres boites ( voir la "Tracking - Labels gmail api" dans evernote pour mise en place )
+ * il ne traque que les emails d'élève ( pas les mails des étudiants et des parents )
+ *
+ * ce script sert :
+ * - à stocker dans mail eleve - les messages des élèves
+ * - à attribuer des libellées aux emails
+ * - il tourne tous les 5 minutes
  */
 
-require_once(dirname(dirname(dirname(dirname(dirname(__FILE__)))))."/wp-config.php");
+require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
 $wp->init();
 $wp->parse_request();
 $wp->query_posts();
@@ -33,25 +32,37 @@ $gmailManager = new spamtonprof\gmailManager\GmailManager("profdemathsenligne@gm
 
 $mailEleveMg = new \spamtonprof\stp_api\EmailManager();
 
-$lastEmail = $mailEleveMg->getLastEmail();
-
-$dateLastEmail = $lastEmail->getDate_reception();
-
-$searchOperator = "after:" . $dateLastEmail->getTimestamp() . " -from:sebastien@spamtonprof.com";
-
-$messages = $gmailManager->listMessages($searchOperator);
-
 $accountMg = new \spamtonprof\stp_api\AccountManager();
 
-foreach ($messages as $message) {
+$last = $mailEleveMg->getLastEmail();
+
+$hitories = $gmailManager->listHistory($last->getHistory_id());
+
+$indexMessage = 0;
+
+foreach ($hitories as $hitory) {
     
-    $messageId = $message->getId();
+    if ($indexMessage == 20) { // on arrête dès que 10 messages ont été traités pour éviter le time out
+        exit(0);
+    }
     
-    $message = $gmailManager->getMessage($messageId);
+    $hitoryId = $hitory->id;
+    
+    $messageId = $hitory->messages[0]->id;
+    
+    try {
+        
+        $message = $gmailManager->getMessage($messageId);
+    } catch (\Exception $e) {
+        echo ("404 not found " . "<br>" . "<br>");
+        continue;
+    }
     
     $email = new \spamtonprof\stp_api\Email(array(
         "message" => $message
     ));
+    
+    $indexMessage = $indexMessage + 1;
     
     // récupération du compte
     
@@ -69,7 +80,6 @@ foreach ($messages as $message) {
                 'phone_eleve' => $phoneNumber
             )
         ));
-        
     } else {
         
         $account = $accountMg->get(array(
@@ -79,17 +89,40 @@ foreach ($messages as $message) {
         ));
     }
     
-    
     if ($account) {
         
-        $slack -> sendMessages($slack::MessagEleve, array("nouveau message de " . $account->eleve()->adresse_mail()));
+        echo ("ref gmail : " . $email->getRef_gmail() . "<br>");
+        echo ("account id " . $account->ref_compte() . "<br>". "<br>");
         
-        echo("account id ".$account->ref_compte(). "<br>");
         
-        // add le mail dans la base
         $email->setRef_compte($account->ref_compte());
         
-        $mailEleveMg->add($email);
+        $email->setHistory_id($hitoryId);
+        
+        // add le mail dans la base
+        
+        
+        $mailEleve = $mailEleveMg->get(array("ref_gmail" =>$email->getRef_gmail()));
+        if($mailEleve){
+            if(is_null($mailEleve->getHistory_id())){
+                $mailEleveMg->updateHistoryId($email);
+                $slack->sendMessages($slack::MessagEleve, array(
+                    "maj de l'history id du message de " . $account->eleve()
+                    ->adresse_mail(),"envoyé le " . $email->getDate_reception()->format(PG_DATETIME_FORMAT), 
+                    "ref gmail : " . $email->getRef_gmail() ,
+                    "------"
+                ));
+            }
+        }else{
+            $mailEleveMg->add($email);
+            $slack->sendMessages($slack::MessagEleve, array(
+                "nouveau message de " . $account->eleve()
+                ->adresse_mail(),"envoyé le " . $email->getDate_reception()->format(PG_DATETIME_FORMAT), 
+                "ref gmail : " . $email->getRef_gmail() ,
+                "------"
+            ));
+        }
+        
         
         // attribution des labels
         
@@ -97,11 +130,13 @@ foreach ($messages as $message) {
         
         $gmailManager->modifyMessage($messageId, $labelsToAdd, array());
         
-        // mise à jour de la date de dernier contact 
+        // mise à jour de la date de dernier contact
         
         $account->setLast_contact_eleve($email->getDate_reception());
         
         $accountMg->updateLastContactEleve($account);
     }
+    
+    $indexMessage = $indexMessage + 1;
 }
 

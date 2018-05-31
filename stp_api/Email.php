@@ -34,7 +34,7 @@ class Email implements \JsonSerializable
         "CATEGORY_FORUMS"
     );
 
-    protected $subject, $body, $ref_mail, $ref_gmail, $date_reception, $mail_expe, $threadId, $labelIds, $ref_compte, $received, $snippet, $type, $text;
+    protected $subject, $body, $ref_mail, $ref_gmail, $date_reception, $mail_expe, $threadId, $labelIds, $ref_compte, $received, $snippet, $type, $text, $history_id;
 
     public function __construct(array $donnees = array(), $type = null)
     
@@ -49,6 +49,7 @@ class Email implements \JsonSerializable
             
             $this->setRef_gmail($message->getId());
             $this->setThreadId($message->getThreadId());
+            $this->setHistory_id($message->getHistoryId());
             
             // récupération du snippet
             $this->snippet = $message->snippet;
@@ -65,9 +66,9 @@ class Email implements \JsonSerializable
                     $dateReception;
                     try {
                         $dateReception = new \DateTime($value);
+                        
                     } catch (Exception $e) {
-                        echo (" erreur date : " . $value . " : <br>");
-                        $dateReception = new \DateTime(str_replace("UT", "", "$value"));
+                        $dateReception = new \DateTime();
                     }
                     $dateReception->setTimezone(new \DateTimeZone("Europe/Paris"));
                     
@@ -90,7 +91,7 @@ class Email implements \JsonSerializable
                         $from = $matches[1];
                     }
                     
-                    $this->setMail_expe($from);
+                    $this->setMail_expe(strtolower($from));
                 }
                 
                 // récupération des labels
@@ -109,7 +110,7 @@ class Email implements \JsonSerializable
             
             if ($type == "lbcType1") {
                 $this->body = base64url_decode($message->getPayload()->getParts()[0]->getParts()[0]->getBody()->getData());
-                if($this->body == ""){
+                if ($this->body == "") {
                     $this->body = base64url_decode($message->getPayload()->getParts()[0]->getParts()[0]->getParts()[1]->getBody()->getData());
                 }
             }
@@ -398,18 +399,16 @@ class Email implements \JsonSerializable
      */
     public function getText()
     {
-        if(is_null($this->text) && !is_null($this->body) && !is_null($this->type)){
+        if (is_null($this->text) && ! is_null($this->body) && ! is_null($this->type)) {
             
             if ($this->type == "lbcType1") {
-             
+                
                 $dom = new \DOMDocument();
                 $dom->loadHTML($this->body);
                 $paragraphs = $dom->getElementsByTagName('p');
                 $msgProspect = "";
                 foreach ($paragraphs as $paragraph) {
                     $msgProspect = $msgProspect . "\r\n" . $paragraph->textContent;
-                    
-
                 }
                 
                 $this->text = utf8_decode($msgProspect);
@@ -420,8 +419,6 @@ class Email implements \JsonSerializable
                 preg_match('#http://.*\r\n\r\n([\S\s]*Coo[\S\s]*)\r\n\r\nCet#', $this->body, $matches);
                 $this->text = $matches[1];
             }
-            
-            
         }
         return $this->text;
     }
@@ -434,5 +431,24 @@ class Email implements \JsonSerializable
     {
         $this->text = $text;
     }
+    /**
+     * @return mixed
+     */
+    public function getHistory_id()
+    {
+        return $this->history_id;
+    }
+
+    /**
+     * @param mixed $history_id
+     */
+    public function setHistory_id($history_id)
+    {
+        $this->history_id = $history_id;
+    }
+
+    
+    
+    
 }
 
