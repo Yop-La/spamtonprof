@@ -30,8 +30,13 @@ function redirect(slug ,info = ""  ){
 function showMessage(message){
 	$("#band-message").text(message);
 	$("#top-message").removeClass("hide");
+	window.scrollTo(0, 0);
 }
 
 function hideMessage(){
 	$("#top-message").addClass("hide");
+}
+
+function isPositiveInteger(n) {
+    return n >>> 0 === parseFloat(n);
 }
