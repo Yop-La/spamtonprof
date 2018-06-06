@@ -13,6 +13,60 @@ texteId = null; // pour garder l'id du texte arpès click boutton 'copier' ou 'm
 nbTextesWritted = null;
 nbTextTot = null;
 
+
+// pour adapter les ids des formulaires qui changent entre le localhost et le site en prod
+if(domain == "localhost"){
+	
+	// form lire titre
+	idTitleForm = "55";
+	idSelectTitleForm = "886";
+	
+	// form lire textes
+	idTextForm = "56";
+	idSelectTextForm = "888";
+	
+	// form add cat
+	idAddTextCat = "57";
+	idNomCat = "890";
+	idNbPara = "894";
+	idNbTexte = "895";
+	
+	// form load cat
+	idLoadCat = "58";
+	idNomCatLoaded = "897";
+	
+	idAddText = "59";
+	idAddTextCont = "#nf-form-59-cont";
+	idFirstPara = 900;
+	
+}else{
+
+	// form lire titre
+	idTitleForm = "57";
+	idSelectTitleForm = "887";
+	
+	// form lire textes
+	idTextForm = "59";
+	idSelectTextForm = "891";
+	
+	// form add cat
+	idAddTextCat = "60";
+	idNomCat = "893";
+	idNbPara = "894";
+	idNbTexte = "895";
+	
+	// form load cat
+	idLoadCat = "61";
+	idNomCatLoaded = "897";
+	
+	// form add text
+	idAddText = "62";
+	idAddTextCont = "#nf-form-62-cont";
+	idFirstPara = 899;
+	
+}
+
+
 var mySubmitController = Marionette.Object.extend( {
 
 	initialize: function() {
@@ -24,11 +78,11 @@ var mySubmitController = Marionette.Object.extend( {
 		console.log(response);
 
 		// titles form
-		if(response.data.form_id == "55"){
+		if(response.data.form_id == idTitleForm){
 			$("#loadingSpinner").removeClass("hide");
 			$("#onglets").addClass("hide");
 
-			typeTitle = response.data.fields["886"].value;
+			typeTitle = response.data.fields[idSelectTitleForm].value;
 			console.log(typeTitle);
 
 			ajaxEnCours++;
@@ -75,9 +129,9 @@ var mySubmitController = Marionette.Object.extend( {
 		}
 
 		// textes form
-		if(response.data.form_id == "56"){
+		if(response.data.form_id == idTextForm){
 			console.log("textes form submitted");
-			typeTexte = response.data.fields["888"].value;
+			typeTexte = response.data.fields[idSelectTextForm].value;
 			console.log(typeTexte);
 
 			$("#loadingSpinner").removeClass("hide");
@@ -123,11 +177,11 @@ var mySubmitController = Marionette.Object.extend( {
 		}
 
 		// nouvelle catégorie de textes
-		if(response.data.form_id == "57"){
+		if(response.data.form_id == idAddTextCat){
 			console.log("nouvelle cat texte submitted");
-			nomCat = response.data.fields["890"].value;
-			nbPara = response.data.fields["894"].value;
-			nbTexte = response.data.fields["895"].value;
+			nomCat = response.data.fields[idNomCat].value;
+			nbPara = response.data.fields[idNbPara].value;
+			nbTexte = response.data.fields[idNbTexte].value;
 
 			if(!(isPositiveInteger(nbPara) && isPositiveInteger(nbTexte))){
 				showMessage("Le nombre de paragraphes et de textes doit être un entier positive. Veuillez refaire votre saisie");
@@ -202,12 +256,12 @@ var mySubmitController = Marionette.Object.extend( {
 		}
 
 		// chargement d'une cat de texte pour rédaction
-		if(response.data.form_id == "58"){
+		if(response.data.form_id == idLoadCat){
 			$("#loadingSpinner").removeClass("hide");
 			$("#onglets").addClass("hide");
 			$("#writing-area").removeClass("hide");
 			console.log("chargement d'une cat de texte pour rédaction");
-			nomCat = response.data.fields["897"].value;
+			nomCat = response.data.fields[idNomCatLoaded].value;
 			nomCatLoaded = nomCat;
 
 			ajaxEnCours++;
@@ -232,8 +286,8 @@ var mySubmitController = Marionette.Object.extend( {
 							$("#nomCat").text(textCat.nom_cat);
 
 
-							nbMaxPar = $('#nf-form-59-cont textarea').size() - 1;
-							$.each($('#nf-form-59-cont .nf-row'), function (i, item) {
+							nbMaxPar = $(idAddTextCont.concat(' textarea')).size() - 1;
+							$.each($(idAddTextCont.concat(' .nf-row')), function (i, item) {
 
 								if(i>=nbPara && i <= nbMaxPar){
 									$(item).remove();	
@@ -242,7 +296,7 @@ var mySubmitController = Marionette.Object.extend( {
 
 							loadTextCat();
 							loadBaseTextes();
-							$('#nf-field-897').prop(nomCatLoaded, true);
+							$(idNomCatLoaded).prop(nomCatLoaded, true);
 							
 							
 							
@@ -272,7 +326,7 @@ var mySubmitController = Marionette.Object.extend( {
 		}
 
 		// ajout ou modification d'un texte
-		if(response.data.form_id == "59"){
+		if(response.data.form_id == idAddText){
 			$("#loadingSpinner").removeClass("hide");
 			$("#onglets").addClass("hide");
 			console.log("demande d'éditiion d'un texte");
@@ -281,7 +335,7 @@ var mySubmitController = Marionette.Object.extend( {
 
 			for(var i = 0; i< nbPara ; i++){
 
-				var j = 900 + i;
+				var j = idFirstPara + i;
 				par = {};
 				par["paragraph"] = response.data.fields[j].value;
 				par["indice"] = i;
@@ -431,12 +485,12 @@ jQuery( document ).ready( function( $ ) {
 		textCol = $( '#text-col' );
 	});
 
-	waitForEl('#nf-form-59-cont', function() {
-		$('#nf-form-59-cont').addClass("hide");
+	waitForEl(idAddTextCont, function() {
+		$(idAddTextCont).addClass("hide");
 	});
 
 	// chargement des options du formulaire des titres
-	waitForEl('#nf-field-886', function() {
+	waitForEl('#nf-field-'.concat(idSelectTitleForm), function() {
 
 
 		$("#loadingSpinner").removeClass("hide");
@@ -451,13 +505,13 @@ jQuery( document ).ready( function( $ ) {
 				.done(function(titleTypes){ 
 
 					$.each(titleTypes, function (i, item) {
-						$('#nf-field-886').append($('<option>', { 
+						$('#nf-field-'.concat(idSelectTitleForm)).append($('<option>', { 
 							value: item,
 							text : item 
 						}));
 
 					});
-					$('#nf-field-886').prepend("<option value='' selected='selected'></option>");
+					$('#nf-field-'.concat(idSelectTitleForm)).prepend("<option value='' selected='selected'></option>");
 
 				})
 				.fail(function(err){
@@ -488,10 +542,10 @@ jQuery( document ).ready( function( $ ) {
 });
 
 function loadTextCat(){
-	waitForEl('#nf-field-897', function() {
+	waitForEl('#nf-field-'.concat(idNomCatLoaded), function() {
 		$("#loadingSpinner").removeClass("hide");
 		$("#onglets").addClass("hide");
-		$('#nf-field-897')
+		$('#nf-field-'.concat(idNomCatLoaded))
 		.find('option')
 		.remove();
 
@@ -504,15 +558,15 @@ function loadTextCat(){
 				.done(function(texteCats){ 
 					$.each(texteCats, function (i, item) {
 						console.log(item.nom_cat);
-						$('#nf-field-897').append($('<option>', { 
+						$('#nf-field-'.concat(idNomCatLoaded)).append($('<option>', { 
 							value: item.nom_cat,
 							text : item.nom_cat 
 						}));
 
 					});
-					$('#nf-field-897').prepend("<option value='' selected='selected'></option>");
-					$('#nf-form-59-cont').removeClass("hide");
-					$('#nf-field-897 option[value="'.concat(nomCatLoaded,'"]')).prop('selected', true);
+					$('#nf-field-'.concat(idNomCatLoaded)).prepend("<option value='' selected='selected'></option>");
+					$(idAddTextCont).removeClass("hide");
+					$('#nf-field-'.concat(idNomCatLoaded,' option[value="',nomCatLoaded,'"]')).prop('selected', true);
 				})
 				.fail(function(err){
 					console.log("erreur ajax chaargement catégorie de textes");
@@ -644,13 +698,13 @@ function loadBaseTextes(){
 }
 
 function fillTextForm(){
-	waitForEl('#nf-form-title-59', function() {
+	waitForEl('#nf-form-title-'.concat(idAddText), function() {
 		console.log("fill text form");
 		paras = baseTextes[texteId];
 		console.log(texteId);
 		console.log(baseTextes);
 		$.each(paras, function (i, item) {
-			$('#nf-field-'.concat(900+i)).val(item);
+			$('#nf-field-'.concat(idFirstPara+i)).val(item);
 		});
 
 	});
@@ -692,7 +746,7 @@ function loadTextesCat(){
 	
 	
 	// chargement des options du formulaire des textes
-	waitForEl('#nf-field-888', function() {
+	waitForEl('#nf-field-'.concat(idSelectTextForm), function() {
 
 		$("#loadingSpinner").removeClass("hide");
 		$("#onglets").addClass("hide");
@@ -705,13 +759,13 @@ function loadTextesCat(){
 				.done(function(titleTypes){ 
 
 					$.each(titleTypes, function (i, item) {
-						$('#nf-field-888').append($('<option>', { 
+						$('#nf-field-'.concat(idSelectTextForm)).append($('<option>', { 
 							value: item,
 							text : item 
 						}));
 
 					});
-					$('#nf-field-888').prepend("<option value='' selected='selected'></option>");
+					$('#nf-field-'.concat(idSelectTextForm)).prepend("<option value='' selected='selected'></option>");
 
 				})
 				.fail(function(err){
