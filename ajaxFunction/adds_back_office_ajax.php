@@ -4,6 +4,7 @@ use spamtonprof\stp_api;
 use spamtonprof\stp_api\CampaignManager;
 use spamtonprof\stp_api\Abonnement;
 use spamtonprof\stp_api\AbonnementManager;
+use spamtonprof\slack\Slack;
 
 // toutes ces fonction seront éxécutés par un appel ajax réalisé dans adds-back-office.js sur la page dont le slug est adds
 add_action('wp_ajax_ajaxGetAddsTitle', 'ajaxGetAddsTitle');
@@ -62,6 +63,9 @@ add_action('wp_ajax_ajaxGenerateAndSaveTexts', 'ajaxGenerateAndSaveTexts');
 
 add_action('wp_ajax_nopriv_ajaxGenerateAndSaveTexts', 'ajaxGenerateAndSaveTexts');
 
+add_action('wp_ajax_doesTextCatExist', 'doesTextCatExist');
+
+add_action('wp_ajax_nopriv_doesTextCatExist', 'doesTextCatExist');
 /* retourne la liste des types de textes des annonces lbc */
 function ajaxGetAddsTexteType()
 
@@ -156,6 +160,35 @@ function ajaxAddNewTexteCat()
     echo (json_encode($texteCat));
     
     die();
+}
+
+// vérifie que la cat choisie n'existe pas à la fois dans baseTextes et textes
+
+function doesTextCatExist(){
+
+    header('Content-type: application/json');
+    
+    $nomCat = $_POST["nomCat"];
+    
+    $texteCatMg = new \spamtonprof\stp_api\LbcTexteCatMg();
+    
+    $texteCat = $texteCatMg->get(array(
+        "nom_cat" => $nomCat
+    ));
+    
+    $texteMg = new \spamtonprof\stp_api\LbcTexteManager();
+    
+    
+    
+    $typeExist = $texteMg->exist($nomCat);
+    
+    if($typeExist || $textCat){
+        echo(json_encode(true));
+    }else{
+        echo(json_encode(false));
+    }
+    die();
+    
 }
 
 function ajaxGetTexteCat()

@@ -203,7 +203,7 @@ var mySubmitController = Marionette.Object.extend( {
 			jQuery.post(
 					ajaxurl,
 					{
-						'action' : 'ajaxGetTexteCat',
+						'action' : 'doesTextCatExist',
 						'nomCat' : nomCat, 
 					})
 

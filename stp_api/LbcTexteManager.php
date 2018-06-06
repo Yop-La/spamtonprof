@@ -82,4 +82,27 @@ class LbcTexteManager
         
         return ($textes);
     }
+    
+    public function exist($texteType)
+    {
+        
+        $q = $this->_db->prepare("select count(*) as exist from textes where type = :type_texte ");
+        
+        $q->bindValue(":type_texte", $texteType);
+        
+        $q->execute();
+        
+        $data = $q->fetch(PDO::FETCH_ASSOC);
+        
+        $exist = $data['exist'];
+        
+        if ($exist == 0) {
+            return (false);
+        }else{
+            return(true);
+        }
+        
+    }
+    
+    
 }
