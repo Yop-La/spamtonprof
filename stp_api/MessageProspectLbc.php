@@ -17,6 +17,7 @@ class MessageProspectLbc implements \JsonSerializable
     $ref_prospect_lbc,
     $is_sent,
     $ref_compte_lbc,
+    $subject,
     $gmail_id;
     
 
@@ -150,6 +151,22 @@ class MessageProspectLbc implements \JsonSerializable
     {
         $this->gmail_id = $gmail_id;
     }
+    /**
+     * @return mixed
+     */
+    public function getSubject()
+    {
+        return $this->subject;
+    }
+
+    /**
+     * @param mixed $subject
+     */
+    public function setSubject($subject)
+    {
+        $this->subject = $subject;
+    }
+
 
 
     

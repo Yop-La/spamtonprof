@@ -218,6 +218,7 @@ class SmtpServer implements \JsonSerializable
         //Password to use for SMTP authentication
         $mail->Password = $this->password;
         //Set who the message is to be sent from
+        $mail->addReplyTo($from, $this->name);
         $mail->setFrom($from, $this->name);
 
         //Set who the message is to be sent to

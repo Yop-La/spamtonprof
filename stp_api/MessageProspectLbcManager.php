@@ -74,13 +74,14 @@ class MessageProspectLbcManager
 
     public function add(MessageProspectLbc $message)
     {
-        $q = $this->_db->prepare('INSERT INTO message_prospect_lbc(date_reception, ref_compte_lbc, ref_prospect_lbc, is_sent, gmail_id) VALUES(:date_reception, :ref_compte_lbc, :ref_prospect_lbc, :is_sent, :gmail_id)');
+        $q = $this->_db->prepare('INSERT INTO message_prospect_lbc(date_reception, ref_compte_lbc, ref_prospect_lbc, is_sent, gmail_id, subject) VALUES(:date_reception, :ref_compte_lbc, :ref_prospect_lbc, :is_sent, :gmail_id, :subject)');
         $q->bindValue(':date_reception', $message->getDate_reception()
             ->format(PG_DATETIME_FORMAT));
         $q->bindValue(':ref_compte_lbc', $message->getRef_compte_lbc());
         $q->bindValue(':ref_prospect_lbc', $message->getRef_prospect_lbc());
         $q->bindValue(':is_sent', $message->getIs_sent(), PDO::PARAM_BOOL);
         $q->bindValue(':gmail_id', $message->getGmail_id());
+        $q->bindValue(':subject', $message->getSubject());
         
         $q->execute();
         

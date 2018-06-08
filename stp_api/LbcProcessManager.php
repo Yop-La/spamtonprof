@@ -138,6 +138,7 @@ class LbcProcessManager
             $contactLbc = substr($matches[3], 0, - 4);
             $dateReception = $email->getDate_reception()->format(PG_DATETIME_FORMAT);
             $gmailId = $email->getRef_gmail();
+            $subject = $email->getSubject();
             
             if ((strpos($matches[0], 'This email was sent to the alias') !== false)) {
                 
@@ -148,7 +149,7 @@ class LbcProcessManager
                 $this->msgs[] = "   ------   ";
                 $this->msgs[] = $email->getText();
                 
-                $this->addNewLeadMessage($emailAccountLbc, $contactLbc, $dateReception, $gmailId);
+                $this->addNewLeadMessage($emailAccountLbc, $contactLbc, $dateReception, $gmailId, $subject);
                 
                 $labelId = $this->gmailManager->getLabelsIds(array(
                     "bot_read_it"
@@ -201,6 +202,7 @@ class LbcProcessManager
             
             $dateReception = $email->getDate_reception()->format(PG_DATETIME_FORMAT);
             $gmailId = $email->getRef_gmail();
+            $subject = $email->getSubject();
             
             if ((strpos($matches[0], 'This email was sent to the alias') !== false)) {
                 
@@ -214,7 +216,7 @@ class LbcProcessManager
                 $this->msgs[] = "   ------   ";
                 $this->msgs[] = $email->getText();
                 
-                $this->addNewLeadMessage($emailAccountLbc, $contactLbc, $dateReception, $gmailId);
+                $this->addNewLeadMessage($emailAccountLbc, $contactLbc, $dateReception, $gmailId, $subject);
                 
                 $labelId = $this->gmailManager->getLabelsIds(array(
                     "bot_read_it"
@@ -232,7 +234,7 @@ class LbcProcessManager
         }
     }
 
-    private function addNewLeadMessage($emailAccountLbc, $contactLbc, $dateReception, $gmailId)
+    private function addNewLeadMessage($emailAccountLbc, $contactLbc, $dateReception, $gmailId, $subject)
     {
         
         // détermination du compte leboncoin associé au messsage
@@ -282,6 +284,7 @@ class LbcProcessManager
         $mess->setIs_sent(! $newProspect);
         $mess->setRef_prospect_lbc($prospectLbc->getRef_prospect_lbc());
         $mess->setGmail_id($gmailId);
+        $mess->setSubject($subject);
         
         // return;
         
@@ -312,7 +315,9 @@ class LbcProcessManager
             
             $smtpServerMg = new SmtpServerManager();
             
-            $rep = $smtpServer->sendEmail("Cours de maths-physique-chimie sur leboncoin", $lead->getAdresse_mail(), $mailForLead->getBody(), $compteLbc->getMail());
+            $subject = 'Re: '.str_replace ('leboncoin', 'lebonc...',$message->getSubject());
+            
+            $rep = $smtpServer->sendEmail($subject, $lead->getAdresse_mail(), $mailForLead->getBody(), $compteLbc->getMail());
             if ($rep) {
                 
                 $message->setIs_sent(true);
@@ -325,7 +330,7 @@ class LbcProcessManager
                 $msgs[] = "Compte Lbc concerné et expediteur : " . $compteLbc->getMail();
                 $msgs[] = "Sender : " . $smtpServer->getFrom();
                 $msgs[] = "Réponse : ";
-                $msgs[] = $mailForLead->getSubject();
+                $msgs[] = $subject;
                 $msgs[] = $mailForLead->getBody();
                 $this->slack->sendMessages($this->slack::LogLbc, $msgs);
             }

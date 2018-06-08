@@ -28,4 +28,6 @@ $lbcProcessManager->processNewLeadMessages();
 
 sleep(10); // pour avoir une chronologie dans les messages sur slack
 
+echo("passsssssseeeeeee");
+
 $lbcProcessManager->answerToLeadMessages();
