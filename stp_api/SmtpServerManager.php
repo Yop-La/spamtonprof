@@ -10,7 +10,8 @@ class SmtpServerManager
     const soutienMathsPhysiqueAtThomasCoursFr = 'soutien-maths-physique@thomas-cours.fr',
     mathsPhysiqueAtThomasCoursFr = 'maths-physique@thomas-cours.fr',
     francaisAtThomasCoursFr = 'francais@thomas-cours.fr',
-    coursparmailAtthomasCoursFr = 'coursparmail@thomas-cours.fr';
+    coursparmailAtthomasCoursFr = 'coursparmail@thomas-cours.fr',
+    alexandreAtSpamTonProf = 'alexandre@spamtonprof.com';
 
     private $_db;
 

@@ -349,8 +349,40 @@ class GetResponseManager
             
             $contact = $contacts[0];
             
-            return ($contacts);
+            return ($contact);
         }
+    }
+
+    /**
+     *
+     * @param string $adresseMail
+     * @return mixed|\StdClass pour avoir tous les contacts correspondants à une adresse mail
+     */
+    public function getContacts($adresseMail)
+    {
+        $contacts = $this->getresponse->getContacts(array(
+            
+            "query[email]" => $adresseMail
+        
+        ));
+        
+        return ($contacts);
+    }
+    
+
+    
+    public function removeAll($adresseMail){
+    
+        $contacts = $this->getContacts($adresseMail);
+        foreach ($contacts as $contact){
+            
+            $campaignName = $contact->campaign->name;
+            
+            $this->getresponse->updateContact($contact->contactId, $params = array("campaign" => array("campaignId" => '47CmU')));
+
+        }
+
+        
     }
 
     public function getContactInCampaign(Personne $personne, string $nomCampaign)
@@ -411,15 +443,14 @@ class GetResponseManager
         foreach ($campaigns as $campaign) {
             
             $campaign = new \spamtonprof\getresponse_api\Campaign($campaign);
-            if(in_array($campaign -> getName(), $nomsCampaigns)){
+            if (in_array($campaign->getName(), $nomsCampaigns)) {
                 $campaigns[$i];
-            }else{
+            } else {
                 unset($campaigns[$i]);
             }
-            $i ++ ;
-
+            $i ++;
         }
-        return($campaigns);
+        return ($campaigns);
     }
 
     public function removeFromCampaign(Personne $personne, $campaign)

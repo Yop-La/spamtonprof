@@ -559,7 +559,7 @@ class AccountManager
             
         }
         
-        prettyPrint($refComptes);
+        return($refComptes);
         
     }
     
@@ -571,16 +571,15 @@ class AccountManager
         
         foreach ($accounts as $account){
             
+            
             $account->setStatut('desinscrit_essai');
             $account->setAttente_paiement(true);
             
             $this->updateAfterSubsCreated($account);
-            
-            
-            
-            
-            
+                        
         }
+        
+        return($accounts);
         
     }
 

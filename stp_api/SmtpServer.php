@@ -10,6 +10,8 @@ use PHPMailer\PHPMailer\PHPMailer;
  */
 class SmtpServer implements \JsonSerializable
 {
+    
+    
 
     protected 
     $slack,
@@ -19,7 +21,6 @@ class SmtpServer implements \JsonSerializable
     $username,
     $from,
     $replyTo,
-    $adress,
     $name;
 
     public function __construct(array $donnees = array())
@@ -88,13 +89,6 @@ class SmtpServer implements \JsonSerializable
         return $this->replyTo;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAdress()
-    {
-        return $this->adress;
-    }
 
     /**
      * @return mixed
@@ -144,13 +138,7 @@ class SmtpServer implements \JsonSerializable
         $this->replyTo = $replyTo;
     }
 
-    /**
-     * @param mixed $adress
-     */
-    public function setAdress($adress)
-    {
-        $this->adress = $adress;
-    }
+
 
     /**
      * @param mixed $username
