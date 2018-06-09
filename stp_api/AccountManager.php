@@ -104,18 +104,16 @@ class AccountManager
     public function getListParent($mailParent)
     {
         $accounts = [];
-                
+        
         $parentManager = new ParentManager();
         $parent = $parentManager->get($mailParent);
-
+        
         if ($parent) {
             
             $q = $this->_db->prepare('SELECT * from compte_eleve WHERE ref_parent = :ref_parent');
             $q->execute([
                 ':ref_parent' => $parent->ref_parent()
             ]);
-            
-            
             
             while ($donnees = $q->fetch(PDO::FETCH_ASSOC)) {
                 $account = $this->get($donnees);
@@ -218,14 +216,13 @@ class AccountManager
     {
         $accounts = [];
         
-        $q = $this->_db->prepare("SELECT * FROM compte_eleve where ref_compte IN ('" . implode("','", $refComptes) . "')" );
+        $q = $this->_db->prepare("SELECT * FROM compte_eleve where ref_compte IN ('" . implode("','", $refComptes) . "')");
         $q->execute();
         
         while ($donnees = $q->fetch(PDO::FETCH_ASSOC)) {
             
             $account = $this->get($donnees);
             $accounts[] = $account;
-            
         }
         
         return $accounts;
@@ -283,6 +280,7 @@ class AccountManager
         $q->execute();
     }
 
+    // pour mettre  à jour attente paiement et statut
     public function updateAfterSubsCreated(spamtonprof\stp_api\Account $account)
     
     {
@@ -543,6 +541,47 @@ class AccountManager
             $q->bindValue(":ref_compte", $info, PDO::PARAM_INT);
             $q->execute();
         }
+    }
+
+    // un compte inactif est un compte en essai âgé de 10 jours avec 5 jours d'inactivité
+    public function getInactiveAccounts()
+    {
+        $refComptes = [];
+        
+        $q = $this->_db->prepare("select ref_compte from compte_eleve where date_creation + interval '10 days' < now()  
+            and statut = 'essai' and nb_jour_inactivite >= 5
+            order by date_creation desc;");
+        $q->execute();
+        
+        while ($data = $q -> fetch(PDO::FETCH_ASSOC)){
+        
+            $refComptes[] = $data['ref_compte'];
+            
+        }
+        
+        prettyPrint($refComptes);
+        
+    }
+    
+    public function unsubInactiveAccounts(){
+        
+        $refComptes = $this->getInactiveAccounts();
+        
+        $accounts = $this->getAll($refComptes);
+        
+        foreach ($accounts as $account){
+            
+            $account->setStatut('desinscrit_essai');
+            $account->setAttente_paiement(true);
+            
+            $this->updateAfterSubsCreated($account);
+            
+            
+            
+            
+            
+        }
+        
     }
 
     public function setDb(PDO $db)
