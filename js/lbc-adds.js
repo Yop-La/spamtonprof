@@ -14,57 +14,29 @@ nbTextesWritted = null;
 nbTextTot = null;
 
 
-// pour adapter les ids des formulaires qui changent entre le localhost et le site en prod
-if(domain == "localhost"){
-	
-	// form lire titre
-	idTitleForm = "55";
-	idSelectTitleForm = "886";
-	
-	// form lire textes
-	idTextForm = "56";
-	idSelectTextForm = "888";
-	
-	// form add cat
-	idAddTextCat = "57";
-	idNomCat = "890";
-	idNbPara = "894";
-	idNbTexte = "895";
-	
-	// form load cat
-	idLoadCat = "58";
-	idNomCatLoaded = "897";
-	
-	idAddText = "59";
-	idAddTextCont = "#nf-form-59-cont";
-	idFirstPara = 900;
-	
-}else{
+// form lire titre
+idTitleForm = "57";
+idSelectTitleForm = "887";
 
-	// form lire titre
-	idTitleForm = "57";
-	idSelectTitleForm = "887";
-	
-	// form lire textes
-	idTextForm = "59";
-	idSelectTextForm = "891";
-	
-	// form add cat
-	idAddTextCat = "60";
-	idNomCat = "893";
-	idNbPara = "894";
-	idNbTexte = "895";
-	
-	// form load cat
-	idLoadCat = "61";
-	idNomCatLoaded = "897";
-	
-	// form add text
-	idAddText = "62";
-	idAddTextCont = "#nf-form-62-cont";
-	idFirstPara = 899;
-	
-}
+// form lire textes
+idTextForm = "59";
+idSelectTextForm = "891";
+
+// form add cat
+idAddTextCat = "60";
+idNomCat = "893";
+idNbPara = "894";
+idNbTexte = "895";
+
+// form load cat
+idLoadCat = "61";
+idNomCatLoaded = "897";
+
+// form add text
+idAddText = "62";
+idAddTextCont = "#nf-form-62-cont";
+idFirstPara = 899;
+
 
 
 var mySubmitController = Marionette.Object.extend( {
@@ -187,14 +159,14 @@ var mySubmitController = Marionette.Object.extend( {
 				showMessage("Le nombre de paragraphes et de textes doit être un entier positive. Veuillez refaire votre saisie");
 				return;
 			}
-			
+
 			console.log(Math.pow(parseInt(nbTexte), parseInt(nbPara)) >= 10000000);
-			
+
 			if( Math.pow(parseInt(nbTexte), parseInt(nbPara)) >= 10000000){
-				
+
 				showMessage("Il y a trop de paragraphes ou de textes. Veuillez en choisir moins");
 				return;				
-				
+
 			}
 
 			$("#loadingSpinner").removeClass("hide");
@@ -280,7 +252,7 @@ var mySubmitController = Marionette.Object.extend( {
 							refTextCat = textCat.ref_texte_cat;
 
 							nbTextTot = textCat.nb_texte;
-							
+
 							$("#nbTexte").text(nbTextTot);
 							$("#nbParagraphe").text(nbPara);
 							$("#nomCat").text(textCat.nom_cat);
@@ -297,9 +269,9 @@ var mySubmitController = Marionette.Object.extend( {
 							loadTextCat();
 							loadBaseTextes();
 							$(idNomCatLoaded).prop(nomCatLoaded, true);
-							
-							
-							
+
+
+
 							showMessage("Vous pouvez maintenant voir, modifier et ajouter des textes à la catégorie choisie");
 
 						}else{
@@ -347,8 +319,8 @@ var mySubmitController = Marionette.Object.extend( {
 			}
 			console.log("paras");
 			console.log(pars);
-			
-			
+
+
 			if( modeEdition == "ajout"){
 
 				ajaxEnCours++;
@@ -377,11 +349,11 @@ var mySubmitController = Marionette.Object.extend( {
 								$("#onglets").removeClass("hide");
 							}
 						});
-				
+
 			}else if( modeEdition == "update"){
-				
+
 				ajaxEnCours++;
-				
+
 				jQuery.post(
 						ajaxurl,
 						{
@@ -407,9 +379,9 @@ var mySubmitController = Marionette.Object.extend( {
 								$("#onglets").removeClass("hide");
 							}
 						});
-				
+
 			}
-			
+
 		}
 
 
@@ -421,28 +393,28 @@ var mySubmitController = Marionette.Object.extend( {
 //début jquery
 jQuery( document ).ready( function( $ ) {
 
-	
+
 	loadTextesCat();
 
 	waitForEl('.generateText', function() {
 		$('.generateText').click(function(){
-			
+
 			if(!nomCatLoaded){
-				
+
 				showMessage("Il faut d'abord choisir une catégorie de textes avant de pouvoir en générer automatiquement." );
 				return;
-				
+
 			}
-			
+
 			if(nbTextTot -nbTextesWritted <= 0){
-				
+
 				$("#loadingSpinner").removeClass("hide");
 				$("#onglets").addClass("hide");
-				
+
 				showMessage("Génération des textes en cours ... " );
-				
+
 				ajaxEnCours++;
-				
+
 				jQuery.post(
 						ajaxurl,
 						{
@@ -450,9 +422,9 @@ jQuery( document ).ready( function( $ ) {
 							'nomCatLoaded' : nomCatLoaded, 
 						})
 						.done(function(textCat){
-							
+
 							loadTextesCat();
-							
+
 							showMessage("100 textes ont générés. Retrouvez les dans l'onglet consultation des textes sous la catégorie ".concat(nomCatLoaded));
 						})
 						.fail(function(err){
@@ -473,7 +445,7 @@ jQuery( document ).ready( function( $ ) {
 			}
 		});
 	});
-	
+
 
 
 	waitForEl('#text-row-template', function() {
@@ -534,7 +506,7 @@ jQuery( document ).ready( function( $ ) {
 
 
 	// chargement des options du formulaire de choix textes à rédiger
-	
+
 	loadTextCat();
 
 	new mySubmitController();
@@ -596,7 +568,7 @@ function loadBaseTextes(){
 		ajaxEnCours++;
 
 		$(textCol).html('');
-		
+
 		jQuery.post(
 				ajaxurl,
 				{
@@ -629,7 +601,7 @@ function loadBaseTextes(){
 						fillTextForm();
 						modeEdition = "update";
 						showMessage("Texte ajouté dans le formulaire de rédaction. Faites vos modifications et soumettez le texte pour enregistrer vos modifications.");
-						
+
 					});
 					$(".copier-texte").click(function(){
 						modeEdition = "ajout";
@@ -645,9 +617,9 @@ function loadBaseTextes(){
 						textRow = $(this).parent().parent();
 						texteId = textRow.attr("id");
 
-						
+
 						ajaxEnCours++;
-						
+
 						jQuery.post(
 								ajaxurl,
 								{
@@ -672,13 +644,13 @@ function loadBaseTextes(){
 										$("#onglets").removeClass("hide");
 									}
 								});
-						
-					
-						
+
+
+
 					});
 
 					fillNbTextToWrite();
-					
+
 				})
 				.fail(function(err){
 					removeLoadingSpinner = false;
@@ -712,7 +684,7 @@ function fillTextForm(){
 
 function fillNbTextToWrite(){
 	waitForEl('#nbTexteRestant', function() {
-		
+
 		ajaxEnCours++;
 		jQuery.post(
 				ajaxurl,
@@ -737,14 +709,14 @@ function fillNbTextToWrite(){
 						$("#onglets").removeClass("hide");
 					}
 				});
-		
-		
+
+
 	});
 }
 
 function loadTextesCat(){
-	
-	
+
+
 	// chargement des options du formulaire des textes
 	waitForEl('#nf-field-'.concat(idSelectTextForm), function() {
 
@@ -782,7 +754,7 @@ function loadTextesCat(){
 				});
 
 	});
-	
-	
+
+
 }
 
