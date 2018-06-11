@@ -65,3 +65,33 @@ require_once (dirname(__FILE__) . '/ajaxFunction/adds_back_office_ajax.php');
 require_once (dirname(__FILE__) . '/ninjaFormHooks/afterSubmission.php');
 
 require_once (dirname(__FILE__) . '/dev-tools.php');
+
+
+/* ------- partie pour rediriger les abonnées vers la home page après connexion ----------- */
+function acme_login_redirect($redirect_to, $request, $user)
+{
+    return (is_array($user->roles) && in_array('administrator', $user->roles)) ? admin_url() : site_url();
+}
+add_filter('login_redirect', 'acme_login_redirect', 10, 3);
+
+// pour enlever la barre d'admin aux non administrateurs
+add_action('after_setup_theme', 'remove_admin_bar');
+
+function remove_admin_bar()
+{
+    if (! current_user_can('administrator') && ! is_admin()) {
+        show_admin_bar(false);
+    }
+}
+
+// pour bloquer l'accès à l'espace admin de wordpress aux non administrateurs
+add_action( 'init', 'blockusers_init' );
+function blockusers_init() {
+    if ( is_admin() && ! current_user_can( 'administrator' ) &&
+        ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+            wp_redirect( home_url() );
+            exit;
+        }
+}
+
+
