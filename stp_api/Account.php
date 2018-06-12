@@ -206,6 +206,7 @@ class Account implements \JsonSerializable
     public function setDate_dernier_statut($date_dernier_statut)
     {
         $this->date_dernier_statut = new \DateTime($date_dernier_statut, new \DateTimeZone("Europe/Paris"));
+
     }
 
     public function jsonSerialize()

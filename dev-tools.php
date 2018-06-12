@@ -99,15 +99,27 @@ function prettyPrint($object)
     exit(0);
 }
 
-function serializeTemp($object, $file = "/tempo/tempoObject")
+function serializeTemp($object, $file = "/tempo/tempoObject", $rel = true)
 {
     $s = serialize($object);
-    file_put_contents(dirname(__FILE__) . $file, $s);
+    if ($rel) {
+        $file = dirname(__FILE__) . $file;
+    }
+    
+    file_put_contents($file, $s);
 }
 
-function unserializeTemp($file = "/tempo/tempoObject")
+function unserializeTemp($file = "/tempo/tempoObject", $rel = true)
 {
-    $file = dirname(__FILE__) . $file;
+    
+    if ($rel) {
+        $file = dirname(__FILE__) . $file;
+    }
+    
+   
+    
+    
+    
     if (file_exists($file)) {
         $s = file_get_contents($file);
         $a = unserialize($s);

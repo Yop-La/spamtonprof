@@ -1,7 +1,7 @@
-<?php
+<?php
 namespace spamtonprof\stp_api;
-
-use PDO;
+use PDO;
+
 
 class PlanPaiementManager
 {
