@@ -1,5 +1,5 @@
 <?php
-require_once (dirname(__FILE__) . '/wp-config.php');
+require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
 $wp->init();
 $wp->parse_request();
 $wp->query_posts();
@@ -35,6 +35,16 @@ $smtpEmailParent = $smtpEmailMg->get(array(
 // set email expediteur
 $smtpServer = $smtpServerMg->get(array("mail" => $smtpServerMg::alexandreAtSpamTonProf));
 $prenomSender = 'Alexandre';
+
+if(!$accounts){
+    
+    echo("pas de comptes à virer");
+    
+}else{
+    
+    echo("des comptes à virer");
+    
+}
 
 foreach ($accounts as $account) {
     
