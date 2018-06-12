@@ -1,5 +1,5 @@
 <?php
-require_once (dirname(__FILE__) . "/wp-config.php");
+require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
 $wp->init();
 $wp->parse_request();
 $wp->query_posts();
@@ -41,15 +41,9 @@ $iFile = dirname(__FILE__) . "\indiceContactPl";
 
 $i = unserializeTemp($iFile, false);
 
-
-
 if ($i == false) {
     $i = 1;
-} else {
-    $i ++;
 }
-
-serializeTemp($i, $iFile, false);
 
 $contacts = $getResponse->getContactsSearchContacts('Zkhg');
 
@@ -63,33 +57,44 @@ if ($i > $nbContacts) {
     $msgs[] = 'il faut arrêter le cron du fichier addToPageLife.php';
 } else {
     
-    $msgs[] = " ajout du contact n° " . $i." à page life";
-    $contact = $contacts[$i-1];
+    $now = new DateTime(null, new \DateTimeZone("Europe/Paris"));
     
+    $hour = $now -> format('G');
+    $random = rand(1,2);
     
+    echo("heure : " .$hour . "<br>");
+    echo("random : " .$random . "<br>");
     
-    $contact = $getResponse -> getContact($contact -> contactId);
-    
-    echo(json_encode($contact));
-    
-    $get['contact_ip'] = $contact->ipAddress;
-    $get['contact_email'] = $contact->email;
-    $get['contact_name'] = $contact->name;
-    
-    $url = "https://us-central1-pali-c323a.cloudfunctions.net/getrespcv/-L6zpT-ZsqyuHk97mw0i/0?" . http_build_query($get);
-    // Get cURL resource
-    $curl = curl_init();
-    // Set some options - we are passing in a useragent too here
-    curl_setopt_array($curl, array(
-        CURLOPT_RETURNTRANSFER => 1,
-        CURLOPT_URL => $url,
-        CURLOPT_USERAGENT => 'Codular Sample cURL Request'
-    ));
-    // Send the request & save response to $resp
-    $resp = curl_exec($curl);
-    // Close request to clear up some resources
-    curl_close($curl);
-    
+    if ( $random == 2 && ( $hour >= 8 || $hour <= 23 )  ) {
+        
+        $msgs[] = " ajout du contact n° " . $i . " à page life";
+        $contact = $contacts[$i - 1];
+        
+        $contact = $getResponse->getContact($contact->contactId);
+        
+        echo (json_encode($contact));
+        
+        $get['contact_ip'] = $contact->ipAddress;
+        $get['contact_email'] = $contact->email;
+        $get['contact_name'] = $contact->name;
+        
+        $url = "https://us-central1-pali-c323a.cloudfunctions.net/getrespcv/-L6zpT-ZsqyuHk97mw0i/0?" . http_build_query($get);
+        // Get cURL resource
+        $curl = curl_init();
+        // Set some options - we are passing in a useragent too here
+        curl_setopt_array($curl, array(
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_URL => $url,
+            CURLOPT_USERAGENT => 'Codular Sample cURL Request'
+        ));
+        // Send the request & save response to $resp
+        $resp = curl_exec($curl);
+        // Close request to clear up some resources
+        curl_close($curl);
+        
+        $i ++;
+        serializeTemp($i, $iFile, false);
+    }
 }
 
 $slack->sendMessages("log", $msgs);
