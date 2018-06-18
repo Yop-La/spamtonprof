@@ -93,6 +93,11 @@ class PageManager
             
             PageManager::lbcAdds();
         }
+        
+        if ($this->pageSlug == 'semaine-decouverte') {
+            
+            PageManager::discoverWeek();
+        }
     }
 
     public static function abonnementApresEssaiLoader()
@@ -135,6 +140,21 @@ class PageManager
             'nf-front-end'
         
         ), time());
+    }
+    
+    public static function discoverWeek()
+    
+    {
+        wp_enqueue_script('discover_week', plugins_url() . '/spamtonprof/js/discover_week.js', array(
+            
+            'nf-front-end'
+            
+        ), time());
+        
+        wp_enqueue_script('jquery_ui_js', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.js');
+        
+        wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
+        
     }
 }
 

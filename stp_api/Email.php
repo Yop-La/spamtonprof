@@ -183,6 +183,11 @@ class Email implements \JsonSerializable
      */
     public function getDate_reception()
     {
+        
+        if(is_null($this->date_reception)){
+            return(new \DateTime());
+        }
+        
         return $this->date_reception;
     }
 
