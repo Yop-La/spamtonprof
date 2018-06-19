@@ -153,6 +153,8 @@ class PageManager
         
         wp_enqueue_script('jquery_ui_js', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.js');
         
+        wp_enqueue_style('popup_css', get_home_url() . '/wp-content/themes/salient-child/css/popup/inscription-essai.css');
+        
         wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
         
     }

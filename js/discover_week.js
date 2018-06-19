@@ -2,11 +2,15 @@
  * script chargé sur la page dont le slug est discover_week
  */
 
-matieres  = null; // contient la matières choisies
+matiere  = "maths-physique"; // contient la matiere affiché (choisie)
+matieres  = "maths-physique".split("-");
 
 //début jquery
 jQuery( document ).ready( function( $ ) {
 
+
+
+	/* pour customiser le select des matières */
 
 	waitForEl('#choix-matieres', function() {
 
@@ -39,24 +43,61 @@ jQuery( document ).ready( function( $ ) {
 
 		waitForEl('.select-box', function() {
 
-			checkUntil('.select-box' , 5);
+			checkUntil('.select-box' , 3);
+
+			$('#select-box1').change(function(){
+
+				var nouvelleMatiere = $('#select-box1	').val();
+
+				if(nouvelleMatiere != matiere){
+
+					$(".".concat(nouvelleMatiere)).removeClass("hide");
+					$(".".concat(matiere)).addClass("hide");
+					matiere = nouvelleMatiere;
+					matieres  = nouvelleMatiere.split("-");
+
+				}
+
+
+
+
+
+
+			});
 
 		});
 
+		waitForEl('.pop-essai', function() {
+
+
+			$('.pop-essai').click(function(){
+
+				PUM.open(18006);
+
+				waitForEl(".toute-matiere", function() {
+					console.log(matieres);
+					$(".toute-matiere").addClass("hide");
+					matieres.forEach(function(element) {
+						$(".".concat(element,"-bilan")).removeClass("hide");
+					});
+
+				});
+				
+			});
+			
+
+
+		});
+
+
+
+
 	});
 
-	function checkUntil(selector, nbShake) {
-		if (nbShake == 0) {
-			return;
-		} else {
-			setTimeout(function() {
-				$(selector).effect( "shake",500);
-				nbShake--;
-				console.log(nbShake);
-				checkUntil(selector, nbShake);
-			}, 5000);
-		}
-	};
+
+	/* fin customiser le select des matières */
+
+
 
 
 
@@ -119,5 +160,16 @@ jQuery( document ).ready( function( $ ) {
 
 });
 
-
+function checkUntil(selector, nbShake) {
+	if (nbShake == 0) {
+		return;
+	} else {
+		setTimeout(function() {
+			$(selector).effect( "shake",500);
+			nbShake--;
+			console.log(nbShake);
+			checkUntil(selector, nbShake);
+		}, 5000);
+	}
+};
 
