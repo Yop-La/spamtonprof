@@ -103,10 +103,7 @@ function ajaxGetTitles()
     
     $titles = $accountManager->getAll($typeTitle);
     
-    $csvName = "titles.csv";
-    
-    saveArrayAsCsv($titles, $csvName);
-    
+
     echo (json_encode(array(
         "titles" => $titles,
         "csvPath" => plugins_url("spamtonprof/tempo/" . $csvName)
@@ -125,11 +122,7 @@ function ajaxGetTextes()
     $texteMg = new \spamtonprof\stp_api\LbcTexteManager();
     
     $textes = $texteMg->getAll($typeTexte);
-    
-    $csvName = "titles.csv";
-    
-    saveArrayAsCsv($textes, $csvName);
-    
+
     echo (json_encode(array(
         "textes" => $textes,
         "csvPath" => plugins_url("spamtonprof/tempo/" . $csvName)

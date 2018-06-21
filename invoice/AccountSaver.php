@@ -20,7 +20,11 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
+$slack = new \spamtonprof\slack\Slack();
+
 $refComptes = $_GET["refComptes"];
+
+
 
 $accountMg = new \spamtonprof\stp_api\AccountManager();
 
@@ -29,3 +33,5 @@ $accounts = $accountMg ->getAll($refComptes);
 $s = serialize($accounts);
 
 file_put_contents('../tempo/invoice/accounts' . $refComptes[0] , $s);
+
+$slack -> sendMessages("invoicing", array(count($accounts) . " comptes viennent d'êtres traités"));

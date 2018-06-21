@@ -20,3 +20,5 @@ wp-content/plugins/hello.php
 tempo/historyId
 tempo/titles.csv
 tempo/
+*.csv
+invoice/invoice/facture-maths-physique-du-5-2018.csv

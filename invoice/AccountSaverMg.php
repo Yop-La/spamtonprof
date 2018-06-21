@@ -32,6 +32,10 @@ $refComptes = $accountMg->getAllRefCompte(array(
     "inscrit"
 ), null, true, false);
 
+$slack = new \spamtonprof\slack\Slack();
+
+$slack -> sendMessages("invoicing", array(count($refComptes) . " a traiter ..."));
+
 $arraysRefComptes = array_chunk ($refComptes, 50);
 
 $url = plugins_url("spamtonprof/invoice/AccountSaver.php");
@@ -40,12 +44,10 @@ echo($url."<br>");
 
 foreach ($arraysRefComptes as $arrayRefComptes){
     
-    call($url,"GET",array("refComptes" => $arrayRefComptes),true);
+    $ret = call($url,"GET",array("refComptes" => $arrayRefComptes),true);
     
     print_r($arrayRefComptes);
     
     echo("<br><br>");
-    
-    
     
 }

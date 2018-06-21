@@ -88,18 +88,21 @@ class FactureManager
      */
     public function generateInvoicesCsv()
     {
+        $slack = new \spamtonprof\slack\Slack();
         
         $accounts = array();
         $files = glob('../tempo/invoice/*');
         foreach($files as $file){
             if(is_file($file))
                 $s = file_get_contents($file);
-            
+                
                 $accountsPart = unserialize($s);
                 $accounts = array_merge($accounts,$accountsPart);
                 
         
         }
+        
+        $slack->sendMessages("invoicing", array("nb accounts : " . count($accounts)));
         
         $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
         
@@ -133,10 +136,12 @@ class FactureManager
         
         $csvNameMathsPhysique = "facture-maths-physique-du-$currentMonth-$currentYear.csv";
         $csvNameFrancais = "facture-francais-du$currentMonth-$currentYear.csv";
-        
         foreach ($accounts as $account) {
             
             if ($account->attente_paiement() && ! $account->getTest_account() && ! $account->getLong_pay_plan()) {
+                
+                
+                
                 array_push($row, $account->statut());
                 array_push($row, $account->ref_compte());
                 array_push($row, "Mme/Mr " . $account->proche()->nom());
@@ -149,6 +154,7 @@ class FactureManager
                 array_push($row, $account->tarif());
                 
                 if ($account->maths() || $account->physique()) {
+                    
                     array_push($csvTableMathsPhysique, $row);
                 }
                 
@@ -160,16 +166,15 @@ class FactureManager
             }
         }
         
-        saveArrayAsCsv($csvTableMathsPhysique, "../tempo/invoice/" . $csvNameMathsPhysique);
-        saveArrayAsCsv($csvTableFrancais, "../tempo/invoice/" . $csvNameFrancais);
+        $csvPathMathsPhysique = dirname(dirname(__FILE__)) . "/tempo/invoice/" . $csvNameMathsPhysique;
+        $csvPathFrancais = dirname(dirname(__FILE__)) . "/tempo/invoice/" . $csvNameFrancais;
         
-        $slack = new \spamtonprof\slack\Slack();
+        saveArrayAsCsv($csvTableMathsPhysique, $csvPathMathsPhysique);
+        saveArrayAsCsv($csvTableFrancais, $csvPathFrancais);
         
-        $url1 = plugins_url("spamtonprof/tempo/invoice/" . $csvNameMathsPhysique);
-        $url2 = plugins_url("spamtonprof/tempo/invoice/" . $csvNameFrancais);
-        
-        echo ("chemin 1 : " . $url1 . "<br>");
-        echo ("chemin 2 : " . $url2);
+      
+        $url1 = plugins_url("spamtonprof/tempo/invoice/" . $csvNameMathsPhysique) . "?t=" . rand (0,1000);
+        $url2 = plugins_url("spamtonprof/tempo/invoice/" . $csvNameFrancais ) . "?t=" . rand (0,1000);
         
         $msgs = [
             $url1,

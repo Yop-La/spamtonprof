@@ -153,11 +153,9 @@ function prettyPrintArray(array $arr)
     exit(0);
 }
 
-function saveArrayAsCsv($array, $filename = "export.csv", $delimiter = ";")
+function saveArrayAsCsv($array, $filename , $delimiter = ";")
 {
-    // open raw memory as file so no temp files needed, you might run out of memory though
-    $filename = dirname(__FILE__) . "/tempo/" . $filename;
-    
+
     $f = fopen($filename, 'w');
     
     // loop over the input array
@@ -181,6 +179,7 @@ function call($url, $http_method = 'GET', $params = array(), $async = null)
 {
     if ($http_method == 'GET') {
         $url = $url . "?" . http_build_query($params);
+
     }
     
     $params = json_encode($params);
