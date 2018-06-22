@@ -56,14 +56,20 @@ require_once (dirname(dirname(dirname(dirname(__FILE__)))) . '/getresponse/GetRe
 
 require_once (dirname(__FILE__) . '/slack/Slack.php'); // pour communiquer avec slack
 
+require_once (dirname(__FILE__) . '/dev-tools.php');
+
+/* require tous les fichiers contenant des fonctions ajax */
+
 require_once (dirname(__FILE__) . '/ajaxFunction/page-paiement-ajax.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/page-inscription-essai_eleve-ajax.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/adds_back_office_ajax.php');
 
+require_once (dirname(__FILE__) . '/ajaxFunction/discover_week_ajax.php');
+
 require_once (dirname(__FILE__) . '/ninjaFormHooks/afterSubmission.php');
 
-require_once (dirname(__FILE__) . '/dev-tools.php');
+
 
 

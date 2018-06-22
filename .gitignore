@@ -17,8 +17,11 @@ wp-content/plugins/hello.php
 /sitemap.xml
 /sitemap.xml.gz
 
-tempo/historyId
-tempo/titles.csv
-tempo/
+tempo/invoice/*
+!tempo/invoice/init
+tempo/*
+!tempo/invoice
+
+
+
 *.csv
-invoice/invoice/facture-maths-physique-du-5-2018.csv

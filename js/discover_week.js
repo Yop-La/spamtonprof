@@ -69,16 +69,13 @@ var mySubmitController = Marionette.Object.extend( {
 
 		// titles form
 		if(response.data.form_id == idFormEssai){
-			$("#fountainTextG").removeClass("hide");
-			$(idFormContentEssai).addClass("hide");
+			$("#loadingSpinner").removeClass("hide");
+			$(".hide_loading").addClass("hide");
+			PUM.close(18006);
 
 
-			prenomEleve = response.data.fields[idPrenomEleve].value;
-			nomEleve = response.data.fields[idNomEleve].value;
-			emailEleve = response.data.fields[idEmailEleve].value;
-			phoneEleve = response.data.fields[idPhoneEleve].value;
-			profil = response.data.fields[idProfil].value;
-			classe = response.data.fields[idClasse].value;
+			
+			
 			prenomEleve = response.data.fields[idPrenomEleve].value;
 			nomEleve = response.data.fields[idNomEleve].value;
 			emailEleve = response.data.fields[idEmailEleve].value;
@@ -101,55 +98,59 @@ var mySubmitController = Marionette.Object.extend( {
 			phoneProche = response.data.fields[idPhoneProche].value;
 			remarque = response.data.fields[idRemarque].value;
 			code = response.data.fields[idCode].value;
-
-
 			mathsCoche = response.data.fields[idMathsCoche].value;
 			physiqueCoche = response.data.fields[idPhysiqueCoche].value;
 			frenchCoche = response.data.fields[idFrenchCoche].value;
 
-			
-
-
-//			ajaxEnCours++;
-//			jQuery.post(
-//					ajaxurl,
-//					{
-//						'action' : 'ajaxGetTitles',
-//						'typeTitle' : typeTitle 
-//					})
-//					.done(function(titles){ 
-//						console.log("okay");
-//
-//						$('#csvTitles').empty();
-//						$('#csvTitles').append('<a href="' .concat(titles.csvPath,'">Download as csv</a>'));
-//
-//						$("#titleTable tr").remove();
-//
-//						$.each(titles.titles, function (i, item) {
-//
-//
-//							var table = document.getElementById("titleTable");
-//							var row = table.insertRow(0);
-//							var cell1 = row.insertCell(0);
-//							cell1.innerHTML = item.titre;
-//
-//
-//
-//						});
-//
-//					})
-//					.fail(function(err){
-//						console.log("erreur ajax");
-//						console.log(err);
-//						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
-//					})
-//					.always(function() {
-//						ajaxEnCours--;
-//						if(ajaxEnCours == 0){
-//							$("#fountainTextG").addClass("hide");
-//							$("idFormContentEssai").removeClass("hide");
-//						}
-//					});
+			ajaxEnCours++;
+			jQuery.post(
+					ajaxurl,
+					{
+						'action' : 'ajaxAfterSubmissionEssai',
+						'prenomEleve' : prenomEleve,
+						'nomEleve' : nomEleve,
+						'emailEleve' : emailEleve,
+						'phoneEleve' : phoneEleve,
+						'profil' : profil,
+						'classe' : classe,
+						'chapterMaths' : chapterMaths,
+						'lacuneMaths' : lacuneMaths,
+						'noteMaths' : noteMaths,
+						'chapterPhysique' : chapterPhysique,
+						'lacunePhysique' : lacunePhysique,
+						'notePhysique' : notePhysique,
+						'chapterFrench' : chapterFrench,
+						'lacuneFrench' : lacuneFrench,
+						'noteFrench' : noteFrench,
+						'proche' : proche,
+						'prenomProche' : prenomProche,
+						'nomProche' : nomProche,
+						'mailProche' : mailProche,
+						'phoneProche' : phoneProche,
+						'remarque' : remarque,
+						'code' : code,
+						'mathsCoche' : mathsCoche,
+						'physiqueCoche' : physiqueCoche,
+						'frenchCoche' : frenchCoche
+					})
+					.done(function(retour){ 
+						console.log(retour);
+						showMessage("Inscription bien validée ! Voulez vous en faire une autre ?");
+					})
+					.fail(function(err){
+						ajaxEnCours--;
+						console.log("erreur ajax");
+						console.log(err);
+						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
+					})
+					.always(function() {
+						ajaxEnCours--;
+						if(ajaxEnCours == 0){
+							$("#loadingSpinner").addClass("hide");
+							$(".hide_loading").removeClass("hide");
+						}
+						
+					});
 
 		}
 
