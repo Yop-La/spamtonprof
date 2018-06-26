@@ -98,6 +98,12 @@ class PageManager
             
             PageManager::discoverWeek();
         }
+        
+        if ($this->pageSlug == 'reset-password') {
+            
+            PageManager::passwordReset();
+        }
+        
     }
 
     public static function abonnementApresEssaiLoader()
@@ -153,7 +159,25 @@ class PageManager
         
         wp_enqueue_script('jquery_ui_js', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.js');
         
-        wp_enqueue_style('popup_css', get_home_url() . '/wp-content/themes/salient-child/css/popup/inscription-essai.css');
+//         wp_enqueue_style('popup_css', get_home_url() . '/wp-content/themes/salient-child/css/popup/inscription-essai.css');
+        
+        wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
+        
+    }
+    
+    
+    public static function passwordReset()
+    
+    {
+        wp_enqueue_script('discover_week', plugins_url() . '/spamtonprof/js/password_reset.js', array(
+            
+            'nf-front-end'
+            
+        ), time());
+        
+        wp_enqueue_script('jquery_ui_js', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.js');
+        
+//         wp_enqueue_style('popup_css', get_home_url() . '/wp-content/themes/salient-child/css/popup/inscription-essai.css');
         
         wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
         

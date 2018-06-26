@@ -1,23 +1,16 @@
 <?php
 namespace spamtonprof\stp_api;
 
-use Exception;
-
-/**
- *
- * @author alexg
- *         
- */
 class StpPlan implements \JsonSerializable
 {
 
     protected $ref_plan, $nom, $tarif, $ref_formule, $ref_plan_stripe, $ref_plan_paypal, $ref_plan_stripe_test, $ref_plan_paypal_test, $ref_plan_old;
 
     public function __construct(array $donnees = array())
-
-{
-    $this->hydrate($donnees);
-}
+    
+    {
+        $this->hydrate($donnees);
+    }
 
     public function hydrate(array $donnees)
     
@@ -32,9 +25,9 @@ class StpPlan implements \JsonSerializable
             }
         }
     }
-    
-    
-      /**
+
+    /**
+     *
      * @return mixed
      */
     public function getRef_plan()
@@ -43,6 +36,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getNom()
@@ -51,6 +45,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getTarif()
@@ -59,6 +54,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getRef_formule()
@@ -67,6 +63,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getRef_plan_stripe()
@@ -75,6 +72,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getRef_plan_paypal()
@@ -83,6 +81,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getRef_plan_stripe_test()
@@ -91,6 +90,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getRef_plan_paypal_test()
@@ -99,6 +99,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $ref_plan
      */
     public function setRef_plan($ref_plan)
@@ -107,6 +108,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $nom
      */
     public function setNom($nom)
@@ -115,6 +117,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $tarif
      */
     public function setTarif($tarif)
@@ -123,6 +126,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $ref_formule
      */
     public function setRef_formule($ref_formule)
@@ -131,6 +135,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $ref_plan_stripe
      */
     public function setRef_plan_stripe($ref_plan_stripe)
@@ -139,6 +144,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $ref_plan_paypal
      */
     public function setRef_plan_paypal($ref_plan_paypal)
@@ -147,6 +153,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $ref_plan_stripe_test
      */
     public function setRef_plan_stripe_test($ref_plan_stripe_test)
@@ -155,6 +162,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $ref_plan_paypal_test
      */
     public function setRef_plan_paypal_test($ref_plan_paypal_test)
@@ -163,6 +171,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getRef_plan_old()
@@ -171,6 +180,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $ref_plan_old
      */
     public function setRef_plan_old($ref_plan_old)
@@ -184,7 +194,5 @@ class StpPlan implements \JsonSerializable
         
         return $vars;
     }
-
-  
 }
 

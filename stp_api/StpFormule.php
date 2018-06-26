@@ -1,23 +1,16 @@
 <?php
 namespace spamtonprof\stp_api;
 
-use Exception;
-
-/**
- *
- * @author alexg
- *         
- */
 class StpFormule implements \JsonSerializable
 {
 
-    protected $formule,  $ref_formule;
+    protected $formule, $ref_formule;
 
     public function __construct(array $donnees = array())
-
-{
-    $this->hydrate($donnees);
-}
+    
+    {
+        $this->hydrate($donnees);
+    }
 
     public function hydrate(array $donnees)
     
@@ -32,10 +25,9 @@ class StpFormule implements \JsonSerializable
             }
         }
     }
-    
-    
-    
-      /**
+
+    /**
+     *
      * @return mixed
      */
     public function getFormule()
@@ -44,6 +36,7 @@ class StpFormule implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $formule
      */
     public function setFormule($formule)
@@ -57,7 +50,9 @@ class StpFormule implements \JsonSerializable
         
         return $vars;
     }
+
     /**
+     *
      * @return mixed
      */
     public function getRef_formule()
@@ -66,16 +61,12 @@ class StpFormule implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $ref_formule
      */
     public function setRef_formule($ref_formule)
     {
         $this->ref_formule = $ref_formule;
     }
-
-    
-    
-
-  
 }
 

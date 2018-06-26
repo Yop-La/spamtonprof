@@ -17,14 +17,11 @@ idNomEleve = "916";
 idEmailEleve = "918";
 idPhoneEleve = "919";
 idProfil = "948";
-idClasse = "949";
+idClasse1 = "949";
+idClasse2 = "917";
+idClasse3 = "950";
+idClasse4 = "951";
 
-idPrenomEleve = "915";
-idNomEleve = "916";
-idEmailEleve = "918";
-idPhoneEleve = "919";
-idProfil = "948";
-idClasse = "949";
 
 idChapterMaths = "920";
 idLacuneMaths = "921";
@@ -81,7 +78,10 @@ var mySubmitController = Marionette.Object.extend( {
 			emailEleve = response.data.fields[idEmailEleve].value;
 			phoneEleve = response.data.fields[idPhoneEleve].value;
 			profil = response.data.fields[idProfil].value;
-			classe = response.data.fields[idClasse].value;
+			classe1 = response.data.fields[idClasse1].value;
+			classe2 = response.data.fields[idClasse2].value;
+			classe3 = response.data.fields[idClasse3].value;
+			classe4 = response.data.fields[idClasse4].value;
 			chapterMaths = response.data.fields[idChapterMaths].value;
 			lacuneMaths = response.data.fields[idLacuneMaths].value;
 			noteMaths = response.data.fields[idNoteMaths].value;
@@ -112,7 +112,10 @@ var mySubmitController = Marionette.Object.extend( {
 						'emailEleve' : emailEleve,
 						'phoneEleve' : phoneEleve,
 						'profil' : profil,
-						'classe' : classe,
+						'classe1' : classe1,
+						'classe2' : classe2,
+						'classe3' : classe3,
+						'classe4' : classe4,
 						'chapterMaths' : chapterMaths,
 						'lacuneMaths' : lacuneMaths,
 						'noteMaths' : noteMaths,
