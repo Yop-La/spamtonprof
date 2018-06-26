@@ -68,6 +68,8 @@ class PageManager
     {
         wp_enqueue_script('functions_js', plugins_url() . '/spamtonprof/js/functions.js');
         
+        wp_enqueue_script('log_out_js', plugins_url() . '/spamtonprof/js/log_out.js');
+        
         wp_localize_script('functions_js', 'homeUrl', get_home_url());
         
         wp_localize_script('functions_js', 'ajaxurl', admin_url('admin-ajax.php'));
