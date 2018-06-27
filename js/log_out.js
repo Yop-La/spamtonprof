@@ -6,22 +6,24 @@
 //début jquery
 jQuery( document ).ready( function( $ ) {
 
-	waitForEl('#deco-button', function() {
-		$('#deco-button').click(function(){
+	waitForEl('.deco-button', function() {
+		console.log('deco button exist');
+		$('.deco-button').click(function(){
 
 				jQuery.post(
 						ajaxurl,
 						{
 							'action' : 'ajaxLogOut',
 						})
-						.done(function(textCat){
-
-							redirect(currentSlug, "Vous êtes bien déconnecté, à bientôt sur SpamTonProf ! ");
+						.done(function(data){
+							console.log('done');
+							console.log(data);
+							redirect('', "Vous êtes bien déconnecté, à bientôt sur SpamTonProf ! ");
 							
 						})
 						.fail(function(err){
-
-							redirect(currentSlug, "Vous êtes bien déconnecté, à bientôt sur SpamTonProf ! ");
+							console.log(fail);
+							redirect('', "Impossible de vous déconnecter. Veuillez réessayer et contacter l'équipe si le problème persiste");
 							return;
 						});
 		

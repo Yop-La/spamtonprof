@@ -68,7 +68,7 @@ require_once (dirname(__FILE__) . '/ajaxFunction/adds_back_office_ajax.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/discover_week_ajax.php');
 
-require_once (dirname(__FILE__) . '/ajaxFunction/all_pages_ajax.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/log_in_and_out.php');
 
 require_once (dirname(__FILE__) . '/ninjaFormHooks/afterSubmission.php');
 

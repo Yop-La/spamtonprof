@@ -41,11 +41,11 @@ class PageManager
         
         $this->domain = $host_split[0];
         
-        $this->handleTestMode();
+        $this->loadSessionVariable();
         
     }
 
-    public function handleTestMode()
+    public function loadSessionVariable()
     
     {
         $TestModeManager = new \spamtonprof\stp_api\TestModeManager($this->pageSlug);
@@ -54,9 +54,15 @@ class PageManager
         
         $TestModeManager->initDebuger();
         
+        $isLogged = is_user_logged_in();
+        
         $testMode = $testMode ? 'true' : 'false';
         
+        $isLogged = $isLogged ? 'true' : 'false';
+        
         wp_localize_script('functions_js', 'testMode', $testMode);
+        
+        wp_localize_script('functions_js', 'isLogged', $isLogged);
         
         wp_localize_script('functions_js', 'domain', $this->domain);
         
@@ -104,6 +110,11 @@ class PageManager
         if ($this->pageSlug == 'reset-password') {
             
             PageManager::passwordReset();
+        }
+        
+        if ($this->pageSlug == 'connexion') {
+            
+            PageManager::logIn();
         }
         
     }
@@ -171,7 +182,7 @@ class PageManager
     public static function passwordReset()
     
     {
-        wp_enqueue_script('discover_week', plugins_url() . '/spamtonprof/js/password_reset.js', array(
+        wp_enqueue_script('password_reset', plugins_url() . '/spamtonprof/js/password_reset.js', array(
             
             'nf-front-end'
             
@@ -180,6 +191,23 @@ class PageManager
         wp_enqueue_script('jquery_ui_js', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.js');
         
 //         wp_enqueue_style('popup_css', get_home_url() . '/wp-content/themes/salient-child/css/popup/inscription-essai.css');
+        
+        wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
+        
+    }
+    
+    public static function logIn()
+    
+    {
+        wp_enqueue_script('log_in', plugins_url() . '/spamtonprof/js/log_in.js', array(
+            
+            'nf-front-end'
+            
+        ), time());
+        
+        wp_enqueue_script('jquery_ui_js', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.js');
+        
+        //         wp_enqueue_style('popup_css', get_home_url() . '/wp-content/themes/salient-child/css/popup/inscription-essai.css');
         
         wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
         

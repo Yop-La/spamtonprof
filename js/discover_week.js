@@ -141,7 +141,6 @@ var mySubmitController = Marionette.Object.extend( {
 						showMessage("Inscription bien validée ! Voulez vous en faire une autre ?");
 					})
 					.fail(function(err){
-						ajaxEnCours--;
 						console.log("erreur ajax");
 						console.log(err);
 						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
