@@ -1,50 +1,47 @@
 <?php
 
-
-
 /*
-
  *
-
+ *
+ *
  * Plugin Name: spamtonprof
-
  *
-
+ *
+ *
  * Plugin URI: http://spamtonprof.com
-
  *
-
+ *
+ *
  * GitHub Plugin URI: https://github.com/Yop-La/spamtonprof
-
  *
-
+ *
+ *
  * Description: Un plugin pour intégrer l'api de spamtonprof
-
  *
-
+ *
+ *
  * Version: 1.1.5.3.8
-
  *
-
+ *
+ *
  * Author: yopla
-
  *
-
+ *
+ *
  * Author URI: http://spamtonprof.com
-
  *
-
+ *
+ *
  * License: GPL2
-
  *
-
+ *
+ *
  */
-
 require_once (dirname(__FILE__) . '/inc/autoloader_stp.php'); // autoloader des classes stp
 
-require_once (dirname(__FILE__) . '/inc/autoloader_getresponse.php'); // autoloader les custom classes de getresponse 
+require_once (dirname(__FILE__) . '/inc/autoloader_getresponse.php'); // autoloader les custom classes de getresponse
 
-require_once (dirname(__FILE__) . '/inc/autoloader_gmail.php'); // autoloader les custom classes de getresponse 
+require_once (dirname(__FILE__) . '/inc/autoloader_gmail.php'); // autoloader les custom classes de getresponse
 
 require_once (dirname(__FILE__) . '/inc/autoloader_cnl.php'); // autoloader les custom classes de cnl
 
@@ -70,8 +67,8 @@ require_once (dirname(__FILE__) . '/ajaxFunction/discover_week_ajax.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/log_in_and_out.php');
 
+require_once (dirname(__FILE__) . '/ajaxFunction/inscription_prof_ajax.php');
+
 require_once (dirname(__FILE__) . '/ninjaFormHooks/afterSubmission.php');
-
-
 
 

@@ -14,6 +14,7 @@ idFormLogIn = "65";
 idUsername = "956";
 idPassword = "957";
 ajaxEnCours = 0;
+wpUser = null;
 var mySubmitController = Marionette.Object.extend( {
 
 	initialize: function() {
@@ -49,14 +50,24 @@ var mySubmitController = Marionette.Object.extend( {
 						'username' : username
 
 					})
-					.done(function(canLog){ 
-						console.log(canLog);
-						if(canLog){
+					.done(function(user){ 
+
+						if(user){
 							$('#nf-field-'.concat(idUsername)).val('');
 							$('#nf-field-'.concat(idPassword)).val('');
-							redirect('dashboard-eleve', "Bienvenue sur SpamTonProf ! ");
+							wpUser = user;
+							if('client' in wpUser.caps){
+								redirect('dashboard-eleve', "Bienvenue sur SpamTonProf ! ");	
+							}else if('prof' in wpUser.caps){
+								redirect('dashboard-prof', "Bienvenue sur SpamTonProf ! ");	
+							}else{
+								redirect('', "Bienvenue sur SpamTonProf ! ");	
+							}
+							
 						}else{
 							showMessage("L'adresse mail ou le mot passe est incorrect");
+							$("#loadingSpinner").addClass("hide");
+							$(".hide_loading").removeClass("hide");
 						}
 					})
 					.fail(function(err){

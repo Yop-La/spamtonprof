@@ -26,6 +26,10 @@ function ajaxLogOut()
 function ajaxCheckLogIn()
 
 {
+    
+    $retour = "ok";
+    $user;
+    
     header('Content-type: application/json');
     
     $canLog = false;
@@ -41,14 +45,20 @@ function ajaxCheckLogIn()
     
     if ($canLog) {
         
-        wp_signon(array(
+        $user = wp_signon(array(
             'user_login' => $username,
             'user_password' => $password,
             'remember' => true
         ));
     }
     
-    echo (json_encode($canLog));
+    if($canLog){
+        $retour = $user;
+    }else{
+        $retour = false;
+    }
+    
+    echo (json_encode($retour));
     
     die();
 }

@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class stpProf implements \JsonSerializable
 {
 
-    protected $email, $prenom, $nom, $telephone, $ref_prof;
+    protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $id_paper, $user_id_wp, $onboarding;
 
     public function __construct(array $donnees = array())
     {
@@ -21,14 +21,14 @@ class stpProf implements \JsonSerializable
         }
     }
 
-    public function getEmail()
+    public function getEmail_perso()
     {
-        return $this->email;
+        return $this->email_perso;
     }
 
-    public function setEmail($email)
+    public function setEmail_perso($email_perso)
     {
-        $this->email = $email;
+        $this->email_perso = $email_perso;
     }
 
     public function getPrenom()
@@ -71,9 +71,127 @@ class stpProf implements \JsonSerializable
         $this->ref_prof = $ref_prof;
     }
 
+    public function getEmail_stp()
+    {
+        return $this->email_stp;
+    }
+
+    public function setEmail_stp($email_stp)
+    {
+        $this->email_stp = $email_stp;
+    }
+
+    public function getCode_postal()
+    {
+        return $this->code_postal;
+    }
+
+    public function setCode_postal($code_postal)
+    {
+        $this->code_postal = $code_postal;
+    }
+
+    public function getVille()
+    {
+        return $this->ville;
+    }
+
+    public function setVille($ville)
+    {
+        $this->ville = $ville;
+    }
+
+    public function getPays()
+    {
+        return $this->pays;
+    }
+
+    public function setPays($pays)
+    {
+        $this->pays = $pays;
+    }
+
+    public function getAdresse()
+    {
+        return $this->adresse;
+    }
+
+    public function setAdresse($adresse)
+    {
+        $this->adresse = $adresse;
+    }
+
+    public function getDate_naissance()
+    {
+        return $this->date_naissance;
+    }
+
+    public function setDate_naissance($date_naissance)
+    {
+        $this->date_naissance = $date_naissance;
+    }
+
+    public function getStripe_id()
+    {
+        return $this->stripe_id;
+    }
+
+    public function setStripe_id($stripe_id)
+    {
+        $this->stripe_id = $stripe_id;
+    }
+
+    public function getId_paper()
+    {
+        return $this->id_paper;
+    }
+
+    public function setId_paper($id_paper)
+    {
+        $this->id_paper = $id_paper;
+    }
+
     public function jsonSerialize()
     {
         $vars = get_object_vars($this);
         return $vars;
     }
+    /**
+     * @return mixed
+     */
+    public function getUser_id_wp()
+    {
+        return $this->user_id_wp;
+    }
+
+    /**
+     * @param mixed $user_id_wp
+     */
+    public function setUser_id_wp($user_id_wp)
+    {
+        $this->user_id_wp = $user_id_wp;
+    }
+    /**
+     * @return mixed
+     */
+    public function getOnboarding()
+    {
+        return $this->onboarding;
+    }
+
+    /**
+     * @param mixed $onboarding
+     */
+    public function setOnboarding($onboarding)
+    {
+        $this->onboarding = $onboarding;
+    }
+
+    
+    
+
+    
+    
+    
+    
 }

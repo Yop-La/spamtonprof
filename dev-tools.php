@@ -211,14 +211,14 @@ function base64url_decode($base64url)
     return ($plainText);
 }
 
-/*
- * pour générer des classes et des managers
- * example :
- * $tableName = 'stp_eleve';
- * $path = dirname(__FILE__) . "/wp-content/plugins/spamtonprof/stp_api";
- * $nameSpace = 'spamtonprof\stp_api';
- * generateClassAndManager($tableName, $path, $nameSpace);
- */
+
+//   pour générer des classes et des managers
+//   example :
+//   $tableName = 'stp_eleve';
+//   $path = dirname(__FILE__) . "/wp-content/plugins/spamtonprof/stp_api";
+//   $nameSpace = 'spamtonprof\stp_api';
+//   generateClassAndManager($tableName, $path, $nameSpace);
+ 
 function generateClassAndManager($tableName, $path, $nameSpace)
 {
     $classeNameParts = explode('_', $tableName);

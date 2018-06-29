@@ -42,37 +42,60 @@ class PageManager
         $this->domain = $host_split[0];
         
         $this->loadSessionVariable();
-        
     }
 
     public function loadSessionVariable()
     
     {
+        /* pour le mode test et le mode prod */
         $TestModeManager = new \spamtonprof\stp_api\TestModeManager($this->pageSlug);
-        
         $testMode = $TestModeManager->testMode();
-        
         $TestModeManager->initDebuger();
-        
-        $isLogged = is_user_logged_in();
-        
         $testMode = $testMode ? 'true' : 'false';
-        
-        $isLogged = $isLogged ? 'true' : 'false';
-        
         wp_localize_script('functions_js', 'testMode', $testMode);
+        wp_localize_script('functions_js', 'publicStripeKey', $TestModeManager->getPublicStripeKey());
         
+        /* pour savoir si le user est loggé */
+        $isLogged = is_user_logged_in();
+        $isLogged = $isLogged ? 'true' : 'false';
         wp_localize_script('functions_js', 'isLogged', $isLogged);
         
-        wp_localize_script('functions_js', 'domain', $this->domain);
+        /* gérer les redirections */
+        $redirection = $this->getRedirections();
+        wp_localize_script('functions_js', 'redirection', $redirection);
         
-        wp_localize_script('functions_js', 'publicStripeKey', $TestModeManager->getPublicStripeKey());
+        /* avoir le domain */
+        wp_localize_script('functions_js', 'domain', $this->domain);
+    }
+    
+    public function getRedirections(){
+        
+        $current_user = wp_get_current_user();
+
+        $redirection = [];
+     
+        if (current_user_can('prof') && ! is_page('onboarding-prof') && is_user_logged_in()) {
+            
+            $profMg = new \spamtonprof\stp_api\stpProfManager();
+            
+            $prof = $profMg->get(array(
+                'user_id_wp' => $current_user->ID
+            ));
+            
+            if (! $prof->getOnboarding()) {
+                $redirection['slug'] = 'onboarding-prof';
+                $redirection['message'] = utf8_encode("Terminez l 'inscription pour donner des cours ! ");
+            }
+        }
+        return($redirection);
+        
     }
 
     public function loadScripts()
-    
     {
         wp_enqueue_script('functions_js', plugins_url() . '/spamtonprof/js/functions.js');
+        
+        wp_enqueue_script('redirection_js', plugins_url() . '/spamtonprof/js/redirection.js');
         
         wp_enqueue_script('log_out_js', plugins_url() . '/spamtonprof/js/log_out.js');
         
@@ -117,6 +140,10 @@ class PageManager
             PageManager::logIn();
         }
         
+        if ($this->pageSlug == 'inscription-prof') {
+            
+            PageManager::inscriptionProf();
+        }
     }
 
     public static function abonnementApresEssaiLoader()
@@ -160,57 +187,67 @@ class PageManager
         
         ), time());
     }
-    
+
     public static function discoverWeek()
     
     {
         wp_enqueue_script('discover_week', plugins_url() . '/spamtonprof/js/discover_week.js', array(
             
             'nf-front-end'
-            
+        
         ), time());
         
         wp_enqueue_script('jquery_ui_js', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.js');
         
-//         wp_enqueue_style('popup_css', get_home_url() . '/wp-content/themes/salient-child/css/popup/inscription-essai.css');
-        
         wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
-        
     }
-    
-    
+
     public static function passwordReset()
     
     {
         wp_enqueue_script('password_reset', plugins_url() . '/spamtonprof/js/password_reset.js', array(
             
             'nf-front-end'
-            
+        
         ), time());
         
         wp_enqueue_script('jquery_ui_js', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.js');
         
-//         wp_enqueue_style('popup_css', get_home_url() . '/wp-content/themes/salient-child/css/popup/inscription-essai.css');
+        // wp_enqueue_style('popup_css', get_home_url() . '/wp-content/themes/salient-child/css/popup/inscription-essai.css');
         
         wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
-        
     }
-    
+
     public static function logIn()
     
     {
         wp_enqueue_script('log_in', plugins_url() . '/spamtonprof/js/log_in.js', array(
             
             'nf-front-end'
-            
+        
         ), time());
         
         wp_enqueue_script('jquery_ui_js', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.js');
         
-        //         wp_enqueue_style('popup_css', get_home_url() . '/wp-content/themes/salient-child/css/popup/inscription-essai.css');
+        // wp_enqueue_style('popup_css', get_home_url() . '/wp-content/themes/salient-child/css/popup/inscription-essai.css');
         
         wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
+    }
+
+    public static function inscriptionProf()
+    
+    {
+        wp_enqueue_script('discover_week', plugins_url() . '/spamtonprof/js/inscription-prof.js', array(
+            
+            'nf-front-end'
         
+        ), time());
+        
+        wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
+        
+        wp_enqueue_script('jquery_ui_js', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.js');
+        
+        wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
     }
 }
 
