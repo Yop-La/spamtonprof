@@ -15,17 +15,35 @@
  * the License.
  */
 
-class Google_Service_ServiceUsage_BatchEnableServicesRequest extends Google_Collection
+class Google_Service_IAMCredentials_GenerateAccessTokenRequest extends Google_Collection
 {
-  protected $collection_key = 'serviceIds';
-  public $serviceIds;
+  protected $collection_key = 'scope';
+  public $delegates;
+  public $lifetime;
+  public $scope;
 
-  public function setServiceIds($serviceIds)
+  public function setDelegates($delegates)
   {
-    $this->serviceIds = $serviceIds;
+    $this->delegates = $delegates;
   }
-  public function getServiceIds()
+  public function getDelegates()
   {
-    return $this->serviceIds;
+    return $this->delegates;
+  }
+  public function setLifetime($lifetime)
+  {
+    $this->lifetime = $lifetime;
+  }
+  public function getLifetime()
+  {
+    return $this->lifetime;
+  }
+  public function setScope($scope)
+  {
+    $this->scope = $scope;
+  }
+  public function getScope()
+  {
+    return $this->scope;
   }
 }

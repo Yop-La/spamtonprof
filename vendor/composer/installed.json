@@ -49,17 +49,17 @@
     },
     {
         "name": "google/apiclient",
-        "version": "v2.2.1",
-        "version_normalized": "2.2.1.0",
+        "version": "v2.2.2",
+        "version_normalized": "2.2.2.0",
         "source": {
             "type": "git",
             "url": "https://github.com/google/google-api-php-client.git",
-            "reference": "b69b8ac4bf6501793c389d4e013a79d09c85c5f2"
+            "reference": "4e0fd83510e579043e10e565528b323b7c2b3c81"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/google/google-api-php-client/zipball/b69b8ac4bf6501793c389d4e013a79d09c85c5f2",
-            "reference": "b69b8ac4bf6501793c389d4e013a79d09c85c5f2",
+            "url": "https://api.github.com/repos/google/google-api-php-client/zipball/4e0fd83510e579043e10e565528b323b7c2b3c81",
+            "reference": "4e0fd83510e579043e10e565528b323b7c2b3c81",
             "shasum": ""
         },
         "require": {
@@ -74,7 +74,7 @@
         },
         "require-dev": {
             "cache/filesystem-adapter": "^0.3.2",
-            "phpunit/phpunit": "~4",
+            "phpunit/phpunit": "~4.8.36",
             "squizlabs/php_codesniffer": "~2.3",
             "symfony/css-selector": "~2.1",
             "symfony/dom-crawler": "~2.1"
@@ -82,7 +82,7 @@
         "suggest": {
             "cache/filesystem-adapter": "For caching certs and tokens (using Google_Client::setCache)"
         },
-        "time": "2017-11-03T01:19:53+00:00",
+        "time": "2018-06-20T15:52:20+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -110,17 +110,17 @@
     },
     {
         "name": "google/apiclient-services",
-        "version": "v0.63",
-        "version_normalized": "0.63.0.0",
+        "version": "v0.64",
+        "version_normalized": "0.64.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/google/google-api-php-client-services.git",
-            "reference": "a009a33246e90bf1f60f745f8e47039ac5a87fdf"
+            "reference": "0250aa8cadbe58e790aa07d736b675f3bdd87a1c"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/google/google-api-php-client-services/zipball/a009a33246e90bf1f60f745f8e47039ac5a87fdf",
-            "reference": "a009a33246e90bf1f60f745f8e47039ac5a87fdf",
+            "url": "https://api.github.com/repos/google/google-api-php-client-services/zipball/0250aa8cadbe58e790aa07d736b675f3bdd87a1c",
+            "reference": "0250aa8cadbe58e790aa07d736b675f3bdd87a1c",
             "shasum": ""
         },
         "require": {
@@ -129,7 +129,7 @@
         "require-dev": {
             "phpunit/phpunit": "~4.8"
         },
-        "time": "2018-06-07T00:22:54+00:00",
+        "time": "2018-06-30T00:22:51+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -444,17 +444,17 @@
     },
     {
         "name": "ifsnop/mysqldump-php",
-        "version": "v2.4",
-        "version_normalized": "2.4.0.0",
+        "version": "v2.5",
+        "version_normalized": "2.5.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/ifsnop/mysqldump-php.git",
-            "reference": "2a633b3da5db1e5bdc39c1b71c697ef197c39eeb"
+            "reference": "8d063449981e3f7bd28a3a083842e21a24d1f4af"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/2a633b3da5db1e5bdc39c1b71c697ef197c39eeb",
-            "reference": "2a633b3da5db1e5bdc39c1b71c697ef197c39eeb",
+            "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/8d063449981e3f7bd28a3a083842e21a24d1f4af",
+            "reference": "8d063449981e3f7bd28a3a083842e21a24d1f4af",
             "shasum": ""
         },
         "require": {
@@ -464,7 +464,7 @@
             "phpunit/phpunit": "3.7.*",
             "squizlabs/php_codesniffer": "1.*"
         },
-        "time": "2018-03-07T22:27:23+00:00",
+        "time": "2018-06-30T19:40:05+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1045,17 +1045,17 @@
     },
     {
         "name": "stripe/stripe-php",
-        "version": "v6.7.4",
-        "version_normalized": "6.7.4.0",
+        "version": "v6.10.0",
+        "version_normalized": "6.10.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/stripe/stripe-php.git",
-            "reference": "67fee13fcb344aa865076589888f4afef542dfd7"
+            "reference": "be46d55c4a67265d6fe3eaf2ff69f6cfffe0034d"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/stripe/stripe-php/zipball/67fee13fcb344aa865076589888f4afef542dfd7",
-            "reference": "67fee13fcb344aa865076589888f4afef542dfd7",
+            "url": "https://api.github.com/repos/stripe/stripe-php/zipball/be46d55c4a67265d6fe3eaf2ff69f6cfffe0034d",
+            "reference": "be46d55c4a67265d6fe3eaf2ff69f6cfffe0034d",
             "shasum": ""
         },
         "require": {
@@ -1069,7 +1069,7 @@
             "satooshi/php-coveralls": "~0.6.1",
             "squizlabs/php_codesniffer": "~2.0"
         },
-        "time": "2018-05-30T00:13:55+00:00",
+        "time": "2018-06-28T15:25:46+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {

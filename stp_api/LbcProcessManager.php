@@ -315,7 +315,7 @@ class LbcProcessManager
             
             $smtpServerMg = new SmtpServerManager();
             
-            $subject = 'Re: '.str_replace ('leboncoin', 'lebonc...',$message->getSubject());
+            $subject = 'Re: ' . str_replace('leboncoin', 'lebonc...', $message->getSubject());
             
             $rep = $smtpServer->sendEmail($subject, $lead->getAdresse_mail(), $mailForLead->getBody(), $compteLbc->getMail());
             if ($rep) {
@@ -336,4 +336,61 @@ class LbcProcessManager
             }
         }
     }
+
+    public function sendTest()
+    {
+        // $message = $this->messProspectMg->get(array("gmail_id" => '1647173c6b7aaed7'));
+        $message= $this->gmailManager->getMessage('1647173c6b7aaed7', [
+            'format' => 'full'
+        ]);
+        
+        $body = $this->gmailManager->getBody($message);
+//         $this->gmailManager->sendMessage($msg);
+        
+        $message = $this->gmailManager->createMessage($body);
+        
+        $this->gmailManager->sendMessage($message);
+        
+        
+        
+        exit(0);
+        
+        $email = $this->gmailManager->createMessage();
+        
+        $email->setThreadId('1647173c6b7aaed7');
+        
+        $draft = $this->gmailManager->createDraft($email, '1647173c6b7aaed7');
+        
+        prettyPrint($draft);
+        
+        // prettyPrint($draft);
+        
+        // $this->gmailManager->saveDraft('helloo' , '1647173c6b7aaed7');
+        
+        $compteLbc = $this->lbcAccountMg->get(array(
+            "ref_compte" => $message->getRef_compte_lbc()
+        ));
+        
+        $expe = $compteLbc->getExpe();
+        
+        $mailForLead = $expe->getMailForLead();
+        
+        // prettyPrint($expe);
+        
+        $smtpServer = $expe->getSmtpServer();
+        
+        $lead = $this->prospectLbcMg->get(array(
+            "ref_prospect_lbc" => $message->getRef_prospect_lbc()
+        ));
+        
+        $smtpServerMg = new SmtpServerManager();
+        
+        $subject = 'Re: ' . str_replace('leboncoin', 'lebonc...', $message->getSubject());
+        
+        echo ($lead->getAdresse_mail());
+        
+        // $rep = $smtpServer->sendEmail($subject, $lead->getAdresse_mail(), $mailForLead->getBody(), $compteLbc->getMail());
+    }
+    
+  
 }

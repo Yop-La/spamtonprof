@@ -69,6 +69,8 @@ require_once (dirname(__FILE__) . '/ajaxFunction/log_in_and_out.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/inscription_prof_ajax.php');
 
+require_once (dirname(__FILE__) . '/ajaxFunction/onboarding_prof_ajax.php');
+
 require_once (dirname(__FILE__) . '/ninjaFormHooks/afterSubmission.php');
 
 

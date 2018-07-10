@@ -15,7 +15,7 @@
  * the License.
  */
 
-class Google_Service_Firestore_IndexField extends Google_Model
+class Google_Service_Firestore_GoogleFirestoreAdminV1beta1IndexField extends Google_Model
 {
   public $fieldPath;
   public $mode;

@@ -15,6 +15,25 @@
  * the License.
  */
 
-class Google_Service_ServiceUsage_DisableServiceRequest extends Google_Model
+class Google_Service_IAMCredentials_GenerateAccessTokenResponse extends Google_Model
 {
+  public $accessToken;
+  public $expireTime;
+
+  public function setAccessToken($accessToken)
+  {
+    $this->accessToken = $accessToken;
+  }
+  public function getAccessToken()
+  {
+    return $this->accessToken;
+  }
+  public function setExpireTime($expireTime)
+  {
+    $this->expireTime = $expireTime;
+  }
+  public function getExpireTime()
+  {
+    return $this->expireTime;
+  }
 }

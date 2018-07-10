@@ -15,27 +15,20 @@
  * the License.
  */
 
-class Google_Service_ServiceUsage_Service extends Google_Model
+class Google_Service_ServiceControl_ServicecontrolResource extends Google_Model
 {
-  protected $configType = 'Google_Service_ServiceUsage_ServiceConfig';
-  protected $configDataType = '';
+  public $labels;
   public $name;
-  public $parent;
-  public $state;
+  public $service;
+  public $type;
 
-  /**
-   * @param Google_Service_ServiceUsage_ServiceConfig
-   */
-  public function setConfig(Google_Service_ServiceUsage_ServiceConfig $config)
+  public function setLabels($labels)
   {
-    $this->config = $config;
+    $this->labels = $labels;
   }
-  /**
-   * @return Google_Service_ServiceUsage_ServiceConfig
-   */
-  public function getConfig()
+  public function getLabels()
   {
-    return $this->config;
+    return $this->labels;
   }
   public function setName($name)
   {
@@ -45,20 +38,20 @@ class Google_Service_ServiceUsage_Service extends Google_Model
   {
     return $this->name;
   }
-  public function setParent($parent)
+  public function setService($service)
   {
-    $this->parent = $parent;
+    $this->service = $service;
   }
-  public function getParent()
+  public function getService()
   {
-    return $this->parent;
+    return $this->service;
   }
-  public function setState($state)
+  public function setType($type)
   {
-    $this->state = $state;
+    $this->type = $type;
   }
-  public function getState()
+  public function getType()
   {
-    return $this->state;
+    return $this->type;
   }
 }

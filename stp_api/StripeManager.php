@@ -32,7 +32,7 @@ class StripeManager
 
 {
 
-    private $testMode = true, $bdd;
+    private $testMode = true;
 
     public function __construct($testMode = true)
     
@@ -43,8 +43,7 @@ class StripeManager
         }
         
         $this->testMode = $testMode;
-        
-        $bdd = \spamtonprof\stp_api\PdoManager::getBdd();
+
     }
 
     public function createSubscription($emailParent, $source, $refCompte, $planStripe)
@@ -255,4 +254,21 @@ class StripeManager
         
         return($subscriptions);
     }
+
+    public function createCustomAccount($tokenId, $pays){
+        
+        // faire la création du compte stripe
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        
+        $acct = \Stripe\Account::create(array(
+            "country" => $pays,
+            "type" => "custom",
+            "account_token" => $tokenId,
+        ));
+        
+        
+        return($acct->id);
+       
+    }
+    
 }

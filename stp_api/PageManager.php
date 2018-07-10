@@ -62,7 +62,7 @@ class PageManager
         
         /* gérer les redirections */
         $redirection = $this->getRedirections();
-        wp_localize_script('functions_js', 'redirection', $redirection);
+        wp_localize_script('redirection_js', 'redirection', $redirection);
         
         /* avoir le domain */
         wp_localize_script('functions_js', 'domain', $this->domain);
@@ -143,6 +143,11 @@ class PageManager
         if ($this->pageSlug == 'inscription-prof') {
             
             PageManager::inscriptionProf();
+        }
+        
+        if ($this->pageSlug == 'onboarding-prof') {
+            
+            PageManager::onboardingProf();
         }
     }
 
@@ -242,6 +247,27 @@ class PageManager
             'nf-front-end'
         
         ), time());
+        
+        wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
+        
+        wp_enqueue_script('jquery_ui_js', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.js');
+        
+        wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
+    }
+    
+    public static function onboardingProf()
+    
+    {
+        
+        wp_enqueue_script('stripe_main_js', 'https://js.stripe.com/v3/');
+        
+        wp_enqueue_script('discover_week', plugins_url() . '/spamtonprof/js/onboarding-prof.js', array(
+            
+            'nf-front-end'
+            
+        ), time());
+        
+        
         
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
         

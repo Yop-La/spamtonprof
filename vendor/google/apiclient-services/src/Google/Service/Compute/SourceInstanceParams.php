@@ -15,33 +15,24 @@
  * the License.
  */
 
-class Google_Service_Firestore_ListIndexesResponse extends Google_Collection
+class Google_Service_Compute_SourceInstanceParams extends Google_Collection
 {
-  protected $collection_key = 'indexes';
-  protected $indexesType = 'Google_Service_Firestore_Index';
-  protected $indexesDataType = 'array';
-  public $nextPageToken;
+  protected $collection_key = 'diskConfigs';
+  protected $diskConfigsType = 'Google_Service_Compute_DiskInstantiationConfig';
+  protected $diskConfigsDataType = 'array';
 
   /**
-   * @param Google_Service_Firestore_Index
+   * @param Google_Service_Compute_DiskInstantiationConfig
    */
-  public function setIndexes($indexes)
+  public function setDiskConfigs($diskConfigs)
   {
-    $this->indexes = $indexes;
+    $this->diskConfigs = $diskConfigs;
   }
   /**
-   * @return Google_Service_Firestore_Index
+   * @return Google_Service_Compute_DiskInstantiationConfig
    */
-  public function getIndexes()
+  public function getDiskConfigs()
   {
-    return $this->indexes;
-  }
-  public function setNextPageToken($nextPageToken)
-  {
-    $this->nextPageToken = $nextPageToken;
-  }
-  public function getNextPageToken()
-  {
-    return $this->nextPageToken;
+    return $this->diskConfigs;
   }
 }

@@ -87,4 +87,17 @@ class stpProfManager
         
         return ($prof);
     }
+    
+    public function updateStripeId(\spamtonprof\stp_api\stpProf $prof)
+    {
+        $q = $this->_db->prepare('update stp_prof set stripe_id = :stripe_id where ref_prof = :ref_prof');
+        
+        $q->bindValue(':stripe_id', $prof->getStripe_id());
+        
+        $q->bindValue(':ref_prof', $prof->getRef_prof());
+        
+        $q->execute();
+        
+        return ($prof);
+    }
 }
