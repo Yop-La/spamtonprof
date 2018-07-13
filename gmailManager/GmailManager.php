@@ -7,6 +7,8 @@ use Google_Service_Gmail;
 use Google_Service_Gmail_Message;
 use spamtonprof\stp_api\GmailLabelManager;
 use spamtonprof;
+use PHPMailer\PHPMailer\PHPMailer;
+
 
 class GmailManager
 {
@@ -411,7 +413,7 @@ class GmailManager
     private function createMessage($body, $subject, $to, $replyTo, $from, $fromName)
     {
         
-        $mail = new \PHPMailer();
+        $mail  = new PHPMailer;
         $mail->CharSet = "UTF-8";
 
 
