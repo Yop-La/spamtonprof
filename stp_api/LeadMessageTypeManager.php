@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 use PDO;
 use spamtonprof;
 
-class leadMessageTypeManager
+class LeadMessageTypeManager
 {
 
     const MESSAGE_DIRECT = 1, DEBUT_MESSAGERIE_LEBONCOIN = 2, CONVERSATION_MESSAGERIE_LEBONCOIN = 3;
@@ -35,7 +35,7 @@ class leadMessageTypeManager
         $data = $q->fetch(PDO::FETCH_ASSOC);
         
         if ($data) {
-            return new spamtonprof\stp_api\leadMessageType($data);
+            return new spamtonprof\stp_api\LeadMessageType($data);
         } else {
             return (false);
         }

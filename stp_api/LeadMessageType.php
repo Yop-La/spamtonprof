@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class leadMessageType implements \JsonSerializable
+class LeadMessageType implements \JsonSerializable
 {
 
     protected $type, $ref_type;
