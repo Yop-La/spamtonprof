@@ -88,7 +88,7 @@ class LbcProcessManager
                 }
                 
                 if ($messageType != 0) {
-                    $indexMessageProcessed ++;
+                    
                     
                     $emails = [];
                     
@@ -144,7 +144,7 @@ class LbcProcessManager
                 
                 if (strpos($subject, "|--|") !== false) {
                     
-                    $indexMessageProcessed ++;
+                    
                     
                     preg_match('/\|--\|(\d*)\|--\|/', $subject, $matches);
                     
@@ -188,7 +188,7 @@ class LbcProcessManager
                 $this->gmailAccountMg->updateHistoryId($this->gmailAccount);
             }
             
-            
+            $indexMessageProcessed ++;
             if ($nbMessageToProcess == $indexMessageProcessed) {
                 break;
             }

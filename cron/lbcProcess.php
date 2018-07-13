@@ -32,9 +32,11 @@ header("Pragma: no-cache");
 
 $date = new \DateTime(null);
 
-$minute = $date->format('i');
+$minute = (int) $date->format('i');
 
 $lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
+
+echo("minute : " .$minute  . "<br>");
 
 if($minute % 2 == 0){
     echo("process 1 : lecture des emails de mailsfromlbc@gmail.com" . "<br>");
