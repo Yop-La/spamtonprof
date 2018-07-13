@@ -13,7 +13,7 @@ class StpGmailAccountManager
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
 
-    public function add(stpGmailAccount $stpGmailAccount)
+    public function add(StpGmailAccount $stpGmailAccount)
     {
         $q = $this->_db->prepare('insert into stp_gmail_account(ref_gmail_account, email) values( :ref_gmail_account,:email)');
         $q->bindValue(':ref_gmail_account', $stpGmailAccount->getRef_gmail_account());
@@ -38,7 +38,7 @@ class StpGmailAccountManager
             if ($q->rowCount() <= 0) {
                 return (false);
             } else {
-                return new stpGmailAccount($q->fetch(PDO::FETCH_ASSOC));
+                return new StpGmailAccount($q->fetch(PDO::FETCH_ASSOC));
             }
         } else {
             $q = $this->_db->prepare('SELECT * FROM stp_gmail_account WHERE email like :email');
@@ -49,12 +49,12 @@ class StpGmailAccountManager
                 return (false);
             } else {
                 $res = $q->fetch(PDO::FETCH_ASSOC);
-                return new stpGmailAccount($res);
+                return new StpGmailAccount($res);
             }
         }
     }
     
-    public function updateCredential(stpGmailAccount $stpGmailAccount)
+    public function updateCredential(StpGmailAccount $stpGmailAccount)
     
     {
         $q = $this->_db->prepare('UPDATE stp_gmail_account credential=:credential
@@ -68,7 +68,7 @@ class StpGmailAccountManager
         
     }
     
-    public function updateHistoryId(stpGmailAccount $stpGmailAccount)
+    public function updateHistoryId(StpGmailAccount $stpGmailAccount)
     
     {
         $q = $this->_db->prepare('UPDATE stp_gmail_account SET last_history_id =:last_history_id

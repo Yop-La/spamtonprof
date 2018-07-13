@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpGmailAccount implements \JsonSerializable
+class StpGmailAccount implements \JsonSerializable
 {
 
     protected $ref_gmail_account, $email, $credential, $last_history_id;
