@@ -15,10 +15,14 @@ class MessageProspectLbc implements \JsonSerializable
     $ref_message,
     $date_reception,
     $ref_prospect_lbc,
-    $is_sent,
+    $processed,
+    $type,
     $ref_compte_lbc,
     $subject,
-    $gmail_id;
+    $gmail_id,
+    $answered,
+    $reply,
+    $answer_gmail_id;
     
 
     public function __construct(array $donnees = array())
@@ -63,9 +67,9 @@ class MessageProspectLbc implements \JsonSerializable
     /**
      * @return mixed
      */
-    public function getIs_sent()
+    public function getProcessed()
     {
-        return $this->is_sent;
+        return $this->processed;
     }
 
 
@@ -91,12 +95,9 @@ class MessageProspectLbc implements \JsonSerializable
         $this->date_reception = $date_reception;
     }
 
-    /**
-     * @param mixed $is_sent
-     */
-    public function setIs_sent($is_sent)
+    public function setProcessed($processed)
     {
-        $this->is_sent = $is_sent;
+        $this->processed = $processed;
     }
 
 
@@ -166,6 +167,70 @@ class MessageProspectLbc implements \JsonSerializable
     {
         $this->subject = $subject;
     }
+    /**
+     * @return mixed
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param mixed $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+    /**
+     * @return mixed
+     */
+    public function getAnswered()
+    {
+        return $this->answered;
+    }
+
+    /**
+     * @param mixed $answered
+     */
+    public function setAnswered($answered)
+    {
+        $this->answered = $answered;
+    }
+    /**
+     * @return mixed
+     */
+    public function getReply()
+    {
+        return $this->reply;
+    }
+
+    /**
+     * @param mixed $reply
+     */
+    public function setReply($reply)
+    {
+        $this->reply = $reply;
+    }
+    /**
+     * @return mixed
+     */
+    public function getAnswer_gmail_id()
+    {
+        return $this->answer_gmail_id;
+    }
+
+    /**
+     * @param mixed $answer_gmail_id
+     */
+    public function setAnswer_gmail_id($answer_gmail_id)
+    {
+        $this->answer_gmail_id = $answer_gmail_id;
+    }
+
+
+
+
 
 
 

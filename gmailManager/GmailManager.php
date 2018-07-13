@@ -27,13 +27,14 @@ class GmailManager
      */
     public function getClient($gmailAdress)
     {
-        $profMg = new \spamtonprof\stp_api\ProfManager();
+        
+        $accountMg = new \spamtonprof\stp_api\stpGmailAccountManager();
         
         $keyMg = new \spamtonprof\stp_api\KeyManager();
         
         $key = $keyMg->get($keyMg::GMAIL_KEY);
         
-        $prof = $profMg->get($gmailAdress);
+        $account = $accountMg->get($gmailAdress);
         
         $client = new Google_Client();
         $client->setApplicationName('Gmail API PHP Quickstart');
@@ -46,12 +47,12 @@ class GmailManager
         
         $accessToken;
         
-        if (! $prof) {
+        if (! $account) {
             echo ("ajouté : " . $gmailAdress . " à la table prof <br><br><br>");
         }
         
-        if ($prof->getGmail_credential() != "" && ! is_null($prof->getGmail_credential())) {
-            $accessToken = json_decode($prof->getGmail_credential(), true);
+        if ($account->getCredential() != "" && ! is_null($account->getCredential())) {
+            $accessToken = json_decode($account->getCredential(), true);
         } else {
             // Request authorization from the user.
             $authUrl = $client->createAuthUrl();
@@ -66,8 +67,8 @@ class GmailManager
             // Exchange authorization code for an access token.
             $accessToken = $client->fetchAccessTokenWithAuthCode($authCode);
             
-            $prof->setGmail_credential(json_encode($accessToken));
-            $profMg->update($prof);
+            $account->setCredential(json_encode($accessToken));
+            $accountMg->updateCredential($account);
         }
         
         $client->setAccessToken($accessToken);
@@ -75,8 +76,8 @@ class GmailManager
         // Refresh the token if it's expired.
         if ($client->isAccessTokenExpired()) {
             $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
-            $prof->setGmail_credential(json_encode($client->getAccessToken()));
-            $profMg->update($prof);
+            $account->setCredential(json_encode($client->getAccessToken()));
+            $accountMg->updateCredential($account);
         }
         return $client;
     }
@@ -99,6 +100,9 @@ class GmailManager
             "q" => $searchOperator,
             "maxResults" => 10
         );
+        
+        $indexPage = 0;
+        
         do {
             try {
                 if ($pageToken) {
@@ -107,6 +111,7 @@ class GmailManager
                 $messagesResponse = $this->service->users_messages->listUsersMessages($this->userId, $opt_param);
                 if ($messagesResponse->getMessages()) {
                     $messages = array_merge($messages, $messagesResponse->getMessages());
+                
                     $pageToken = $messagesResponse->getNextPageToken();
                 }
             } catch (Exception $e) {
@@ -298,14 +303,15 @@ class GmailManager
         return ($labelsIdToAdd);
     }
 
-    function listHistory($startHistoryId, $historyTypes = "messageAdded")
+    function listHistory($startHistoryId, $historyTypes = "messageAdded", $labelId = "INBOX")
     {
         $userId = $this->userId;
         $service = $this->service;
         $opt_param = array(
             'startHistoryId' => $startHistoryId,
             'historyTypes' => $historyTypes,
-            'maxResults' => '100'
+            'maxResults' => '1000',
+            'labelId' => $labelId
         );
         $pageToken = NULL;
         $histories = array();
@@ -328,9 +334,118 @@ class GmailManager
         
         return $histories;
     }
+    
+    function getMessageIdsInHistory($histories){
+        
+        $gmailIds = [];
+        foreach ($histories as $history){
+            $messages = $history->messages;
+            foreach ($messages as $message){
+                $gmailIds[] = $message->id;
+            }
+        }
+        
+        return($gmailIds);
+        
+    }
+
+    /*
+     *
+     * permet de retourner le header d'un email. Pour retourner le from il suffit de saisir "From" comme headerName par exemple.
+     *
+     */
+    function getHeader(\Google_Service_Gmail_Message $message, $headerName)
+    {
+        $headers = $message->getPayload()->getHeaders();
+        
+        foreach ($headers as $header) {
+            
+            if ($header->name == $headerName) {
+                
+                return ($header->value);
+            }
+        }
+        return (null);
+    }
+
+    function getNewMessages($q, $lastHistoryId)
+    {
+        $shortMessages = $this->listMessages($q);
+     
+        $messages = [];
+        
+        
+        $histories = $this->listHistory($lastHistoryId, $historyTypes = "messageAdded");
+        
+        
+        $messagesIdsAdded = $this->getMessageIdsInHistory($histories);
+        
+        foreach ($shortMessages as $message) {
+             
+            $messageId = $message->id;
+            
+            try {
+                
+                $message = $this->getMessage($messageId, [
+                    "format" => "full"
+                ]);
+                
+                if (in_array($messageId, $messagesIdsAdded)) {
+                    
+                    $messages[] = $message;
+                    
+                }
+            } catch (\Exception $e) {
+                // ce message n'existe plus
+            }
+        }
+        
+        return ($messages);
+    }
+
+    /*
+     * sert à créer un message pour l'envoyer à partir de gmail
+     * 
+     */
+    
+    private function createMessage($body, $subject, $to, $replyTo, $from, $fromName)
+    {
+        
+        $mail = new \PHPMailer();
+        $mail->CharSet = "UTF-8";
+
+
+        
+        $mail->From = $from;
+        $mail->FromName = $fromName;
+        
+        $mail->AddAddress($to);
+        $mail->addReplyTo($replyTo);
+        
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $body;
+        
+        $mail->preSend();
+        $mime = $mail->getSentMIMEMessage();
+        $gMessage = new Google_Service_Gmail_Message();
+        $data = base64_encode($mime);
+        $data = str_replace(array(
+            '+',
+            '/',
+            '='
+        ), array(
+            '-',
+            '_',
+            ''
+        ), $data); // url safe
+        $gMessage->setRaw($data);
+        
+        return $gMessage;
+    }
 
     /**
-     * Create Draft email.
+     * Send Message.
      *
      * @param Google_Service_Gmail $service
      *            Authorized Gmail API instance.
@@ -338,160 +453,68 @@ class GmailManager
      *            User's email address. The special value 'me'
      *            can be used to indicate the authenticated user.
      * @param Google_Service_Gmail_Message $message
-     *            Message of the created Draft.
-     * @return \Google_Service_Gmail_Draft Created Draft.
-     */
-    function createDraft($email, $threadId)
-    {
-        
-        $draft = new \Google_Service_Gmail_Draft();
-        $draft->setMessage($email);
-        try {
-            $draft = $this->service->users_drafts->create($this->userId, $draft);
-            print 'Draft ID: ' . $draft->getId();
-        } catch (Exception $e) {
-            print 'An error occurred: ' . $e->getMessage();
-        }
-        return $draft;
-    }
-
-    /**
-     * Get Thread with given ID.
-     *
-     * @param Google_Service_Gmail $service
-     *            Authorized Gmail API instance.
-     * @param string $userId
-     *            User's email address. The special value 'me'
-     *            can be used to indicate the authenticated user.
-     * @param string $threadId
-     *            ID of Thread to get.
-     * @return \Google_Service_Gmail_Thread Retrieved Thread.
-     */
-    function getThread($threadId)
-    {
-        try {
-            $thread = $this->service->users_threads->get($this->userId, $threadId);
-            $messages = $thread->getMessages();
-            $msgCount = count($messages);
-//             print 'Number of Messages in the Thread: ' . $msgCount;
-            return $thread;
-        } catch (Exception $e) {
-            print 'An error occurred: ' . $e->getMessage();
-        }
-    }
-    
-    function createMessage($body)
-    {
-        $message = new \Google_Service_Gmail_Message();
-        
-        
-        $mail = new \PHPMailer();
-        $mail->CharSet = "UTF-8";
-        $subject = 'Nouveau message concernant l\'annonce "Besoin de cours de maths - physiques ?" sur leboncoin';
-        $msg = "hey there!";
-        $from = "myemail@gmail.com";
-        $fname = "my name";
-        
-        
-        
-        $mail->From = "thomas@lbc.thomas-cours.fr";
-
-        $mail->AddAddress("alex.guillemine@gmail.com");
-        
-
-        
-        
-        $mail->isHTML(true);                                  
-        $mail->Subject = $subject;
-        $mail->Body    = $body;
-        
-        
-        $mail->preSend();
-        $mime = $mail->getSentMIMEMessage();
-        $m = new Google_Service_Gmail_Message();
-        $data = base64_encode($mime);
-        $data = str_replace(array('+','/','='),array('-','_',''),$data); // url safe
-        $m->setRaw($data);
-        
-        
-        return $m;
-    }
-    
-    /**
-     * Send Message.
-     *
-     * @param  Google_Service_Gmail $service Authorized Gmail API instance.
-     * @param  string $userId User's email address. The special value 'me'
-     * can be used to indicate the authenticated user.
-     * @param  Google_Service_Gmail_Message $message Message to send.
+     *            Message to send.
      * @return Google_Service_Gmail_Message sent Message.
      */
-    function sendMessage( $message) {
+    function sendMessage($body, $subject, $to, $replyTo, $from, $fromName)
+    {
+        $gMessage = $this->createMessage($body, $subject, $to, $replyTo, $from, $fromName);
         try {
-            $message = $this->service->users_messages->send($this->userId, $message);
-            print 'Message with ID: ' . $message->getId() . ' sent.';
-            return $message;
+            $gMessage = $this->service->users_messages->send($this->userId, $gMessage);
+            print 'Message with ID: ' . $gMessage->getId() . ' sent.<br>' ;
+            return $gMessage;
         } catch (Exception $e) {
             print 'An error occurred: ' . $e->getMessage();
         }
     }
-    
-    function decodeBody($body) {
+
+    function decodeBody($body)
+    {
         $rawData = $body;
-        $sanitizedData = strtr($rawData,'-_', '+/');
+        $sanitizedData = strtr($rawData, '-_', '+/');
         $decodedMessage = base64_decode($sanitizedData);
-        if(!$decodedMessage){
+        if (! $decodedMessage) {
             $decodedMessage = FALSE;
         }
         return $decodedMessage;
     }
-    
-    
-    function getBody($email) {
+
+
+    function getBody($message)
+    {
+        $body = "";
+        $message_array = json_decode(json_encode($message), True);
+        $datas = $this->getDatas($message_array);
         
-        try{
-            
-            $payload = $email->getPayload();
-            
-            // With no attachment, the payload might be directly in the body, encoded.
-            $body = $payload->getBody();
-            $FOUND_BODY = $this->decodeBody($body['data']);
-            
-            // If we didn't find a body, let's look for the parts
-            if(!$FOUND_BODY) {
-                $parts = $payload->getParts();
-                foreach ($parts  as $part) {
-                    if($part['body'] && $part['mimeType'] == 'text/html') {
-                        $FOUND_BODY = $this->decodeBody($part['body']->data);
-                        break;
-                    }
-                }
-            } if(!$FOUND_BODY) {
-                foreach ($parts  as $part) {
-                    // Last try: if we didn't find the body in the first parts,
-                    // let's loop into the parts of the parts (as @Tholle suggested).
-                    if($part['parts'] && !$FOUND_BODY) {
-                        foreach ($part['parts'] as $p) {
-                            // replace 'text/html' by 'text/plain' if you prefer
-                            if($p['mimeType'] === 'text/html' && $p['body']) {
-                                $FOUND_BODY = $this->decodeBody($p['body']->data);
-                                break;
-                            }
-                        }
-                    }
-                    if($FOUND_BODY) {
-                        break;
-                    }
-                }
-            }
-            
-            
-        } catch (\Exception $e) {
-            echo $e->getMessage();
+        if (array_key_exists("text/html", $datas) ) {
+            return ($this->decodeBody($datas["text/html"]));
+        } else {
+            return ($this->decodeBody($datas["text/plain"]));
         }
+    }
+
+    function getDatas(array $message_part, $mimeType = "text/html")
+    {
+        $values = [];
         
-        return($FOUND_BODY);
-        
+        foreach ($message_part as $key => $value) {
+            
+            if ($key === "data") {
+                if ($value) {
+                    $values[$mimeType] = $value;
+                }
+            } elseif ($key === "mimeType") {
+                
+                if ($value === "text/html") {
+                    $mimeType = "text/html";
+                } elseif ($value === "text/plain") {
+                    $mimeType = "text/plain";
+                }
+            } elseif (is_array($value)) {
+                $values = array_merge($values, $this->getDatas($value, $mimeType));
+            }
+        }
+        return ($values);
     }
 }
 

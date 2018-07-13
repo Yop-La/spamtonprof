@@ -171,14 +171,12 @@ class SmtpServer implements \JsonSerializable
         return $vars;
     }
     
-    public function sendEmail($subject, $to, $textBody, $from){
+    public function sendEmail($subject, $to, $body, $from, $fromName = "", $html = false){
         
-//         $subject = utf8_encode($subject);
-//         $textBody = utf8_encode($textBody);
         
-        //SMTP needs accurate times, and the PHP time zone MUST be set
-        //This should be done in your php.ini, but this is how to do it if you don't have access to that
-        date_default_timezone_set('Etc/UTC');
+        if($fromName == ""){
+            $fromName = $this->name;
+        }
         
         
         //Create a new PHPMailer instance
@@ -206,16 +204,17 @@ class SmtpServer implements \JsonSerializable
         //Password to use for SMTP authentication
         $mail->Password = $this->password;
         //Set who the message is to be sent from
-        $mail->addReplyTo($from, $this->name);
-        $mail->setFrom($from, $this->name);
+        $mail->addReplyTo($from);
+        $mail->setFrom($from, $fromName);
 
         //Set who the message is to be sent to
         $mail->addAddress($to);
         //Set the subject line
         $mail->Subject = $subject;
 
-        //Replace the plain text body with one created manually
-        $mail->Body = $textBody;
+
+        $mail->isHTML($html);
+        $mail->Body = $body;
         
         //send the message, check for errors
         if (!$mail->send()) {
