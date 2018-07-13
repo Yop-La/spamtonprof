@@ -46,11 +46,15 @@ class LbcProcessManager
     {
         $lastHistoryId = $this->gmailAccount->getLast_history_id();
         
-        $now = new \DateTime(null);
+        $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+        
+        $now -> sub(new \DateInterval("PT2H"));
+        
+        $timestamp = $now->getTimestamp();
         
         $now = $now->format('Y/m/d');
         
-        $messages = $this->gmailManager->getNewMessages("is:inbox after:" . $now, $lastHistoryId);
+        $messages = $this->gmailManager->getNewMessages("is:inbox after:" . $timestamp, $lastHistoryId);
         
         echo("------  nb messages : " . count($messages) . " ----- <br>");
         

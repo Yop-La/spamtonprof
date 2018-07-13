@@ -29,20 +29,27 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-
-$date = new \DateTime(null);
-
-$minute = (int) $date->format('i');
-
 $lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
 
-echo("minute : " .$minute  . "<br>");
+$lbcReaderint = unserializeTemp("/tempo/lbcReaderInt");
 
-if($minute % 2 == 0){
-    echo("process 1 : lecture des emails de mailsfromlbc@gmail.com" . "<br>");
-    $lbcProcessMg -> readNewLeadMessages();
-    
-}else{
-    echo("process 2 : redirection des emails vers lebureaudesprofs + envoi des emails aux prospects depuis mailsfromlbc@gmail.com"  . "<br>");
-    $lbcProcessMg ->processNewMessages(); 
+if (! $lbcReaderint) {  
+    $lbcReaderInt = - 1;
+    serializeTemp($lbcReaderInt, "/tempo/lbcReaderInt");
+}
+
+if ($lbcReaderint == - 1) {
+    $lbcReaderInt = 1;
+} elseif ($lbcReaderint == 1) {
+    $lbcReaderInt = - 1;
+}
+
+serializeTemp($lbcReaderInt, "/tempo/lbcReaderInt");
+
+if ($lbcReaderint == - 1) {
+    echo ("process 1 : lecture des emails de mailsfromlbc@gmail.com" . "<br>");
+    $lbcProcessMg->readNewLeadMessages();
+} elseif ($lbcReaderint == 1) {
+    echo ("process 2 : redirection des emails vers lebureaudesprofs + envoi des emails aux prospects depuis mailsfromlbc@gmail.com" . "<br>");
+    $lbcProcessMg->processNewMessages();
 }
