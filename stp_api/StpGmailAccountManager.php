@@ -3,7 +3,7 @@ namespace spamtonprof\stp_api;
 
 use PDO;
 
-class stpGmailAccountManager
+class StpGmailAccountManager
 {
 
     private $_db;
