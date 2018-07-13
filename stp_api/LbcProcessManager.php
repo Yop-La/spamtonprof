@@ -54,7 +54,7 @@ class LbcProcessManager
         
         echo("------  nb messages : " . count($messages) . " ----- <br>");
         
-        $nbMessageToProcess = 10;
+        $nbMessageToProcess = 100;
         $indexMessageProcessed = 0;
         
         foreach ($messages as $message) {
