@@ -28,7 +28,7 @@ class GmailManager
     public function getClient($gmailAdress)
     {
         
-        $accountMg = new \spamtonprof\stp_api\stpGmailAccountManager();
+        $accountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
         
         $keyMg = new \spamtonprof\stp_api\KeyManager();
         
