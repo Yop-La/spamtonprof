@@ -54,7 +54,7 @@ class LbcProcessManager
         
         echo("------  nb messages : " . count($messages) . " ----- <br>");
         
-        $nbMessageToProcess = 110;
+        $nbMessageToProcess = 10;
         $indexMessageProcessed = 0;
         
         foreach ($messages as $message) {
@@ -199,14 +199,14 @@ class LbcProcessManager
     {
         
         // pour traiter les messages de leads si il y en a et les transférer à bureau des profs
-        for ($i = 0; $i < 50; $i ++) {
+        for ($i = 0; $i < 5; $i ++) {
             
             $this->processLeadMessage();
         }
         
         // pour envoyer au prospect les messages envoyés par le service prospection
         
-        for ($i = 0; $i < 3; $i ++) {
+        for ($i = 0; $i < 1; $i ++) {
             
             $this->replyToLeadMessages();
         }
@@ -224,6 +224,7 @@ class LbcProcessManager
         
         $body = $this->gmailManager->getBody($gMessage);
         
+        $subject = "|--|" . $refMessage . "|--| " . $subject;
         $replyTo = "mailsfromlbc@gmail.com";
         if ($message->getType() == $this->messageTypeMg::MESSAGE_DIRECT) {
             
@@ -232,9 +233,10 @@ class LbcProcessManager
             ));
             
             $replyTo = $lead->getAdresse_mail();
+            $subject = $message->getSubject();
         }
         
-        $this->gmailManager->sendMessage($body, "|--|" . $refMessage . "|--| " . $subject, "le.bureau.des.profs@gmail.com", $replyTo, "mailsfromlbc@gmail.com", "lbcBot");
+        $this->gmailManager->sendMessage($body,$subject , "le.bureau.des.profs@gmail.com", $replyTo, "mailsfromlbc@gmail.com", "lbcBot");
         
         $message->setProcessed(true);
         $this->messProspectMg->updateProcessed($message);
@@ -337,7 +339,7 @@ class LbcProcessManager
                 
                 $msgs = array();
                 $msgs[] = " ------------------------ ";
-                $msgs[] = "Réponse automatique au mail : " . $message->getGmail_id();
+                $msgs[] = "Réponse automatique au mail : " . $message->getRef_message();
                 $msgs[] = "Lead concerné : " . $lead->getAdresse_mail();
                 $msgs[] = "Compte Lbc concerné et expediteur : " . $compteLbc->getMail();
                 $msgs[] = "Sender : " . $smtpServer->getFrom();
