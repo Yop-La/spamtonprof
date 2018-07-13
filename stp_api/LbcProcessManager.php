@@ -15,8 +15,8 @@ class LbcProcessManager
         $this->messProspectMg = new \spamtonprof\stp_api\MessageProspectLbcManager();
         $this->lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
         $this->expeMg = new \spamtonprof\stp_api\ExpeLbcManager();
-        $this->gmailAccountMg = new \spamtonprof\stp_api\stpGmailAccountManager();
-        $this->messageTypeMg = new \spamtonprof\stp_api\leadMessageTypeManager();
+        $this->gmailAccountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
+        $this->messageTypeMg = new \spamtonprof\stp_api\LeadMessageTypeManager();
         
         $this->gmailAccount = $this->gmailAccountMg->get("mailsfromlbc@gmail.com");
         
