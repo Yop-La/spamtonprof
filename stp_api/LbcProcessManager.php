@@ -42,6 +42,33 @@ class LbcProcessManager
      * - en extraire la réponse de l'agent de prospection et le stocker dans la colonne reply de la table message_prospect_lbc
      *
      */
+    
+    public function  testZone(){
+        
+        $lastHistoryId = $this->gmailAccount->getLast_history_id();
+        
+        $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+        
+        $now -> sub(new \DateInterval("PT4H"));
+        
+        $timestamp = $now->getTimestamp();
+        
+        $now = $now->format('Y/m/d');
+        
+        $lastHistoryId = 2269850;
+        
+        $retour = $this->gmailManager->getNewMessages($lastHistoryId);
+        
+        $messages = $retour["messages"];
+        
+        $lastHistoryId = $retour["lastHistoryId"];
+        
+        echo($lastHistoryId);
+        
+        prettyPrint($messages);
+        
+    }
+    
     public function readNewLeadMessages()
     {
         $lastHistoryId = $this->gmailAccount->getLast_history_id();
@@ -54,7 +81,14 @@ class LbcProcessManager
         
         $now = $now->format('Y/m/d');
         
-        $messages = $this->gmailManager->getNewMessages("is:inbox after:" . $timestamp, $lastHistoryId);
+        $retour = $this->gmailManager->getNewMessages($lastHistoryId);
+        
+        $messages = $retour["messages"];
+        
+        $lastHistoryId = $retour["lastHistoryId"];
+        
+        $this->gmailAccount->setLast_history_id($lastHistoryId);
+        $this->gmailAccountMg->updateHistoryId($this->gmailAccount);
         
         echo("------  nb messages : " . count($messages) . " ----- <br>");
         
@@ -182,16 +216,7 @@ class LbcProcessManager
             }
 
             
-            // on enregistre le dernier history id
-            if ($lastHistoryId < $historyId) {
-                
-                echo(" lastHistoryId: " . $lastHistoryId . " et " . " historyId: " . $historyId  . "<br>");
-                
-                $lastHistoryId = $historyId;
-                $this->gmailAccount->setLast_history_id($lastHistoryId);
-                $this->gmailAccountMg->updateHistoryId($this->gmailAccount);
-            }
-            
+    
             $indexMessageProcessed ++;
             if ($nbMessageToProcess == $indexMessageProcessed) {
                 break;
@@ -381,20 +406,5 @@ class LbcProcessManager
         }
     }
 
-    public function testZone()
-    {
-        
-     
-
-//         $message = $this->gmailManager->getMessage("16481b67ba5ed8a5");
-        
-//         prettyPrint($message);
-        
-//         $histories = $this->gmailManager->listHistory(2235000, $historyTypes = "messageAdded", $labelId = "INBOX");
-        
-        $messages = $this->gmailManager->getNewMessages("is:inbox after:2018/07/09", 2234000);
-        
-        echo(count($messages));
-        
-    }
+    
 }

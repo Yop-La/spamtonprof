@@ -370,39 +370,36 @@ class GmailManager
         return (null);
     }
 
-    function getNewMessages($q, $lastHistoryId)
+    function getNewMessages( $lastHistoryId)
     {
-        $shortMessages = $this->listMessages($q);
      
-        $messages = [];
-        
-        
         $histories = $this->listHistory($lastHistoryId, $historyTypes = "messageAdded");
         
+        $indexMessage = 0;
+        $messageLimit = 30;
         
-        $messagesIdsAdded = $this->getMessageIdsInHistory($histories);
+        $messages = [];
         
-        foreach ($shortMessages as $message) {
-             
-            $messageId = $message->id;
+        foreach ($histories as $history){
             
-            try {
-                
-                $message = $this->getMessage($messageId, [
-                    "format" => "full"
-                ]);
-                
-                if (in_array($messageId, $messagesIdsAdded)) {
-                    
-                    $messages[] = $message;
-                    
-                }
-            } catch (\Exception $e) {
-                // ce message n'existe plus
+            
+            
+            $message = $history -> messages[0];
+            
+            $messages[] = $this->getMessage($message -> id, ['format' => 'full']);
+            
+            $indexMessage++;
+            
+            $lastHistoryId = $history->id;
+            
+            if($indexMessage == $messageLimit){
+                break;
             }
+            
         }
         
-        return ($messages);
+        return(array("messages" => $messages, "lastHistoryId" => $lastHistoryId));
+        
     }
 
     /*
