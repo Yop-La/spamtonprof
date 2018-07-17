@@ -11,6 +11,7 @@ idPrenom = "978";
 idNom = "979";
 idEmail = "977";
 idMobile = "982";
+idDob = "993";
 
 ajaxEnCours = 0;
 
@@ -40,7 +41,10 @@ var mySubmitController = Marionette.Object.extend( {
 			nom = response.data.fields[idNom].value;
 			email = response.data.fields[idEmail].value;
 			mobile = response.data.fields[idMobile].value;
+			dob = response.data.fields[idDob].value;
 
+			console.log(dob);
+			
 			ajaxEnCours++;
 			jQuery.post(
 					ajaxurl,
@@ -49,15 +53,17 @@ var mySubmitController = Marionette.Object.extend( {
 						'prenom' : prenom,
 						'nom' : nom,
 						'email' : email,
-						'mobile' : mobile
+						'mobile' : mobile,
+						'dob' : dob
 					})
 					.done(function(retour){ 
 						if(retour == "account-exists"){
 							redirect('connexion', "Vous avez déjà un compte avec cette adresse email. Connectez vous !");
 						}else if(retour == "creation-compte-wp-prof"){
 							showMessage("Impossible de vous créer un compte. Veuillez raffraichir la page et réssayer. Contacter l'équipe si le problème persiste");
-						}else if(retour == "ok"){
-							redirect('dashboard-prof', "Inscription bien validée !  Complétez votre profil pour pouvoir touchez vos premiers €€€ ! ");
+						}else{
+							redirect('onboarding-prof', 
+									"Inscription bien validée !  Complétez votre profil pour pouvoir touchez vos premiers €€€ ! "); // on envoie le prof à onboarding-prof
 						}
 					})
 					.fail(function(err){
@@ -65,14 +71,7 @@ var mySubmitController = Marionette.Object.extend( {
 						console.log(err);
 						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
 					})
-					.always(function() {
-						ajaxEnCours--;
-						if(ajaxEnCours == 0){
-							$("#loadingSpinner").addClass("hide");
-							$(".hide_loading").removeClass("hide");
-						}
 
-					});
 
 		}
 

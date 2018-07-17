@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class stpProf implements \JsonSerializable
 {
 
-    protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $id_paper, $user_id_wp, $onboarding;
+    protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $id_paper, $user_id_wp, $onboarding_step, $iban;
 
     public function __construct(array $donnees = array())
     {
@@ -39,6 +39,24 @@ class stpProf implements \JsonSerializable
     public function setPrenom($prenom)
     {
         $this->prenom = $prenom;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getIban()
+    {
+        return $this->iban;
+    }
+
+    /**
+     *
+     * @param mixed $iban
+     */
+    public function setIban($iban)
+    {
+        $this->iban = $iban;
     }
 
     public function getNom()
@@ -156,7 +174,9 @@ class stpProf implements \JsonSerializable
         $vars = get_object_vars($this);
         return $vars;
     }
+
     /**
+     *
      * @return mixed
      */
     public function getUser_id_wp()
@@ -165,13 +185,16 @@ class stpProf implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $user_id_wp
      */
     public function setUser_id_wp($user_id_wp)
     {
         $this->user_id_wp = $user_id_wp;
     }
+
     /**
+     *
      * @return mixed
      */
     public function getOnboarding()
@@ -180,6 +203,7 @@ class stpProf implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $onboarding
      */
     public function setOnboarding($onboarding)
@@ -187,11 +211,45 @@ class stpProf implements \JsonSerializable
         $this->onboarding = $onboarding;
     }
 
-    
-    
+    /**
+     *
+     * @return mixed
+     */
+    public function getOnboarding_step()
+    {
+        return $this->onboarding_step;
+    }
 
-    
-    
-    
-    
+    /**
+     *
+     * @param mixed $onboarding_step
+     */
+    public function setOnboarding_step($onboarding_step)
+    {
+        $this->onboarding_step = $onboarding_step;
+    }
+
+    public function toArray()
+    {
+        $retour = [];
+        
+        foreach ($this as $key => $value) {
+            $retour[$key] = $value;
+        }
+        return ($retour);
+    }
+
+    public function toSlack($header)
+    {
+        $retour = [];
+        
+        $retour[] = $header;
+        $retour[] = " ";
+        foreach ($this as $key => $value) {
+            if ($value) {
+                $retour[] = $key . " : " . $value;
+            }
+        }
+        return ($retour);
+    }
 }

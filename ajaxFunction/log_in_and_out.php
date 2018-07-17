@@ -26,14 +26,14 @@ function ajaxLogOut()
 function ajaxCheckLogIn()
 
 {
-    
     $retour = "ok";
     $user;
+    $redirection = "";
     
     header('Content-type: application/json');
     
     $canLog = false;
-   
+    
     $username = $_POST['username'];
     $password = $_POST['password'];
     
@@ -52,9 +52,42 @@ function ajaxCheckLogIn()
         ));
     }
     
-    if($canLog){
-        $retour = $user;
-    }else{
+    if (array_key_exists("prof", $user->get_role_caps())) {
+        
+        $profMg = new \spamtonprof\stp_api\stpProfManager();
+        
+        $prof = $profMg->get(array(
+            'user_id_wp' => $user->ID
+        ));
+        $user = $prof;
+        
+        if ($prof->getOnboarding()) {
+            
+            $redirection = 'dashboard-prof';
+        } else {
+            
+            $redirection = 'onboarding-prof';
+        }
+        
+        $retour = array(
+            "prof" => $user,
+            "redirection" => $redirection,
+            "message" => "Terminez votre inscription pour pouvoir gagner vos premiers &euro;&euro; !"
+        );
+    } elseif (array_key_exists("client", $user->get_role_caps())) {
+        
+        $user = $user;
+        $redirection = 'dashboard-eleve';
+        $retour = array(
+            "client" => $user,
+            "redirection" => $redirection,
+            "message" => "Bienvenue sur SpamTonProf"
+        );
+    }
+    
+    if ($canLog) {
+        $retour = $retour;
+    } else {
         $retour = false;
     }
     

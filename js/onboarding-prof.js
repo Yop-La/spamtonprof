@@ -4,11 +4,14 @@
 
 //id des champs du formulaire
 
-idForm = "69";
-idFormContent= "#nf-form-".concat(idForm, "-cont");
+idFormPays = "69";
+idFormIban = "70";
+
+idFormIbanContent= "#nf-form-".concat(idFormIban, "-cont");
 
 idPays = "990";
-
+idIban = "994";
+ibanField = "#nf-field-994";
 ajaxEnCours = 0;
 
 /*
@@ -27,7 +30,7 @@ var mySubmitController = Marionette.Object.extend( {
 		console.log(response);
 
 		// titles form
-		if(response.data.form_id == idForm){
+		if(response.data.form_id == idFormPays){
 
 
 			pays = response.data.fields[idPays].value;
@@ -41,6 +44,13 @@ var mySubmitController = Marionette.Object.extend( {
 				showMessage("Désolé ce pays n'est pas supporté. Nous ne pourrons pas vous payer.");
 
 			}
+
+		}else if(response.data.form_id == idFormIban){
+
+
+			iban = response.data.fields[idIban].value;
+
+			updateIbanProf(iban);
 
 		}
 
@@ -63,8 +73,16 @@ jQuery( document ).ready( function( $ ) {
 
 
 
-	
-	
+	stepId = "#".concat(loggedProf.onboarding_step);
+
+	waitForEl(stepId,function(){
+
+		$(stepId).removeClass("hide");
+
+	});
+
+
+
 });
 
 //pour créer le token permettant de créer le custom acccount. Eclispe indique 3 erreurs de syntaxe mais il se trompe
@@ -98,7 +116,10 @@ async function createCustomAccnt(pays) {
 			})
 			.done(function(retour){ 
 
-				showMessage("Le pays choisi est ".concat(retour));
+				$("#step-1").removeClass("hide");
+				$("#step-0").addClass("hide");
+
+				showMessage("Il ne reste plus qu'à fournir votre IBAN");
 
 			})
 			.fail(function(err){
@@ -117,6 +138,60 @@ async function createCustomAccnt(pays) {
 
 }
 
+function updateIbanProf(iban){
+
+
+
+	var stripe = Stripe(publicStripeKey);
+	stripe.createSource({
+		type: 'sepa_debit',
+		sepa_debit: {
+			iban: iban,
+		},
+		currency: 'eur',
+		owner: {
+			name: "just to test iban",
+		},
+	}).then(function(result) {
+
+		console.log("result stripe");
+		console.log(result);
+		
+		if(result.error == null){
+
+			
+		
+			$("#loadingSpinner").removeClass("hide");
+			$(".hide_loading").addClass("hide");
+			ajaxEnCours++;
+			jQuery.post(
+					ajaxurl,
+					{
+						'action' : 'updateIbanProf',
+						'iban' : iban
+					})
+					.done(function(retour){ 
+
+						redirect("dashboard-prof" ,info = "Félicitations, nous avons bien reçu votre inscription. Nous allons vérifier tout ça et revenir vers vous rapidement."  )
+
+					})
+					.fail(function(err){
+						console.log("erreur ajax");
+						console.log(err);
+						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
+					});
+		}else{
+			
+			$(idFormIbanContent).effect( "shake" );
+			
+			
+			showMessage("L'IBAN saisie est invalide. Veuillez saisir un IBAN correct.");
+			
+			$(ibanField).attr('style', 'color: red !important; font-weight: 900');
+			
+		}
+	});
+}
 
 
 

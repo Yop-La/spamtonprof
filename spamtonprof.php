@@ -74,3 +74,13 @@ require_once (dirname(__FILE__) . '/ajaxFunction/onboarding_prof_ajax.php');
 require_once (dirname(__FILE__) . '/ninjaFormHooks/afterSubmission.php');
 
 
+
+
+add_action('wp_enqueue_scripts', 'handleScriptAndTestModeOnPage');
+function handleScriptAndTestModeOnPage()
+{
+    global $post;
+    $pageSlug = $post->post_name;
+    $PageManager = new \spamtonprof\stp_api\PageManager($pageSlug);
+}
+

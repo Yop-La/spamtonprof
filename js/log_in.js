@@ -17,8 +17,11 @@ ajaxEnCours = 0;
 wpUser = null;
 var mySubmitController = Marionette.Object.extend( {
 
+	
+	
 	initialize: function() {
 		this.listenTo( Backbone.Radio.channel( 'forms' ), 'submit:response', this.actionSubmit );
+		console.log("submit controler loaded");
 	},
 
 	actionSubmit: function( response ) {
@@ -50,16 +53,16 @@ var mySubmitController = Marionette.Object.extend( {
 						'username' : username
 
 					})
-					.done(function(user){ 
+					.done(function(retour){ 
 
-						if(user){
+						if(retour){
 							$('#nf-field-'.concat(idUsername)).val('');
 							$('#nf-field-'.concat(idPassword)).val('');
-							wpUser = user;
-							if('client' in wpUser.caps){
-								redirect('dashboard-eleve', "Bienvenue sur SpamTonProf ! ");	
-							}else if('prof' in wpUser.caps){
-								redirect('dashboard-prof', "Bienvenue sur SpamTonProf ! ");	
+
+							if('client' in retour){
+								redirect(retour.redirection, "Bienvenue sur SpamTonProf ! ");	
+							}else if('prof' in retour){
+								redirect(retour.redirection, retour.message);	
 							}else{
 								redirect('', "Bienvenue sur SpamTonProf ! ");	
 							}
@@ -90,6 +93,8 @@ var mySubmitController = Marionette.Object.extend( {
 //début jquery
 jQuery( document ).ready( function( $ ) {
 
+	console.log("jquery begin");
+	
 	new mySubmitController();
 	
 	waitForEl(".hide_loading",function(){

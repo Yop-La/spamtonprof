@@ -23,6 +23,7 @@ function ajaxInscriptionProf()
     $nom = trim($_POST['nom']);
     $email = trim($_POST['email']);
     $mobile = trim($_POST['mobile']);
+    $dob = trim($_POST['dob']);
     
     // première partie : est ce que prof à déjà un compte chez nous ?
     $accountExist = $stpProfMg->get(array(
@@ -35,11 +36,15 @@ function ajaxInscriptionProf()
         $error = "account-exists";
     } else {
         
+        $dob = DateTime::createFromFormat('j/m/Y', $dob);
+        
         $stpProf = $stpProfMg->add(new \spamtonprof\stp_api\stpProf(array(
             'email_perso' => $email,
             'prenom' => $prenom,
             'nom' => $nom,
-            'telephone' => $mobile
+            'telephone' => $mobile,
+            'onboarding_step' => "step-0",
+            'date_naissance' => $dob
         )));
         
         $stpProf -> setOnboarding(false);
@@ -87,6 +92,8 @@ function ajaxInscriptionProf()
     
     if ($error) {
         $retour = $error;
+    }else{
+        $retour = $stpProf;
     }
     
     echo (json_encode($retour));

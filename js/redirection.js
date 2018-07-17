@@ -7,14 +7,18 @@ console.log("begin : trying to redirect");
 //début jquery
 jQuery( document ).ready( function( $ ) {
 
-	waitForEl("#hidden-form",function(){
+	
+	if(redirection != 0){
 
-		if("slug" in redirection){
-			redirect(redirection.slug, redirection.message );
-		}
-	});
+		waitForEl("#hidden-form",function(){
 
+			if("slug" in redirection){
+				redirect(redirection.slug, redirection.message );
+			}
 
+		});
+
+	}
 
 
 });

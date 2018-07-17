@@ -21,10 +21,10 @@ function isEmail(email) {
 	return regex.test(email);
 }
 
-function redirect(slug ,info = ""  ){
+function redirect(slug ,info = "" ){
 	info = htmlentities.encode(info);
 	$("#hidden-form").attr("action", homeUrl.concat("/",slug) );
-	$("#info").val(info);
+	$("#info").val($("<div>").html(info).text());
 	$("#hidden-form").submit();
 }
 
