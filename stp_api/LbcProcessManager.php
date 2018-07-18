@@ -359,7 +359,7 @@ class LbcProcessManager
                 return ("");
             }, $body);
             
-            $rep = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), "Cannelle Gaucher", $html = true);
+            $rep = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), "", $html = true);
             
             if ($rep) {
                 

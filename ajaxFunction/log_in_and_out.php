@@ -83,6 +83,8 @@ function ajaxCheckLogIn()
             "redirection" => $redirection,
             "message" => "Bienvenue sur SpamTonProf"
         );
+    }else{
+        $retour = $user;
     }
     
     if ($canLog) {

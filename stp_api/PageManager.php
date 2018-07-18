@@ -3,24 +3,7 @@ namespace spamtonprof\stp_api;
 
 /*
  *
- * Cette classe sert à gérér ( CRUD ) les plans de paiement paypal
- *
- * attention un billing plan ( equivalent service/produit dans stripe ) ne peut avoir qu'un seul type de paiement definition regulier
- *
- * ainsi ici un billing plan est équivalent à un plan dans stp
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
+ * Pour charger des scripts css ou js et des variables js avant le chargement d'une page
  *
  *
  */
