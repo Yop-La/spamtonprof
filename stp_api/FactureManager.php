@@ -6,6 +6,9 @@ use PDO;
 class FactureManager
 {
 
+    const MONTH_NAMES  = array("Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Juillet","Septembre","Octobre","Novembre","Décembre");
+    
+    
     private $_db;
 
     // Instance de PDO
