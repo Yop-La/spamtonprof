@@ -42,40 +42,13 @@ class LbcProcessManager
      * - en extraire la réponse de l'agent de prospection et le stocker dans la colonne reply de la table message_prospect_lbc
      *
      */
-    
-    public function  testZone(){
-        
-        $lastHistoryId = $this->gmailAccount->getLast_history_id();
-        
-        $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-        
-        $now -> sub(new \DateInterval("PT4H"));
-        
-        $timestamp = $now->getTimestamp();
-        
-        $now = $now->format('Y/m/d');
-        
-        $lastHistoryId = 2269850;
-        
-        $retour = $this->gmailManager->getNewMessages($lastHistoryId);
-        
-        $messages = $retour["messages"];
-        
-        $lastHistoryId = $retour["lastHistoryId"];
-        
-        echo($lastHistoryId);
-        
-        prettyPrint($messages);
-        
-    }
-    
     public function readNewLeadMessages()
     {
         $lastHistoryId = $this->gmailAccount->getLast_history_id();
         
         $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
         
-        $now -> sub(new \DateInterval("PT2H"));
+        $now->sub(new \DateInterval("PT2H"));
         
         $timestamp = $now->getTimestamp();
         
@@ -90,7 +63,7 @@ class LbcProcessManager
         $this->gmailAccount->setLast_history_id($lastHistoryId);
         $this->gmailAccountMg->updateHistoryId($this->gmailAccount);
         
-        echo("------  nb messages : " . count($messages) . " ----- <br>");
+        echo ("------  nb messages : " . count($messages) . " ----- <br>");
         
         $nbMessageToProcess = 100;
         $indexMessageProcessed = 0;
@@ -126,7 +99,6 @@ class LbcProcessManager
                 }
                 
                 if ($messageType != 0) {
-                    
                     
                     $emails = [];
                     
@@ -182,8 +154,6 @@ class LbcProcessManager
                 
                 if (strpos($subject, "|--|") !== false) {
                     
-                    
-                    
                     preg_match('/\|--\|(\d*)\|--\|/', $subject, $matches);
                     
                     $refMessage = $matches[1];
@@ -214,9 +184,7 @@ class LbcProcessManager
                     }
                 }
             }
-
             
-    
             $indexMessageProcessed ++;
             if ($nbMessageToProcess == $indexMessageProcessed) {
                 break;
@@ -265,7 +233,7 @@ class LbcProcessManager
             $subject = $message->getSubject();
         }
         
-        $this->gmailManager->sendMessage($body,$subject , "le.bureau.des.profs@gmail.com", $replyTo, "mailsfromlbc@gmail.com", "lbcBot");
+        $this->gmailManager->sendMessage($body, $subject, "le.bureau.des.profs@gmail.com", $replyTo, "mailsfromlbc@gmail.com", "lbcBot");
         
         $message->setProcessed(true);
         $this->messProspectMg->updateProcessed($message);
@@ -331,6 +299,7 @@ class LbcProcessManager
     {
         $message = $this->messProspectMg->getMessageToSend();
         
+       
         if ($message) {
             
             $compteLbc = $this->lbcAccountMg->get(array(
@@ -359,9 +328,9 @@ class LbcProcessManager
                 return ("");
             }, $body);
             
-            $rep = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), "", $html = true);
+            $send = $this->sendLeadReply($compteLbc, $smtpServer, $subject, $to, $body, $message);
             
-            if ($rep) {
+            if ($send) {
                 
                 $message->setAnswered(true);
                 $this->messProspectMg->updateAnswered($message);
@@ -383,9 +352,25 @@ class LbcProcessManager
                 
                 $this->gmailManager->modifyMessage($message->getGmail_id(), $labelId, array());
                 $this->gmailManager->modifyMessage($message->getAnswer_gmail_id(), $labelId, array());
-                
+            } else {
+                $slack = new \spamtonprof\slack\Slack();
+                $slack->sendMessages("log-lbc", array(
+                    "La réponse au lead de ref " . $message->getRef_message() . " n'a pas pu être envoyé ... "
+                ));
             }
         }
+    }
+    
+    public function sendLeadReply($compteLbc, $smtpServer, $subject, $to, $body, $message){
+        
+        $send = true;
+        
+        $rep = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), "", $html = true);
+        $rep = $smtpServer->sendEmail("Stp Reply : |--|".$message->getRef_message(). "|--|" .$subject, "lebureaudesprofs@gmail.com", $body, $compteLbc->getMail(), "", $html = true);
+        
+        return($send);
+        
+        
     }
 
     public function processLeadMessage()
@@ -406,5 +391,61 @@ class LbcProcessManager
         }
     }
 
-    
+    public function testZone()
+    {
+        $message = $this->messProspectMg->get(array(
+            "ref_message" => 12086
+        ));
+        
+        if ($message) {
+            
+            $compteLbc = $this->lbcAccountMg->get(array(
+                "ref_compte" => $message->getRef_compte_lbc()
+            ));
+            
+            $expe = $compteLbc->getExpe();
+            
+            $smtpServer = $expe->getSmtpServer();
+            
+            $lead = $this->prospectLbcMg->get(array(
+                "ref_prospect_lbc" => $message->getRef_prospect_lbc()
+            ));
+            
+            $smtpServerMg = new SmtpServerManager();
+            
+            $subject = 'Re: ' . str_replace('leboncoin', 'lebonc...', $message->getSubject());
+            $body = $message->getReply();
+            
+            // on supprime la partie écrite par 33mail.
+            
+            $to = $lead->getAdresse_mail(); // 'alex.guillemine@gmail.com'
+            
+            $pattern = '/(<div align="center">.*?<\/div><\/div>)|(This email was sent to the alias(.*?)[\r\n])/';
+            $body = preg_replace_callback($pattern, function ($m) {
+                return ("");
+            }, $body);
+            
+            $body = str_replace(9, 8, $body);
+            
+            echo($body);
+            
+            // 4 -> send grid / full body / to alex.guillemine
+            
+            // 1 -> send grid - to : alex.guillemine - full body : tarif
+            
+            // 5 -> ovh / full body / to alex.guillemine / subject normal
+            // 2 -> ovh - to : alex.guillemine - full body : tarif
+            // $body = str_replace(9, 8, $body);
+            
+            $rep = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), "", $html = true);
+            $rep = $smtpServer->sendEmail($subject, "alex.guillemine@gmail.com", $body, $compteLbc->getMail(), "", $html = true);
+            
+            // 3 -> ovh - to : alex.guillemine - short body : tarif
+            // $body = "Bonjour, je demande entre 15 et 20 euros par heure. ";
+            // $rep = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), "", $html = true);
+            // $rep = $smtpServer->sendEmail($subject, "alex.guillemine@gmail.com", $body, $compteLbc->getMail(), "", $html = true);
+            
+            // $rep = $smtpServer->sendEmail("Cours de maths physique", "alex.guillemine@gmail.com", $body, $compteLbc->getMail(), "", $html = true);
+        }
+    }
 }

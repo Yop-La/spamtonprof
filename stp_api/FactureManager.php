@@ -1,7 +1,6 @@
 <?php
 namespace spamtonprof\stp_api;
 
-use PDO;
 
 class FactureManager
 {

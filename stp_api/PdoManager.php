@@ -24,11 +24,11 @@ class PdoManager
                 // to_log_slack(array("str1" => "connection bdd" ));
             } catch (Exception $e) {
                 
-                to_log_slack(array(
-                    "str1" => "error connection bdd" . $e->getMessage()
-                ));
+                $slack = new \spamtonprof\slack\Slack();
                 
-                echo ("fuck");
+                $slack->sendMessages("log", array("error connection bdd : " . $e->getMessage()));
+                
+                echo ("echec connexion à la bdd");
             }
         }
         

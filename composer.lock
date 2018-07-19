@@ -1016,16 +1016,16 @@
         },
         {
             "name": "stripe/stripe-php",
-            "version": "v6.10.0",
+            "version": "v6.10.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/stripe/stripe-php.git",
-                "reference": "be46d55c4a67265d6fe3eaf2ff69f6cfffe0034d"
+                "reference": "879ab79c842a759339cee955fc925491847ac7d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/be46d55c4a67265d6fe3eaf2ff69f6cfffe0034d",
-                "reference": "be46d55c4a67265d6fe3eaf2ff69f6cfffe0034d",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/879ab79c842a759339cee955fc925491847ac7d9",
+                "reference": "879ab79c842a759339cee955fc925491847ac7d9",
                 "shasum": ""
             },
             "require": {
@@ -1067,7 +1067,7 @@
                 "payment processing",
                 "stripe"
             ],
-            "time": "2018-06-28T15:25:46+00:00"
+            "time": "2018-07-19T09:52:11+00:00"
         },
         {
             "name": "wrapi/slack",
