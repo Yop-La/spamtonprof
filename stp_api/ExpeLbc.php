@@ -11,7 +11,7 @@ use Exception;
 class ExpeLbc implements \JsonSerializable
 {
 
-    protected $ref_expe, $smtpServer, $ref_smtp_server, $expe, $nb_message, $weebhook, $ref_mail_for_lead, $mailForLead, $filtre;
+    protected $ref_expe, $smtpServer, $ref_smtp_server, $expe, $nb_message, $weebhook, $ref_mail_for_lead, $mailForLead, $filtre, $from_name;
 
     public function __construct(array $donnees = array())
     
@@ -216,5 +216,23 @@ class ExpeLbc implements \JsonSerializable
     {
         $this->mailForLead = $mailForLead;
     }
+    /**
+     * @return mixed
+     */
+    public function getFrom_name()
+    {
+        return $this->from_name;
+    }
+
+    /**
+     * @param mixed $from_name
+     */
+    public function setFrom_name($from_name)
+    {
+        $this->from_name = $from_name;
+    }
+
+    
+    
 }
 

@@ -7,6 +7,5 @@
         "wrapi/slack": "^1.0",
 		"hashids/hashids": "1.0.5",
 		"ifsnop/mysqldump-php":"2.*"
-		
     }
 }

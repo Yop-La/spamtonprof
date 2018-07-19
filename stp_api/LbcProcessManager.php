@@ -328,7 +328,7 @@ class LbcProcessManager
                 return ("");
             }, $body);
             
-            $send = $this->sendLeadReply($compteLbc, $smtpServer, $subject, $to, $body, $message);
+            $send = $this->sendLeadReply($compteLbc, $expe, $subject, $to, $body, $message);
             
             if ($send) {
                 
@@ -340,7 +340,7 @@ class LbcProcessManager
                 $msgs[] = "Réponse automatique au mail : " . $message->getRef_message();
                 $msgs[] = "Lead concerné : " . $lead->getAdresse_mail();
                 $msgs[] = "Compte Lbc concerné et expediteur : " . $compteLbc->getMail();
-                $msgs[] = "Sender : " . $smtpServer->getFrom();
+                $msgs[] = "Sender : " . $expe->getExpe();
                 $msgs[] = "Réponse : ";
                 $msgs[] = $subject;
                 $msgs[] = strip_tags($body);
@@ -361,14 +361,14 @@ class LbcProcessManager
         }
     }
     
-    public function sendLeadReply($compteLbc, $smtpServer, $subject, $to, $body, $message){
+    public function sendLeadReply($compteLbc,\spamtonprof\stp_api\ExpeLbc $expe, $subject, $to, $body, $message){
+
+        $smtpServer = $expe -> getSmtpServer();
+   
+        $send1 = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), $expe->getFrom_name(), $html = true);
+        $send2 = $smtpServer->sendEmail("Stp Reply : |--|".$message->getRef_message(). "|--|" .$subject, "lebureaudesprofs@gmail.com", $body, $compteLbc->getMail(), $expe -> getFrom_name(), $html = true);
         
-        $send = true;
-        
-        $rep = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), "", $html = true);
-        $rep = $smtpServer->sendEmail("Stp Reply : |--|".$message->getRef_message(). "|--|" .$subject, "lebureaudesprofs@gmail.com", $body, $compteLbc->getMail(), "", $html = true);
-        
-        return($send);
+        return($send1 && $send2);
         
         
     }
@@ -404,9 +404,7 @@ class LbcProcessManager
             ));
             
             $expe = $compteLbc->getExpe();
-            
-            $smtpServer = $expe->getSmtpServer();
-            
+           
             $lead = $this->prospectLbcMg->get(array(
                 "ref_prospect_lbc" => $message->getRef_prospect_lbc()
             ));
@@ -425,9 +423,11 @@ class LbcProcessManager
                 return ("");
             }, $body);
             
-            $body = str_replace(9, 8, $body);
+            $body = str_replace(9, 5, $body);
             
-            echo($body);
+//             echo($body);
+            
+            $this->sendLeadReply($compteLbc, $expe, $subject, $to, $body, $message);
             
             // 4 -> send grid / full body / to alex.guillemine
             
@@ -437,8 +437,8 @@ class LbcProcessManager
             // 2 -> ovh - to : alex.guillemine - full body : tarif
             // $body = str_replace(9, 8, $body);
             
-            $rep = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), "", $html = true);
-            $rep = $smtpServer->sendEmail($subject, "alex.guillemine@gmail.com", $body, $compteLbc->getMail(), "", $html = true);
+//             $rep = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), "", $html = true);
+//             $rep = $smtpServer->sendEmail($subject, "alex.guillemine@gmail.com", $body, $compteLbc->getMail(), "", $html = true);
             
             // 3 -> ovh - to : alex.guillemine - short body : tarif
             // $body = "Bonjour, je demande entre 15 et 20 euros par heure. ";
