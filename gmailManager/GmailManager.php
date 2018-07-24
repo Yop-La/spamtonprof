@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\gmailManager;
 
-use Assetic\Exception\Exception;
+use \Exception;
 use Google_Client;
 use Google_Service_Gmail;
 use Google_Service_Gmail_Message;
@@ -59,7 +59,7 @@ class GmailManager
             // Request authorization from the user.
             $authUrl = $client->createAuthUrl();
             
-            $authCode = "4/AAABsopG0L4d_xfUATtu-CtFMs3vYu9JKQOD-kshGWGmtuOh7k7bpUo"; // à remplir par ce qui sera donné par $authUrl
+            $authCode = "4/AACmM2YHmN5W5nEY4J2OWuKQPh90QRsZ9HE1Yc5KqqWJKwfcE_Z9eyM"; // à remplir par ce qui sera donné par $authUrl
             
             if ($authCode == "") {
                 echo ("la2");
@@ -68,6 +68,8 @@ class GmailManager
             
             // Exchange authorization code for an access token.
             $accessToken = $client->fetchAccessTokenWithAuthCode($authCode);
+            
+            echo(json_encode($accessToken));
             
             $account->setCredential(json_encode($accessToken));
             $accountMg->updateCredential($account);
@@ -116,7 +118,7 @@ class GmailManager
                 
                     $pageToken = $messagesResponse->getNextPageToken();
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 print 'An error occurred: ' . $e->getMessage();
             }
         } while ($pageToken);
@@ -130,7 +132,7 @@ class GmailManager
             
             $message = $this->service->users_messages->get($this->userId, $messageId, $format);
             return $message;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             print 'An error occurred: ' . $e->getMessage();
         }
     }
@@ -146,7 +148,7 @@ class GmailManager
         try {
             $message = $this->service->users_messages->modify($this->userId, $messageId, $mods);
             return $message;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             print 'An error occurred: ' . $e->getMessage();
         }
     }
@@ -177,7 +179,7 @@ class GmailManager
         
         try {
             $label = $this->service->users_labels->create($this->userId, $label);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             print 'An error occurred: ' . $e->getMessage();
         }
         return $label;

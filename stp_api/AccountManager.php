@@ -280,7 +280,7 @@ class AccountManager
         $q->execute();
     }
 
-    // pour mettre  à jour attente paiement et statut
+    // pour mettre à jour attente paiement et statut
     public function updateAfterSubsCreated(spamtonprof\stp_api\Account $account)
     
     {
@@ -553,34 +553,64 @@ class AccountManager
             order by date_creation desc;");
         $q->execute();
         
-        while ($data = $q -> fetch(PDO::FETCH_ASSOC)){
-        
-            $refComptes[] = $data['ref_compte'];
+        while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
             
+            $refComptes[] = $data['ref_compte'];
         }
         
-        return($refComptes);
-        
+        return ($refComptes);
     }
-    
-    public function unsubInactiveAccounts(){
+
+    // pour retourner les comptes en fin d'essai ( ie avec 7 jours d'ancienneté ).
+    public function getTrialEndAccounts()
+    {
+        $refComptes = [];
         
+        $q = $this->_db->prepare("select * from compte_eleve where extract(day from now() - date_creation ) = 7
+            and statut = 'essai' 
+            order by date_creation desc;");
+        $q->execute();
+        
+        while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
+            
+            $refComptes[] = $data['ref_compte'];
+        }
+        
+        return ($refComptes);
+    }
+
+    public function unsubInactiveAccounts()
+    {
         $refComptes = $this->getInactiveAccounts();
         
         $accounts = $this->getAll($refComptes);
         
-        foreach ($accounts as $account){
-            
+        foreach ($accounts as $account) {
             
             $account->setStatut('desinscrit_essai');
             $account->setAttente_paiement(true);
             
             $this->updateAfterSubsCreated($account);
-                        
         }
         
-        return($accounts);
+        return ($accounts);
+    }
+
+    public function getNbMessage($refAccount)
+    {
+        $refComptes = [];
         
+        $q = $this->_db->prepare("select count(*) as nb_message from mail_eleve where ref_compte = :ref_compte");
+        $q->bindValue(":ref_compte", $refAccount);
+        $q->execute();
+        
+        if ($data = $q->fetch(PDO::FETCH_ASSOC)) {
+            
+            return ($data['nb_message']);
+        } else {
+            
+            return (0);
+        }
     }
 
     public function setDb(PDO $db)
