@@ -33,7 +33,7 @@ class EleveManager
     public function get($info)
     {
         if (is_int($info)) {
-            $q = $this->_db->query('SELECT adresse_mail, prenom, nom, ref_eleve, classe FROM eleve WHERE ref_eleve = ' . $info);
+            $q = $this->_db->query('SELECT * FROM eleve WHERE ref_eleve = ' . $info);
             
             if ($q->rowCount() <= 0) {
                 return (false);
@@ -41,7 +41,7 @@ class EleveManager
                 return new Eleve($q->fetch(PDO::FETCH_ASSOC));
             }
         } else {
-            $q = $this->_db->prepare('SELECT adresse_mail, prenom, nom, ref_eleve, classe FROM eleve WHERE adresse_mail like :mail');
+            $q = $this->_db->prepare('SELECT * FROM eleve WHERE adresse_mail like :mail');
             $q->execute([
                 ':mail' => '%' . $info . '%'
             ]);

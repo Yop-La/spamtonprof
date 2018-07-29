@@ -35,7 +35,7 @@ class ParentManager
   {
     if (is_int($info))
     {
-      $q = $this->_db->query('SELECT adresse_mail, prenom, nom, ref_parent FROM parent WHERE ref_parent = '.$info);
+      $q = $this->_db->query('SELECT * FROM parent WHERE ref_parent = '.$info);
 
       if($q->rowCount() <= 0){
         return(false);
@@ -45,7 +45,7 @@ class ParentManager
     }
     else
     {
-      $q = $this->_db->prepare('SELECT adresse_mail, prenom, nom, ref_parent FROM parent WHERE adresse_mail like :mail');
+      $q = $this->_db->prepare('SELECT * WHERE adresse_mail like :mail');
       $q->execute([':mail' => '%' . $info . '%']);
       if($q->rowCount() <= 0){
         return(false);

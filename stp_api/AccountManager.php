@@ -74,6 +74,7 @@ class AccountManager
             $q->execute([
                 ':ref_compte' => $info
             ]);
+            
             $account = $this->get($q->fetch(PDO::FETCH_ASSOC));
             return $account;
         }
