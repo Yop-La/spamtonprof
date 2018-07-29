@@ -138,6 +138,12 @@ class PageManager
             
             PageManager::onboardingProf();
         }
+        
+        if ($this->pageSlug == 'temoigner') {
+            
+            PageManager::temoigner();
+            
+        }
     }
 
     public static function abonnementApresEssaiLoader()
@@ -272,6 +278,19 @@ class PageManager
             
             wp_enqueue_script('onboarding_prof');
         }
+    }
+    
+    public static function temoigner()
+    
+    {
+        
+        wp_enqueue_script('temoigner', plugins_url() . '/spamtonprof/js/temoigner.js', array(
+            
+            'nf-front-end'
+            
+        ), time());
+        
+     
     }
 }
 
