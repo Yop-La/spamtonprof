@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class stpAbonnement implements \JsonSerializable
 {
 
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $prof_referent, $date_maj, $interrompu, $probleme_paiement, $remarque_inscription, $ref_plan;
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $prof_referent, $remarque_inscription, $ref_plan;
 
     public function __construct(array $donnees = array())
     {
@@ -66,7 +66,7 @@ class stpAbonnement implements \JsonSerializable
         return $this->date_creation;
     }
 
-    public function setDate_creation($date_creation)
+    public function setDate_creation(\DateTime $date_creation)
     {
         $this->date_creation = $date_creation;
     }
@@ -79,36 +79,6 @@ class stpAbonnement implements \JsonSerializable
     public function setProf_referent($prof_referent)
     {
         $this->prof_referent = $prof_referent;
-    }
-
-    public function getDate_maj()
-    {
-        return $this->date_maj;
-    }
-
-    public function setDate_maj($date_maj)
-    {
-        $this->date_maj = $date_maj;
-    }
-
-    public function getInterrompu()
-    {
-        return $this->interrompu;
-    }
-
-    public function setInterrompu($interrompu)
-    {
-        $this->interrompu = $interrompu;
-    }
-
-    public function getProbleme_paiement()
-    {
-        return $this->probleme_paiement;
-    }
-
-    public function setProbleme_paiement($probleme_paiement)
-    {
-        $this->probleme_paiement = $probleme_paiement;
     }
 
     public function getRemarque_inscription()

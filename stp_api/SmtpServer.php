@@ -125,9 +125,6 @@ class SmtpServer implements \JsonSerializable
         $password = $this->password;
         $username = $this->username;
         
-        if ($fromName == "") {
-            $fromName = $this->name;
-        }
         
         // Create a new PHPMailer instance
         $mail = new PHPMailer();
@@ -140,7 +137,7 @@ class SmtpServer implements \JsonSerializable
         // 0 = off (for production use)
         // 1 = client messages
         // 2 = client and server messages
-        $mail->SMTPDebug = 4;
+        $mail->SMTPDebug = 0;
         // Set the hostname of the mail server
         // $mail->Host = $this->host;
         $mail->Host = $host;

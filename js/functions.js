@@ -44,7 +44,7 @@ function isPositiveInteger(n) {
 
 function toFieldId(id){
 	
-	return("#nf-field".concat(id));
+	return("#nf-field-".concat(id));
 	
 }
 

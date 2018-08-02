@@ -211,14 +211,52 @@ function base64url_decode($base64url)
     return ($plainText);
 }
 
+// pour importer des plans de paiements depuis un csv vers la table stp_plan_paiement
+function importPlanPaiementFromCsv()
+{
+    $stpPlanMg = new \spamtonprof\stp_api\StpPlanManager();
+    
+    $row = 0;
+    if (($handle = fopen("formules_plan_paiements.csv", "r")) !== FALSE) {
+        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+            
+            $row ++;
+            
+            $tarif = $data[3];
+            
+            if ($tarif != "" and $row != 1) {
+                
+                $arrPlan = array(
+                    "nom" => $data[2],
+                    "tarif" => $tarif,
+                    "ref_formule" => $data[0],
+                    "ref_plan_old" => $data[4]
+                );
+                
+                $stpPlan = new \spamtonprof\stp_api\StpPlan($arrPlan);
+                
+                echo (json_encode($stpPlan));
+                
+                echo ("<br>");
+                
+                $stpPlan = $stpPlanMg->add($stpPlan);
+                
+                if ($stpPlan->getRef_plan_old() != "") {
+                    
+                    $stpPlanMg->updateRefPlanOld($stpPlan);
+                }
+            }
+        }
+        fclose($handle);
+    }
+}
 
-//   pour générer des classes et des managers
-//   example :
-//   $tableName = 'stp_eleve';
-//   $path = dirname(__FILE__) . "/wp-content/plugins/spamtonprof/stp_api";
-//   $nameSpace = 'spamtonprof\stp_api';
-//   generateClassAndManager($tableName, $path, $nameSpace);
- 
+// pour générer des classes et des managers
+// example :
+// $tableName = 'stp_eleve';
+// $path = dirname(__FILE__) . "/wp-content/plugins/spamtonprof/stp_api";
+// $nameSpace = 'spamtonprof\stp_api';
+// generateClassAndManager($tableName, $path, $nameSpace);
 function generateClassAndManager($tableName, $path, $nameSpace)
 {
     $classeNameParts = explode('_', $tableName);

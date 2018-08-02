@@ -73,14 +73,43 @@ require_once (dirname(__FILE__) . '/ajaxFunction/onboarding_prof_ajax.php');
 
 require_once (dirname(__FILE__) . '/ninjaFormHooks/afterSubmission.php');
 
-
-
-
 add_action('wp_enqueue_scripts', 'handleScriptAndTestModeOnPage');
+
 function handleScriptAndTestModeOnPage()
 {
     global $post;
     $pageSlug = $post->post_name;
     $PageManager = new \spamtonprof\stp_api\PageManager($pageSlug);
 }
+
+add_filter('ninja_forms_render_options', 'my_pre_population_callback', 10, 2);
+
+function my_pre_population_callback($options, $settings)
+{
+    
+    $profils = [];
+    
+    // target profil field in discover week form
+    if ($settings['key'] == 'profil_1532954478855') {
+        
+        $stpProfilMg = new \spamtonprof\stp_api\stpProfilManager();
+        
+        $profils = $stpProfilMg->getAll();
+        
+        foreach ($profils as $profil) {
+            
+            $options[] = array(
+                'label' => $profil->getProfil(),
+                'value' => $profil->getRef_profil()
+            );
+        }
+        
+        wp_reset_postdata();
+    }
+    
+    return $options;
+}
+
+
+
 

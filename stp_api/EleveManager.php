@@ -93,6 +93,10 @@ class EleveManager
         
         return;
     }
+    
+
+    
+    
 
     public function setDb(PDO $db)
     {

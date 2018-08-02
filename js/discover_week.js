@@ -1,52 +1,51 @@
 /*
  * script chargé sur la page dont le slug est discover_week
+ *  voir process ajout matière pour ajouter une matière
+ * 
  */
 
 matiere  = "maths-physique"; // contient la matiere affiché (choisie)
 matieres  = "maths-physique".split("-");
 ajaxEnCours = 0;
-
+gClasseSelect = null;
 
 //id des champs du formulaire
 
-idFormEssai = "64";
+idFormEssai = "72";
 idFormContentEssai = "#nf-form-".concat(idFormEssai, "-cont");
 
-idPrenomEleve = "915";
-idNomEleve = "916";
-idEmailEleve = "918";
-idPhoneEleve = "919";
-idProfil = "948";
-idClasse1 = "949";
-idClasse2 = "917";
-idClasse3 = "950";
-idClasse4 = "951";
+idPrenomEleve = "1006";
+idNomEleve = "1007";
+idEmailEleve = "1009";
+idPhoneEleve = "1010";
+idChoixProfil = "1008";
+idClasse = "1037";
+idMatieres = "1039";
+idProfil = "1040";
 
 
-idChapterMaths = "920";
-idLacuneMaths = "921";
-idNoteMaths = "924";
 
-idChapterPhysique = "928";
-idLacunePhysique = "929";
-idNotePhysique = "930";
+idChapterMaths = "1011";
+idLacuneMaths = "1012";
+idNoteMaths = "1015";
 
-idChapterFrench = "943";
-idLacuneFrench = "947";
-idNoteFrench = "946";
+idChapterPhysique = "1019";
+idLacunePhysique = "1020";
+idNotePhysique = "1021";
 
-idProche = "923";
-idPrenomProche = "931";
-idNomProche = "934";
-idMailProche = "932";
-idPhoneProche = "935";
-idRemarque 	= "938";
+idChapterFrench = "1034";
+idLacuneFrench = "1035";
+idNoteFrench = "1036";
 
-idCode = "941";
+idProche = "1014";
+idPrenomProche = "1022";
+idNomProche = "1025";
+idMailProche = "1023";
+idPhoneProche = "1026";
+idRemarque 	= "1029";
 
-idMathsCoche = "953";
-idPhysiqueCoche = "953";
-idFrenchCoche = "955";
+idCode = "1032";
+
 
 
 /*
@@ -70,18 +69,16 @@ var mySubmitController = Marionette.Object.extend( {
 			$(".hide_loading").addClass("hide");
 			PUM.close(18006);
 
+			//récupérationdes variables du form
 
-			
-			
+			matieres = response.data.fields[idMatieres].value;
+
 			prenomEleve = response.data.fields[idPrenomEleve].value;
 			nomEleve = response.data.fields[idNomEleve].value;
 			emailEleve = response.data.fields[idEmailEleve].value;
 			phoneEleve = response.data.fields[idPhoneEleve].value;
-			profil = response.data.fields[idProfil].value;
-			classe1 = response.data.fields[idClasse1].value;
-			classe2 = response.data.fields[idClasse2].value;
-			classe3 = response.data.fields[idClasse3].value;
-			classe4 = response.data.fields[idClasse4].value;
+			profil = response.data.fields[idChoixProfil].value;
+			classe = response.data.fields[idClasse].value;
 			chapterMaths = response.data.fields[idChapterMaths].value;
 			lacuneMaths = response.data.fields[idLacuneMaths].value;
 			noteMaths = response.data.fields[idNoteMaths].value;
@@ -98,10 +95,8 @@ var mySubmitController = Marionette.Object.extend( {
 			phoneProche = response.data.fields[idPhoneProche].value;
 			remarque = response.data.fields[idRemarque].value;
 			code = response.data.fields[idCode].value;
-			mathsCoche = response.data.fields[idMathsCoche].value;
-			physiqueCoche = response.data.fields[idPhysiqueCoche].value;
-			frenchCoche = response.data.fields[idFrenchCoche].value;
 
+			// soumission ajax des champs du form pour création inscription
 			ajaxEnCours++;
 			jQuery.post(
 					ajaxurl,
@@ -112,10 +107,7 @@ var mySubmitController = Marionette.Object.extend( {
 						'emailEleve' : emailEleve,
 						'phoneEleve' : phoneEleve,
 						'profil' : profil,
-						'classe1' : classe1,
-						'classe2' : classe2,
-						'classe3' : classe3,
-						'classe4' : classe4,
+						'classe' : classe,
 						'chapterMaths' : chapterMaths,
 						'lacuneMaths' : lacuneMaths,
 						'noteMaths' : noteMaths,
@@ -131,34 +123,131 @@ var mySubmitController = Marionette.Object.extend( {
 						'mailProche' : mailProche,
 						'phoneProche' : phoneProche,
 						'remarque' : remarque,
-						'code' : code,
-						'mathsCoche' : mathsCoche,
-						'physiqueCoche' : physiqueCoche,
-						'frenchCoche' : frenchCoche
+						'matieres' : matieres,
+						'code' : code
 					})
 					.done(function(retour){ 
-						console.log(retour);
-						showMessage("Inscription bien validée ! Voulez vous en faire une autre ?");
+						
+						error = retour.error;
+						message = retour.message;
+						
+						if(error){
+							
+							showMessage("Il y a un problème. Contacter l'équipe et donner leur ce message d'erreur : ".concat(message));
+							ajaxEnCours--;
+							if(ajaxEnCours == 0){
+								$("#loadingSpinner").addClass("hide");
+								$(".hide_loading").removeClass("hide");
+							}
+						}else{
+							
+							if(message == "compte_existe_deja"){
+								redirect("connexion" ,info = "Vous avez déjà un compte. Connectez vous ! " );
+							}else{
+								redirect("remerciement-eleve" ,"Félicitations. Tu pourras démarrer la semaine de découverte dans 1 jours !" );
+							}
+							
+						}
+						
+						
 					})
 					.fail(function(err){
 						console.log("erreur ajax");
 						console.log(err);
 						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
-					})
-					.always(function() {
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
 							$("#loadingSpinner").addClass("hide");
 							$(".hide_loading").removeClass("hide");
 						}
-						
 					});
-
 		}
 
 	},
 
 });
+
+//pour changer les choix de classe en fonction du profil
+var myCustomFieldController = Marionette.Object.extend( {
+	initialize: function() {
+
+
+		// on the Field's model value change...
+		var fieldsChannel = Backbone.Radio.channel( 'fields' );
+		this.listenTo( fieldsChannel, 'change:modelValue', this.validateRequired );
+
+		// Listen to the render:view event for fields
+		this.listenTo( nfRadio.channel( 'fields' ), 'render:view', this.renderView );
+
+	},
+
+	validateRequired: function( model ) {
+
+		if ( 'profil_1532954478855' != model.get( 'key' ) ) return false;
+		
+		value = model.get( 'value' );
+		
+		$(toFieldId(idProfil)).val(value);
+		$(toFieldId(idProfil)).trigger("change");
+
+
+		jQuery.post(
+				ajaxurl,
+				{
+					'action' : 'ajaxGetClasses',
+					'ref_profil' : model.get( 'value' )
+				})
+				.done(function(classes){
+
+
+
+
+					$(toFieldId(idClasse)).find('option').remove();
+
+					$(toFieldId(idClasse)).prepend("<option value='' selected='selected'></option>");
+
+					classes.forEach(function(classe) {
+
+						// ajouter options à form
+						$(toFieldId(idClasse)).append($('<option>', {
+							value: classe.ref_classe,
+							text: classe.nom_complet
+						}));
+
+
+
+					});
+
+					gClasseSelect = $(toFieldId(idClasse));
+
+				})
+				.fail(function(err){
+					showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
+
+				});
+
+
+	},
+
+	renderView: function( view ) {
+
+		var el = jQuery( view.el ).find( '.nf-element' );
+
+		if ( 'classe_1532954602744' == view.model.get( 'key' ) ) {
+
+			if(gClasseSelect != null) {
+
+				$(el).replaceWith(gClasseSelect);
+			}
+		}
+
+
+
+
+	}
+});
+
+
 
 
 /*
@@ -168,18 +257,24 @@ var mySubmitController = Marionette.Object.extend( {
 
 //début jquery
 jQuery( document ).ready( function( $ ) {
-
+	
+	waitForEl(toFieldId(idClasse), function() {
+		gClasseSelect = $(toFieldId(idClasse));
+	});
 
 	new mySubmitController();
 
+	new myCustomFieldController();
+
+	setMatieresField(matieres);
 
 	/* pour customiser le select des matières et changer l'affichage du blco matière en fonction du choix*/
 
 	waitForEl('#choix-matieres', function() {
-		
+
 		$("#select-box1").val('maths-physique');
 
-		$("select").on("click" , function() {
+		$("#select-box1").on("click" , function() {
 
 			$(this).parent(".select-box").toggleClass("open");
 
@@ -196,7 +291,7 @@ jQuery( document ).ready( function( $ ) {
 				});
 
 
-		$("select").on("change" , function() {
+		$("#select-box1").on("change" , function() {
 
 			var selection = $(this).find("option:selected").text(),
 			labelFor = $(this).attr("id"),
@@ -224,7 +319,7 @@ jQuery( document ).ready( function( $ ) {
 				}
 
 
-
+				setMatieresField(matieres);
 
 
 
@@ -243,30 +338,13 @@ jQuery( document ).ready( function( $ ) {
 			$('.pop-essai').click(function(){
 
 				PUM.open(18006);
-				
+
 				$($('.nf-breadcrumb')[0]).trigger('click');
 
-				mathsCoche = toFieldId(idMathsCoche);
-				physiqueCoche = toFieldId(idPhysiqueCoche);
-				frenchCoche = toFieldId(idFrenchCoche);
-				
-				Array.from($(".matiere-coche")).forEach(function(element) {
-					if($(element).is(':checked')){
-						$(element).trigger('click');
-					}
-				});
-				
-				matieres.forEach(function(element) {
-					console.log(element);
-					$('.'.concat(element,"-coche")).trigger('click');
-				});
+
 
 			});
-
-
-
 		});
-
 		/* fin : pour afficher popup et faire les bons affichages de matière dans la deuxième partie du formulaire */
 
 
@@ -304,24 +382,7 @@ jQuery( document ).ready( function( $ ) {
 
 //	ajaxEnCours++;
 
-//	jQuery.post(
-//	ajaxurl,
-//	{
-//	'action' : 'ajaxGenerateAndSaveTexts',
-//	'nomCatLoaded' : nomCatLoaded, 
-//	})
-//	.done(function(textCat){
 
-//	loadTextesCat();
-
-//	showMessage("100 textes ont générés. Retrouvez les dans l'onglet consultation des textes sous la catégorie ".concat(nomCatLoaded));
-//	})
-//	.fail(function(err){
-//	console.log("erreur ajax exist");
-//	console.log(err);
-//	showMessage("Il y a un problème avec la génération des textes. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
-//	return;
-//	})
 //	.always(function() {
 //	ajaxEnCours--;
 //	if(ajaxEnCours == 0){
@@ -347,9 +408,43 @@ function checkUntil(selector, nbShake) {
 		setTimeout(function() {
 			$(selector).effect( "shake",500);
 			nbShake--;
-			console.log(nbShake);
 			checkUntil(selector, nbShake);
 		}, 5000);
 	}
 };
+
+/* pour remplir le champ caché matières */
+
+function setMatieresField(matieres){
+
+
+
+	waitForEl(toFieldId(idMatieres), function() {
+
+		$(toFieldId(idMatieres)).val('');
+
+		$(toFieldId(idMatieres)).trigger('change');
+
+		matieres.forEach(function(matiere) {
+
+			valMatiere = $(toFieldId(idMatieres)).val();
+
+			if(valMatiere == ''){
+				$(toFieldId(idMatieres)).val(valMatiere.concat(matiere));
+			}else{
+				$(toFieldId(idMatieres)).val(valMatiere.concat("-",matiere));
+			}
+
+
+			$(toFieldId(idMatieres)).trigger('change');
+
+		});
+
+
+
+	});
+}
+
+
+
 

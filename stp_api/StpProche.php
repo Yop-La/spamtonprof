@@ -4,7 +4,23 @@ namespace spamtonprof\stp_api;
 class stpProche implements \JsonSerializable
 {
 
-    protected $email, $prenom, $nom, $telephone, $ref_proche;
+    protected $email, $prenom, $nom, $telephone, $ref_proche, $ref_compte_wp, $statut_proche;
+
+    /**
+     * @return mixed
+     */
+    public function getRef_compte_wp()
+    {
+        return $this->ref_compte_wp;
+    }
+
+    /**
+     * @param mixed $ref_compte_wp
+     */
+    public function setRef_compte_wp($ref_compte_wp)
+    {
+        $this->ref_compte_wp = $ref_compte_wp;
+    }
 
     public function __construct(array $donnees = array())
     {
@@ -76,4 +92,22 @@ class stpProche implements \JsonSerializable
         $vars = get_object_vars($this);
         return $vars;
     }
+    /**
+     * @return mixed
+     */
+    public function getStatut_proche()
+    {
+        return $this->statut_proche;
+    }
+
+    /**
+     * @param mixed $statut_proche
+     */
+    public function setStatut_proche($statut_proche)
+    {
+        $this->statut_proche = $statut_proche;
+    }
+
+    
+    
 }

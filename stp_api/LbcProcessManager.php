@@ -425,27 +425,8 @@ class LbcProcessManager
             
             $body = str_replace(9, 5, $body);
             
-//             echo($body);
-            
             $this->sendLeadReply($compteLbc, $expe, $subject, $to, $body, $message);
             
-            // 4 -> send grid / full body / to alex.guillemine
-            
-            // 1 -> send grid - to : alex.guillemine - full body : tarif
-            
-            // 5 -> ovh / full body / to alex.guillemine / subject normal
-            // 2 -> ovh - to : alex.guillemine - full body : tarif
-            // $body = str_replace(9, 8, $body);
-            
-//             $rep = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), "", $html = true);
-//             $rep = $smtpServer->sendEmail($subject, "alex.guillemine@gmail.com", $body, $compteLbc->getMail(), "", $html = true);
-            
-            // 3 -> ovh - to : alex.guillemine - short body : tarif
-            // $body = "Bonjour, je demande entre 15 et 20 euros par heure. ";
-            // $rep = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), "", $html = true);
-            // $rep = $smtpServer->sendEmail($subject, "alex.guillemine@gmail.com", $body, $compteLbc->getMail(), "", $html = true);
-            
-            // $rep = $smtpServer->sendEmail("Cours de maths physique", "alex.guillemine@gmail.com", $body, $compteLbc->getMail(), "", $html = true);
         }
     }
 }

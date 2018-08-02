@@ -19,21 +19,26 @@ class StpPlanManager
 
     public function add(\spamtonprof\stp_api\StpPlan $plan)
     {
-        $q = $this->_db->prepare("insert into stp_plan_paiement( nom, tarif, ref_formule, ref_plan_stripe, ref_plan_paypal, ref_plan_stripe_test, ref_plan_paypal_test, ref_plan_old) 
-                        values( :nom, :tarif, :ref_formule, :ref_plan_stripe, :ref_plan_paypal, :ref_plan_stripe_test, :ref_plan_paypal_test, :ref_plan_old);");
+        $q = $this->_db->prepare("insert into stp_plan_paiement( nom, tarif, ref_formule) 
+                        values( :nom, :tarif, :ref_formule);");
         
         $q->bindValue(":nom", $plan->getNom());
         $q->bindValue(":tarif", $plan->getTarif());
         $q->bindValue(":ref_formule", $plan->getRef_formule());
-        $q->bindValue(":ref_plan_stripe", $plan->getRef_plan_stripe());
-        $q->bindValue(":ref_plan_paypal", $plan->getRef_plan_paypal());
-        $q->bindValue(":ref_plan_stripe_test", $plan->getRef_plan_stripe_test());
-        $q->bindValue(":ref_plan_paypal_test", $plan->getRef_plan_paypal_test());
-        $q->bindValue(":ref_plan_old", $plan->getRef_plan_old());
         
         $q->execute();
         
         $plan->setRef_plan($this->_db->lastInsertId());
+        
+        return ($plan);
+    }
+    
+    public function updateRefPlanOld(\spamtonprof\stp_api\StpPlan $plan)
+    {
+        $q = $this->_db->prepare('update stp_plan_paiement set ref_plan_old = :ref_plan_old where ref_plan = :ref_plan');
+        $q->bindValue(':ref_plan_old', $plan->getRef_plan_old());
+        $q->bindValue(':ref_plan', $plan->getRef_plan());
+        $q->execute();
         
         return ($plan);
     }

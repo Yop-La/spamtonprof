@@ -13,15 +13,48 @@ class stpProcheManager
 
     public function add(stpProche $stpProche)
     {
-        $q = $this->_db->prepare('insert into stp_proche(email, prenom, nom, telephone) values( :email,:prenom,:nom,:telephone)');
+        $q = $this->_db->prepare('insert into stp_proche(email, prenom, nom, telephone, statut_proche) values( :email,:prenom,:nom,:telephone, :statut_proche)');
         $q->bindValue(':email', $stpProche->getEmail());
         $q->bindValue(':prenom', $stpProche->getPrenom());
         $q->bindValue(':nom', $stpProche->getNom());
         $q->bindValue(':telephone', $stpProche->getTelephone());
+        $q->bindValue(':statut_proche', $stpProche->getStatut_proche());
         $q->execute();
         
         $stpProche->setRef_proche($this->_db->lastInsertId());
         
         return ($stpProche);
+    }
+    
+    public function updateRefCompteWp(stpProche $proche)
+    {
+        $q = $this->_db->prepare('update stp_proche set ref_compte_wp = :ref_compte_wp where ref_proche = :ref_proche');
+        $q->bindValue(':ref_compte_wp', $proche->getRef_compte_wp());
+        $q->bindValue(':ref_proche', $proche->getRef_proche());
+        $q->execute();
+        
+        return ($proche);
+    }
+    
+    public function get($info){
+        
+        if(array_key_exists("email", $info)){
+            
+            $email = $info["email"];
+            
+            $q = $this->_db->prepare('select * from stp_proche where lower(email) like lower(:email)');
+            $q->bindValue(':email', $email);
+            $q->execute();
+            
+            $data = $q->fetch(\PDO::FETCH_ASSOC);
+            
+            if($data){
+                return(new \spamtonprof\stp_api\stpProche($data));
+            }else{
+                return (false);
+            }
+            
+        }
+        
     }
 }

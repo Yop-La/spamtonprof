@@ -11,7 +11,8 @@ class SmtpServerManager
     mathsPhysiqueAtThomasCoursFr = 'maths-physique@thomas-cours.fr',
     francaisAtThomasCoursFr = 'francais@thomas-cours.fr',
     coursparmailAtthomasCoursFr = 'coursparmail@thomas-cours.fr',
-    alexandreAtSpamTonProf = 'alexandre@spamtonprof.com';
+    alexandreAtSpamTonProf = 'alexandre@spamtonprof.com',
+    smtp2Go = 10;
 
     private $_db;
 

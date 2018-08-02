@@ -1,6 +1,8 @@
 <?php
 namespace spamtonprof\stp_api;
 
+use spamtonprof;
+
 class stpClasseManager
 {
 
@@ -11,31 +13,49 @@ class stpClasseManager
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
 
-    public function add(stpClasse $stpClasse)
+    public function getAll($info)
     {
-        $q = $this->_db->prepare('insert into stp_classe(classe, ref_classe) values( :classe,:ref_classe)');
-        $q->bindValue(':classe', $stpClasse->getClasse());
-        $q->bindValue(':ref_classe', $stpClasse->getRef_classe());
-        $q->execute();
+        $classes = [];
         
-        $stpClasse->setRef_classe($this->_db->lastInsertId());
+        if(array_key_exists("ref_profil", $info)){
         
-        return ($stpClasse);
-    }
-
-    public function get($nomClasse)
-    {
-        $q = $this->_db->prepare('select * from stp_classe where classe like :classe');
-        $q->bindValue(':classe', $nomClasse);
-        $q->execute();
-        
-        $data = $q->fetch(\PDO::FETCH_ASSOC);
-        
-        if ($data) {
+            $refProfil = $info["ref_profil"];
             
-            return (new \spamtonprof\stp_api\stpClasse($data));
-        } else {
-            return (false);
+            $q = $this->_db->prepare('select * from stp_classe where ref_profil = :ref_profil');
+            $q->bindValue(':ref_profil', $refProfil);
+            $q->execute();
+            
+            while($data = $q->fetch(\PDO::FETCH_ASSOC)){
+                
+                $classes[] = new spamtonprof\stp_api\stpClasse($data);
+                
+            }
+            return($classes);
         }
+        
+    }
+    
+    public function get($info)
+    {
+        
+        
+        if(array_key_exists("ref_classe", $info)){
+            
+            $refClasse = $info["ref_classe"];
+            
+            $q = $this->_db->prepare('select * from stp_classe where ref_classe = :ref_classe');
+            $q->bindValue(':ref_classe', $refClasse);
+            $q->execute();
+            
+            if($data = $q->fetch(\PDO::FETCH_ASSOC)){
+                
+                return( new spamtonprof\stp_api\stpClasse($data));
+                
+            }else{
+                return(false);
+            }
+            
+        }
+        
     }
 }

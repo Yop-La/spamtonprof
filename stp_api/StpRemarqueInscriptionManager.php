@@ -13,13 +13,12 @@ class stpRemarqueInscriptionManager
 
     public function add(stpRemarqueInscription $stpRemarqueInscription)
     {
-        $q = $this->_db->prepare('insert into stp_remarque_inscription(ref_abonnement, chapitre, difficulte, note, ref_matiere, ref_remarque) values( :ref_abonnement,:chapitre,:difficulte,:note,:ref_matiere,:ref_remarque)');
+        $q = $this->_db->prepare('insert into stp_remarque_inscription(ref_abonnement, chapitre, difficulte, note, ref_matiere) values( :ref_abonnement,:chapitre,:difficulte,:note,:ref_matiere)');
         $q->bindValue(':ref_abonnement', $stpRemarqueInscription->getRef_abonnement());
         $q->bindValue(':chapitre', $stpRemarqueInscription->getChapitre());
         $q->bindValue(':difficulte', $stpRemarqueInscription->getDifficulte());
         $q->bindValue(':note', $stpRemarqueInscription->getNote());
         $q->bindValue(':ref_matiere', $stpRemarqueInscription->getRef_matiere());
-        $q->bindValue(':ref_remarque', $stpRemarqueInscription->getRef_remarque());
         $q->execute();
         
         $stpRemarqueInscription->setRef_remarque($this->_db->lastInsertId());

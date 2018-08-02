@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class StpPlan implements \JsonSerializable
 {
 
-    protected $ref_plan, $nom, $tarif, $ref_formule, $ref_plan_stripe, $ref_plan_paypal, $ref_plan_stripe_test, $ref_plan_paypal_test, $ref_plan_old;
+    protected $ref_plan, $nom, $tarif, $ref_formule, $ref_plan_stripe, $ref_plan_stripe_test, $ref_plan_old;
 
     public function __construct(array $donnees = array())
     
@@ -71,14 +71,7 @@ class StpPlan implements \JsonSerializable
         return $this->ref_plan_stripe;
     }
 
-    /**
-     *
-     * @return mixed
-     */
-    public function getRef_plan_paypal()
-    {
-        return $this->ref_plan_paypal;
-    }
+    
 
     /**
      *
@@ -89,14 +82,7 @@ class StpPlan implements \JsonSerializable
         return $this->ref_plan_stripe_test;
     }
 
-    /**
-     *
-     * @return mixed
-     */
-    public function getRef_plan_paypal_test()
-    {
-        return $this->ref_plan_paypal_test;
-    }
+    
 
     /**
      *
@@ -143,14 +129,6 @@ class StpPlan implements \JsonSerializable
         $this->ref_plan_stripe = $ref_plan_stripe;
     }
 
-    /**
-     *
-     * @param mixed $ref_plan_paypal
-     */
-    public function setRef_plan_paypal($ref_plan_paypal)
-    {
-        $this->ref_plan_paypal = $ref_plan_paypal;
-    }
 
     /**
      *
@@ -161,14 +139,6 @@ class StpPlan implements \JsonSerializable
         $this->ref_plan_stripe_test = $ref_plan_stripe_test;
     }
 
-    /**
-     *
-     * @param mixed $ref_plan_paypal_test
-     */
-    public function setRef_plan_paypal_test($ref_plan_paypal_test)
-    {
-        $this->ref_plan_paypal_test = $ref_plan_paypal_test;
-    }
 
     /**
      *

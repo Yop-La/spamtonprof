@@ -1,0 +1,16 @@
+﻿Bienvenue chez SpamTonProf,
+
+Je m'appelle Alexandre, je suis le directeur de SpamTonProf. Comme vous venez tout juste d'inscrire [prenom-eleve] à la semaine de découverte, je tenais à vous souhaiter la bienvenue.
+
+J'espère que ces 7 jours d'essai vont plaire à [prenom-eleve]. [prof-responsable] est déjà entrain de lui chercher un super prof. Tous nos profs sont passionnés d'éducation et sélectionnés avec soin afin d'assurer des échanges de qualité.
+
+Dans un jour maximum, je vous enverrai un autre mail pour vous présenter le nouveau prof de [prenom-eleve]. À partir de là, [prenom-eleve] pourra commencer à travailler avec son nouveau prof.
+
+À bientôt,
+
+Alexandre
+
+--
+
+Alexandre Guillemine
+Directeur de SpamTonProf
