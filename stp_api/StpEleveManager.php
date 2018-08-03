@@ -4,11 +4,12 @@ namespace spamtonprof\stp_api;
 class stpEleveManager
 {
 
-    private $_db;
+    private $_db, $profilMg, $classeMg;
 
     public function __construct()
     {
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
+
     }
 
     public function add(stpEleve $stpEleve)
@@ -19,14 +20,14 @@ class stpEleveManager
         $q->bindValue(':ref_classe', $stpEleve->getRef_classe());
         $q->bindValue(':nom', $stpEleve->getNom());
         $q->bindValue(':telephone', $stpEleve->getTelephone());
-        $q->bindValue(':same_email', $stpEleve->getSame_email(),\PDO::PARAM_BOOL);
+        $q->bindValue(':same_email', $stpEleve->getSame_email(), \PDO::PARAM_BOOL);
         $q->bindValue(':ref_profil', $stpEleve->getRef_profil());
         
         $q->execute();
         $stpEleve->setRef_eleve($this->_db->lastInsertId());
         return ($stpEleve);
     }
-    
+
     public function updateRefCompteWp(stpEleve $eleve)
     {
         $q = $this->_db->prepare('update stp_eleve set ref_compte_wp = :ref_compte_wp where ref_eleve = :ref_eleve');
@@ -36,10 +37,10 @@ class stpEleveManager
         
         return ($eleve);
     }
-    
-    public function get($info){
-        
-        if(array_key_exists("email", $info)){
+
+    public function get($info)
+    {
+        if (array_key_exists("email", $info)) {
             
             $email = $info["email"];
             
@@ -49,13 +50,65 @@ class stpEleveManager
             
             $data = $q->fetch(\PDO::FETCH_ASSOC);
             
-            if($data){
-                return(new \spamtonprof\stp_api\stpEleve($data));
-            }else{
+            if ($data) {
+                return (new \spamtonprof\stp_api\stpEleve($data));
+            } else {
                 return (false);
             }
-            
         }
         
+        if (array_key_exists("ref_eleve", $info)) {
+            
+            $refEleve = $info["ref_eleve"];
+            
+            $q = $this->_db->prepare('select * from stp_eleve where ref_eleve = :ref_eleve');
+            $q->bindValue(':ref_eleve', $refEleve);
+            $q->execute();
+            
+            $data = $q->fetch(\PDO::FETCH_ASSOC);
+            
+            if ($data) {
+                return (new \spamtonprof\stp_api\stpEleve($data));
+            } else {
+                return (false);
+            }
+        }
+    }
+
+    
+    public function cast(\spamtonprof\stp_api\stpEleve $object)
+    {
+        return ($object);
+    }
+
+    public function construct($constructor)
+    {
+        
+        $classeMg = new \spamtonprof\stp_api\stpClasseManager();
+        $profilMg = new \spamtonprof\stp_api\stpProfilManager();
+        
+        $eleve = $this->cast($constructor["objet"]);
+        
+        $constructOrders = $constructor["construct"];
+        
+        foreach ($constructOrders as $constructOrder) {
+            
+            switch ($constructOrder) {
+                case "ref_classe":
+                    $classe = $classeMg->get(array(
+                        'ref_classe' => $eleve->getRef_classe()
+                    ));
+                    
+                    $eleve->setClasse($classe);
+                    break;
+                case "ref_profil":
+                    $profil = $profilMg->get(array(
+                        'ref_profil' => $eleve->getRef_profil()
+                    ));
+                    
+                    $eleve->setProfil($profil);
+                    break;
+            }
+        }
     }
 }

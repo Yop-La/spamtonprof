@@ -71,6 +71,8 @@ require_once (dirname(__FILE__) . '/ajaxFunction/inscription_prof_ajax.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/onboarding_prof_ajax.php');
 
+require_once (dirname(__FILE__) . '/ajaxFunction/choisir-prof.php');
+
 require_once (dirname(__FILE__) . '/ninjaFormHooks/afterSubmission.php');
 
 add_action('wp_enqueue_scripts', 'handleScriptAndTestModeOnPage');
@@ -87,10 +89,12 @@ add_filter('ninja_forms_render_options', 'my_pre_population_callback', 10, 2);
 function my_pre_population_callback($options, $settings)
 {
     
-    $profils = [];
+    
     
     // target profil field in discover week form
     if ($settings['key'] == 'profil_1532954478855') {
+        
+        $profils = [];
         
         $stpProfilMg = new \spamtonprof\stp_api\stpProfilManager();
         
@@ -101,6 +105,28 @@ function my_pre_population_callback($options, $settings)
             $options[] = array(
                 'label' => $profil->getProfil(),
                 'value' => $profil->getRef_profil()
+            );
+        }
+        
+        wp_reset_postdata();
+    }
+    
+    // target "choisir prof" field in choisir_prof
+    if ($settings['key'] == 'choisir_le_prof_1533217231976') {
+        
+        
+        
+        $stpProfMg = new \spamtonprof\stp_api\stpProfManager();
+        
+        $profs = $stpProfMg->getAll();
+        
+        foreach ($profs as $prof) {
+            
+            $prof = $stpProfMg->cast($prof);
+            
+            $options[] = array(
+                'label' => $prof ->getPrenom(). " " . $prof -> getNom(),
+                'value' => $prof -> getRef_prof()
             );
         }
         

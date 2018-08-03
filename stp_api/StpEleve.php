@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class stpEleve implements \JsonSerializable
 {
 
-    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil;
+    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil;
 
     public function __construct(array $donnees = array())
     {
@@ -122,7 +122,9 @@ class stpEleve implements \JsonSerializable
     {
         $this->same_email = $same_email;
     }
+
     /**
+     *
      * @return mixed
      */
     public function getRef_profil()
@@ -131,6 +133,7 @@ class stpEleve implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $ref_profil
      */
     public function setRef_profil($ref_profil)
@@ -138,6 +141,39 @@ class stpEleve implements \JsonSerializable
         $this->ref_profil = $ref_profil;
     }
 
-    
-    
+    /**
+     *
+     * @return mixed
+     */
+    public function getClasse()
+    {
+        return $this->classe;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getProfil()
+    {
+        return $this->profil;
+    }
+
+    /**
+     *
+     * @param mixed $classe
+     */
+    public function setClasse($classe)
+    {
+        $this->classe = $classe;
+    }
+
+    /**
+     *
+     * @param mixed $profil
+     */
+    public function setProfil($profil)
+    {
+        $this->profil = $profil;
+    }
 }

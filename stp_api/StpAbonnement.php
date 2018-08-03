@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class stpAbonnement implements \JsonSerializable
 {
 
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $prof_referent, $remarque_inscription, $ref_plan;
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof;
 
     public function __construct(array $donnees = array())
     {
@@ -41,6 +41,24 @@ class stpAbonnement implements \JsonSerializable
         $this->ref_formule = $ref_formule;
     }
 
+    /**
+     *
+     * @return mixed
+     */
+    public function getProf()
+    {
+        return $this->prof;
+    }
+
+    /**
+     *
+     * @param mixed $prof
+     */
+    public function setProf($prof)
+    {
+        $this->prof = $prof;
+    }
+
     public function getRef_statut_abonnement()
     {
         return $this->ref_statut_abonnement;
@@ -66,19 +84,9 @@ class stpAbonnement implements \JsonSerializable
         return $this->date_creation;
     }
 
-    public function setDate_creation(\DateTime $date_creation)
+    public function setDate_creation($date_creation)
     {
         $this->date_creation = $date_creation;
-    }
-
-    public function getProf_referent()
-    {
-        return $this->prof_referent;
-    }
-
-    public function setProf_referent($prof_referent)
-    {
-        $this->prof_referent = $prof_referent;
     }
 
     public function getRemarque_inscription()
@@ -105,5 +113,61 @@ class stpAbonnement implements \JsonSerializable
     {
         $vars = get_object_vars($this);
         return $vars;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getEleve()
+    {
+        return $this->eleve;
+    }
+
+    /**
+     *
+     * @param mixed $eleve
+     */
+    public function setEleve($eleve)
+    {
+        if (is_array($eleve)) {}
+        
+        $this->eleve = $eleve;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getRef_prof()
+    {
+        return $this->ref_prof;
+    }
+
+    /**
+     *
+     * @param mixed $ref_prof
+     */
+    public function setRef_prof($ref_prof)
+    {
+        $this->ref_prof = $ref_prof;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getFormule()
+    {
+        return $this->formule;
+    }
+
+    /**
+     *
+     * @param mixed $formule
+     */
+    public function setFormule($formule)
+    {
+        $this->formule = $formule;
     }
 }

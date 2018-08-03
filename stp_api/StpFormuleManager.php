@@ -81,6 +81,22 @@ class StpFormuleManager
                 } else {
                     return ($data);
                 }
+            } else if (array_key_exists('ref_formule', $info) ) {
+                
+                $refFormule = $info['ref_formule'];
+                
+                $q = $this->_db->prepare('SELECT * FROM stp_formule where ref_formule = :ref_formule');
+                $q->bindValue(':ref_formule', $refFormule);
+                
+                $q->execute();
+                
+                $data = $q->fetch();
+                
+                if ($data) {
+                    return (new \spamtonprof\stp_api\StpFormule($data));
+                } else {
+                    return ($data);
+                }
             }
         }
     }

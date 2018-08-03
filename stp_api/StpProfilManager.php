@@ -26,4 +26,29 @@ class stpProfilManager
         
         return ($profils);
     }
+    
+    
+    public function get($info)
+    {
+        
+        
+        if(array_key_exists("ref_profil", $info)){
+            
+            $refProfil = $info["ref_profil"];
+            
+            $q = $this->_db->prepare('select * from stp_profil where ref_profil = :ref_profil');
+            $q->bindValue(':ref_profil', $refProfil);
+            $q->execute();
+            
+            if($data = $q->fetch(\PDO::FETCH_ASSOC)){
+                
+                return( new \spamtonprof\stp_api\stpProfil($data));
+                
+            }else{
+                return(false);
+            }
+            
+        }
+        
+    }
 }

@@ -142,7 +142,11 @@ class PageManager
         if ($this->pageSlug == 'temoigner') {
             
             PageManager::temoigner();
+        }
+        
+        if ($this->pageSlug == 'choisir-prof') {
             
+            PageManager::choisirProf();
         }
     }
 
@@ -279,18 +283,33 @@ class PageManager
             wp_enqueue_script('onboarding_prof');
         }
     }
-    
+
     public static function temoigner()
     
     {
-        
         wp_enqueue_script('temoigner', plugins_url() . '/spamtonprof/js/temoigner.js', array(
             
             'nf-front-end'
+        
+        ), time());
+    }
+
+    public static function choisirProf()
+    
+    {
+        wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
+        
+        wp_enqueue_script('choisir_prof', plugins_url() . '/spamtonprof/js/choisir-prof.js', array(
             
+            'nf-front-end'
+        
         ), time());
         
-     
+        $abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
+        
+        $abonnementsSansProf = $abonnementMg->getAbonnementsSansProf();
+        
+        wp_localize_script('choisir_prof', 'abonnementsSansProf', $abonnementsSansProf);
     }
 }
 

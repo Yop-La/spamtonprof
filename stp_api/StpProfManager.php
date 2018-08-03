@@ -20,7 +20,8 @@ class stpProfManager
         $q->bindValue(':nom', $stpProf->getNom());
         $q->bindValue(':telephone', $stpProf->getTelephone());
         $q->bindValue(':onboarding_step', $stpProf->getOnboarding_step());
-        $q->bindValue(':date_naissance', $stpProf->getDate_naissance()->format(PG_DATE_FORMAT));
+        $q->bindValue(':date_naissance', $stpProf->getDate_naissance()
+            ->format(PG_DATE_FORMAT));
         $q->execute();
         
         $stpProf->setRef_prof($this->_db->lastInsertId());
@@ -50,6 +51,15 @@ class stpProfManager
             $q->bindValue(':user_id_wp', $userId);
         }
         
+        if (array_key_exists('ref_prof', $info)) {
+            
+            $refProf = $info['ref_prof'];
+            
+            $q = $this->_db->prepare('select * from stp_prof where ref_prof = :ref_prof');
+            
+            $q->bindValue(':ref_prof', $refProf);
+        }
+        
         if (! is_null($q)) {
             
             $q->execute();
@@ -65,6 +75,21 @@ class stpProfManager
         }
     }
 
+    public function getAll()
+    {
+        $profs = [];
+        
+        $q = $this->_db->prepare('select * from stp_prof ');
+        
+        $q->execute();
+       
+        while ($data = $q->fetch(\PDO::FETCH_ASSOC)) {
+            
+            $profs[] = new \spamtonprof\stp_api\stpProf($data);
+        }
+        return($profs);
+    }
+
     public function updateUserIdWp(\spamtonprof\stp_api\stpProf $prof)
     {
         $q = $this->_db->prepare('update stp_prof set user_id_wp = :user_id_wp where ref_prof = :ref_prof');
@@ -77,12 +102,12 @@ class stpProfManager
         
         return ($prof);
     }
-    
+
     public function updateOnboarding(\spamtonprof\stp_api\stpProf $prof)
     {
         $q = $this->_db->prepare('update stp_prof set onboarding = :onboarding where ref_prof = :ref_prof');
         
-        $q->bindValue(':onboarding', $prof->getOnboarding(),\PDO::PARAM_BOOL);
+        $q->bindValue(':onboarding', $prof->getOnboarding(), \PDO::PARAM_BOOL);
         
         $q->bindValue(':ref_prof', $prof->getRef_prof());
         
@@ -90,7 +115,7 @@ class stpProfManager
         
         return ($prof);
     }
-    
+
     public function updateStripeId(\spamtonprof\stp_api\stpProf $prof)
     {
         $q = $this->_db->prepare('update stp_prof set stripe_id = :stripe_id where ref_prof = :ref_prof');
@@ -103,7 +128,7 @@ class stpProfManager
         
         return ($prof);
     }
-    
+
     public function updateOnboarding_step(\spamtonprof\stp_api\stpProf $prof)
     {
         $q = $this->_db->prepare('update stp_prof set onboarding_step = :onboarding_step where ref_prof = :ref_prof');
@@ -116,6 +141,7 @@ class stpProfManager
         
         return ($prof);
     }
+
     public function updateIban(\spamtonprof\stp_api\stpProf $prof)
     {
         $q = $this->_db->prepare('update stp_prof set iban = :iban where ref_prof = :ref_prof');
@@ -127,5 +153,11 @@ class stpProfManager
         $q->execute();
         
         return ($prof);
+    }
+    
+    
+    public function cast(\spamtonprof\stp_api\stpProf $object)
+    {
+        return ($object);
     }
 }
