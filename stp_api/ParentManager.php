@@ -45,7 +45,8 @@ class ParentManager
     }
     else
     {
-      $q = $this->_db->prepare('SELECT * WHERE adresse_mail like :mail');
+
+      $q = $this->_db->prepare('SELECT * FROM parent WHERE adresse_mail like :mail');
       $q->execute([':mail' => '%' . $info . '%']);
       if($q->rowCount() <= 0){
         return(false);
