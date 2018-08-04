@@ -104,7 +104,7 @@ function getBillingAgreement()
 
 {
     header('Content-type: application/json');
-    
+        
     $planPaypal = $_POST["planPaypal"];
     
     $testMode = $_POST["testMode"];

@@ -149,17 +149,17 @@
     },
     {
         "name": "google/auth",
-        "version": "v1.3.0",
-        "version_normalized": "1.3.0.0",
+        "version": "v1.3.2",
+        "version_normalized": "1.3.2.0",
         "source": {
             "type": "git",
             "url": "https://github.com/google/google-auth-library-php.git",
-            "reference": "8f7c96146b2c62d3f4c6bbc4b5bb8a8e396b0b71"
+            "reference": "436007a77fd2037f933d3a5c8e4c7e0c9b88a7b0"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/google/google-auth-library-php/zipball/8f7c96146b2c62d3f4c6bbc4b5bb8a8e396b0b71",
-            "reference": "8f7c96146b2c62d3f4c6bbc4b5bb8a8e396b0b71",
+            "url": "https://api.github.com/repos/google/google-auth-library-php/zipball/436007a77fd2037f933d3a5c8e4c7e0c9b88a7b0",
+            "reference": "436007a77fd2037f933d3a5c8e4c7e0c9b88a7b0",
             "shasum": ""
         },
         "require": {
@@ -176,7 +176,7 @@
             "phpunit/phpunit": "^4.8.36|^5.7",
             "sebastian/comparator": ">=1.2.3"
         },
-        "time": "2018-04-06T19:26:30+00:00",
+        "time": "2018-07-23T21:44:38+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1045,17 +1045,17 @@
     },
     {
         "name": "stripe/stripe-php",
-        "version": "v6.10.4",
-        "version_normalized": "6.10.4.0",
+        "version": "v6.15.0",
+        "version_normalized": "6.15.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/stripe/stripe-php.git",
-            "reference": "879ab79c842a759339cee955fc925491847ac7d9"
+            "reference": "20e18a9feface85d183eece03e84013ff794d5b1"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/stripe/stripe-php/zipball/879ab79c842a759339cee955fc925491847ac7d9",
-            "reference": "879ab79c842a759339cee955fc925491847ac7d9",
+            "url": "https://api.github.com/repos/stripe/stripe-php/zipball/20e18a9feface85d183eece03e84013ff794d5b1",
+            "reference": "20e18a9feface85d183eece03e84013ff794d5b1",
             "shasum": ""
         },
         "require": {
@@ -1069,7 +1069,7 @@
             "satooshi/php-coveralls": "~0.6.1",
             "squizlabs/php_codesniffer": "~2.0"
         },
-        "time": "2018-07-19T09:52:11+00:00",
+        "time": "2018-08-03T10:54:52+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
