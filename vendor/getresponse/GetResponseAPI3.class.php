@@ -98,6 +98,29 @@ class GetResponse
     {
         return $this->call('autoresponders?' . $this->setParams($params));
     }
+
+    /**
+     * retrieving autoresponder
+     *
+     * @param string autoresponder_id - to retrieve autoresponder
+     * @return mixed
+     */
+    
+    public function getAutoresponder($autoresponder_id)
+    {
+        return $this->call('autoresponders/' . $autoresponder_id);
+    }
+    
+    /**
+     * add single autoresponder into your campaign
+     *
+     * @param $params
+     * @return mixed
+     */
+    public function addAutoresponder($params)
+    {
+        return $this->call('autoresponders', 'POST', $params);
+    }
     
     
     

@@ -70,8 +70,6 @@ class AutoresponderManager
         
         $autoresponders = $this->getresponse->getAutoresponders($params);
         
-        echo('la');
-        prettyPrint($autoresponders);
         
         foreach ($autoresponders as $autoresponder) {
             
@@ -119,7 +117,7 @@ class AutoresponderManager
      
             $autoresponder->setTriggerSettings($triggerSettings);
             
-            $ret = $this->getresponse->setAutoresponder($autoresponder);
+            $ret = $this->getresponse->addAutoresponder($autoresponder);
             
             
         }
