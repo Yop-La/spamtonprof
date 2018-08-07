@@ -49,7 +49,7 @@ require_once (dirname(__FILE__) . '/inc/autoloader_lbc.php'); // autoloader les 
 
 require_once (dirname(__FILE__) . '/vendor/autoload.php'); // autoload strip, paypal , gmail
 
-require_once (dirname(dirname(dirname(dirname(__FILE__)))) . '/getresponse/GetResponseAPI3.class.php');
+require_once (dirname(__FILE__) . 'vendor/getresponse/GetResponseAPI3.class.php');
 
 require_once (dirname(__FILE__) . '/slack/Slack.php'); // pour communiquer avec slack
 
