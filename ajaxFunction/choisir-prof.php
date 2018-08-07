@@ -15,7 +15,10 @@ function ajaxAttribuerProf()
     
     $retour->error = false;
     
+    $now = new \DateTime(null,new \DateTimeZone("Europe/Paris"));
 
+    $now = $now->add(new \DateInterval("PT30M"));
+    
     $refAbonnement = $_POST["refAbonnement"];
     $refProf = $_POST["refProf"];
     
@@ -23,10 +26,11 @@ function ajaxAttribuerProf()
     
     $slack -> sendMessages("log", array('ref abo' , $refAbonnement, 'ref prof' ,$refProf));
     
-    $abonnement = new \spamtonprof\stp_api\stpAbonnement(array("ref_abonnement" => $refAbonnement, "ref_prof" => $refProf));
+    $abonnement = new \spamtonprof\stp_api\stpAbonnement(array("ref_abonnement" => $refAbonnement, "ref_prof" => $refProf, "date_attribution_prof" => $now ));
     
     $abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
     $abonnementMg -> updateRefProf($abonnement);
+    $abonnementMg -> updateDateAttributionProf($abonnement);
     
     $profMg = new \spamtonprof\stp_api\stpProfManager();
     
