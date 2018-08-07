@@ -70,6 +70,9 @@ class AutoresponderManager
         
         $autoresponders = $this->getresponse->getAutoresponders($params);
         
+        echo('la');
+        prettyPrint($autoresponders);
+        
         foreach ($autoresponders as $autoresponder) {
             
             $autoresponder = $this->getresponse->getAutoresponder($autoresponder->autoresponderId);
