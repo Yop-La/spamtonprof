@@ -4,7 +4,23 @@ namespace spamtonprof\stp_api;
 class stpAbonnement implements \JsonSerializable
 {
 
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof;
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned;
+
+    /**
+     * @return mixed
+     */
+    public function getFirst_prof_assigned()
+    {
+        return $this->first_prof_assigned;
+    }
+
+    /**
+     * @param mixed $first_prof_assigned
+     */
+    public function setFirst_prof_assigned($first_prof_assigned)
+    {
+        $this->first_prof_assigned = $first_prof_assigned;
+    }
 
     public function __construct(array $donnees = array())
     {
@@ -169,5 +185,23 @@ class stpAbonnement implements \JsonSerializable
     public function setFormule($formule)
     {
         $this->formule = $formule;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getDate_attribution_prof()
+    {
+        return $this->date_attribution_prof;
+    }
+
+    /**
+     *
+     * @param mixed $date_attribution_prof
+     */
+    public function setDate_attribution_prof($date_attribution_prof)
+    {
+        $this->date_attribution_prof = $date_attribution_prof;
     }
 }

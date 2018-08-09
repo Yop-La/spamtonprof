@@ -29,7 +29,9 @@ class stpAbonnementManager
         
         return ($stpAbonnement);
     }
-
+    /*
+     *  pour remonter les abonnements sans prof 
+     */
     public function getAbonnementsSansProf()
     {
         $abonnements = [];
@@ -62,6 +64,40 @@ class stpAbonnementManager
         return ($abonnements);
     }
     
+    
+    // pour remonter les abonnements qui viennent de se voir attribuer un prof pour la première fois après l'inscription
+    public function getHasNotFirstProfAssignement()
+    {
+        $abonnements = [];
+        
+        $q = $this->_db->prepare("select * from stp_abonnement where first_prof_assigned = false and date_attribution_prof >= NOW() ");
+        
+        $q->execute();
+        
+        while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
+            
+            $abonnement = new \spamtonprof\stp_api\stpAbonnement($data);
+            
+            $this->construct(array(
+                "objet" => $abonnement,
+                "construct" => array(
+                    'ref_eleve',
+                    'ref_formule',
+                    'ref_prof'
+                ),
+                "ref_eleve" => array(
+                    "construct" => array(
+                        'ref_classe',
+                        'ref_profil'
+                    )
+                )
+                
+            ));
+            $abonnements[] = $abonnement;
+        }
+        return ($abonnements);
+    }
+    
     public function updateRefProf(\spamtonprof\stp_api\stpAbonnement $abonnement){
         
         $q = $this->_db->prepare("update stp_abonnement set ref_prof = :ref_prof where ref_abonnement = :ref_abonnement");
@@ -69,6 +105,22 @@ class stpAbonnementManager
         $q -> bindValue(":ref_prof", $abonnement->getRef_prof());
         $q->execute();
         
+    }
+    
+    public function updateDateAttributionProf(\spamtonprof\stp_api\stpAbonnement $abonnement){
+        
+        $q = $this->_db->prepare("update stp_abonnement set date_attribution_prof = :date_attribution_prof where ref_abonnement = :ref_abonnement");
+        $q -> bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q -> bindValue(":date_attribution_prof", $abonnement->getDate_attribution_prof()->format(PG_DATETIME_FORMAT));
+        $q->execute();
+    }
+    
+    public function updateFirstProfAssigned(\spamtonprof\stp_api\stpAbonnement $abonnement){
+        
+        $q = $this->_db->prepare("update stp_abonnement set first_prof_assigned = :first_prof_assigned where ref_abonnement = :ref_abonnement");
+        $q -> bindValue(":first_prof_assigned", $abonnement->getFirst_prof_assigned());
+        $q -> bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->execute();
     }
 
     public function cast(\spamtonprof\stp_api\stpAbonnement $object)
