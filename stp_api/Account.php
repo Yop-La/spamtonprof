@@ -221,7 +221,6 @@ class Account implements \JsonSerializable
     {
         $this->setAttente_paiement(false);
         $this->setStatut("inscrit");
-        return ($account);
     }
 
     /**

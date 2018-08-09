@@ -108,7 +108,7 @@ class PaypalManager
             echo $ex->getData();
             return (null);
             die($ex);
-        } catch (Exception $ex) {
+        } catch (Exception $ex) {                        echo $ex->getMessage();                        echo $ex->getMessage();
             return (null);
             die($ex);
         }
