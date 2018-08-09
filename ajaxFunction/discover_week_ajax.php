@@ -315,6 +315,10 @@ function ajaxAfterSubmissionEssai()
         
         $abonnementMg->add($abonnement);
         
+        
+        $abonnement->setFirst_prof_assigned(false);
+        $abonnementMg->updateFirstProfAssigned($abonnement);
+        
         // étape n° 11 - insérer les remarques d'inscription
         
         $stpRemarqueMg = new \spamtonprof\stp_api\stpRemarqueInscriptionManager();
@@ -416,7 +420,7 @@ function ajaxAfterSubmissionEssai()
         $profResponsable = utf8_encode($profResponsable);
         
         $expeMg = new \spamtonprof\stp_api\stpExpeManager();
-        $expe = $expeMg->get("equipe@spamtonprof.com");
+        $expe = $expeMg->get("info@spamtonprof.com");
         $smtpMg = new \spamtonprof\stp_api\SmtpServerManager();
         $smtp = $smtpMg->get(array(
             "ref_smtp_server" => $smtpMg::smtp2Go
@@ -425,7 +429,7 @@ function ajaxAfterSubmissionEssai()
         if ($envoiEleve) {
             $body_eleve = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/bienvenue-essai-eleve.html");
             $body_eleve = str_replace("[prof-responsable]", $profResponsable, $body_eleve);
-            $smtp->sendEmail("Bienvenue " . $eleve->getPrenom(), $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alex de SpamTonProf",true);
+            $smtp->sendEmail("Bienvenue " . $eleve->getPrenom(), $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alexandre de SpamTonProf",true);
         }
         
         if ($envoiParent) {
@@ -433,7 +437,7 @@ function ajaxAfterSubmissionEssai()
             $body_parent = str_replace("[prof-responsable]", $profResponsable, $body_parent);
             $body_parent = str_replace("[prenom-eleve]", $eleve->getPrenom(), $body_parent);
             
-            $smtp->sendEmail("Bienvenue " . $proche->getPrenom(), $proche->getEmail(), $body_parent, $expe->getEmail(), "Alex de SpamTonProf",true);
+            $smtp->sendEmail("Bienvenue " . $proche->getPrenom(), $proche->getEmail(), $body_parent, $expe->getEmail(), "Alexandre de SpamTonProf",true);
         }
         
         echo (json_encode($retour));
