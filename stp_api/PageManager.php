@@ -148,6 +148,11 @@ class PageManager
             
             PageManager::choisirProf();
         }
+        
+        if ($this->pageSlug == 'dashboard-eleve') {
+            
+            PageManager::dashboardEleve();
+        }
     }
 
     public static function abonnementApresEssaiLoader()
@@ -310,6 +315,67 @@ class PageManager
         $abonnementsSansProf = $abonnementMg->getAbonnementsSansProf();
         
         wp_localize_script('choisir_prof', 'abonnementsSansProf', $abonnementsSansProf);
+    }
+
+    public static function dashboardEleve()
+    
+    {
+        wp_enqueue_script('dashboard', plugins_url() . '/spamtonprof/js/dashboard-eleve.js', array(
+            
+            'nf-front-end'
+        
+        ), time());
+        
+        $current_user = wp_get_current_user();
+        
+        $compteMg = new \spamtonprof\stp_api\stpCompteManager();
+        
+        $compte = $compteMg->get(array(
+            'ref_compte_wp' => $current_user->ID
+        ));
+        
+        $abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
+        
+        $abonnements = $abonnementMg->getAll(array(
+            "ref_compte" => $compte->getRef_compte()
+        ), array(
+            "construct" => array(
+                'ref_eleve',
+                'ref_formule',
+                'ref_prof',
+                'ref_parent',
+                'ref_plan'
+            ),
+            "ref_eleve" => array(
+                "construct" => array(
+                    'ref_classe',
+                    'ref_profil'
+                )
+            )
+        ));
+        
+        $abosActif  = [];
+        $abosEssai = [];
+        $abosTermine = [];
+        
+        foreach ($abonnements as $abonnement) {
+
+            switch ($abonnement->getRef_statut_abonnement()) {
+                case $abonnement::ACTIF:
+                    $abosActif[] = $abonnement;
+                    break;
+                case $abonnement::ESSAI:
+                    $abosEssai[] = $abonnement;
+                    break;
+                case $abonnement::TERMINE:
+                    $abosTermine[] = $abonnement;
+                    break;
+            }
+        }
+        
+        wp_localize_script('dashboard', 'abosActif', $abosActif);
+        wp_localize_script('dashboard', 'abosEssai', $abosEssai);
+        wp_localize_script('dashboard', 'abosTermine', $abosTermine);
     }
 }
 

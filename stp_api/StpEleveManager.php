@@ -52,6 +52,7 @@ class stpEleveManager
 
     public function get($info)
     {
+        $data = false;
         if (array_key_exists("email", $info)) {
             
             $email = $info["email"];
@@ -60,13 +61,7 @@ class stpEleveManager
             $q->bindValue(':email', $email);
             $q->execute();
             
-            $data = $q->fetch(\PDO::FETCH_ASSOC);
             
-            if ($data) {
-                return (new \spamtonprof\stp_api\stpEleve($data));
-            } else {
-                return (false);
-            }
         }
         
         if (array_key_exists("ref_eleve", $info)) {
@@ -77,13 +72,24 @@ class stpEleveManager
             $q->bindValue(':ref_eleve', $refEleve);
             $q->execute();
             
-            $data = $q->fetch(\PDO::FETCH_ASSOC);
+        }
+        
+        if (array_key_exists("ref_compte_wp", $info)) {
             
-            if ($data) {
-                return (new \spamtonprof\stp_api\stpEleve($data));
-            } else {
-                return (false);
-            }
+            $refCompteWp = $info["ref_compte_wp"];
+            
+            $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp = :ref_compte_wp');
+            $q->bindValue(':ref_compte_wp', $refCompteWp);
+            $q->execute();
+            
+        }
+        
+        $data = $q->fetch(\PDO::FETCH_ASSOC);
+        
+        if ($data) {
+            return (new \spamtonprof\stp_api\stpEleve($data));
+        } else {
+            return (false);
         }
     }
 

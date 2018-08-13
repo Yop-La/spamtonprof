@@ -4,6 +4,8 @@ namespace spamtonprof\stp_api;
 class stpAbonnement implements \JsonSerializable
 {
 
+    const ACTIF = 1 , ESSAI = 2 , TERMINE = 3;
+    
     protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte;
 
     /**

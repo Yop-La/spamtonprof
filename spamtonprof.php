@@ -73,6 +73,8 @@ require_once (dirname(__FILE__) . '/ajaxFunction/onboarding_prof_ajax.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/choisir-prof.php');
 
+require_once (dirname(__FILE__) . '/ajaxFunction/ajax_dashboard_eleve.php');
+
 require_once (dirname(__FILE__) . '/ninjaFormHooks/afterSubmission.php');
 
 add_action('wp_enqueue_scripts', 'handleScriptAndTestModeOnPage');

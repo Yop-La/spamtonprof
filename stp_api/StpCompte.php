@@ -36,7 +36,7 @@ class stpCompte implements \JsonSerializable
         return $this->date_creation;
     }
 
-    public function setDate_creation(\DateTime $date_creation)
+    public function setDate_creation( $date_creation)
     {
         $this->date_creation = $date_creation;
     }

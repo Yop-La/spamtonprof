@@ -213,7 +213,7 @@ class stpAbonnementManager
         }
     }
 
-    public function getAll($info)
+    public function getAll($info, $constructor = false)
     {
         $abonnements = [];
         $q = null;
@@ -232,7 +232,15 @@ class stpAbonnementManager
             $q->execute();
         }
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
-            $abonnements[] = new \spamtonprof\stp_api\stpAbonnement($data);
+            
+            $abonnement = new \spamtonprof\stp_api\stpAbonnement($data);
+            
+            if($constructor){
+                $constructor["objet"] = $abonnement;
+                $this->construct($constructor);
+            }
+            
+            $abonnements[] = $abonnement;
         }
         return ($abonnements);
     }
