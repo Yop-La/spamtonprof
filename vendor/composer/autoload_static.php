@@ -125,6 +125,13 @@ class ComposerStaticInit0ed64792fce90d099800fc7a244567d8
     );
 
     public static $prefixesPsr0 = array (
+        'S' => 
+        array (
+            'Sunra\\PhpSimple\\HtmlDomParser' => 
+            array (
+                0 => __DIR__ . '/..' . '/sunra/php-simple-html-dom-parser/Src',
+            ),
+        ),
         'P' => 
         array (
             'PayPal' => 

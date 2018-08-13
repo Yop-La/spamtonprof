@@ -22,6 +22,8 @@ class GetResponse
 
     private $customFields = null;
 
+    private $profNameId, $mailProfId, $sexeProfId, $matieresId, $nameProcheId, $nameProche2Id, $stpEleveEssaiId, $stpParentEssaiId1, $stpParentEssaiId2, $profName2Id, $sexeProf2Id, $mailProf2Id, $matieres2Id;
+
     public $http_status;
 
     /**
@@ -45,12 +47,27 @@ class GetResponse
      *            $api_key
      * @param null $api_url
      */
-    public function __construct($api_key, $api_url = null)
+    public function __construct($api_url = null)
     {
-        $this->api_key = $api_key;
+        $this->api_key = GR_API;
         if (! empty($api_url)) {
             $this->api_url = $api_url;
         }
+        
+        $this->profNameId = $this->getCustomFieldId("prof_name");
+        $this->profName2Id = $this->getCustomFieldId("prof_name_2");
+        $this->mailProfId = $this->getCustomFieldId("mail_prof");
+        $this->mailProf2Id = $this->getCustomFieldId("mail_prof_2");
+        $this->sexeProfId = $this->getCustomFieldId("sexe_prof");
+        $this->sexeProf2Id = $this->getCustomFieldId("sexe_prof_2");
+        $this->matieresId = $this->getCustomFieldId("matieres");
+        $this->matieres2Id = $this->getCustomFieldId("matieres_2");
+        $this->nameProcheId = $this->getCustomFieldId("name_proche");
+        $this->nameProche2Id = $this->getCustomFieldId("name_proche_2");
+        
+        $this->stpEleveEssaiId = $this->getCampagnId('stp_eleve_essai');
+        $this->stpParentEssaiId1 = $this->getCampagnId('stp_parent_essai');
+        $this->stpParentEssaiId2 = $this    ->getCampagnId('stp_parent_essai_2');
     }
 
     /**
@@ -515,11 +532,108 @@ class GetResponse
         if (is_null($this->campaigns)) {
             $this->campaigns = $this->getCampaigns();
         }
-
+        
         foreach ($this->campaigns as $campaign) {
             
             if ($campaign->name == $name)
                 return ($campaign->campaignId);
+        }
+    }
+
+    /*
+     * pour savoir si une adresse email dans une sequence email est après un nombre jour ($limitDay ).
+     * return false si le contact n'est pas après la deadline
+     */
+    function isAfterDeadline($contact, $limitDay)
+    {
+        if (! is_null($contact->dayOfCycle)) {
+            
+            $dayOfCycle = intval($contact->dayOfCycle);
+            
+            if ($dayOfCycle >= $limitDay) {
+                
+                return ($contact);
+            } else {
+                
+                return (false);
+            }
+        }
+    }
+
+    /*
+     *
+     *
+     *
+     */
+    function moveContact($sequenceName, $contactId)
+    {
+        $campaignId = $this->getCampagnId($sequenceName);
+        
+        $params = '
+        {
+            "dayOfCycle": "0",
+            "campaign": {
+                "campaignId": "' . $campaignId . '"
+            }
+        }
+        ';
+        
+        $params = json_decode($params);
+        
+        $ret = $this->updateContact($contactId, $params);
+        return ($ret);
+    }
+
+    function getContactInList($email, $listName)
+    {
+        $campaignId = $this->getCampagnId($listName);
+        
+        $params = array(
+            "query" => array(
+                "email" => $email,
+                "campaignId" => $campaignId
+            )
+        );
+        
+        $contacts = $this->getContacts($params);
+        
+        if (empty((array) $contacts)) {
+            return (false);
+        }
+        
+        foreach ($contacts as $contact) { // on boucle sur un contact uniquement car il ne peut y avoir qu'un
+            
+            return ($contact);
+        }
+    }
+
+    function getFreeParentEssaiList($emailParent)
+    {
+        $contact = $this->getContactInList($emailParent, "stp_parent_essai");
+        
+        if ($contact) {
+            
+            $contact = $this->isAfterDeadline("stp_parent_essai", 7, $proche->getEmail());
+            
+            if ($contact) {
+                
+                return ("stp_parent_essai");
+            }
+        } else {
+            return ("stp_parent_essai");
+        }
+        $contact = $this->getContactInList($emailParent, "stp_parent_essai_2");
+        
+        if ($contact) {
+            
+            $contact = $this->isAfterDeadline("stp_parent_essai_2", 7, $proche->getEmail());
+            
+            if ($contact) {
+                
+                return ("stp_parent_essai_2");
+            }
+        } else {
+            return ("stp_parent_essai_2");
         }
     }
 
@@ -583,6 +697,150 @@ class GetResponse
             }
         }
         return http_build_query($result);
+    }
+
+    public function addEleveInTrialSequence(\spamtonprof\stp_api\stpEleve $eleve, \spamtonprof\stp_api\stpProf $prof, \spamtonprof\stp_api\StpFormule $formule)
+    {
+        $params = '{
+            "name": "' . $eleve->getPrenom() . '",
+            "email": "' . $eleve->getEmail() . '",
+            "dayOfCycle": "0",
+            "campaign": {
+                "campaignId": "' . $this->stpEleveEssaiId . '"
+            },
+            "customFieldValues": [
+                {
+                    "customFieldId": "' . $this->profNameId . '",
+                    "value": [
+                        "' . $prof->getPrenom() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $this->mailProfId . '",
+                    "value": [
+                        "' . $prof->getEmail_stp() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $this->sexeProfId . '",
+                    "value": [
+                        "' . $prof->getSexe() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $this->matieresId . '",
+                    "value": [
+                        "' . $formule->toGetResponse() . '"
+                    ]
+                }
+            ]
+        }';
+        
+        $params = json_decode($params);
+        
+        $rep = $this->addContact($params);
+        
+        return ($rep);
+    }
+
+    public function addParentInTrialSequence1(\spamtonprof\stp_api\stpEleve $eleve, \spamtonprof\stp_api\stpProf $prof, \spamtonprof\stp_api\StpFormule $formule, \spamtonprof\stp_api\stpProche $proche)
+    {
+        $params = '{
+            "name": "' . $proche->getPrenom() . '",
+            "email": "' . $proche->getEmail() . '",
+            "dayOfCycle": "0",
+            "campaign": {
+                "campaignId": "' . $this->stpParentEssaiId1 . '"
+            },
+            "customFieldValues": [
+                {
+                    "customFieldId": "' . $this->profNameId . '",
+                    "value": [
+                        "' . $prof->getPrenom() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $this->mailProfId . '",
+                    "value": [
+                        "' . $prof->getEmail_stp() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $this->sexeProfId . '",
+                    "value": [
+                        "' . $prof->getSexe() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $this->matieresId . '",
+                    "value": [
+                        "' . $formule->toGetResponse() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $this->nameProcheId . '",
+                    "value": [
+                        "' . $eleve->getPrenom() . '"
+                    ]
+                }
+            ]
+        }';
+        
+        $params = json_decode($params);
+        
+        $rep = $this->addContact($params);
+        
+        return ($rep);
+    }
+
+    public function addParentInTrialSequence2(\spamtonprof\stp_api\stpEleve $eleve, \spamtonprof\stp_api\stpProf $prof, \spamtonprof\stp_api\StpFormule $formule, \spamtonprof\stp_api\stpProche $proche)
+    {
+        $params = '{
+            "name": "' . $proche->getPrenom() . '",
+            "email": "' . $proche->getEmail() . '",
+            "dayOfCycle": "0",
+            "campaign": {
+                "campaignId": "' . $this->stpParentEssaiId2 . '"
+            },
+            "customFieldValues": [
+                {
+                    "customFieldId": "' . $this->profName2Id . '",
+                    "value": [
+                        "' . $prof->getPrenom() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $this->mailProf2Id . '",
+                    "value": [
+                        "' . $prof->getEmail_stp() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $this->sexeProf2Id . '",
+                    "value": [
+                        "' . $prof->getSexe() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $this->matieres2Id . '",
+                    "value": [
+                        "' . $formule->toGetResponse() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $this->nameProche2Id . '",
+                    "value": [
+                        "' . $eleve->getPrenom() . '"
+                    ]
+                }
+            ]
+        }';
+        
+        $params = json_decode($params);
+        
+        $rep = $this->addContact($params);
+        
+        return ($rep);
     }
 }
 
