@@ -25,7 +25,7 @@ class stpProcheManager
         
         return ($stpProche);
     }
-    
+
     public function updateRefCompteWp(stpProche $proche)
     {
         $q = $this->_db->prepare('update stp_proche set ref_compte_wp = :ref_compte_wp where ref_proche = :ref_proche');
@@ -35,26 +35,34 @@ class stpProcheManager
         
         return ($proche);
     }
-    
-    public function get($info){
-        
-        if(array_key_exists("email", $info)){
+
+    public function get($info)
+    {
+        $data = false;
+        if (array_key_exists("email", $info)) {
             
             $email = $info["email"];
             
             $q = $this->_db->prepare('select * from stp_proche where lower(email) like lower(:email)');
             $q->bindValue(':email', $email);
             $q->execute();
+        }
+        if (array_key_exists("ref_proche", $info)) {
             
-            $data = $q->fetch(\PDO::FETCH_ASSOC);
+            $refProche = $info["ref_proche"];
             
-            if($data){
-                return(new \spamtonprof\stp_api\stpProche($data));
-            }else{
-                return (false);
-            }
-            
+            $q = $this->_db->prepare('select * from stp_proche where ref_proche = :ref_proche');
+            $q->bindValue(':ref_proche', $refProche);
+            $q->execute();
         }
         
+        $data = $q->fetch(\PDO::FETCH_ASSOC);
+        
+        if ($data) {
+            return (new \spamtonprof\stp_api\stpProche($data));
+        } else {
+            return (false);
+        }
     }
+    
 }

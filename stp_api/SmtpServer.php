@@ -17,7 +17,7 @@ class SmtpServer implements \JsonSerializable
     
     {
         $this->hydrate($donnees);
-
+        
         $this->slack = new \spamtonprof\slack\Slack();
     }
 
@@ -98,7 +98,6 @@ class SmtpServer implements \JsonSerializable
         $this->password = $password;
     }
 
-
     /**
      *
      * @param mixed $username
@@ -108,7 +107,6 @@ class SmtpServer implements \JsonSerializable
         $this->username = $username;
     }
 
-
     public function jsonSerialize()
     {
         $vars = get_object_vars($this);
@@ -116,15 +114,12 @@ class SmtpServer implements \JsonSerializable
         return $vars;
     }
 
-    public function sendEmail($subject, $to, $body, $from, $fromName = "", $html = false)
+    public function sendEmail($subject, $to, $body, $from, $fromName = "", $html = false, $ccs = false)
     {
-        
-      
         $host = $this->host;
         $port = $this->port;
         $password = $this->password;
         $username = $this->username;
-        
         
         // Create a new PHPMailer instance
         $mail = new PHPMailer();
@@ -163,6 +158,13 @@ class SmtpServer implements \JsonSerializable
         
         $mail->isHTML($html);
         $mail->Body = $body;
+        
+        if ($ccs) {
+            
+            foreach ($ccs as $cc) {
+                $mail->addCC($cc);
+            }
+        }
         
         // send the message, check for errors
         if (! $mail->send()) {

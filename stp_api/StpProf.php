@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class stpProf implements \JsonSerializable
 {
 
-    protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $id_paper, $user_id_wp, $onboarding_step, $iban;
+    protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $id_paper, $user_id_wp, $onboarding_step, $iban, $sexe;
 
     public function __construct(array $donnees = array())
     {
@@ -251,5 +251,28 @@ class stpProf implements \JsonSerializable
             }
         }
         return ($retour);
+    }
+
+    public static function cast($prof): \spamtonprof\stp_api\stpProf
+    {
+        return ($prof);
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getSexe()
+    {
+        return $this->sexe;
+    }
+
+    /**
+     *
+     * @param mixed $sexe
+     */
+    public function setSexe($sexe)
+    {
+        $this->sexe = $sexe;
     }
 }

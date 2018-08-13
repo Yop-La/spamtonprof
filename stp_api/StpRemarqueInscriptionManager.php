@@ -25,4 +25,29 @@ class stpRemarqueInscriptionManager
         
         return ($stpRemarqueInscription);
     }
+    
+    public function getAll($info){
+        
+        $q=null;
+        $remarques = [];
+        
+        if(array_key_exists("ref_abonnement", $info)){
+            
+            $refAbonnement = $info["ref_abonnement"];
+            
+            $q = $this->_db->prepare("select * from stp_remarque_inscription where ref_abonnement = :ref_abonnement");
+            $q->bindValue(":ref_abonnement", $refAbonnement);
+            $q->execute();
+            
+        }
+        
+        while($data = $q->fetch(\PDO::FETCH_ASSOC)){
+            
+            $remarques[] = new \spamtonprof\stp_api\stpRemarqueInscription($data);
+            
+            
+        }
+        return($remarques);
+        
+    }
 }

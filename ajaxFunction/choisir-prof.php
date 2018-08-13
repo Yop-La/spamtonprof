@@ -22,15 +22,14 @@ function ajaxAttribuerProf()
     $refAbonnement = $_POST["refAbonnement"];
     $refProf = $_POST["refProf"];
     
-    $slack = new \spamtonprof\slack\Slack();
-    
-    $slack -> sendMessages("log", array('ref abo' , $refAbonnement, 'ref prof' ,$refProf));
-    
-    $abonnement = new \spamtonprof\stp_api\stpAbonnement(array("ref_abonnement" => $refAbonnement, "ref_prof" => $refProf, "date_attribution_prof" => $now ));
+    $abonnement = new \spamtonprof\stp_api\stpAbonnement(array("ref_abonnement" => $refAbonnement, "ref_prof" => $refProf, "date_attribution_prof" => $now, 'first_prof_assigned' => false ));
     
     $abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
     $abonnementMg -> updateRefProf($abonnement);
     $abonnementMg -> updateDateAttributionProf($abonnement);
+    $abonnementMg -> updateFirstProfAssigned($abonnement);
+    
+    $slack = new \spamtonprof\slack\Slack();
     
     $profMg = new \spamtonprof\stp_api\stpProfManager();
     

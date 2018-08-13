@@ -109,5 +109,9 @@ class stpProche implements \JsonSerializable
     }
 
     
-    
+    public static function cast($proche) : \spamtonprof\stp_api\stpProche{
+        
+        return($proche);
+        
+    }
 }

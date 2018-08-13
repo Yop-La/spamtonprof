@@ -1,9 +1,13 @@
 <?php
 namespace spamtonprof\stp_api;
 
+
+
 class stpMatiere implements \JsonSerializable
 {
 
+    const MATHS = 1, FRANCAIS = 2, PHYSIQUE = 3;
+    
     protected $ref_matiere, $matiere;
 
     public function __construct(array $donnees = array())

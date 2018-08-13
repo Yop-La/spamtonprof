@@ -164,5 +164,11 @@ class StpPlan implements \JsonSerializable
         
         return $vars;
     }
+    
+    public static function cast($plan) : \spamtonprof\stp_api\stpPlan{
+        
+        return($plan);
+        
+    }
 }
 

@@ -4,6 +4,8 @@ namespace spamtonprof\stp_api;
 class stpStatutEssai implements \JsonSerializable
 {
 
+    const EN_COURS = 1, ACHEVE_SUCCES = 2, EN_ATTENTE_DEMARRAGE = 3, AVORTE = 4, EXPIRE = 5;
+    
     protected $statut_essai, $ref_statut_essai;
 
     public function __construct(array $donnees = array())

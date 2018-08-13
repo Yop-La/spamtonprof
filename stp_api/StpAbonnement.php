@@ -4,9 +4,10 @@ namespace spamtonprof\stp_api;
 class stpAbonnement implements \JsonSerializable
 {
 
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned;
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte;
 
     /**
+     *
      * @return mixed
      */
     public function getFirst_prof_assigned()
@@ -15,6 +16,7 @@ class stpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $first_prof_assigned
      */
     public function setFirst_prof_assigned($first_prof_assigned)
@@ -203,5 +205,77 @@ class stpAbonnement implements \JsonSerializable
     public function setDate_attribution_prof($date_attribution_prof)
     {
         $this->date_attribution_prof = $date_attribution_prof;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getRef_proche()
+    {
+        return $this->ref_proche;
+    }
+
+    /**
+     *
+     * @param mixed $ref_proche
+     */
+    public function setRef_proche($ref_proche)
+    {
+        $this->ref_proche = $ref_proche;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getProche()
+    {
+        return $this->proche;
+    }
+
+    /**
+     *
+     * @param mixed $proche
+     */
+    public function setProche($proche)
+    {
+        $this->proche = $proche;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getPlan()
+    {
+        return $this->plan;
+    }
+
+    /**
+     *
+     * @param mixed $plan
+     */
+    public function setPlan($plan)
+    {
+        $this->plan = $plan;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getRef_compte()
+    {
+        return $this->ref_compte;
+    }
+
+    /**
+     *
+     * @param mixed $ref_compte
+     */
+    public function setRef_compte($ref_compte)
+    {
+        $this->ref_compte = $ref_compte;
     }
 }

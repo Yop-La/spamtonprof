@@ -24,7 +24,32 @@ class stpCompteManager
         return ($stpCompte);
     }
 
-    
+    /*
+     * retourne le numéro de list d'essai parent occupé ( ie dont l'abonnement associé est en essai ) du compte $refCompte
+     * ou 0 si il n'y aucun abonnement en essai
+     *
+     */
+    public function getNotFreeParentTrialList($refCompte)
+    {
+        $abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
+        $eleveMg = new \spamtonprof\stp_api\stpEleveManager();
+        $statutEssai = new \spamtonprof\stp_api\stpStatutEssai();
+        
+        $abonnementsCompte = $abonnementMg->getAll(array(
+            "ref_compte" => $refCompte
+        ));
+        
+        foreach ($abonnementsCompte as $abonnementCompte) {
+            
+            if ($abonnementCompte->getRef_statut_abonnement() == $statutEssai::EN_COURS || $abonnementCompte->getRef_statut_abonnement() == $statutEssai::EN_ATTENTE_DEMARRAGE) {
+                
+                $eleve = $eleveMg->get(array(
+                    "ref_eleve" => $abonnementCompte->getRef_eleve()
+                ));
+                return($eleve->getSeq_email_parent_essai());
 
-    
+            }
+        }
+        return(0);
+    }
 }

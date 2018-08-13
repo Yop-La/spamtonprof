@@ -32,7 +32,7 @@ class StpPlanManager
         
         return ($plan);
     }
-    
+
     public function updateRefPlanOld(\spamtonprof\stp_api\StpPlan $plan)
     {
         $q = $this->_db->prepare('update stp_plan_paiement set ref_plan_old = :ref_plan_old where ref_plan = :ref_plan');
@@ -42,8 +42,7 @@ class StpPlanManager
         
         return ($plan);
     }
-    
-    
+
     public function get($info)
     {
         if (is_int($info)) {
@@ -59,6 +58,7 @@ class StpPlanManager
                 return new \spamtonprof\stp_api\StpFormule($data);
             }
         } else if (is_array($info)) {
+            $data = false;
             if (array_key_exists('ref_formule', $info) && array_key_exists('nom', $info)) {
                 $refFormule = $info['ref_formule'];
                 $nom = $info['nom'];
@@ -66,16 +66,23 @@ class StpPlanManager
                 $q->bindValue(':ref_formule', $refFormule);
                 $q->bindValue(':nom', $nom);
                 $q->execute();
+            }
+            if (array_key_exists('ref_plan', $info)) {
+                $refPlan = $info['ref_plan'];
                 
-                $data = $q->fetch(PDO::FETCH_ASSOC);
-                
-                if (!$data) {
-                    return (false);
-                } else {
-                    return new \spamtonprof\stp_api\StpPlan($data);
-                }
+                $q = $this->_db->prepare('SELECT * FROM stp_plan_paiement WHERE ref_plan =:ref_plan');
+                $q->bindValue(':ref_plan', $refPlan);
+                $q->execute();
+            }
+            
+            $data = $q->fetch(PDO::FETCH_ASSOC);
+            
+            if (! $data) {
+                return (false);
+            } else {
+                return new \spamtonprof\stp_api\StpPlan($data);
             }
         }
     }
-    
 }
+    

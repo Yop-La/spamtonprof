@@ -159,22 +159,16 @@ function ajaxAfterSubmissionEssai()
             'nom' => $nomEleve,
             'telephone' => $phoneEleve,
             "same_email" => $sameEmail,
-            "ref_profil" => $classe->getRef_profil()
+            "ref_profil" => $classe->getRef_profil(),
+            "ref_compte" => $compte->getRef_compte()
         ));
         
         $eleve = $eleveMg->add($eleve);
         
-        // étape n° 5 lié l'élève au compte
+        $eleve -> setSeq_email_parent_essai(1);
+        $eleveMg->updateSeqEmailParentEssai($eleve);
         
-        $stpCompose = new \spamtonprof\stp_api\stpCompose(array(
-            "ref_eleve" => $eleve->getRef_eleve(),
-            "ref_compte" => $compte->getRef_compte()
-        ));
-        
-        $stpComposeMg = new \spamtonprof\stp_api\stpComposeManager();
-        
-        $stpComposeMg->add($stpCompose);
-        
+     
         // étape n°6 : créer les nouveaux comptes wordpress
         
         // étape n°6-1 : création du compte élève
@@ -313,8 +307,18 @@ function ajaxAfterSubmissionEssai()
         
         $abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
         
-        $abonnementMg->add($abonnement);
+        $abonnement= $abonnementMg->add($abonnement);
         
+        $abonnement->setRef_compte($compte->getRef_compte());
+        $abonnementMg->updateRefCompte($abonnement);
+       
+        
+        if($proche){
+            
+            $abonnement->setRef_proche($proche->getRef_proche());
+            $abonnementMg->updateRefProche($abonnement);
+            
+        }
         
         $abonnement->setFirst_prof_assigned(false);
         $abonnementMg->updateFirstProfAssigned($abonnement);

@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class StpFormule implements \JsonSerializable
 {
 
-    protected $formule, $ref_formule;
+    protected $formule, $ref_formule, $matieres;
 
     public function __construct(array $donnees = array())
     
@@ -68,5 +68,53 @@ class StpFormule implements \JsonSerializable
     {
         $this->ref_formule = $ref_formule;
     }
+
+    public static function cast($formule): \spamtonprof\stp_api\StpFormule
+    {
+        return ($formule);
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getMatieres()
+    {
+        if (gettype($this->matieres) == "string") {
+            $matieres = str_replace(array(
+                '{',
+                '}'
+            ), array(
+                ''
+            ), $this->matieres);
+            $matieres = explode(",", $matieres);
+            $this->matieres = $matieres;
+        }
+        return $this->matieres;
+    }
+
+    /**
+     *
+     * @param mixed $matieres
+     */
+    public function setMatieres($matieres)
+    {
+        $this->matieres = $matieres;
+    }
+
+    // pour retourner le custom field matières de getresponse ( sequence essai )
+    public function toGetResponse()
+    {
+        $matieres = $this->getMatieres();
+        for ($i = 0; $i < count($matieres); $i ++) {
+            $matiere = $matieres[$i];
+            if ($matiere == "francais") {
+                $matieres[$i] = "français";
+            }
+        }
+        $matieres = implode("_", $matieres);
+        return (utf8_encode($matieres));
+    }
+    
 }
 

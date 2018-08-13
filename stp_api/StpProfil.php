@@ -4,6 +4,8 @@ namespace spamtonprof\stp_api;
 class stpProfil implements \JsonSerializable
 {
 
+    const ECOLIER = 1, COLLEGIEN = 2, LYCEEN = 3, ETUDIANT = 4;
+    
     protected $ref_profil, $profil;
 
     public function __construct(array $donnees = array())

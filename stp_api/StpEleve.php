@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class stpEleve implements \JsonSerializable
 {
 
-    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil;
+    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil, $ref_compte, $seq_email_parent_essai;
 
     public function __construct(array $donnees = array())
     {
@@ -176,4 +176,45 @@ class stpEleve implements \JsonSerializable
     {
         $this->profil = $profil;
     }
+
+    public static function cast($eleve): \spamtonprof\stp_api\stpEleve
+    {
+        return ($eleve);
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getRef_compte()
+    {
+        return $this->ref_compte;
+    }
+
+    /**
+     *
+     * @param mixed $ref_compte
+     */
+    public function setRef_compte($ref_compte)
+    {
+        $this->ref_compte = $ref_compte;
+    }
+    /**
+     * @return mixed
+     */
+    public function getSeq_email_parent_essai()
+    {
+        return $this->seq_email_parent_essai;
+    }
+
+    /**
+     * @param mixed $seq_email_parent_essai
+     */
+    public function setSeq_email_parent_essai($seq_email_parent_essai)
+    {
+        $this->seq_email_parent_essai = $seq_email_parent_essai;
+    }
+
+    
+    
 }
