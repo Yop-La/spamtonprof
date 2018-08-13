@@ -97,9 +97,12 @@ foreach ($abonnements as $abonnement) {
         
         if ($listRetenu == "stp_parent_essai") {
             $reponse[] = $getresponse->addParentInTrialSequence1($eleve, $prof, $formule, $proche);
+            $eleve->setSeq_email_parent_essai(1);
         } else if ($listRetenu == "stp_parent_essai_2") {
             $reponse[] = $getresponse->addParentInTrialSequence2($eleve, $prof, $formule, $proche);
+            $eleve->setSeq_email_parent_essai(2);
         }
+        $eleveMg->updateSeqEmailParentEssai($eleve);
     }
     
     // envoyer le mail recap au prof choisi
