@@ -113,15 +113,15 @@ foreach ($abonnements as $abonnement) {
         switch ($matiere) {
             case "francais":
                 $elems = $html->find('.francais');
-                $elems[0]->{'class'} = 'francais';
+                $elems[0]->{'style'} = "line-height: inherit;";
                 break;
             case "maths":
                 $elems = $html->find('.maths');
-                $elems[0]->{'class'} = 'maths';
+                $elems[0]->{'style'} = "line-height: inherit;";
                 break;
             case "physique":
                 $elems = $html->find('.physique');
-                $elems[0]->{'class'} = 'physique';
+                $elems[0]->{'style'} = "line-height: inherit;";
                 break;
         }
     }
@@ -225,6 +225,8 @@ foreach ($abonnements as $abonnement) {
     $smtp = $smtpMg->get(array(
         "ref_smtp_server" => $smtpMg::smtp2Go
     ));
+    
+    echo($emailRecap);
     
     $smtp->sendEmail("Nouvelle inscription à la semaine découverte", $prof->getEmail_stp(), $emailRecap, "alexandre@spamtonprof.com", "Alex de SpamTonProf", true,array("alexandre@spamtonprof.com"));
     
