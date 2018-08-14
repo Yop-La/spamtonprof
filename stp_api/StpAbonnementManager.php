@@ -135,11 +135,27 @@ class stpAbonnementManager
         $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
         $q->execute();
     }
-    
+
     public function updateRefCompte(\spamtonprof\stp_api\stpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set ref_compte = :ref_compte where ref_abonnement = :ref_abonnement");
         $q->bindValue(":ref_compte", $abonnement->getRef_compte());
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->execute();
+    }
+
+    public function updateDebutEssai(\spamtonprof\stp_api\stpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set debut_essai = :debut_essai where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":debut_essai", $abonnement->getDebut_essai());
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->execute();
+    }
+
+    public function updateFinEssai(\spamtonprof\stp_api\stpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set fin_essai = :fin_essai where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":fin_essai", $abonnement->getFin_essai());
         $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
         $q->execute();
     }
@@ -217,25 +233,35 @@ class stpAbonnementManager
     {
         $abonnements = [];
         $q = null;
-        if (array_key_exists("ref_eleve", $info)) {
+        
+        if (is_array($info)) {
             
-            $refEleve = $info["ref_eleve"];
-            $q = $this->_db->prepare('select * from stp_abonnement where ref_eleve = :ref_eleve');
-            $q->bindValue(":ref_eleve", $refEleve);
+            if (array_key_exists("ref_eleve", $info)) {
+                
+                $refEleve = $info["ref_eleve"];
+                $q = $this->_db->prepare('select * from stp_abonnement where ref_eleve = :ref_eleve');
+                $q->bindValue(":ref_eleve", $refEleve);
+                $q->execute();
+            }
+            if (array_key_exists("ref_compte", $info)) {
+                
+                $refCompte = $info["ref_compte"];
+                $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte');
+                $q->bindValue(":ref_compte", $refCompte);
+                $q->execute();
+            }
+        }
+        
+        if ($info == "all") {
+            $q = $this->_db->prepare('select * from stp_abonnement');
             $q->execute();
         }
-        if (array_key_exists("ref_compte", $info)) {
-            
-            $refCompte = $info["ref_compte"];
-            $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte');
-            $q->bindValue(":ref_compte", $refCompte);
-            $q->execute();
-        }
+        
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
             
             $abonnement = new \spamtonprof\stp_api\stpAbonnement($data);
             
-            if($constructor){
+            if ($constructor) {
                 $constructor["objet"] = $abonnement;
                 $this->construct($constructor);
             }

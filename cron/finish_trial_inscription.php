@@ -105,6 +105,16 @@ foreach ($abonnements as $abonnement) {
         $eleveMg->updateSeqEmailParentEssai($eleve);
     }
     
+    // définir les dates de début et de fin d'essai
+    $begin = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+    
+    $abonnement->setDebut_essai($begin->format(PG_DATE_FORMAT));
+    $end = $begin->add(new DateInterval('P7D'));
+    $abonnement->setFin_essai($end->format(PG_DATE_FORMAT));
+    
+    $abonnementMg->updateDebutEssai($abonnement);
+    $abonnementMg->updateFinEssai($abonnement);
+    
     // envoyer le mail recap au prof choisi
     
     $emailRecap = file_get_contents(dirname(dirname(__FILE__)) . "/emails/mail_recap_prof.html");
@@ -229,12 +239,11 @@ foreach ($abonnements as $abonnement) {
         "ref_smtp_server" => $smtpMg::smtp2Go
     ));
     
-    echo($emailRecap);
-    
-    $smtp->sendEmail("Nouvelle inscription à la semaine découverte", $prof->getEmail_stp(), $emailRecap, "alexandre@spamtonprof.com", "Alex de SpamTonProf", true,array("alexandre@spamtonprof.com"));
+    $smtp->sendEmail("Nouvelle inscription à la semaine découverte", $prof->getEmail_stp(), $emailRecap, "alexandre@spamtonprof.com", "Alex de SpamTonProf", true, array(
+        "alexandre@spamtonprof.com"
+    ));
     
     $abonnement->setFirst_prof_assigned(true);
     $abonnementMg->updateFirstProfAssigned($abonnement);
-    
 }
 

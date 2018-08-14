@@ -6,7 +6,7 @@ class stpAbonnement implements \JsonSerializable
 
     const ACTIF = 1 , ESSAI = 2 , TERMINE = 3;
     
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte;
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai;
 
     /**
      *
@@ -280,4 +280,39 @@ class stpAbonnement implements \JsonSerializable
     {
         $this->ref_compte = $ref_compte;
     }
+    /**
+     * @return mixed
+     */
+    public function getDebut_essai()
+    {
+        
+        return $this->debut_essai;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFin_essai()
+    {
+        return $this->fin_essai;
+    }
+
+    /**
+     * @param mixed $debut_essai
+     */
+    public function setDebut_essai($debut_essai)
+    {
+        $this->debut_essai = $debut_essai;
+    }
+
+    /**
+     * @param mixed $fin_essai
+     */
+    public function setFin_essai($fin_essai)
+    {
+        $this->fin_essai = $fin_essai;
+    }
+
+    
+    
 }
