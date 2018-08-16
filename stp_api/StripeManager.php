@@ -34,6 +34,34 @@ class StripeManager
 
     private $testMode = true;
 
+    public function transfertSubscriptionCharge($event_json){
+        
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        
+        $subId = $event_json->data->object->subscription;
+        
+        $chargeId = $event_json->data->object->charge;
+        
+        $sub = \Stripe\Subscription::retrieve($subId);
+        
+        $profId = $sub->metadata["stripe_prof_id"];
+        
+        $charge = \Stripe\Charge::retrieve($chargeId);
+        $charge-> transfer_group = $charge->id; // on utilise la charge id comme id de groupage de transactions
+        $charge->save();
+        
+        // on transfère 75 % au prof
+        $transfer = \Stripe\Transfer::create(array(
+            "amount" => round(0.75*$charge->amount),
+            "currency" => "eur",
+            "destination" => $profId,
+            "transfer_group" => $charge->id,
+            "source_transaction" => $charge->id
+        ));
+        
+    }
+    
+    
     public function __construct($testMode = true)
     
     {
@@ -45,7 +73,7 @@ class StripeManager
         $this->testMode = $testMode;
     }
 
-    public function addConnectSubscription($emailClient, $source, $refCompte, $planStripeId, $stripeProfId)
+    public function addConnectSubscription($emailClient, $source, $refCompte, $planStripeId, $stripeProfId, $refAbonnement)
     {
         $slack = new \spamtonprof\slack\Slack();
         
@@ -83,6 +111,8 @@ class StripeManager
                 
                 "metadata" => array(
                     
+                    "ref_compte" => $refCompte,
+                    "ref_abonnement" => $refAbonnement,
                     "stripe_prof_id" => $stripeProfId
                 
                 )
@@ -101,7 +131,7 @@ class StripeManager
             
             ));
             
-            return (true);
+            return ($subscription->id);
         } catch (Exception $e) {
             
             $slack->sendMessages("abonnement", array(

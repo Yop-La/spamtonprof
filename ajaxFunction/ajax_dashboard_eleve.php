@@ -67,13 +67,13 @@ function ajaxCreateSubscription()
     $subscriptionCreated = false;
     if ($testMode == "true") {
         
-        $subscriptionCreated = $stripeMg->addConnectSubscription($emailClient, $source, $abonnement->getRef_compte(), $plan->getRef_plan_stripe_test(), $prof->getStripe_id_test());
+        $subsId = $stripeMg->addConnectSubscription($emailClient, $source, $abonnement->getRef_compte(), $plan->getRef_plan_stripe_test(), $prof->getStripe_id_test(), $abonnement->getRef_abonnement());
     } else {
         
-        $subscriptionCreated = $stripeMg->addConnectSubscription($emailClient, $source, $abonnement->getRef_compte(), $plan->getRef_plan_stripe(), $prof->getStripe_id());
+        $subsId = $stripeMg->addConnectSubscription($emailClient, $source, $abonnement->getRef_compte(), $plan->getRef_plan_stripe(), $prof->getStripe_id(), $abonnement->getRef_abonnement());
     }
     
-    if (!$subscriptionCreated) {
+    if (!$subsId) {
         
         
         $retour->error = true;
@@ -83,6 +83,8 @@ function ajaxCreateSubscription()
         
     } else {
         
+        $abonnement->setSubs_Id($subsId);
+        $abonnementMg->updateSubsId($abonnement);
         
         // mettre à jour le statut de l'abonnement : de essai à inscrit
         // envoyer mail d'inscription avec smtp2go
@@ -92,13 +94,6 @@ function ajaxCreateSubscription()
     //
     
 
-    
-    $slack->sendMessages("log", array(
-        "message de test",
-        "ref abo : " . $refAbonnement,
-        " source : " . $source,
-        "test mode : " . $testMode
-    ));
     
     echo (json_encode($retour));
     

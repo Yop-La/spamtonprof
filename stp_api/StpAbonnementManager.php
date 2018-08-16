@@ -110,6 +110,14 @@ class stpAbonnementManager
         $q->bindValue(":ref_prof", $abonnement->getRef_prof());
         $q->execute();
     }
+    
+    public function updateSubsId(\spamtonprof\stp_api\stpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set subs_Id = :subs_Id where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->bindValue(":subs_Id", $abonnement->getSubs_Id());
+        $q->execute();
+    }
 
     public function updateDateAttributionProf(\spamtonprof\stp_api\stpAbonnement $abonnement)
     {

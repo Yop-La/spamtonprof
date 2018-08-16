@@ -1,9 +1,9 @@
 <?php
 /**
  * 
- *  pour recevoir les hooks de stripe en mode test
+ *  pour recevoir les hooks de stripe en mode prof
  *  Voilà les hooks reçus :
- *  - invoice.payment_succeeded pour envoyer les fonds au prof
+ *  - invoice.payment_succeeded pour transférer les fonds au prof
  *  
  */
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
@@ -31,13 +31,9 @@ $event_json = json_decode($input);
 
 if ($event_json->type == "invoice.payment_succeeded") {
     
-    $stripeMg = new \spamtonprof\stp_api\StripeManager(true);
+    $stripeMg = new \spamtonprof\stp_api\StripeManager(false);
     
     $stripeMg->transfertSubscriptionCharge($event_json);
-
-    $slack->sendMessages("log", array(
-        "hook de test stripe reçu"
-    ));
     
 }
 
