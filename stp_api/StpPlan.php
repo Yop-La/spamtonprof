@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class StpPlan implements \JsonSerializable
 {
 
-    protected $ref_plan, $nom, $tarif, $ref_formule, $ref_plan_stripe, $ref_plan_stripe_test, $ref_plan_old;
+    protected $ref_plan, $nom, $tarif, $ref_formule, $ref_plan_stripe, $ref_plan_stripe_test, $ref_plan_old, $formule;
 
     public function __construct(array $donnees = array())
     
@@ -71,8 +71,6 @@ class StpPlan implements \JsonSerializable
         return $this->ref_plan_stripe;
     }
 
-    
-
     /**
      *
      * @return mixed
@@ -81,8 +79,6 @@ class StpPlan implements \JsonSerializable
     {
         return $this->ref_plan_stripe_test;
     }
-
-    
 
     /**
      *
@@ -129,7 +125,6 @@ class StpPlan implements \JsonSerializable
         $this->ref_plan_stripe = $ref_plan_stripe;
     }
 
-
     /**
      *
      * @param mixed $ref_plan_stripe_test
@@ -138,7 +133,6 @@ class StpPlan implements \JsonSerializable
     {
         $this->ref_plan_stripe_test = $ref_plan_stripe_test;
     }
-
 
     /**
      *
@@ -164,11 +158,28 @@ class StpPlan implements \JsonSerializable
         
         return $vars;
     }
-    
-    public static function cast($plan) : \spamtonprof\stp_api\stpPlan{
-        
-        return($plan);
-        
+
+    public static function cast($plan): \spamtonprof\stp_api\stpPlan
+    {
+        return ($plan);
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getFormule()
+    {
+        return $this->formule;
+    }
+
+    /**
+     *
+     * @param mixed $formule
+     */
+    public function setFormule($formule)
+    {
+        $this->formule = $formule;
     }
 }
 

@@ -77,6 +77,83 @@ require_once (dirname(__FILE__) . '/ajaxFunction/ajax_dashboard_eleve.php');
 
 require_once (dirname(__FILE__) . '/ninjaFormHooks/afterSubmission.php');
 
+add_action('template_redirect', 'handleRedirections');
+
+function handleRedirections()
+{
+    
+    if (isset($_SESSION['age_message'])) {
+        $_SESSION['age_message'] = $_SESSION['age_message'] + 1;
+    }else{
+        $_SESSION['age_message'] = 1;
+    }
+    
+    if ($_SESSION['age_message'] > 1) {
+        unset($_SESSION['age_message']);
+        unset($_SESSION['message']);
+    }
+    
+    
+    
+    $current_user = wp_get_current_user();
+    
+    if ($current_user->ID != 0) {
+        
+        if (current_user_can('prof') && is_user_logged_in()) {
+            
+            $profMg = new \spamtonprof\stp_api\stpProfManager();
+            
+            $prof = $profMg->get(array(
+                'user_id_wp' => $current_user->ID
+            ));
+            
+            if (! $prof->getOnboarding() && ! is_page('onboarding-prof')) {
+                
+                if (wp_redirect(home_url('onboarding-prof'))) {
+                    $_SESSION['message'] = utf8_encode("Terminez l 'inscription pour donner des cours ! ");
+                    exit();
+                }
+            }
+            
+            if (is_page('inscription-prof')) {
+                
+                if (wp_redirect(home_url('dashboard-prof'))) {
+                    $_SESSION['message'] = utf8_encode("Pas besoin de faire l'inscription deux fois  :) ");
+                    exit();
+                }
+            }
+            
+            if ($prof->getOnboarding() && is_page('onboarding-prof')) {
+                if (wp_redirect(home_url('dashboard-prof'))) {
+                    $_SESSION['message'] = utf8_encode("Pas besoin de faire l'inscription deux fois  :) ");
+                    exit();
+                }
+            }
+        }
+        
+        if (current_user_can('client') && is_user_logged_in()) {
+            
+            if (is_page('accueil')) {
+                
+                if (wp_redirect(home_url('dashboard-eleve'))) {
+                    $_SESSION['message'] = utf8_encode("Bienvenue sur SpamTonProf !");
+                    exit();
+                }
+            }
+        }
+    }
+}
+
+add_action('init', 'stp_session_start', 1);
+
+function stp_session_start()
+{
+    if (! session_id()) {
+        
+        @session_start();
+    }
+}
+
 add_action('wp_enqueue_scripts', 'handleScriptAndTestModeOnPage');
 
 function handleScriptAndTestModeOnPage()
@@ -90,8 +167,6 @@ add_filter('ninja_forms_render_options', 'my_pre_population_callback', 10, 2);
 
 function my_pre_population_callback($options, $settings)
 {
-    
-    
     
     // target profil field in discover week form
     if ($settings['key'] == 'profil_1532954478855') {
@@ -116,8 +191,6 @@ function my_pre_population_callback($options, $settings)
     // target "choisir prof" field in choisir_prof
     if ($settings['key'] == 'choisir_le_prof_1533217231976') {
         
-        
-        
         $stpProfMg = new \spamtonprof\stp_api\stpProfManager();
         
         $profs = $stpProfMg->getAll();
@@ -127,8 +200,8 @@ function my_pre_population_callback($options, $settings)
             $prof = $stpProfMg->cast($prof);
             
             $options[] = array(
-                'label' => $prof ->getPrenom(). " " . $prof -> getNom(),
-                'value' => $prof -> getRef_prof()
+                'label' => $prof->getPrenom() . " " . $prof->getNom(),
+                'value' => $prof->getRef_prof()
             );
         }
         

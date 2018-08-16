@@ -50,7 +50,7 @@ function ajaxAfterSubmissionEssai()
     $phoneProche = trim($_POST["phoneProche"]);
     $remarque = $_POST["remarque"];
     $code = $_POST["code"];
-   
+    
     $maths = false;
     $physique = false;
     $francais = false;
@@ -165,10 +165,9 @@ function ajaxAfterSubmissionEssai()
         
         $eleve = $eleveMg->add($eleve);
         
-        $eleve -> setSeq_email_parent_essai(1);
+        $eleve->setSeq_email_parent_essai(1);
         $eleveMg->updateSeqEmailParentEssai($eleve);
         
-     
         // étape n°6 : créer les nouveaux comptes wordpress
         
         // étape n°6-1 : création du compte élève
@@ -191,8 +190,11 @@ function ajaxAfterSubmissionEssai()
                 
                 $eleveMg->updateRefCompteWp($eleve);
                 
-                $slack->sendMessages('log', array(
-                    'password eleve : ' . $passwordEleve
+                // connexion au compte élève pour les prochaines visites
+                wp_signon(array(
+                    'user_login' => $emailEleve,
+                    'user_password' => $passwordEleve,
+                    'remember' => true
                 ));
                 
                 // insertion du compte stp wordpress
@@ -230,9 +232,14 @@ function ajaxAfterSubmissionEssai()
                     
                     $procheMg->updateRefCompteWp($proche);
                     
-                    $slack->sendMessages('log', array(
-                        'password parent : ' . $passwordProche
-                    ));
+                    // connexion au compte parent (si pas déjà connecté au compte élève) pour les prochaines visites
+                    if (! is_user_logged_in()) {
+                        wp_signon(array(
+                            'user_login' => $mailProche,
+                            'user_password' => $passwordProche,
+                            'remember' => true
+                        ));
+                    }
                 } else {
                     
                     $slack->sendMessages('log', array(
@@ -248,6 +255,7 @@ function ajaxAfterSubmissionEssai()
                 }
             }
         }
+        
         // étape n°7 : construire le tableau des matières
         
         $matiereMg = new \spamtonprof\stp_api\stpMatiereManager();
@@ -307,17 +315,15 @@ function ajaxAfterSubmissionEssai()
         
         $abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
         
-        $abonnement= $abonnementMg->add($abonnement);
+        $abonnement = $abonnementMg->add($abonnement);
         
         $abonnement->setRef_compte($compte->getRef_compte());
         $abonnementMg->updateRefCompte($abonnement);
-       
         
-        if($proche){
+        if ($proche) {
             
             $abonnement->setRef_proche($proche->getRef_proche());
             $abonnementMg->updateRefProche($abonnement);
-            
         }
         
         $abonnement->setFirst_prof_assigned(false);
@@ -433,7 +439,7 @@ function ajaxAfterSubmissionEssai()
         if ($envoiEleve) {
             $body_eleve = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/bienvenue-essai-eleve.html");
             $body_eleve = str_replace("[prof-responsable]", $profResponsable, $body_eleve);
-            $smtp->sendEmail("Bienvenue " . $eleve->getPrenom(), $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alexandre de SpamTonProf",true);
+            $smtp->sendEmail("Bienvenue " . $eleve->getPrenom(), $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alexandre de SpamTonProf", true);
         }
         
         if ($envoiParent) {
@@ -441,7 +447,7 @@ function ajaxAfterSubmissionEssai()
             $body_parent = str_replace("[prof-responsable]", $profResponsable, $body_parent);
             $body_parent = str_replace("[prenom-eleve]", $eleve->getPrenom(), $body_parent);
             
-            $smtp->sendEmail("Bienvenue " . $proche->getPrenom(), $proche->getEmail(), $body_parent, $expe->getEmail(), "Alexandre de SpamTonProf",true);
+            $smtp->sendEmail("Bienvenue " . $proche->getPrenom(), $proche->getEmail(), $body_parent, $expe->getEmail(), "Alexandre de SpamTonProf", true);
         }
         
         echo (json_encode($retour));

@@ -229,6 +229,32 @@ class stpAbonnementManager
         }
     }
 
+    public function get($info, $constructor = false)
+    {
+        $q = null;
+        if (array_key_exists("ref_abonnement", $info)) {
+            
+            $refAbonnement = $info["ref_abonnement"];
+            $q = $this->_db->prepare("select * from stp_abonnement where ref_abonnement =:ref_abonnement");
+            $q->bindValue(":ref_abonnement", $refAbonnement);
+        }
+        
+        $q->execute();
+        $data = $q->fetch(PDO::FETCH_ASSOC);
+        
+        if ($data) {
+            $abonnement = new \spamtonprof\stp_api\stpAbonnement($data);
+            
+            if ($constructor) {
+                $constructor["objet"] = $abonnement;
+                $this->construct($constructor);
+            }
+            
+            return ($abonnement);
+        }
+        return (false);
+    }
+
     public function getAll($info, $constructor = false)
     {
         $abonnements = [];

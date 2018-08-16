@@ -12,6 +12,7 @@ idNom = "979";
 idEmail = "977";
 idMobile = "982";
 idDob = "993";
+idSexe = "1044";
 
 ajaxEnCours = 0;
 
@@ -42,9 +43,10 @@ var mySubmitController = Marionette.Object.extend( {
 			email = response.data.fields[idEmail].value;
 			mobile = response.data.fields[idMobile].value;
 			dob = response.data.fields[idDob].value;
+			sexe = response.data.fields[idSexe].value;
 
 			console.log(dob);
-			
+
 			ajaxEnCours++;
 			jQuery.post(
 					ajaxurl,
@@ -54,7 +56,8 @@ var mySubmitController = Marionette.Object.extend( {
 						'nom' : nom,
 						'email' : email,
 						'mobile' : mobile,
-						'dob' : dob
+						'dob' : dob,
+						'sexe' : sexe
 					})
 					.done(function(retour){ 
 						if(retour == "account-exists"){
@@ -63,7 +66,7 @@ var mySubmitController = Marionette.Object.extend( {
 							showMessage("Impossible de vous créer un compte. Veuillez raffraichir la page et réssayer. Contacter l'équipe si le problème persiste");
 						}else{
 							redirect('onboarding-prof', 
-									"Inscription bien validée !  Complétez votre profil pour pouvoir touchez vos premiers €€€ ! "); // on envoie le prof à onboarding-prof
+							"Inscription bien validée !  Complétez votre profil pour pouvoir touchez vos premiers €€€ ! "); // on envoie le prof à onboarding-prof
 						}
 					})
 					.fail(function(err){
@@ -71,8 +74,6 @@ var mySubmitController = Marionette.Object.extend( {
 						console.log(err);
 						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
 					})
-
-
 		}
 
 	},
@@ -92,18 +93,5 @@ jQuery( document ).ready( function( $ ) {
 
 	new mySubmitController();
 
-
-//	/* pour customiser le select des matières et changer l'affichage du blco matière en fonction du choix*/
-//
-//	waitForEl('#choix-matieres', function() {
-//
-//		$("#select-box1").val('maths-physique');
-//
-//		$("select").on("click" , function() {
-//
-//			$(this).parent(".select-box").toggleClass("open");
-//
-//		});
-//	});
 
 });

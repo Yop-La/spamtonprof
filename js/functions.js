@@ -23,9 +23,11 @@ function isEmail(email) {
 
 function redirect(slug ,info = "" ){
 	info = htmlentities.encode(info);
-	$("#hidden-form").attr("action", homeUrl.concat("/",slug) );
-	$("#info").val($("<div>").html(info).text());
-	$("#hidden-form").submit();
+	waitForEl("#info",function(){
+		$("#hidden-form").attr("action", homeUrl.concat("/",slug) );
+		$("#info").val($("<div>").html(info).text());
+		$("#hidden-form").submit();
+	});
 }
 
 function showMessage(message){

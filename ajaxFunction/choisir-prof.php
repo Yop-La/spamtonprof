@@ -9,6 +9,7 @@ add_action('wp_ajax_nopriv_ajaxAttribuerProf', 'ajaxAttribuerProf');
 function ajaxAttribuerProf()
 
 {
+    
     header('Content-type: application/json');
     
     $retour = new \stdClass();
@@ -26,10 +27,10 @@ function ajaxAttribuerProf()
     
     $abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
     $abonnementMg -> updateRefProf($abonnement);
-    $abonnementMg -> updateDateAttributionProf($abonnement);
-    $abonnementMg -> updateFirstProfAssigned($abonnement);
     
-    $slack = new \spamtonprof\slack\Slack();
+    $abonnementMg -> updateDateAttributionProf($abonnement);
+    
+    $abonnementMg -> updateFirstProfAssigned($abonnement);
     
     $profMg = new \spamtonprof\stp_api\stpProfManager();
     

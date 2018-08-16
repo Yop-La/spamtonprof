@@ -15,25 +15,6 @@
  * the License.
  */
 
-class Google_Service_ServiceUsage_Step extends Google_Model
+class Google_Service_ServiceUsage_EnableServiceRequest extends Google_Model
 {
-  public $description;
-  public $status;
-
-  public function setDescription($description)
-  {
-    $this->description = $description;
-  }
-  public function getDescription()
-  {
-    return $this->description;
-  }
-  public function setStatus($status)
-  {
-    $this->status = $status;
-  }
-  public function getStatus()
-  {
-    return $this->status;
-  }
 }

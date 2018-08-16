@@ -1,5 +1,5 @@
 <?php
-use spamtonprof\stp_api\stpCompteWordpressManager;
+
 
 // toutes ces fonction seront éxécutés par un appel ajax réalisé dans inscription-prof.js sur la page dont le slug est inscription-prof
 
@@ -24,6 +24,7 @@ function ajaxInscriptionProf()
     $email = trim($_POST['email']);
     $mobile = trim($_POST['mobile']);
     $dob = trim($_POST['dob']);
+    $sexe = trim($_POST['sexe']);
     
     // première partie : est ce que prof à déjà un compte chez nous ?
     $accountExist = $stpProfMg->get(array(
@@ -34,6 +35,7 @@ function ajaxInscriptionProf()
     if ($accountExist) {
         
         $error = "account-exists";
+        
     } else {
         
         $dob = DateTime::createFromFormat('j/m/Y', $dob);
@@ -44,15 +46,14 @@ function ajaxInscriptionProf()
             'nom' => $nom,
             'telephone' => $mobile,
             'onboarding_step' => "step-0",
-            'date_naissance' => $dob
+            'date_naissance' => $dob,
+            'sexe' => $sexe
         )));
         
         $stpProf -> setOnboarding(false);
         
         $stpProfMg -> updateOnboarding($stpProf);
         
-        // enregistrer le prof dans la bdd
-        $compteWpMg = new \spamtonprof\stp_api\stpCompteWordpressManager();
         
         // créer le compte wordpresss
         $password = wp_generate_password();
@@ -67,10 +68,6 @@ function ajaxInscriptionProf()
         
         if (! is_wp_error($compteProfId)) {
             
-            $slack->sendMessages('log', array(
-                'password eleve : ' . $password
-            ));
-            
             $stpProf->setUser_id_wp($compteProfId);
             
             $stpProfMg->updateUserIdWp($stpProf);
@@ -82,8 +79,18 @@ function ajaxInscriptionProf()
                 'remember' => true
             ));
 
+            
+            $slack->sendMessages('prof', array(
+                " -- Inscription d'un nouveau prof -- ",
+                "Voilà les actions à mener pour terminer son inscription : ",
+                " - 1°) lui attribuer une adresse spamtonprof ",
+                " - 2°) mettre à jour la table stp_prof avec son adresse pro ",
+                " - 3°) lui préparer sa boite mail' "
+            ));
+            
+            
         } else {
-            $slack->sendMessages('log', array(
+            $slack->sendMessages('prof', array(
                 'erreur de création du compte wp prof : ' . $stpProf->getEmail_perso()
             ));
             $error = 'creation-compte-wp-prof';

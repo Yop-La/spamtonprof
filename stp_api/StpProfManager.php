@@ -13,8 +13,8 @@ class stpProfManager
 
     public function add(stpProf $stpProf)
     {
-        $q = $this->_db->prepare('insert into stp_prof(email_perso, prenom, nom, telephone, onboarding_step, date_naissance) 
-            values( :email_perso,:prenom,:nom,:telephone, :onboarding_step, :date_naissance)');
+        $q = $this->_db->prepare('insert into stp_prof(email_perso, prenom, nom, telephone, onboarding_step, date_naissance, sexe) 
+            values( :email_perso,:prenom,:nom,:telephone, :onboarding_step, :date_naissance, :sexe)');
         $q->bindValue(':email_perso', $stpProf->getEmail_perso());
         $q->bindValue(':prenom', $stpProf->getPrenom());
         $q->bindValue(':nom', $stpProf->getNom());
@@ -22,6 +22,7 @@ class stpProfManager
         $q->bindValue(':onboarding_step', $stpProf->getOnboarding_step());
         $q->bindValue(':date_naissance', $stpProf->getDate_naissance()
             ->format(PG_DATE_FORMAT));
+        $q->bindValue(':sexe', $stpProf->getSexe());
         $q->execute();
         
         $stpProf->setRef_prof($this->_db->lastInsertId());
@@ -128,7 +129,76 @@ class stpProfManager
         
         return ($prof);
     }
+    
+    public function updateStripeIdTest(\spamtonprof\stp_api\stpProf $prof)
+    {
+        $q = $this->_db->prepare('update stp_prof set stripe_id_test = :stripe_id_test where ref_prof = :ref_prof');
+        
+        $q->bindValue(':stripe_id_test', $prof->getStripe_id_test());
+        
+        $q->bindValue(':ref_prof', $prof->getRef_prof());
+        
+        $q->execute();
+        
+        return ($prof);
+    }
+    
+    public function updateAdresse(\spamtonprof\stp_api\stpProf $prof)
+    {
+        $q = $this->_db->prepare('update stp_prof set adresse = :adresse where ref_prof = :ref_prof');
+        
+        $q->bindValue(':adresse', $prof->getAdresse());
+        
+        $q->bindValue(':ref_prof', $prof->getRef_prof());
+        
+        $q->execute();
+        
+        return ($prof);
+    }
+    
 
+    public function updateVille(\spamtonprof\stp_api\stpProf $prof)
+    {
+        $q = $this->_db->prepare('update stp_prof set ville = :ville where ref_prof = :ref_prof');
+        
+        $q->bindValue(':ville', $prof->getVille());
+        
+        $q->bindValue(':ref_prof', $prof->getRef_prof());
+        
+        $q->execute();
+        
+        return ($prof);
+    }
+
+    
+    public function updateCodePostal(\spamtonprof\stp_api\stpProf $prof)
+    {
+        $q = $this->_db->prepare('update stp_prof set code_postal = :code_postal where ref_prof = :ref_prof');
+        
+        $q->bindValue(':code_postal', $prof->getCode_postal());
+        
+        $q->bindValue(':ref_prof', $prof->getRef_prof());
+        
+        $q->execute();
+        
+        return ($prof);
+    }
+
+    
+    public function updatePays(\spamtonprof\stp_api\stpProf $prof)
+    {
+        $q = $this->_db->prepare('update stp_prof set pays = :pays where ref_prof = :ref_prof');
+        
+        $q->bindValue(':pays', $prof->getPays());
+        
+        $q->bindValue(':ref_prof', $prof->getRef_prof());
+        
+        $q->execute();
+        
+        return ($prof);
+    }
+    
+    
     public function updateOnboarding_step(\spamtonprof\stp_api\stpProf $prof)
     {
         $q = $this->_db->prepare('update stp_prof set onboarding_step = :onboarding_step where ref_prof = :ref_prof');

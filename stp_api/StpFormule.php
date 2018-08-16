@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class StpFormule implements \JsonSerializable
 {
 
-    protected $formule, $ref_formule, $matieres;
+    protected $formule, $ref_formule, $matieres, $plans, $ref_product_stripe_test, $ref_product_stripe;
 
     public function __construct(array $donnees = array())
     
@@ -115,6 +115,57 @@ class StpFormule implements \JsonSerializable
         $matieres = implode("_", $matieres);
         return (utf8_encode($matieres));
     }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getPlans()
+    {
+        return $this->plans;
+    }
+
+    /**
+     *
+     * @param mixed $plans
+     */
+    public function setPlans($plans)
+    {
+        $this->plans = $plans;
+    }
+    /**
+     * @return mixed
+     */
+    public function getRef_product_stripe_test()
+    {
+        return $this->ref_product_stripe_test;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRef_product_stripe()
+    {
+        return $this->ref_product_stripe;
+    }
+
+    /**
+     * @param mixed $ref_product_stripe_test
+     */
+    public function setRef_product_stripe_test($ref_product_stripe_test)
+    {
+        $this->ref_product_stripe_test = $ref_product_stripe_test;
+    }
+
+    /**
+     * @param mixed $ref_product_stripe
+     */
+    public function setRef_product_stripe($ref_product_stripe)
+    {
+        $this->ref_product_stripe = $ref_product_stripe;
+    }
+
+    
     
 }
 

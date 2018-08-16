@@ -33,6 +33,41 @@ class StpPlanManager
         return ($plan);
     }
 
+    public function getAll($info, $constructor = false)
+    {
+        $plans = [];
+        $q = null;
+        
+        if (is_array($info)) {
+            
+            if (array_key_exists("ref_formule", $info)) {
+                $refFormule = $info["ref_formule"];
+                $q = $this->_db->prepare("select * from stp_plan_paiement where ref_formule = :ref_formule");
+                $q->bindValue(":ref_formule", $refFormule);
+            }
+        }
+        
+        if ($info == "all") {
+            
+            $q = $this->_db->prepare("select * from stp_plan_paiement");
+        }
+        
+        $q->execute();
+        
+        while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
+            
+            $plan = new \spamtonprof\stp_api\StpPlan($data);
+            
+            if ($constructor) {
+                $constructor["objet"] = $plan;
+                $this->construct($constructor);
+            }
+            
+            $plans[] = $plan;
+        }
+        return ($plans);
+    }
+
     public function updateRefPlanOld(\spamtonprof\stp_api\StpPlan $plan)
     {
         $q = $this->_db->prepare('update stp_plan_paiement set ref_plan_old = :ref_plan_old where ref_plan = :ref_plan');
@@ -43,6 +78,26 @@ class StpPlanManager
         return ($plan);
     }
 
+    public function updateRefPlanStripe(\spamtonprof\stp_api\StpPlan $plan)
+    {
+        $q = $this->_db->prepare('update stp_plan_paiement set ref_plan_stripe = :ref_plan_stripe where ref_plan = :ref_plan');
+        $q->bindValue(':ref_plan_stripe', $plan->getRef_plan_stripe());
+        $q->bindValue(':ref_plan', $plan->getRef_plan());
+        $q->execute();
+        
+        return ($plan);
+    }
+    
+    public function updateRefPlanStripeTest(\spamtonprof\stp_api\StpPlan $plan)
+    {
+        $q = $this->_db->prepare('update stp_plan_paiement set ref_plan_stripe_test = :ref_plan_stripe_test where ref_plan = :ref_plan');
+        $q->bindValue(':ref_plan_stripe_test', $plan->getRef_plan_stripe_test());
+        $q->bindValue(':ref_plan', $plan->getRef_plan());
+        $q->execute();
+        
+        return ($plan);
+    }
+    
     public function get($info)
     {
         if (is_int($info)) {
@@ -81,6 +136,33 @@ class StpPlanManager
                 return (false);
             } else {
                 return new \spamtonprof\stp_api\StpPlan($data);
+            }
+        }
+    }
+
+    public function cast(\spamtonprof\stp_api\StpPlan $plan)
+    {
+        return ($plan);
+    }
+
+    public function construct($constructor)
+    {
+        $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
+        
+        $plan = $this->cast($constructor["objet"]);
+        
+        $constructOrders = $constructor["construct"];
+        
+        foreach ($constructOrders as $constructOrder) {
+            
+            switch ($constructOrder) {
+                case "ref_formule":
+                    $formule = $formuleMg->get(array(
+                        'ref_formule' => $plan->getRef_formule()
+                    ));
+                    
+                    $plan->setFormule($formule);
+                    break;
             }
         }
     }

@@ -34,7 +34,11 @@ foreach ($abonnements as $abonnement) {
     $prof = $abonnement->getProf();
     
     $eleve = \spamtonprof\stp_api\stpEleve::cast($eleve);
-    $proche = \spamtonprof\stp_api\stpProche::cast($proche);
+    
+    if ($proche) {
+        $proche = \spamtonprof\stp_api\stpProche::cast($proche);
+    }
+    
     $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
     $prof = \spamtonprof\stp_api\stpProf::cast($prof);
     

@@ -43,7 +43,83 @@ class StripeManager
         }
         
         $this->testMode = $testMode;
+    }
 
+    public function addConnectSubscription($emailClient, $source, $refCompte, $planStripeId, $stripeProfId)
+    {
+        $slack = new \spamtonprof\slack\Slack();
+        
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        
+        try {
+            
+            $customer = \Stripe\Customer::create(array(
+                
+                'email' => $emailClient,
+                
+                'source' => $source,
+                
+                "metadata" => array(
+                    
+                    "ref_compte" => $refCompte
+                
+                )
+            
+            ));
+            
+            $subscription = \Stripe\Subscription::create(array(
+                
+                "customer" => $customer->id,
+                
+                "items" => array(
+                    
+                    array(
+                        
+                        "plan" => $planStripeId
+                    
+                    )
+                
+                ),
+                
+                "metadata" => array(
+                    
+                    "stripe_prof_id" => $stripeProfId
+                
+                )
+            
+            ));
+            
+            $slack->sendMessages("abonnement", array(
+                
+                "Nouvel abonnement, bien joué la team !!",
+                
+                "ref compte : " . $refCompte,
+                
+                "email client : " . $emailClient,
+                
+                "Ref abonnement stripe : " . $subscription->id
+            
+            ));
+            
+            return (true);
+        } catch (Exception $e) {
+            
+            $slack->sendMessages("abonnement", array(
+                
+                "Oops un paiement pour abonnement vient d'échouer",
+                
+                "ref compte : " . $refCompte,
+                
+                "email client : " . $emailClient,
+                
+                "Faut voir ça avec le client",
+                
+                "Erreur : " . $e->getMessage()
+            
+            ));
+            
+            return (false);
+        }
     }
 
     public function createSubscription($emailParent, $source, $refCompte, $planStripe)
@@ -249,26 +325,165 @@ class StripeManager
         $subscriptions = \Stripe\Subscription::all(array(
             
             "limit" => 500
-            
+        
         ));
         
-        return($subscriptions);
+        return ($subscriptions);
     }
 
-    public function createCustomAccount($tokenId, $pays){
+    public function createCustomAccount($tokenId, $pays)
+    {
         
         // faire la création du compte stripe
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         
-        $acct = \Stripe\Account::create(array(
-            "country" => $pays,
-            "type" => "custom",
-            "account_token" => $tokenId,
+        try {
+            
+            $acct = \Stripe\Account::create(array(
+                "country" => $pays,
+                "type" => "custom",
+                "account_token" => $tokenId
+            ));
+            return ($acct->id);
+        } catch (\Exception $e) {
+            
+            $slack = new \spamtonprof\slack\Slack();
+            $slack->sendMessages("onboarding-prof", array(
+                $e->getMessage()
+            ));
+            
+            return (false);
+        }
+    }
+
+    public function updateCustomAccount($tokenId, $accoundId)
+    {
+        
+        // faire la création du compte stripe
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        
+        try {
+            
+            $acct = \Stripe\Account::retrieve($accoundId);
+            $acct->account_token = $tokenId;
+            $acct->save();
+            
+            return ($acct->id);
+        } catch (\Exception $e) {
+            
+            return (false);
+        }
+    }
+
+    public function addExternalAccount($tokenId, $accoundId)
+    {
+        
+        // faire la création du compte stripe
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        
+        try {
+            
+            $account = \Stripe\Account::retrieve($accoundId);
+            $account->external_accounts->create(array(
+                "external_account" => $tokenId
+            ));
+            return ($account->id);
+        } catch (\Exception $e) {
+            
+            $slack = new \spamtonprof\slack\Slack();
+            $slack->sendMessages("log", array(
+                $e->getMessage()
+            ));
+            
+            return (false);
+        }
+    }
+
+    public function deleteAllProductsAndPlans()
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        
+        $plans = \Stripe\Plan::all(array(
+            
+            "limit" => 100
+        
         ));
         
+        $plans = $plans->data;
         
-        return($acct->id);
-       
+        foreach ($plans as $plan) {
+            
+            $plan->delete();
+        }
+        
+        ;
+        
+        $allProducts = \Stripe\Product::all(array(
+            
+            "limit" => 10000
+        
+        ));
+        
+        $products = $allProducts->data;
+        
+        foreach ($products as $product) {
+            
+            $product->delete();
+        }
     }
-    
+
+    // pour créer tous les produits et les plans définis dans la base stp
+    public function createProductsAndPlans()
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        
+        $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
+        $planMg = new \spamtonprof\stp_api\StpPlanManager();
+        
+        $constructor = array(
+            "construct" => array(
+                'plans'
+            )
+        );
+        
+        $formules = $formuleMg->getAll($constructor);
+        
+        foreach ($formules as $formule) {
+            
+            $strProduct = \Stripe\Product::create(array(
+                "name" => "New " . $formule->getFormule(),
+                "type" => "service"
+            ));
+            
+            if ($this->testMode) {
+                $formule->setRef_product_stripe_test($strProduct->id);
+                $formuleMg->updateRefProductStripeTest($formule);
+            } else {
+                $formule->setRef_product_stripe($strProduct->id);
+                $formuleMg->updateRefProductStripe($formule);
+            }
+            
+            // créer la formule dans stripe
+            $plans = $formule->getPlans();
+            foreach ($plans as $plan) {
+                
+                $plan = \spamtonprof\stp_api\StpPlan::cast($plan);
+                
+                $strPlan = \Stripe\Plan::create(array(
+                    "amount" => $plan->getTarif() * 100,
+                    "interval" => "week",
+                    "product" => $strProduct->id,
+                    "currency" => "eur"
+                ));
+                
+                if ($this->testMode) {
+                    $plan->setRef_plan_stripe_test($strPlan->id);
+                    $planMg->updateRefPlanStripeTest($plan);
+                } else {
+                    $plan->setRef_plan_stripe($strPlan->id);
+                    $planMg->updateRefPlanStripe($plan);
+                }
+            }
+        }
+    }
 }

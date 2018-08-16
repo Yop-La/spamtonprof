@@ -30,6 +30,77 @@ class StpFormuleManager
         return ($formule);
     }
 
+    public function getAll($constructor = false)
+    {
+        $formules = [];
+        
+        $q = $this->_db->prepare("select * from stp_formule");
+        
+        $q->execute();
+        
+        while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
+            
+            $formule = new \spamtonprof\stp_api\StpFormule($data);
+            
+            if ($constructor) {
+                $constructor["objet"] = $formule;
+                $this->construct($constructor);
+            }
+            
+            $formules[] = $formule;
+        }
+        return ($formules);
+    }
+    
+    public function cast(\spamtonprof\stp_api\StpFormule $formule){
+        
+        return($formule);
+    }
+    
+    public function updateRefProductStripe(\spamtonprof\stp_api\StpFormule $formule)
+    {
+        $q = $this->_db->prepare('update stp_formule set ref_product_stripe = :ref_product_stripe where ref_formule = :ref_formule');
+        $q->bindValue(':ref_product_stripe', $formule->getRef_product_stripe());
+        $q->bindValue(':ref_formule', $formule->getRef_formule());
+        $q->execute();
+        
+        return ($formule);
+    }
+    
+    public function updateRefProductStripeTest(\spamtonprof\stp_api\StpFormule $formule)
+    {
+        $q = $this->_db->prepare('update stp_formule set ref_product_stripe_test = :ref_product_stripe_test where ref_formule = :ref_formule');
+        $q->bindValue(':ref_product_stripe_test', $formule->getRef_product_stripe_test());
+        $q->bindValue(':ref_formule', $formule->getRef_formule());
+        $q->execute();
+        
+        return ($formule);
+    }
+    
+    
+    public function construct($constructor)
+    {
+        
+        $planMg = new \spamtonprof\stp_api\StpPlanManager();
+        
+        $formule = $this->cast($constructor["objet"]);
+        
+        $constructOrders = $constructor["construct"];
+        
+        foreach ($constructOrders as $constructOrder) {
+            
+            switch ($constructOrder) {
+                case "plans":
+                    $plans = $planMg->getAll(array(
+                    'ref_formule' => $formule->getRef_formule()
+                    ));
+                    
+                    $formule->setPlans($plans);
+                    break;
+            }
+        }
+    }
+
     public function get($info)
     {
         if (is_array($info)) {
@@ -81,7 +152,7 @@ class StpFormuleManager
                 } else {
                     return ($data);
                 }
-            } else if (array_key_exists('ref_formule', $info) ) {
+            } else if (array_key_exists('ref_formule', $info)) {
                 
                 $refFormule = $info['ref_formule'];
                 
