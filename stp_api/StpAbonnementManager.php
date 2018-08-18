@@ -111,11 +111,19 @@ class stpAbonnementManager
         $q->execute();
     }
     
+    public function updateRefStatutAbonnement(\spamtonprof\stp_api\stpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set ref_statut_abonnement = :ref_statut_abonnement where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->bindValue(":ref_statut_abonnement", $abonnement->getRef_statut_abonnement());
+        $q->execute();
+    }
+    
     public function updateSubsId(\spamtonprof\stp_api\stpAbonnement $abonnement)
     {
-        $q = $this->_db->prepare("update stp_abonnement set subs_Id = :subs_Id where ref_abonnement = :ref_abonnement");
+        $q = $this->_db->prepare("update stp_abonnement set subs_id = :subs_id where ref_abonnement = :ref_abonnement");
         $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
-        $q->bindValue(":subs_Id", $abonnement->getSubs_Id());
+        $q->bindValue(":subs_id", $abonnement->getSubs_Id());
         $q->execute();
     }
 
@@ -240,14 +248,16 @@ class stpAbonnementManager
     public function get($info, $constructor = false)
     {
         $q = null;
+
         if (array_key_exists("ref_abonnement", $info)) {
-            
+
             $refAbonnement = $info["ref_abonnement"];
             $q = $this->_db->prepare("select * from stp_abonnement where ref_abonnement =:ref_abonnement");
             $q->bindValue(":ref_abonnement", $refAbonnement);
+            $q->execute();
         }
         
-        $q->execute();
+        
         $data = $q->fetch(PDO::FETCH_ASSOC);
         
         if ($data) {

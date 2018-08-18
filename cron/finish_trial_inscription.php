@@ -42,27 +42,9 @@ foreach ($abonnements as $abonnement) {
     $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
     $prof = \spamtonprof\stp_api\stpProf::cast($prof);
     
-    // envoyer mail si contact se désabonne de la séquence
     
-    $ajoutEleve = false;
-    $ajoutParent = false;
-    
-    if ($eleve->getRef_profil() == \spamtonprof\stp_api\stpProfil::ETUDIANT) {
-        
-        $ajoutEleve = true;
-        $ajoutParent = false;
-    } else {
-        
-        if ($eleve->getSame_email()) {
-            
-            $ajoutEleve = false;
-            $ajoutParent = true;
-        } else {
-            
-            $ajoutEleve = true;
-            $ajoutParent = true;
-        }
-    }
+    $ajoutEleve = $eleve->hasToSendToEleve();
+    $ajoutParent = $eleve->hasToSendToParent();
     
     if ($ajoutEleve) {
         

@@ -1,0 +1,21 @@
+Bonjour [[name]] c'est Alexandre,
+
+Je vous confirme l'inscription de [[name_proche]] à SpamTonProf (nous avons bien reçu le paiement).  
+
+[[name_proche]] peut dès maintenant demander de l'aide à [[prof_name]] et autant de fois que possible comme tout bon vrai spammeur sait le faire.   
+
+Un spammeur ?
+
+Oui, un spammeur c'est à dire un ou une élève de SpamTonProf qui n'hésite pas à envoyer des dizaines de mails pour comprendre un exercice difficile.
+
+On espère que [[name_proche]] a compris la philosophie de SpamTonProf : envoyer autant de mails que possible pour progresser.
+
+C'est ce que fait un spammeur.
+
+Et nous sommes très content de recevoir tous ces mails ! Cela signifie que [[name_proche]] est sur la bonne voix. De même, n'hésitez plus à nous envoyer des mails et à nous spammer pour en savoir plus sur le travail fait avec [[name_proche]].
+
+À bientôt,
+
+Alexandre le directeur
+
+ps : comme vous venez tout juste de vous abonner, je vous rappelle qu'il possible d'arrêter ou d'interrompre l'abonnement à tous moments sans aucun frais depuis votre compte SpamTonProf.

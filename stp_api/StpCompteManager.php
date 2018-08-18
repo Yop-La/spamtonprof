@@ -41,7 +41,7 @@ class stpCompteManager
         
         foreach ($abonnementsCompte as $abonnementCompte) {
             
-            if ($abonnementCompte->getRef_statut_abonnement() == $statutEssai::EN_COURS || $abonnementCompte->getRef_statut_abonnement() == $statutEssai::EN_ATTENTE_DEMARRAGE) {
+            if ($abonnementCompte->getRef_statut_abonnement() == \spamtonprof\stp_api\stpStatutAbonnementManager::ESSAI) {
                 
                 $eleve = $eleveMg->get(array(
                     "ref_eleve" => $abonnementCompte->getRef_eleve()

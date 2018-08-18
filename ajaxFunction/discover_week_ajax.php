@@ -313,6 +313,12 @@ function ajaxAfterSubmissionEssai()
             "ref_plan" => $plan->getRef_plan()
         ));
         
+        $logAboMg = new \spamtonprof\stp_api\stpLogAbonnementManager();
+        $logAboMg->add(new \spamtonprof\stp_api\stpLogAbonnement(array(
+            "ref_abonnement" => $abonnement->getRef_abonnement(),
+            "ref_statut_abo" => $abonnement->getRef_statut_abonnement()
+        )));
+        
         $abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
         
         $abonnement = $abonnementMg->add($abonnement);

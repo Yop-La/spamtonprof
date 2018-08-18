@@ -1,0 +1,9 @@
+Hello [[prof_name]],
+
+Bien joué ! Cet élève : [[eleve_name]] vient tout juste de s'abonner à la formule : [[formule]] à [[tarif]] € / semaine.
+
+Il a surement adorer cette semaine d'essai avec toi.
+
+Bravo !!
+
+Alexandre

@@ -1,0 +1,13 @@
+Bonjour [[name]],
+
+C'est bon, nous vous le confirmons : l'abonnement de [[eleve_name]] à " [[formule]] " avec [[prof_name]] est bien résilié.
+
+On a été content de compter [[eleve_name]] parmi nos élèves.
+
+On lui souhaite beaucoup de réussites !
+
+À bientôt,
+
+Alexandre le directeur
+
+ps : Vous pouvez toujours revenir dans votre compte SpamTonProf si [[eleve_name]] veut retravailler avec nous dans le futur.

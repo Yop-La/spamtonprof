@@ -4,8 +4,8 @@ namespace spamtonprof\stp_api;
 class stpEleve implements \JsonSerializable
 {
 
-    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil, $ref_compte, $seq_email_parent_essai;
-
+    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil, $ref_compte, $seq_email_parent_essai, $hasToSendToEleve, $hasToSendToParent ;
+    
     public function __construct(array $donnees = array())
     {
         $this->hydrate($donnees);
@@ -19,6 +19,47 @@ class stpEleve implements \JsonSerializable
                 $this->$method($value);
             }
         }
+    }
+    
+    public function hasToSendToEleve(){
+        
+        if(is_null($this->getRef_profil()) || is_null($this->getSame_email())){
+            return(null);
+        }
+        $this->setHasToSend();
+        return($this->hasToSendToEleve);
+        
+    }
+    
+    public function hasToSendToParent(){
+        
+        if(is_null($this->getRef_profil()) || is_null($this->getSame_email())){
+            return(null);
+        }
+        $this->setHasToSend();
+        return($this->hasToSendToParent);
+        
+    }
+    
+    public function setHasToSend(){
+        
+        if ($this->getRef_profil() == \spamtonprof\stp_api\stpProfil::ETUDIANT) {
+            
+            $this->hasToSendToEleve = true;
+            $this->hasToSendToParent = false;
+        } else {
+            
+            if ($this->getSame_email()) {
+                
+                $this->hasToSendToEleve = false;
+                $this->hasToSendToParent = true;
+            } else {
+                
+                $this->hasToSendToEleve = true;
+                $this->hasToSendToParent = true;
+            }
+        }
+        
     }
 
     public function getEmail()

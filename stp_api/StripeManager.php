@@ -34,6 +34,15 @@ class StripeManager
 
     private $testMode = true;
 
+    public function stopSubscription($subscriptionId){
+        
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        
+        $subscription = \Stripe\Subscription::retrieve($subscriptionId);
+        $subscription->cancel();
+        
+    }
+    
     public function transfertSubscriptionCharge($event_json){
         
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());

@@ -43,12 +43,9 @@ class PageManager
         $isLogged = $isLogged ? 'true' : 'false';
         wp_localize_script('functions_js', 'isLogged', $isLogged);
         
-        
         /* avoir le domain */
         wp_localize_script('functions_js', 'domain', $this->domain);
     }
-
-  
 
     public function loadScripts()
     {
@@ -252,7 +249,6 @@ class PageManager
         if ($prof) {
             
             wp_localize_script('onboarding_prof', 'loggedProf', $prof->toArray());
-            
         }
     }
 
@@ -296,7 +292,6 @@ class PageManager
         wp_enqueue_script('stripe_checkout_js', 'https://checkout.stripe.com/checkout.js');
         
         wp_enqueue_script('stripe_main_js', 'https://js.stripe.com/v3/');
-        
         
         $current_user = wp_get_current_user();
         

@@ -4,9 +4,9 @@ namespace spamtonprof\stp_api;
 class stpAbonnement implements \JsonSerializable
 {
 
-    const ACTIF = 1 , ESSAI = 2 , TERMINE = 3;
-    
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id;
+    const ACTIF = 1, ESSAI = 2, TERMINE = 3;
+
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $dateDernierStatut;
 
     /**
      *
@@ -29,6 +29,13 @@ class stpAbonnement implements \JsonSerializable
     public function __construct(array $donnees = array())
     {
         $this->hydrate($donnees);
+        
+        $stpLogAboMg = new \spamtonprof\stp_api\stpLogAbonnementManager();
+        
+        if ($this->getRef_abonnement()) {
+            
+            $this->dateDernierStatut = $stpLogAboMg->getDateDernierStatut($this->getRef_abonnement());
+        }
     }
 
     public function hydrate(array $donnees)
@@ -280,16 +287,18 @@ class stpAbonnement implements \JsonSerializable
     {
         $this->ref_compte = $ref_compte;
     }
+
     /**
+     *
      * @return mixed
      */
     public function getDebut_essai()
     {
-        
         return $this->debut_essai;
     }
 
     /**
+     *
      * @return mixed
      */
     public function getFin_essai()
@@ -298,6 +307,7 @@ class stpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $debut_essai
      */
     public function setDebut_essai($debut_essai)
@@ -306,13 +316,16 @@ class stpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $fin_essai
      */
     public function setFin_essai($fin_essai)
     {
         $this->fin_essai = $fin_essai;
     }
+
     /**
+     *
      * @return mixed
      */
     public function getSubs_Id()
@@ -321,16 +334,11 @@ class stpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $subs_Id
      */
     public function setSubs_Id($subs_Id)
     {
         $this->subs_Id = $subs_Id;
     }
-
-    
-    
-
-    
-    
 }
