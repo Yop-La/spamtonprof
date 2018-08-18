@@ -26,7 +26,7 @@ function ajaxCreateStripAccount()
     
     $slack =new \spamtonprof\slack\Slack();
     
-    $stpProfMg = new \spamtonprof\stp_api\stpProfManager();
+    $StpProfMg = new \spamtonprof\stp_api\StpProfManager();
     
     $tokenId = trim($_POST['tokenId']);
     $testMode = trim($_POST['testMode']);
@@ -50,32 +50,32 @@ function ajaxCreateStripAccount()
     
     // mise à jour du prof
     
-    $prof = $stpProfMg->get(array(
+    $prof = $StpProfMg->get(array(
         'ref_prof' => $refProf
     ));
     
     if ($testMode == "true") {
         $prof->setStripe_id_test($accountStripeId);
-        $stpProfMg->updateStripeIdTest($prof);
+        $StpProfMg->updateStripeIdTest($prof);
     } else {
         $prof->setStripe_id($accountStripeId);
-        $stpProfMg->updateStripeId($prof);
+        $StpProfMg->updateStripeId($prof);
     }
     
     $prof->setAdresse($adresse);
-    $stpProfMg->updateAdresse($prof);
+    $StpProfMg->updateAdresse($prof);
     
     $prof->setVille($ville);
-    $stpProfMg->updateVille($prof);
+    $StpProfMg->updateVille($prof);
     
     $prof->setCode_postal($codePostal);
-    $stpProfMg->updateCodePostal($prof);
+    $StpProfMg->updateCodePostal($prof);
     
     $prof->setPays($pays);
-    $stpProfMg->updatePays($prof);
+    $StpProfMg->updatePays($prof);
     
     $prof->setOnboarding_step("step-1");
-    $stpProfMg->updateOnboarding_step($prof);
+    $StpProfMg->updateOnboarding_step($prof);
     
     echo (json_encode($retour));
     
@@ -96,8 +96,8 @@ function ajaxUpdateCustomAccounts()
     $testMode = trim($_POST['testMode']);
     $refProf = trim($_POST['refProf']);
     
-    $stpProfMg = new \spamtonprof\stp_api\stpProfManager();
-    $prof = $stpProfMg->get(array(
+    $StpProfMg = new \spamtonprof\stp_api\StpProfManager();
+    $prof = $StpProfMg->get(array(
         'ref_prof' => $refProf
     ));
     
@@ -118,7 +118,7 @@ function ajaxUpdateCustomAccounts()
     }
     
     $prof->setOnboarding_step("step-2");
-    $stpProfMg->updateOnboarding_step($prof);
+    $StpProfMg->updateOnboarding_step($prof);
     
     echo (json_encode($retour));
     
@@ -139,8 +139,8 @@ function addIbanProf()
     $refProf = trim($_POST['refProf']);
     $testMode = trim($_POST['testMode']);
     
-    $stpProfMg = new \spamtonprof\stp_api\stpProfManager();
-    $prof = $stpProfMg->get(array(
+    $StpProfMg = new \spamtonprof\stp_api\StpProfManager();
+    $prof = $StpProfMg->get(array(
         'ref_prof' => $refProf
     ));
     
@@ -162,7 +162,7 @@ function addIbanProf()
     
     
     $prof->setOnboarding(true);
-    $stpProfMg->updateOnboarding($prof);
+    $StpProfMg->updateOnboarding($prof);
     
     echo (json_encode($retour));
     

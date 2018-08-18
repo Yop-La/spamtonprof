@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpStatutAbonnement implements \JsonSerializable
+class StpStatutAbonnement implements \JsonSerializable
 {
 
     protected $ref_statut_abonnement, $statut_abonnement;

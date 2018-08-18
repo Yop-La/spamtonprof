@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpProf implements \JsonSerializable
+class StpProf implements \JsonSerializable
 {
 
     protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $id_paper, $user_id_wp, $onboarding_step, $iban, $sexe, $stripe_id_test;
@@ -269,7 +269,7 @@ class stpProf implements \JsonSerializable
         return ($retour);
     }
 
-    public static function cast($prof): \spamtonprof\stp_api\stpProf
+    public static function cast($prof): \spamtonprof\stp_api\StpProf
     {
         return ($prof);
     }

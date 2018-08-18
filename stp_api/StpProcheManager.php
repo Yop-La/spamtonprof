@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpProcheManager
+class StpProcheManager
 {
 
     private $_db;
@@ -11,22 +11,22 @@ class stpProcheManager
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
 
-    public function add(stpProche $stpProche)
+    public function add(StpProche $StpProche)
     {
         $q = $this->_db->prepare('insert into stp_proche(email, prenom, nom, telephone, statut_proche) values( :email,:prenom,:nom,:telephone, :statut_proche)');
-        $q->bindValue(':email', $stpProche->getEmail());
-        $q->bindValue(':prenom', $stpProche->getPrenom());
-        $q->bindValue(':nom', $stpProche->getNom());
-        $q->bindValue(':telephone', $stpProche->getTelephone());
-        $q->bindValue(':statut_proche', $stpProche->getStatut_proche());
+        $q->bindValue(':email', $StpProche->getEmail());
+        $q->bindValue(':prenom', $StpProche->getPrenom());
+        $q->bindValue(':nom', $StpProche->getNom());
+        $q->bindValue(':telephone', $StpProche->getTelephone());
+        $q->bindValue(':statut_proche', $StpProche->getStatut_proche());
         $q->execute();
         
-        $stpProche->setRef_proche($this->_db->lastInsertId());
+        $StpProche->setRef_proche($this->_db->lastInsertId());
         
-        return ($stpProche);
+        return ($StpProche);
     }
 
-    public function updateRefCompteWp(stpProche $proche)
+    public function updateRefCompteWp(StpProche $proche)
     {
         $q = $this->_db->prepare('update stp_proche set ref_compte_wp = :ref_compte_wp where ref_proche = :ref_proche');
         $q->bindValue(':ref_compte_wp', $proche->getRef_compte_wp());
@@ -68,7 +68,7 @@ class stpProcheManager
         $data = $q->fetch(\PDO::FETCH_ASSOC);
         
         if ($data) {
-            return (new \spamtonprof\stp_api\stpProche($data));
+            return (new \spamtonprof\stp_api\StpProche($data));
         } else {
             return (false);
         }

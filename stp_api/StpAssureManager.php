@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpAssureManager
+class StpAssureManager
 {
 
     private $_db;

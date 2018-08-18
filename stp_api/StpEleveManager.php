@@ -3,7 +3,7 @@ namespace spamtonprof\stp_api;
 
 use PDO;
 
-class stpEleveManager
+class StpEleveManager
 {
 
     private $_db, $profilMg, $classeMg;
@@ -13,24 +13,24 @@ class stpEleveManager
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
 
-    public function add(stpEleve $stpEleve)
+    public function add(StpEleve $StpEleve)
     {
         $q = $this->_db->prepare('insert into stp_eleve(email, prenom, ref_classe, nom, telephone, same_email, ref_profil,ref_compte) values( :email,:prenom,:ref_classe,:nom,:telephone,  :same_email, :ref_profil, :ref_compte)');
-        $q->bindValue(':email', $stpEleve->getEmail());
-        $q->bindValue(':prenom', $stpEleve->getPrenom());
-        $q->bindValue(':ref_classe', $stpEleve->getRef_classe());
-        $q->bindValue(':nom', $stpEleve->getNom());
-        $q->bindValue(':telephone', $stpEleve->getTelephone());
-        $q->bindValue(':same_email', $stpEleve->getSame_email(), \PDO::PARAM_BOOL);
-        $q->bindValue(':ref_profil', $stpEleve->getRef_profil());
-        $q->bindValue(':ref_compte', $stpEleve->getRef_compte());
+        $q->bindValue(':email', $StpEleve->getEmail());
+        $q->bindValue(':prenom', $StpEleve->getPrenom());
+        $q->bindValue(':ref_classe', $StpEleve->getRef_classe());
+        $q->bindValue(':nom', $StpEleve->getNom());
+        $q->bindValue(':telephone', $StpEleve->getTelephone());
+        $q->bindValue(':same_email', $StpEleve->getSame_email(), \PDO::PARAM_BOOL);
+        $q->bindValue(':ref_profil', $StpEleve->getRef_profil());
+        $q->bindValue(':ref_compte', $StpEleve->getRef_compte());
         
         $q->execute();
-        $stpEleve->setRef_eleve($this->_db->lastInsertId());
-        return ($stpEleve);
+        $StpEleve->setRef_eleve($this->_db->lastInsertId());
+        return ($StpEleve);
     }
 
-    public function updateRefCompteWp(stpEleve $eleve)
+    public function updateRefCompteWp(StpEleve $eleve)
     {
         $q = $this->_db->prepare('update stp_eleve set ref_compte_wp = :ref_compte_wp where ref_eleve = :ref_eleve');
         $q->bindValue(':ref_compte_wp', $eleve->getRef_compte_wp());
@@ -40,7 +40,7 @@ class stpEleveManager
         return ($eleve);
     }
 
-    public function updateSeqEmailParentEssai(stpEleve $eleve)
+    public function updateSeqEmailParentEssai(StpEleve $eleve)
     {
         $q = $this->_db->prepare('update stp_eleve set seq_email_parent_essai = :seq_email_parent_essai where ref_eleve = :ref_eleve');
         $q->bindValue(':seq_email_parent_essai', $eleve->getSeq_email_parent_essai());
@@ -87,21 +87,21 @@ class stpEleveManager
         $data = $q->fetch(\PDO::FETCH_ASSOC);
         
         if ($data) {
-            return (new \spamtonprof\stp_api\stpEleve($data));
+            return (new \spamtonprof\stp_api\StpEleve($data));
         } else {
             return (false);
         }
     }
 
-    public function cast(\spamtonprof\stp_api\stpEleve $object)
+    public function cast(\spamtonprof\stp_api\StpEleve $object)
     {
         return ($object);
     }
 
     public function construct($constructor)
     {
-        $classeMg = new \spamtonprof\stp_api\stpClasseManager();
-        $profilMg = new \spamtonprof\stp_api\stpProfilManager();
+        $classeMg = new \spamtonprof\stp_api\StpClasseManager();
+        $profilMg = new \spamtonprof\stp_api\StpProfilManager();
         
         $eleve = $this->cast($constructor["objet"]);
         
@@ -141,7 +141,7 @@ class stpEleveManager
 
         }
         while($data = $q->fetch(PDO::FETCH_ASSOC)){
-            $eleves[] = new \spamtonprof\stp_api\stpEleve($data);
+            $eleves[] = new \spamtonprof\stp_api\StpEleve($data);
         }
         return($eleves);
     }

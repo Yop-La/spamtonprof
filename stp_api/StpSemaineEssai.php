@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpSemaineEssai implements \JsonSerializable
+class StpSemaineEssai implements \JsonSerializable
 {
 
     protected $ref_essai, $ref_abonnement, $debut, $fin, $ref_prof, $ref_statut_essai, $essai_rattrapage, $ref_raison_avortement;

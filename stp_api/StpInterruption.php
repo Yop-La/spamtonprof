@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpInterruption implements \JsonSerializable
+class StpInterruption implements \JsonSerializable
 {
 
     protected $ref_interruption, $ref_abonnement, $date_debut, $date_fin;

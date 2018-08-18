@@ -54,7 +54,7 @@ function ajaxCheckLogIn()
     
     if (array_key_exists("prof", $user->get_role_caps())) {
         
-        $profMg = new \spamtonprof\stp_api\stpProfManager();
+        $profMg = new \spamtonprof\stp_api\StpProfManager();
         
         $prof = $profMg->get(array(
             'user_id_wp' => $user->ID

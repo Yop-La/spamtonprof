@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpEleve implements \JsonSerializable
+class StpEleve implements \JsonSerializable
 {
 
     protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil, $ref_compte, $seq_email_parent_essai, $hasToSendToEleve, $hasToSendToParent ;
@@ -43,7 +43,7 @@ class stpEleve implements \JsonSerializable
     
     public function setHasToSend(){
         
-        if ($this->getRef_profil() == \spamtonprof\stp_api\stpProfil::ETUDIANT) {
+        if ($this->getRef_profil() == \spamtonprof\stp_api\StpProfil::ETUDIANT) {
             
             $this->hasToSendToEleve = true;
             $this->hasToSendToParent = false;
@@ -218,7 +218,7 @@ class stpEleve implements \JsonSerializable
         $this->profil = $profil;
     }
 
-    public static function cast($eleve): \spamtonprof\stp_api\stpEleve
+    public static function cast($eleve): \spamtonprof\stp_api\StpEleve
     {
         return ($eleve);
     }

@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpExpeManager
+class StpExpeManager
 {
 
     private $_db;
@@ -23,7 +23,7 @@ class stpExpeManager
         
         if ($data) {
             
-            $expe = new \spamtonprof\stp_api\stpExpe($data);
+            $expe = new \spamtonprof\stp_api\StpExpe($data);
             return ($expe);
         } else {
             return (false);

@@ -16,10 +16,10 @@ header("Pragma: no-cache");
 
 use Sunra\PhpSimple\HtmlDomParser;
 
-$abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
-$eleveMg = new \spamtonprof\stp_api\stpEleveManager();
-$compteMg = new \spamtonprof\stp_api\stpCompteManager();
-$statutEssai = new \spamtonprof\stp_api\stpStatutEssai();
+$abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
+$eleveMg = new \spamtonprof\stp_api\StpEleveManager();
+$compteMg = new \spamtonprof\stp_api\StpCompteManager();
+$statutEssai = new \spamtonprof\stp_api\StpStatutEssai();
 $getresponse = new \GetResponse();
 
 $abonnements = $abonnementMg->getHasNotFirstProfAssignement();
@@ -33,14 +33,14 @@ foreach ($abonnements as $abonnement) {
     $formule = $abonnement->getFormule();
     $prof = $abonnement->getProf();
     
-    $eleve = \spamtonprof\stp_api\stpEleve::cast($eleve);
+    $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
     
     if ($proche) {
-        $proche = \spamtonprof\stp_api\stpProche::cast($proche);
+        $proche = \spamtonprof\stp_api\StpProche::cast($proche);
     }
     
     $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
-    $prof = \spamtonprof\stp_api\stpProf::cast($prof);
+    $prof = \spamtonprof\stp_api\StpProf::cast($prof);
     
     
     $ajoutEleve = $eleve->hasToSendToEleve();
@@ -149,7 +149,7 @@ foreach ($abonnements as $abonnement) {
     ), $emailRecap);
     
     // ajout des infos du bilan scolaire au mail récap
-    $remarqueMg = new \spamtonprof\stp_api\stpRemarqueInscriptionManager();
+    $remarqueMg = new \spamtonprof\stp_api\StpRemarqueInscriptionManager();
     $remarques = $remarqueMg->getAll(array(
         "ref_abonnement" => $abonnement->getRef_abonnement()
     ));
@@ -157,7 +157,7 @@ foreach ($abonnements as $abonnement) {
     foreach ($remarques as $remarque) {
         
         switch ($remarque->getRef_matiere()) {
-            case \spamtonprof\stp_api\stpMatiere::FRANCAIS:
+            case \spamtonprof\stp_api\StpMatiere::FRANCAIS:
                 
                 $emailRecap = str_replace(array(
                     "diff_francais",
@@ -170,7 +170,7 @@ foreach ($abonnements as $abonnement) {
                 ), $emailRecap);
                 
                 break;
-            case \spamtonprof\stp_api\stpMatiere::PHYSIQUE:
+            case \spamtonprof\stp_api\StpMatiere::PHYSIQUE:
                 
                 $emailRecap = str_replace(array(
                     "diff_physique",
@@ -182,7 +182,7 @@ foreach ($abonnements as $abonnement) {
                     $remarque->getChapitre()
                 ), $emailRecap);
                 break;
-            case \spamtonprof\stp_api\stpMatiere::MATHS:
+            case \spamtonprof\stp_api\StpMatiere::MATHS:
                 
                 $emailRecap = str_replace(array(
                     "diff_maths",
@@ -198,7 +198,7 @@ foreach ($abonnements as $abonnement) {
     }
     
     // ajout des infos parents aux mails récap
-    if ($eleve->getRef_profil() == \spamtonprof\stp_api\stpProfil::ETUDIANT) {
+    if ($eleve->getRef_profil() == \spamtonprof\stp_api\StpProfil::ETUDIANT) {
         $elems = $html->find('.parent');
         $elems[0]->outertext = '';
     } else {

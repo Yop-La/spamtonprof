@@ -3,7 +3,7 @@ namespace spamtonprof\stp_api;
 
 use spamtonprof;
 
-class stpClasseManager
+class StpClasseManager
 {
 
     private $_db;
@@ -27,7 +27,7 @@ class stpClasseManager
             
             while($data = $q->fetch(\PDO::FETCH_ASSOC)){
                 
-                $classes[] = new spamtonprof\stp_api\stpClasse($data);
+                $classes[] = new spamtonprof\stp_api\StpClasse($data);
                 
             }
             return($classes);
@@ -49,7 +49,7 @@ class stpClasseManager
             
             if($data = $q->fetch(\PDO::FETCH_ASSOC)){
                 
-                return( new spamtonprof\stp_api\stpClasse($data));
+                return( new spamtonprof\stp_api\StpClasse($data));
                 
             }else{
                 return(false);

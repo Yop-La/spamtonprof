@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpProfil implements \JsonSerializable
+class StpProfil implements \JsonSerializable
 {
 
     const ECOLIER = 1, COLLEGIEN = 2, LYCEEN = 3, ETUDIANT = 4;

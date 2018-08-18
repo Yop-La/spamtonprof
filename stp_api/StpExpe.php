@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpExpe implements \JsonSerializable
+class StpExpe implements \JsonSerializable
 {
 
     protected $ref_expe, $email, $from_name;

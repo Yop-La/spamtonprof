@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpStatutEssai implements \JsonSerializable
+class StpStatutEssai implements \JsonSerializable
 {
 
     const EN_COURS = 1, ACHEVE_SUCCES = 2, EN_ATTENTE_DEMARRAGE = 3, AVORTE = 4, EXPIRE = 5;

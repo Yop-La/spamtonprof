@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpInterruptionManager
+class StpInterruptionManager
 {
 
     private $_db;
@@ -11,17 +11,17 @@ class stpInterruptionManager
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
 
-    public function add(stpInterruption $stpInterruption)
+    public function add(StpInterruption $StpInterruption)
     {
         $q = $this->_db->prepare('insert into stp_interruption(ref_interruption, ref_abonnement, date_debut, date_fin) values( :ref_interruption,:ref_abonnement,:date_debut,:date_fin)');
-        $q->bindValue(':ref_interruption', $stpInterruption->getRef_interruption());
-        $q->bindValue(':ref_abonnement', $stpInterruption->getRef_abonnement());
-        $q->bindValue(':date_debut', $stpInterruption->getDate_debut());
-        $q->bindValue(':date_fin', $stpInterruption->getDate_fin());
+        $q->bindValue(':ref_interruption', $StpInterruption->getRef_interruption());
+        $q->bindValue(':ref_abonnement', $StpInterruption->getRef_abonnement());
+        $q->bindValue(':date_debut', $StpInterruption->getDate_debut());
+        $q->bindValue(':date_fin', $StpInterruption->getDate_fin());
         $q->execute();
         
-        $stpInterruption->setRef_interruption($this->_db->lastInsertId());
+        $StpInterruption->setRef_interruption($this->_db->lastInsertId());
         
-        return ($stpInterruption);
+        return ($StpInterruption);
     }
 }

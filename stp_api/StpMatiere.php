@@ -3,7 +3,7 @@ namespace spamtonprof\stp_api;
 
 
 
-class stpMatiere implements \JsonSerializable
+class StpMatiere implements \JsonSerializable
 {
 
     const MATHS = 1, FRANCAIS = 2, PHYSIQUE = 3;

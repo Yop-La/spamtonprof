@@ -214,7 +214,7 @@ function base64url_decode($base64url)
 // pour importer des plans de paiements depuis un csv vers la table stp_plan_paiement
 function importPlanPaiementFromCsv()
 {
-    $stpPlanMg = new \spamtonprof\stp_api\StpPlanManager();
+    $StpPlanMg = new \spamtonprof\stp_api\StpPlanManager();
     
     $row = 0;
     if (($handle = fopen("formules_plan_paiements.csv", "r")) !== FALSE) {
@@ -233,17 +233,17 @@ function importPlanPaiementFromCsv()
                     "ref_plan_old" => $data[4]
                 );
                 
-                $stpPlan = new \spamtonprof\stp_api\StpPlan($arrPlan);
+                $StpPlan = new \spamtonprof\stp_api\StpPlan($arrPlan);
                 
-                echo (json_encode($stpPlan));
+                echo (json_encode($StpPlan));
                 
                 echo ("<br>");
                 
-                $stpPlan = $stpPlanMg->add($stpPlan);
+                $StpPlan = $StpPlanMg->add($StpPlan);
                 
-                if ($stpPlan->getRef_plan_old() != "") {
+                if ($StpPlan->getRef_plan_old() != "") {
                     
-                    $stpPlanMg->updateRefPlanOld($stpPlan);
+                    $StpPlanMg->updateRefPlanOld($StpPlan);
                 }
             }
         }

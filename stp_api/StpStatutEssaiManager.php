@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpStatutEssaiManager
+class StpStatutEssaiManager
 {
 
     private $_db;
@@ -11,15 +11,15 @@ class stpStatutEssaiManager
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
 
-    public function add(stpStatutEssai $stpStatutEssai)
+    public function add(StpStatutEssai $StpStatutEssai)
     {
         $q = $this->_db->prepare('insert into stp_statut_essai(statut_essai, ref_statut_essai) values( :statut_essai,:ref_statut_essai)');
-        $q->bindValue(':statut_essai', $stpStatutEssai->getStatut_essai());
-        $q->bindValue(':ref_statut_essai', $stpStatutEssai->getRef_statut_essai());
+        $q->bindValue(':statut_essai', $StpStatutEssai->getStatut_essai());
+        $q->bindValue(':ref_statut_essai', $StpStatutEssai->getRef_statut_essai());
         $q->execute();
         
-        $stpStatutEssai->setRef_statut_essai($this->_db->lastInsertId());
+        $StpStatutEssai->setRef_statut_essai($this->_db->lastInsertId());
         
-        return ($stpStatutEssai);
+        return ($StpStatutEssai);
     }
 }

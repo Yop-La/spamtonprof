@@ -13,17 +13,17 @@ class StpGmailAccountManager
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
 
-    public function add(StpGmailAccount $stpGmailAccount)
+    public function add(StpGmailAccount $StpGmailAccount)
     {
         $q = $this->_db->prepare('insert into stp_gmail_account(ref_gmail_account, email) values( :ref_gmail_account,:email)');
-        $q->bindValue(':ref_gmail_account', $stpGmailAccount->getRef_gmail_account());
-        $q->bindValue(':email', $stpGmailAccount->getEmail());
+        $q->bindValue(':ref_gmail_account', $StpGmailAccount->getRef_gmail_account());
+        $q->bindValue(':email', $StpGmailAccount->getEmail());
 
         $q->execute();
 
-        $stpGmailAccount->setRef_gmail_account($this->_db->lastInsertId());
+        $StpGmailAccount->setRef_gmail_account($this->_db->lastInsertId());
 
-        return ($stpGmailAccount);
+        return ($StpGmailAccount);
     }
     
     public function get($info)
@@ -54,29 +54,29 @@ class StpGmailAccountManager
         }
     }
     
-    public function updateCredential(StpGmailAccount $stpGmailAccount)
+    public function updateCredential(StpGmailAccount $StpGmailAccount)
     
     {
         $q = $this->_db->prepare('UPDATE stp_gmail_account credential=:credential
             WHERE ref_gmail_account = :ref_gmail_account');
         
-        $q->bindValue(':credential', $stpGmailAccount->getCredential());
+        $q->bindValue(':credential', $StpGmailAccount->getCredential());
         
-        $q->bindValue(':ref_gmail_account', $stpGmailAccount->getRef_gmail_account());
+        $q->bindValue(':ref_gmail_account', $StpGmailAccount->getRef_gmail_account());
         
         $q->execute();
         
     }
     
-    public function updateHistoryId(StpGmailAccount $stpGmailAccount)
+    public function updateHistoryId(StpGmailAccount $StpGmailAccount)
     
     {
         $q = $this->_db->prepare('UPDATE stp_gmail_account SET last_history_id =:last_history_id
             WHERE ref_gmail_account = :ref_gmail_account');
         
-        $q->bindValue(':last_history_id', $stpGmailAccount->getLast_history_id());
+        $q->bindValue(':last_history_id', $StpGmailAccount->getLast_history_id());
         
-        $q->bindValue(':ref_gmail_account', $stpGmailAccount->getRef_gmail_account());
+        $q->bindValue(':ref_gmail_account', $StpGmailAccount->getRef_gmail_account());
         
         $q->execute();
         

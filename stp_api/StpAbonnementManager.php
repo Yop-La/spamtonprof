@@ -3,7 +3,7 @@ namespace spamtonprof\stp_api;
 
 use PDO;
 
-class stpAbonnementManager
+class StpAbonnementManager
 {
 
     private $_db, $eleveMg;
@@ -13,21 +13,21 @@ class stpAbonnementManager
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
 
-    public function add(stpAbonnement $stpAbonnement)
+    public function add(StpAbonnement $StpAbonnement)
     {
         $q = $this->_db->prepare('insert into stp_abonnement(ref_eleve, ref_formule, ref_statut_abonnement, date_creation, remarque_inscription, ref_plan) values( :ref_eleve,:ref_formule,:ref_statut_abonnement,:date_creation,:remarque_inscription,:ref_plan)');
-        $q->bindValue(':ref_eleve', $stpAbonnement->getRef_eleve());
-        $q->bindValue(':ref_formule', $stpAbonnement->getRef_formule());
-        $q->bindValue(':ref_statut_abonnement', $stpAbonnement->getRef_statut_abonnement());
-        $q->bindValue(':date_creation', $stpAbonnement->getDate_creation()
+        $q->bindValue(':ref_eleve', $StpAbonnement->getRef_eleve());
+        $q->bindValue(':ref_formule', $StpAbonnement->getRef_formule());
+        $q->bindValue(':ref_statut_abonnement', $StpAbonnement->getRef_statut_abonnement());
+        $q->bindValue(':date_creation', $StpAbonnement->getDate_creation()
             ->format(PG_DATETIME_FORMAT));
-        $q->bindValue(':remarque_inscription', $stpAbonnement->getRemarque_inscription());
-        $q->bindValue(':ref_plan', $stpAbonnement->getRef_plan());
+        $q->bindValue(':remarque_inscription', $StpAbonnement->getRemarque_inscription());
+        $q->bindValue(':ref_plan', $StpAbonnement->getRef_plan());
         $q->execute();
         
-        $stpAbonnement->setRef_abonnement($this->_db->lastInsertId());
+        $StpAbonnement->setRef_abonnement($this->_db->lastInsertId());
         
-        return ($stpAbonnement);
+        return ($StpAbonnement);
     }
 
     /*
@@ -43,7 +43,7 @@ class stpAbonnementManager
         
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
             
-            $abonnement = new \spamtonprof\stp_api\stpAbonnement($data);
+            $abonnement = new \spamtonprof\stp_api\StpAbonnement($data);
             
             $this->construct(array(
                 "objet" => $abonnement,
@@ -79,7 +79,7 @@ class stpAbonnementManager
         
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
             
-            $abonnement = new \spamtonprof\stp_api\stpAbonnement($data);
+            $abonnement = new \spamtonprof\stp_api\StpAbonnement($data);
             
             $this->construct(array(
                 "objet" => $abonnement,
@@ -103,7 +103,7 @@ class stpAbonnementManager
         return ($abonnements);
     }
 
-    public function updateRefProf(\spamtonprof\stp_api\stpAbonnement $abonnement)
+    public function updateRefProf(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set ref_prof = :ref_prof where ref_abonnement = :ref_abonnement");
         $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
@@ -111,7 +111,7 @@ class stpAbonnementManager
         $q->execute();
     }
     
-    public function updateRefStatutAbonnement(\spamtonprof\stp_api\stpAbonnement $abonnement)
+    public function updateRefStatutAbonnement(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set ref_statut_abonnement = :ref_statut_abonnement where ref_abonnement = :ref_abonnement");
         $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
@@ -119,7 +119,7 @@ class stpAbonnementManager
         $q->execute();
     }
     
-    public function updateSubsId(\spamtonprof\stp_api\stpAbonnement $abonnement)
+    public function updateSubsId(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set subs_id = :subs_id where ref_abonnement = :ref_abonnement");
         $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
@@ -127,7 +127,7 @@ class stpAbonnementManager
         $q->execute();
     }
 
-    public function updateDateAttributionProf(\spamtonprof\stp_api\stpAbonnement $abonnement)
+    public function updateDateAttributionProf(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set date_attribution_prof = :date_attribution_prof where ref_abonnement = :ref_abonnement");
         $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
@@ -136,7 +136,7 @@ class stpAbonnementManager
         $q->execute();
     }
 
-    public function updateRefProche(\spamtonprof\stp_api\stpAbonnement $abonnement)
+    public function updateRefProche(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set ref_proche = :ref_proche where ref_abonnement = :ref_abonnement");
         $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
@@ -144,7 +144,7 @@ class stpAbonnementManager
         $q->execute();
     }
 
-    public function updateFirstProfAssigned(\spamtonprof\stp_api\stpAbonnement $abonnement)
+    public function updateFirstProfAssigned(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set first_prof_assigned = :first_prof_assigned where ref_abonnement = :ref_abonnement");
         $q->bindValue(":first_prof_assigned", $abonnement->getFirst_prof_assigned(), PDO::PARAM_BOOL);
@@ -152,7 +152,7 @@ class stpAbonnementManager
         $q->execute();
     }
 
-    public function updateRefCompte(\spamtonprof\stp_api\stpAbonnement $abonnement)
+    public function updateRefCompte(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set ref_compte = :ref_compte where ref_abonnement = :ref_abonnement");
         $q->bindValue(":ref_compte", $abonnement->getRef_compte());
@@ -160,7 +160,7 @@ class stpAbonnementManager
         $q->execute();
     }
 
-    public function updateDebutEssai(\spamtonprof\stp_api\stpAbonnement $abonnement)
+    public function updateDebutEssai(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set debut_essai = :debut_essai where ref_abonnement = :ref_abonnement");
         $q->bindValue(":debut_essai", $abonnement->getDebut_essai());
@@ -168,7 +168,7 @@ class stpAbonnementManager
         $q->execute();
     }
 
-    public function updateFinEssai(\spamtonprof\stp_api\stpAbonnement $abonnement)
+    public function updateFinEssai(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set fin_essai = :fin_essai where ref_abonnement = :ref_abonnement");
         $q->bindValue(":fin_essai", $abonnement->getFin_essai());
@@ -176,17 +176,17 @@ class stpAbonnementManager
         $q->execute();
     }
 
-    public function cast(\spamtonprof\stp_api\stpAbonnement $object)
+    public function cast(\spamtonprof\stp_api\StpAbonnement $object)
     {
         return ($object);
     }
 
     public function construct($constructor)
     {
-        $eleveMg = new \spamtonprof\stp_api\stpEleveManager();
+        $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
         $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
-        $profMg = new \spamtonprof\stp_api\stpProfManager();
-        $procheMg = new \spamtonprof\stp_api\stpProcheManager();
+        $profMg = new \spamtonprof\stp_api\StpProfManager();
+        $procheMg = new \spamtonprof\stp_api\StpProcheManager();
         
         $abonnement = $this->cast($constructor["objet"]);
         
@@ -225,7 +225,7 @@ class stpAbonnementManager
                     break;
                 case "ref_parent":
                     if (! is_null($abonnement->getRef_proche())) {
-                        $procheMg = new \spamtonprof\stp_api\stpProcheManager();
+                        $procheMg = new \spamtonprof\stp_api\StpProcheManager();
                         $proche = $procheMg->get(array(
                             'ref_proche' => $abonnement->getRef_proche()
                         ));
@@ -261,7 +261,7 @@ class stpAbonnementManager
         $data = $q->fetch(PDO::FETCH_ASSOC);
         
         if ($data) {
-            $abonnement = new \spamtonprof\stp_api\stpAbonnement($data);
+            $abonnement = new \spamtonprof\stp_api\StpAbonnement($data);
             
             if ($constructor) {
                 $constructor["objet"] = $abonnement;
@@ -303,7 +303,7 @@ class stpAbonnementManager
         
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
             
-            $abonnement = new \spamtonprof\stp_api\stpAbonnement($data);
+            $abonnement = new \spamtonprof\stp_api\StpAbonnement($data);
             
             if ($constructor) {
                 $constructor["objet"] = $abonnement;

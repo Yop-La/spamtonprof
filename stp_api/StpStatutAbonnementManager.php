@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpStatutAbonnementManager
+class StpStatutAbonnementManager
 {
 
     const ACTIF = 1, ESSAI = 2, TERMINE = 3;

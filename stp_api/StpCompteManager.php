@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpCompteManager
+class StpCompteManager
 {
 
     private $_db;
@@ -11,17 +11,17 @@ class stpCompteManager
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
 
-    public function add(stpCompte $stpCompte)
+    public function add(StpCompte $StpCompte)
     {
         $q = $this->_db->prepare('insert into stp_compte(date_creation, ref_proche) values( :date_creation,:ref_proche)');
-        $q->bindValue(':date_creation', $stpCompte->getDate_creation()
+        $q->bindValue(':date_creation', $StpCompte->getDate_creation()
             ->format(PG_DATETIME_FORMAT));
-        $q->bindValue(':ref_proche', $stpCompte->getRef_proche());
+        $q->bindValue(':ref_proche', $StpCompte->getRef_proche());
         $q->execute();
         
-        $stpCompte->setRef_compte($this->_db->lastInsertId());
+        $StpCompte->setRef_compte($this->_db->lastInsertId());
         
-        return ($stpCompte);
+        return ($StpCompte);
     }
 
     /*
@@ -31,9 +31,9 @@ class stpCompteManager
      */
     public function getNotFreeParentTrialList($refCompte)
     {
-        $abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
-        $eleveMg = new \spamtonprof\stp_api\stpEleveManager();
-        $statutEssai = new \spamtonprof\stp_api\stpStatutEssai();
+        $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
+        $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
+        $statutEssai = new \spamtonprof\stp_api\StpStatutEssai();
         
         $abonnementsCompte = $abonnementMg->getAll(array(
             "ref_compte" => $refCompte
@@ -41,7 +41,7 @@ class stpCompteManager
         
         foreach ($abonnementsCompte as $abonnementCompte) {
             
-            if ($abonnementCompte->getRef_statut_abonnement() == \spamtonprof\stp_api\stpStatutAbonnementManager::ESSAI) {
+            if ($abonnementCompte->getRef_statut_abonnement() == \spamtonprof\stp_api\StpStatutAbonnementManager::ESSAI) {
                 
                 $eleve = $eleveMg->get(array(
                     "ref_eleve" => $abonnementCompte->getRef_eleve()
@@ -59,8 +59,8 @@ class stpCompteManager
             
             $refCompteWp = $info["ref_compte_wp"];
             
-            $eleveMg = new \spamtonprof\stp_api\stpEleveManager();
-            $procheMg = new \spamtonprof\stp_api\stpProcheManager();
+            $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
+            $procheMg = new \spamtonprof\stp_api\StpProcheManager();
             
             $eleve = $eleveMg->get(array(
                 "ref_compte_wp" => $refCompteWp
@@ -107,7 +107,7 @@ class stpCompteManager
         $data = $q->fetch(\PDO::FETCH_ASSOC);
         
         if ($data) {
-            return (new \spamtonprof\stp_api\stpCompte($data));
+            return (new \spamtonprof\stp_api\StpCompte($data));
         } else {
             return (false);
         }

@@ -1,6 +1,6 @@
 <?php
 namespace spamtonprof\stp_api;
-class stpClasse implements \JsonSerializable
+class StpClasse implements \JsonSerializable
 {
 protected
 $classe, 

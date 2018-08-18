@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.5.6.1
+ * Version: 1.1.5.6.2
  *
  *
  *
@@ -101,7 +101,7 @@ function handleRedirections()
         
         if (current_user_can('prof') && is_user_logged_in()) {
             
-            $profMg = new \spamtonprof\stp_api\stpProfManager();
+            $profMg = new \spamtonprof\stp_api\StpProfManager();
             
             $prof = $profMg->get(array(
                 'user_id_wp' => $current_user->ID
@@ -173,9 +173,9 @@ function my_pre_population_callback($options, $settings)
         
         $profils = [];
         
-        $stpProfilMg = new \spamtonprof\stp_api\stpProfilManager();
+        $StpProfilMg = new \spamtonprof\stp_api\StpProfilManager();
         
-        $profils = $stpProfilMg->getAll();
+        $profils = $StpProfilMg->getAll();
         
         foreach ($profils as $profil) {
             
@@ -191,13 +191,13 @@ function my_pre_population_callback($options, $settings)
     // target "choisir prof" field in choisir_prof
     if ($settings['key'] == 'choisir_le_prof_1533217231976') {
         
-        $stpProfMg = new \spamtonprof\stp_api\stpProfManager();
+        $StpProfMg = new \spamtonprof\stp_api\StpProfManager();
         
-        $profs = $stpProfMg->getAll();
+        $profs = $StpProfMg->getAll();
         
         foreach ($profs as $prof) {
             
-            $prof = $stpProfMg->cast($prof);
+            $prof = $StpProfMg->cast($prof);
             
             $options[] = array(
                 'label' => $prof->getPrenom() . " " . $prof->getNom(),

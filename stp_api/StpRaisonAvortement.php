@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpRaisonAvortement implements \JsonSerializable
+class StpRaisonAvortement implements \JsonSerializable
 {
 
     protected $ref_raison_avortement, $raison_avortement;

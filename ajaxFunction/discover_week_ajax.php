@@ -57,8 +57,8 @@ function ajaxAfterSubmissionEssai()
     
     $sameEmail = $emailEleve == $mailProche;
     
-    $procheMg = new \spamtonprof\stp_api\stpProcheManager();
-    $eleveMg = new \spamtonprof\stp_api\stpEleveManager();
+    $procheMg = new \spamtonprof\stp_api\StpProcheManager();
+    $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
     
     $envoiEleve = false; // pour savoir si il faut envoyer le mail de bienvenue à l'élève et lui créer un compte wordpress
     $envoiParent = false; // pour savoir si il faut envoyer le mail de bienvenue au parent et lui créer un compte wordpress
@@ -94,7 +94,7 @@ function ajaxAfterSubmissionEssai()
         
         if ($prenomProche != "false") {
             
-            $proche = new \spamtonprof\stp_api\stpProche(array(
+            $proche = new \spamtonprof\stp_api\StpProche(array(
                 'email' => $mailProche,
                 'prenom' => $prenomProche,
                 'nom' => $nomProche,
@@ -125,17 +125,17 @@ function ajaxAfterSubmissionEssai()
         
         // étape n°2 : création du compte famille
         
-        $compteMg = new \spamtonprof\stp_api\stpCompteManager();
+        $compteMg = new \spamtonprof\stp_api\StpCompteManager();
         
         if ($proche) {
             
-            $compte = new \spamtonprof\stp_api\stpCompte(array(
+            $compte = new \spamtonprof\stp_api\StpCompte(array(
                 'date_creation' => $now,
                 'ref_proche' => $proche->getRef_proche()
             ));
         } else {
             
-            $compte = new \spamtonprof\stp_api\stpCompte(array(
+            $compte = new \spamtonprof\stp_api\StpCompte(array(
                 'date_creation' => $now
             ));
         }
@@ -144,7 +144,7 @@ function ajaxAfterSubmissionEssai()
         
         // étape n°3 : détermination de la classe
         
-        $classeMg = new \spamtonprof\stp_api\stpClasseManager();
+        $classeMg = new \spamtonprof\stp_api\StpClasseManager();
         
         $classe = $classeMg->get(array(
             "ref_classe" => $classe
@@ -152,7 +152,7 @@ function ajaxAfterSubmissionEssai()
         
         // étape n°4 : ajout de l'élève
         
-        $eleve = new \spamtonprof\stp_api\stpEleve(array(
+        $eleve = new \spamtonprof\stp_api\StpEleve(array(
             'email' => $emailEleve,
             'prenom' => $prenomEleve,
             'ref_classe' => $classe->getRef_classe(),
@@ -258,7 +258,7 @@ function ajaxAfterSubmissionEssai()
         
         // étape n°7 : construire le tableau des matières
         
-        $matiereMg = new \spamtonprof\stp_api\stpMatiereManager();
+        $matiereMg = new \spamtonprof\stp_api\StpMatiereManager();
         $matieres = explode("-", $matieres);
         
         $i = 0;
@@ -304,22 +304,22 @@ function ajaxAfterSubmissionEssai()
         
         // étape n° 10 - insérer l'abonnement
         
-        $abonnement = new \spamtonprof\stp_api\stpAbonnement(array(
+        $abonnement = new \spamtonprof\stp_api\StpAbonnement(array(
             "ref_eleve" => $eleve->getRef_eleve(),
             "ref_formule" => $formule->getRef_formule(),
-            "ref_statut_abonnement" => \spamtonprof\stp_api\stpStatutAbonnementManager::ESSAI,
+            "ref_statut_abonnement" => \spamtonprof\stp_api\StpStatutAbonnementManager::ESSAI,
             "date_creation" => $now,
             "remarque_inscription" => $remarque,
             "ref_plan" => $plan->getRef_plan()
         ));
         
-        $logAboMg = new \spamtonprof\stp_api\stpLogAbonnementManager();
-        $logAboMg->add(new \spamtonprof\stp_api\stpLogAbonnement(array(
+        $logAboMg = new \spamtonprof\stp_api\StpLogAbonnementManager();
+        $logAboMg->add(new \spamtonprof\stp_api\StpLogAbonnement(array(
             "ref_abonnement" => $abonnement->getRef_abonnement(),
             "ref_statut_abo" => $abonnement->getRef_statut_abonnement()
         )));
         
-        $abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
+        $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
         
         $abonnement = $abonnementMg->add($abonnement);
         
@@ -337,14 +337,14 @@ function ajaxAfterSubmissionEssai()
         
         // étape n° 11 - insérer les remarques d'inscription
         
-        $stpRemarqueMg = new \spamtonprof\stp_api\stpRemarqueInscriptionManager();
+        $stpRemarqueMg = new \spamtonprof\stp_api\StpRemarqueInscriptionManager();
         
         foreach ($matieres as $matiere) {
             
             switch ($matiere->getMatiere()) {
                 case "maths":
                     $maths = true;
-                    $stpRemarque = new \spamtonprof\stp_api\stpRemarqueInscription(array(
+                    $stpRemarque = new \spamtonprof\stp_api\StpRemarqueInscription(array(
                         "ref_abonnement" => $abonnement->getRef_abonnement(),
                         "chapitre" => $chapterMaths,
                         "difficulte" => $lacuneMaths,
@@ -357,7 +357,7 @@ function ajaxAfterSubmissionEssai()
                     break;
                 case "physique":
                     $physique = true;
-                    $stpRemarque = new \spamtonprof\stp_api\stpRemarqueInscription(array(
+                    $stpRemarque = new \spamtonprof\stp_api\StpRemarqueInscription(array(
                         "ref_abonnement" => $abonnement->getRef_abonnement(),
                         "chapitre" => $chapterPhysique,
                         "difficulte" => $lacunePhysique,
@@ -370,7 +370,7 @@ function ajaxAfterSubmissionEssai()
                     break;
                 case "francais":
                     $francais = true;
-                    $stpRemarque = new \spamtonprof\stp_api\stpRemarqueInscription(array(
+                    $stpRemarque = new \spamtonprof\stp_api\StpRemarqueInscription(array(
                         "ref_abonnement" => $abonnement->getRef_abonnement(),
                         "chapitre" => $chapterFrench,
                         "difficulte" => $lacuneFrench,
@@ -435,7 +435,7 @@ function ajaxAfterSubmissionEssai()
         
         $profResponsable = utf8_encode($profResponsable);
         
-        $expeMg = new \spamtonprof\stp_api\stpExpeManager();
+        $expeMg = new \spamtonprof\stp_api\StpExpeManager();
         $expe = $expeMg->get("info@spamtonprof.com");
         $smtpMg = new \spamtonprof\stp_api\SmtpServerManager();
         $smtp = $smtpMg->get(array(
@@ -466,9 +466,9 @@ function ajaxGetProfils()
 {
     header('Content-type: application/json');
     
-    $stpProfilMg = new \spamtonprof\stp_api\stpProfilManager();
+    $StpProfilMg = new \spamtonprof\stp_api\StpProfilManager();
     
-    $profils = $stpProfilMg->getAll();
+    $profils = $StpProfilMg->getAll();
     
     echo (json_encode($profils));
     
@@ -479,11 +479,11 @@ function ajaxGetClasses()
 {
     header('Content-type: application/json');
     
-    $stpProfilMg = new \spamtonprof\stp_api\stpClasseManager();
+    $StpProfilMg = new \spamtonprof\stp_api\StpClasseManager();
     
     $refProfil = $_POST["ref_profil"];
     
-    $profils = $stpProfilMg->getAll(array(
+    $profils = $StpProfilMg->getAll(array(
         "ref_profil" => $refProfil
     ));
     

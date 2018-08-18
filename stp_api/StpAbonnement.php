@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpAbonnement implements \JsonSerializable
+class StpAbonnement implements \JsonSerializable
 {
 
     const ACTIF = 1, ESSAI = 2, TERMINE = 3;
@@ -30,7 +30,7 @@ class stpAbonnement implements \JsonSerializable
     {
         $this->hydrate($donnees);
         
-        $stpLogAboMg = new \spamtonprof\stp_api\stpLogAbonnementManager();
+        $stpLogAboMg = new \spamtonprof\stp_api\StpLogAbonnementManager();
         
         if ($this->getRef_abonnement()) {
             

@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpMatiereManager
+class StpMatiereManager
 {
 
     private $_db;
@@ -11,16 +11,16 @@ class stpMatiereManager
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
 
-    public function add(stpMatiere $stpMatiere)
+    public function add(StpMatiere $StpMatiere)
     {
         $q = $this->_db->prepare('insert into stp_matiere(ref_matiere, matiere) values( :ref_matiere,:matiere)');
-        $q->bindValue(':ref_matiere', $stpMatiere->getRef_matiere());
-        $q->bindValue(':matiere', $stpMatiere->getMatiere());
+        $q->bindValue(':ref_matiere', $StpMatiere->getRef_matiere());
+        $q->bindValue(':matiere', $StpMatiere->getMatiere());
         $q->execute();
         
-        $stpMatiere->setRef_matiere($this->_db->lastInsertId());
+        $StpMatiere->setRef_matiere($this->_db->lastInsertId());
         
-        return ($stpMatiere);
+        return ($StpMatiere);
     }
 
     public function get($info)
@@ -36,7 +36,7 @@ class stpMatiereManager
             $data = $q->fetch(\PDO::FETCH_ASSOC);
             
             if ($data) {
-                return (new \spamtonprof\stp_api\stpMatiere($data));
+                return (new \spamtonprof\stp_api\StpMatiere($data));
             } else {
                 return (false);
             }

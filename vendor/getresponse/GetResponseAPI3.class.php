@@ -22,7 +22,7 @@ class GetResponse
 
     private $customFields = null;
 
-    private $profNameId, $mailProfId, $sexeProfId, $matieresId, $nameProcheId, $nameProche2Id, $stpEleveEssaiId, $stpParentEssaiId1, $stpParentEssaiId2, $profName2Id, $sexeProf2Id, $mailProf2Id, $matieres2Id;
+    private $profNameId, $mailProfId, $sexeProfId, $matieresId, $nameProcheId, $nameProche2Id, $StpEleveEssaiId, $stpParentEssaiId1, $stpParentEssaiId2, $profName2Id, $sexeProf2Id, $mailProf2Id, $matieres2Id;
 
     public $http_status;
 
@@ -65,7 +65,7 @@ class GetResponse
         $this->nameProcheId = $this->getCustomFieldId("name_proche");
         $this->nameProche2Id = $this->getCustomFieldId("name_proche_2");
         
-        $this->stpEleveEssaiId = $this->getCampagnId('stp_eleve_essai');
+        $this->StpEleveEssaiId = $this->getCampagnId('stp_eleve_essai');
         $this->stpParentEssaiId1 = $this->getCampagnId('stp_parent_essai');
         $this->stpParentEssaiId2 = $this    ->getCampagnId('stp_parent_essai_2');
     }
@@ -699,14 +699,14 @@ class GetResponse
         return http_build_query($result);
     }
 
-    public function addEleveInTrialSequence(\spamtonprof\stp_api\stpEleve $eleve, \spamtonprof\stp_api\stpProf $prof, \spamtonprof\stp_api\StpFormule $formule)
+    public function addEleveInTrialSequence(\spamtonprof\stp_api\StpEleve $eleve, \spamtonprof\stp_api\StpProf $prof, \spamtonprof\stp_api\StpFormule $formule)
     {
         $params = '{
             "name": "' . $eleve->getPrenom() . '",
             "email": "' . $eleve->getEmail() . '",
             "dayOfCycle": "0",
             "campaign": {
-                "campaignId": "' . $this->stpEleveEssaiId . '"
+                "campaignId": "' . $this->StpEleveEssaiId . '"
             },
             "customFieldValues": [
                 {
@@ -743,7 +743,7 @@ class GetResponse
         return ($rep);
     }
 
-    public function addParentInTrialSequence1(\spamtonprof\stp_api\stpEleve $eleve, \spamtonprof\stp_api\stpProf $prof, \spamtonprof\stp_api\StpFormule $formule, \spamtonprof\stp_api\stpProche $proche)
+    public function addParentInTrialSequence1(\spamtonprof\stp_api\StpEleve $eleve, \spamtonprof\stp_api\StpProf $prof, \spamtonprof\stp_api\StpFormule $formule, \spamtonprof\stp_api\StpProche $proche)
     {
         $params = '{
             "name": "' . $proche->getPrenom() . '",
@@ -793,7 +793,7 @@ class GetResponse
         return ($rep);
     }
 
-    public function addParentInTrialSequence2(\spamtonprof\stp_api\stpEleve $eleve, \spamtonprof\stp_api\stpProf $prof, \spamtonprof\stp_api\StpFormule $formule, \spamtonprof\stp_api\stpProche $proche)
+    public function addParentInTrialSequence2(\spamtonprof\stp_api\StpEleve $eleve, \spamtonprof\stp_api\StpProf $prof, \spamtonprof\stp_api\StpFormule $formule, \spamtonprof\stp_api\StpProche $proche)
     {
         $params = '{
             "name": "' . $proche->getPrenom() . '",

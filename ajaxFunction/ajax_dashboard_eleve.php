@@ -23,7 +23,7 @@ function ajaxStopSubscription()
     $testMode = $_POST["testMode"];
     
     // on récupère l'abonnement
-    $abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
+    $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
     $constructor = array(
         "construct" => array(
             'ref_prof',
@@ -42,9 +42,9 @@ function ajaxStopSubscription()
     $prof = $abonnement->getProf();
     $formule = $abonnement->getFormule();
     
-    $eleve = \spamtonprof\stp_api\stpEleve::cast($eleve);
-    $prof = \spamtonprof\stp_api\stpProf::cast($prof);
-    $proche = \spamtonprof\stp_api\stpProche::cast($proche);
+    $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
+    $prof = \spamtonprof\stp_api\StpProf::cast($prof);
+    $proche = \spamtonprof\stp_api\StpProche::cast($proche);
     $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
     
     // résilier abonnement stripe
@@ -55,8 +55,8 @@ function ajaxStopSubscription()
     $abonnement->setRef_statut_abonnement($abonnement::TERMINE);
     $abonnementMg->updateRefStatutAbonnement($abonnement);
     
-    $logAboMg = new \spamtonprof\stp_api\stpLogAbonnementManager();
-    $logAboMg->add(new \spamtonprof\stp_api\stpLogAbonnement(array(
+    $logAboMg = new \spamtonprof\stp_api\StpLogAbonnementManager();
+    $logAboMg->add(new \spamtonprof\stp_api\StpLogAbonnement(array(
         "ref_abonnement" => $abonnement->getRef_abonnement(),
         "ref_statut_abo" => $abonnement->getRef_statut_abonnement()
     )));
@@ -67,7 +67,7 @@ function ajaxStopSubscription()
     $smtp = $smtpMg->get(array(
         "ref_smtp_server" => $smtpMg::smtp2Go
     ));
-    $expeMg = new \spamtonprof\stp_api\stpExpeManager();
+    $expeMg = new \spamtonprof\stp_api\StpExpeManager();
     $expe = $expeMg->get("info@spamtonprof.com");
     
     if ($eleve->hasToSendToParent()) {
@@ -121,7 +121,7 @@ function ajaxCreateSubscription()
     $testMode = $_POST["testMode"];
     
     // on récupère l'abonnement
-    $abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
+    $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
     $constructor = array(
         "construct" => array(
             'ref_prof',
@@ -142,15 +142,15 @@ function ajaxCreateSubscription()
     $plan = $abonnement->getPlan();
     $formule = $abonnement->getFormule();
     
-    $eleve = \spamtonprof\stp_api\stpEleve::cast($eleve);
-    $prof = \spamtonprof\stp_api\stpProf::cast($prof);
+    $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
+    $prof = \spamtonprof\stp_api\StpProf::cast($prof);
     $plan = \spamtonprof\stp_api\StpPlan::cast($plan);
     $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
     
     // détermination de l'email client
     $emailClient = "alexandre@spamtonprof.com";
     if ($proche) {
-        $proche = \spamtonprof\stp_api\stpProche::cast($proche);
+        $proche = \spamtonprof\stp_api\StpProche::cast($proche);
         $emailClient = $proche->getEmail();
     } else {
         $emailClient = $eleve->getEmail();
@@ -179,11 +179,11 @@ function ajaxCreateSubscription()
         $abonnement->setSubs_Id($subsId);
         $abonnementMg->updateSubsId($abonnement);
         
-        $abonnement->setRef_statut_abonnement(\spamtonprof\stp_api\stpStatutAbonnementManager::ACTIF);
+        $abonnement->setRef_statut_abonnement(\spamtonprof\stp_api\StpStatutAbonnementManager::ACTIF);
         $abonnementMg->updateRefStatutAbonnement($abonnement);
         
-        $logAboMg = new \spamtonprof\stp_api\stpLogAbonnementManager();
-        $logAboMg->add(new \spamtonprof\stp_api\stpLogAbonnement(array(
+        $logAboMg = new \spamtonprof\stp_api\StpLogAbonnementManager();
+        $logAboMg->add(new \spamtonprof\stp_api\StpLogAbonnement(array(
             "ref_abonnement" => $abonnement->getRef_abonnement(),
             "ref_statut_abo" => $abonnement->getRef_statut_abonnement()
         )));
@@ -192,7 +192,7 @@ function ajaxCreateSubscription()
         $smtp = $smtpMg->get(array(
             "ref_smtp_server" => $smtpMg::smtp2Go
         ));
-        $expeMg = new \spamtonprof\stp_api\stpExpeManager();
+        $expeMg = new \spamtonprof\stp_api\StpExpeManager();
         $expe = $expeMg->get("info@spamtonprof.com");
         
         if ($eleve->hasToSendToParent()) {

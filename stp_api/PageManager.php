@@ -240,7 +240,7 @@ class PageManager
         wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
         
         $current_user = wp_get_current_user();
-        $profMg = new \spamtonprof\stp_api\stpProfManager();
+        $profMg = new \spamtonprof\stp_api\StpProfManager();
         
         $prof = $profMg->get(array(
             'user_id_wp' => $current_user->ID
@@ -273,7 +273,7 @@ class PageManager
         
         ), time());
         
-        $abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
+        $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
         
         $abonnementsSansProf = $abonnementMg->getAbonnementsSansProf();
         
@@ -297,13 +297,13 @@ class PageManager
         
         if (current_user_can('client')) {
             
-            $compteMg = new \spamtonprof\stp_api\stpCompteManager();
+            $compteMg = new \spamtonprof\stp_api\StpCompteManager();
             
             $compte = $compteMg->get(array(
                 'ref_compte_wp' => $current_user->ID
             ));
             
-            $abonnementMg = new \spamtonprof\stp_api\stpAbonnementManager();
+            $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
             
             $abonnements = $abonnementMg->getAll(array(
                 "ref_compte" => $compte->getRef_compte()

@@ -15,7 +15,7 @@ function ajaxInscriptionProf()
     $retour = "ok";
     
     $slack = new \spamtonprof\slack\Slack();
-    $stpProfMg = new \spamtonprof\stp_api\stpProfManager();
+    $StpProfMg = new \spamtonprof\stp_api\StpProfManager();
     
     header('Content-type: application/json');
     
@@ -27,7 +27,7 @@ function ajaxInscriptionProf()
     $sexe = trim($_POST['sexe']);
     
     // première partie : est ce que prof à déjà un compte chez nous ?
-    $accountExist = $stpProfMg->get(array(
+    $accountExist = $StpProfMg->get(array(
         'email_perso' => $email
     ));
     
@@ -40,7 +40,7 @@ function ajaxInscriptionProf()
         
         $dob = DateTime::createFromFormat('j/m/Y', $dob);
         
-        $stpProf = $stpProfMg->add(new \spamtonprof\stp_api\stpProf(array(
+        $StpProf = $StpProfMg->add(new \spamtonprof\stp_api\StpProf(array(
             'email_perso' => $email,
             'prenom' => $prenom,
             'nom' => $nom,
@@ -50,31 +50,31 @@ function ajaxInscriptionProf()
             'sexe' => $sexe
         )));
         
-        $stpProf -> setOnboarding(false);
+        $StpProf -> setOnboarding(false);
         
-        $stpProfMg -> updateOnboarding($stpProf);
+        $StpProfMg -> updateOnboarding($StpProf);
         
         
         // créer le compte wordpresss
         $password = wp_generate_password();
         $compteProf = array(
-            'user_login' => $stpProf->getEmail_perso(),
+            'user_login' => $StpProf->getEmail_perso(),
             'user_pass' => $password, // When creating an user, `user_pass` is expected.,
-            'user_email' => $stpProf->getEmail_perso(),
-            'first_name' => $stpProf -> getPrenom(),
+            'user_email' => $StpProf->getEmail_perso(),
+            'first_name' => $StpProf -> getPrenom(),
             'role' => 'prof'
         );
         $compteProfId = wp_insert_user($compteProf);
         
         if (! is_wp_error($compteProfId)) {
             
-            $stpProf->setUser_id_wp($compteProfId);
+            $StpProf->setUser_id_wp($compteProfId);
             
-            $stpProfMg->updateUserIdWp($stpProf);
+            $StpProfMg->updateUserIdWp($StpProf);
             
             
             wp_signon(array(
-                'user_login' => $stpProf->getEmail_perso(),
+                'user_login' => $StpProf->getEmail_perso(),
                 'user_password' => $password,
                 'remember' => true
             ));
@@ -91,7 +91,7 @@ function ajaxInscriptionProf()
             
         } else {
             $slack->sendMessages('prof', array(
-                'erreur de création du compte wp prof : ' . $stpProf->getEmail_perso()
+                'erreur de création du compte wp prof : ' . $StpProf->getEmail_perso()
             ));
             $error = 'creation-compte-wp-prof';
         }
@@ -100,7 +100,7 @@ function ajaxInscriptionProf()
     if ($error) {
         $retour = $error;
     }else{
-        $retour = $stpProf;
+        $retour = $StpProf;
     }
     
     echo (json_encode($retour));

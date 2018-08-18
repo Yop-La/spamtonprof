@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpMessageEleve implements \JsonSerializable
+class StpMessageEleve implements \JsonSerializable
 {
 
     protected $message, $ref_abonnement, $date_message, $ref_message;

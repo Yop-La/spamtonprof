@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class stpProfilManager
+class StpProfilManager
 {
 
     private $_db;
@@ -21,7 +21,7 @@ class stpProfilManager
         
         while ($data = $q->fetch(\PDO::FETCH_ASSOC)) {
             
-            $profils[] = new \spamtonprof\stp_api\stpProfil($data);
+            $profils[] = new \spamtonprof\stp_api\StpProfil($data);
         }
         
         return ($profils);
@@ -42,7 +42,7 @@ class stpProfilManager
             
             if($data = $q->fetch(\PDO::FETCH_ASSOC)){
                 
-                return( new \spamtonprof\stp_api\stpProfil($data));
+                return( new \spamtonprof\stp_api\StpProfil($data));
                 
             }else{
                 return(false);
