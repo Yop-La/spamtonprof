@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.5.7.0
+ * Version: 1.1.5.7.1
  *
  *
  *
@@ -81,22 +81,17 @@ add_action('template_redirect', 'handleRedirections');
 
 function handleRedirections()
 {
-    if (isset($_SESSION['age_message'])) {
-        $_SESSION['age_message'] = $_SESSION['age_message'] + 1;
-    } else {
-        $_SESSION['age_message'] = 1;
-    }
-    
-    if ($_SESSION['age_message'] > 1) {
-        unset($_SESSION['age_message']);
-        unset($_SESSION['message']);
-    }
-    
+
     $current_user = wp_get_current_user();
+    
+    $slack = new \spamtonprof\slack\Slack();
+    
     
     if ($current_user->ID != 0) {
         
         if (current_user_can('prof') && is_user_logged_in()) {
+            
+            
             
             $profMg = new \spamtonprof\stp_api\StpProfManager();
             
@@ -106,23 +101,31 @@ function handleRedirections()
             
             if (! $prof->getOnboarding() && ! is_page('onboarding-prof')) {
                 
+                $_SESSION['message'] = utf8_encode("Terminez l 'inscription pour donner des cours ! ");
+                
+                
                 if (wp_redirect(home_url('onboarding-prof'))) {
-                    $_SESSION['message'] = utf8_encode("Terminez l 'inscription pour donner des cours ! ");
+                    
+                    
+                    
                     exit();
                 }
             }
             
-            if (is_page('inscription-prof')) {
-                
+            if ($prof->getOnboarding() && is_page('inscription-prof')) {
+                $_SESSION['message'] = utf8_encode("Pas besoin de faire l'inscription deux fois  :) ");
+                $slack -> sendMessages("log", array("p2",$_SESSION['message']));
                 if (wp_redirect(home_url('dashboard-prof'))) {
-                    $_SESSION['message'] = utf8_encode("Pas besoin de faire l'inscription deux fois  :) ");
+                
                     exit();
                 }
             }
             
             if ($prof->getOnboarding() && is_page('onboarding-prof')) {
-                $_SESSION['message'] = utf8_encode("Pas besoin de faire l'inscription deux fois  :) ");
+
                 if (wp_redirect(home_url('dashboard-prof'))) {
+                    $_SESSION['message'] = utf8_encode("Pas besoin de faire l'inscription deux fois  :) ");
+                    $slack -> sendMessages("log", array("p2",$_SESSION['message']));
                     exit();
                 }
             }
