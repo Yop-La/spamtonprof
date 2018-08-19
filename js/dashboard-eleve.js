@@ -14,7 +14,7 @@ jQuery( document ).ready( function( $ ) {
 		// pour charger et remplir les lignes d'essai 
 		nbAbosEssai = abosEssai.length;
 
-		
+
 		if(nbAbosEssai == 0){
 			$(".bloc-essai").addClass("hide");
 		}
@@ -31,12 +31,21 @@ jQuery( document ).ready( function( $ ) {
 
 			rowEssai.find(".prenom-eleve").html(abo.eleve.prenom);
 			rowEssai.find(".nom-formule").html(abo.formule.formule);
-//			rowEssai.find(".statut-essai").html(abo.eleve.prenom);
-			debut = new Date(abo.debut_essai);
-			fin = new Date(abo.fin_essai);
-			debut = debut.toLocaleString("fr-FR", {year: 'numeric', month: '2-digit', day: '2-digit'})
-			fin = fin.toLocaleString("fr-FR", {year: 'numeric', month: '2-digit', day: '2-digit'})
-			rowEssai.find(".date-essai").html("Du ".concat(debut, " au ",fin));
+
+			if(abo.debut_essai != null){
+				
+				$(".essai-off").addClass("hide");
+				debut = new Date(abo.debut_essai);
+				fin = new Date(abo.fin_essai);
+				debut = debut.toLocaleString("fr-FR", {year: 'numeric', month: '2-digit', day: '2-digit'})
+				fin = fin.toLocaleString("fr-FR", {year: 'numeric', month: '2-digit', day: '2-digit'})
+				rowEssai.find(".date-essai").html("Du ".concat(debut, " au ",fin));
+			}else{
+				$(".essai-on").addClass("hide");
+				rowEssai.find(".prof").html(abo.prof.prenom.concat(" ",abo.prof.nom));
+				rowEssai.find(".adresse-prof").html(abo.prof.email_stp);
+				
+			}
 			rowEssai.find(".ref-abo").val(i);
 
 			rowEssai.removeClass("hide");
@@ -104,7 +113,7 @@ jQuery( document ).ready( function( $ ) {
 
 		// pour charger et remplir les lignes d'abonnement
 		nbAbos = abosActif.length;
-		
+
 		if(nbAbos == 0){
 			$(".bloc-actif").addClass("hide");
 		}
@@ -183,7 +192,7 @@ jQuery( document ).ready( function( $ ) {
 
 		// pour charger et remplir les lignes d'abonnement
 		nbAbos = abosTermine.length;
-		
+
 		if(nbAbos == 0){
 			$(".bloc-resilie").addClass("hide");
 		}

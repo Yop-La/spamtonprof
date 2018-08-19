@@ -14,7 +14,7 @@ idMobile = "982";
 idDob = "993";
 idSexe = "1044";
 
-if(testMode == "false"){
+if(!domain.includes("localhost")){
 
 	idForm = "65";
 	idFormContent= "#nf-form-".concat(idForm, "-cont");

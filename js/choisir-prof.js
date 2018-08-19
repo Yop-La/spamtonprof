@@ -10,7 +10,7 @@ idFormContentEssai = "#nf-form-".concat(idForm, "-cont");
 idRefAbonnement = "1041";
 idChoixProf = "1042";
 
-if(testMode == "false"){
+if(!domain.includes("localhost")){
 
 	idForm = "69";
 	idFormContentEssai = "#nf-form-".concat(idForm, "-cont");

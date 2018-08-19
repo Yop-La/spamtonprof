@@ -28,7 +28,7 @@ idTypeId = "1054";
 idRectoId = "1055";
 idVersoId = "1056";
 
-if(testMode == "false"){
+if(!domain.includes("localhost")){
 
 	idFormPays = "66";
 	idFormIds = '72';

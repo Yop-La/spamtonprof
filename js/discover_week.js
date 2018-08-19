@@ -48,7 +48,7 @@ idRemarque 	= "1029";
 
 idCode = "1032";
 
-if(testMode == "false"){
+if(!domain.includes("localhost")){
 
 	idFormEssai = "68";
 	idFormContentEssai = "#nf-form-".concat(idFormEssai, "-cont");

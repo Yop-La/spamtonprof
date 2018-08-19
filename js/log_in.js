@@ -15,8 +15,10 @@ idUsername = "956";
 idPassword = "957";
 
 
-if(testMode == "false"){
+if(!domain.includes("localhost")){
 
+	console.log("dedans");
+	
 	idFormLogIn = "64";
 
 	idUsername = "916";
