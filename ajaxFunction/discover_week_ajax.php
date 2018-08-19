@@ -179,7 +179,9 @@ function ajaxAfterSubmissionEssai()
                 'user_login' => $emailEleve,
                 'user_pass' => $passwordEleve,
                 'user_email' => $emailEleve,
-                'role' => 'client'
+                'role' => 'client',
+                'first_name' => $eleve->getPrenom(),
+                'last_name' => $eleve->getNom()
             );
             $compteEleveId = wp_insert_user($compteEleve);
             
@@ -222,7 +224,9 @@ function ajaxAfterSubmissionEssai()
                     'user_login' => $mailProche,
                     'user_pass' => $passwordProche, // When creating an user, `user_pass` is expected.,
                     'user_email' => $mailProche,
-                    'role' => 'client'
+                    'role' => 'client',
+                    'first_name' => $proche->getPrenom(),
+                    'last_name' => $proche->getNom()
                 );
                 $compteProcheId = wp_insert_user($compteProche);
                 
