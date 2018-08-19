@@ -23,8 +23,7 @@ class TestModeManager
 
 {
 
-    static $pagesSlugInTest = [        'onboarding-prof','dashboard-eleve'
-    ];
+    static $pagesSlugInTest = [];
 
     private $testMode;
 

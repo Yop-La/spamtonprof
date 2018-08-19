@@ -23,7 +23,7 @@ header("Pragma: no-cache");
 
 $slack = new \spamtonprof\slack\Slack();
 
-\Stripe\Stripe::setApiKey(TEST_SECRET_KEY_STRP);
+\Stripe\Stripe::setApiKey(PROD_SECRET_KEY_STRP);
 
 $input = @file_get_contents("php://input");
 

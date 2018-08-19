@@ -84,8 +84,6 @@ function handleRedirections()
 
     $current_user = wp_get_current_user();
     
-    $slack = new \spamtonprof\slack\Slack();
-    
     
     if ($current_user->ID != 0) {
         
@@ -114,7 +112,7 @@ function handleRedirections()
             
             if ($prof->getOnboarding() && is_page('inscription-prof')) {
                 $_SESSION['message'] = utf8_encode("Pas besoin de faire l'inscription deux fois  :) ");
-                $slack -> sendMessages("log", array("p2",$_SESSION['message']));
+
                 if (wp_redirect(home_url('dashboard-prof'))) {
                 
                     exit();
@@ -125,7 +123,7 @@ function handleRedirections()
 
                 if (wp_redirect(home_url('dashboard-prof'))) {
                     $_SESSION['message'] = utf8_encode("Pas besoin de faire l'inscription deux fois  :) ");
-                    $slack -> sendMessages("log", array("p2",$_SESSION['message']));
+
                     exit();
                 }
             }
