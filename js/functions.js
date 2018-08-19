@@ -21,7 +21,7 @@ function isEmail(email) {
 	return regex.test(email);
 }
 
-function redirect(slug ,info = "" ){
+function redirectTo(slug ,info = "" ){
 	info = htmlentities.encode(info);
 	waitForEl("#info",function(){
 		$("#hidden-form").attr("action", homeUrl.concat("/",slug) );

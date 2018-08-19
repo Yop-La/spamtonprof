@@ -73,12 +73,12 @@ var myCustomFieldController = Marionette.Object.extend( {
 						})
 						.done(function(hasToLog){ 
 							if(hasToLog){
-								redirect("abonnement-apres-essai","Vous avez déjà profité de la semaine d&#39;essai. Retrouvez votre compte pour reprendre le soutien");
+								redirectTo("abonnement-apres-essai","Vous avez déjà profité de la semaine d&#39;essai. Retrouvez votre compte pour reprendre le soutien");
 							}
 						})
 						.fail(function(err){
 							console.log(err);
-							redirect(currentSlug,"Il y a un problème. Veuillez raffraichir la page et contacter l&#39;équipe si le problème persiste");
+							redirectTo(currentSlug,"Il y a un problème. Veuillez raffraichir la page et contacter l&#39;équipe si le problème persiste");
 						});
 
 			}
@@ -103,7 +103,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 							}
 						})
 						.fail(function(err){
-							redirect(currentSlug,"Il y a un problème. Veuillez raffraichir la page et contacter l&#39;équipe si le problème persiste");
+							redirectTo(currentSlug,"Il y a un problème. Veuillez raffraichir la page et contacter l&#39;équipe si le problème persiste");
 						});
 
 			}

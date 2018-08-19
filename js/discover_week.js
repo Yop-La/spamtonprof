@@ -184,9 +184,9 @@ var mySubmitController = Marionette.Object.extend( {
 						}else{
 
 							if(message == "compte_existe_deja"){
-								redirect("connexion" ,info = "Vous avez déjà un compte. Connectez vous ! " );
+								redirectTo("connexion" ,info = "Vous avez déjà un compte. Connectez vous ! " );
 							}else{
-								redirect("remerciement-eleve" ,"Félicitations. Tu pourras démarrer la semaine de découverte dans 1 jour !" );
+								redirectTo("remerciement-eleve" ,"Félicitations. Tu pourras démarrer la semaine de découverte dans 1 jour !" );
 							}
 
 						}

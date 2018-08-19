@@ -18,12 +18,12 @@ jQuery( document ).ready( function( $ ) {
 						.done(function(data){
 							console.log('done');
 							console.log(data);
-							redirect('', "Vous êtes bien déconnecté, à bientôt sur SpamTonProf ! ");
+							redirectTo('', "Vous êtes bien déconnecté, à bientôt sur SpamTonProf ! ");
 							
 						})
 						.fail(function(err){
 							console.log(fail);
-							redirect('', "Impossible de vous déconnecter. Veuillez réessayer et contacter l'équipe si le problème persiste");
+							redirectTo('', "Impossible de vous déconnecter. Veuillez réessayer et contacter l'équipe si le problème persiste");
 							return;
 						});
 		

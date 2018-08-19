@@ -265,7 +265,7 @@ jQuery( document ).ready( function( $ ) {
 					$("#fountainTextG").addClass("hide");
 				}
 			}else{
-				redirect('dashboard-eleve','L\'abonnement va être bientôt résilié (un mail de confirmation va être envoyé)');
+				redirectTo('dashboard-eleve','L\'abonnement va être bientôt résilié (un mail de confirmation va être envoyé)');
 			}
 		})
 		.fail(function() {
@@ -305,7 +305,7 @@ jQuery( document ).ready( function( $ ) {
 					$("#fountainTextG").addClass("hide");
 				}
 			}else{
-				redirect('dashboard-eleve','Félicitations : le paiement est passé. L\'inscription est bien validé.');
+				redirectTo('dashboard-eleve','Félicitations : le paiement est passé. L\'inscription est bien validé.');
 			}
 		})
 		.fail(function() {

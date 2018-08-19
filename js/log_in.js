@@ -73,11 +73,11 @@ var mySubmitController = Marionette.Object.extend( {
 							$('#nf-field-'.concat(idPassword)).val('');
 
 							if('client' in retour){
-								redirect(retour.redirection, "Bienvenue sur SpamTonProf ! ");	
+								redirectTo(retour.redirection, "Bienvenue sur SpamTonProf ! ");	
 							}else if('prof' in retour){
-								redirect(retour.redirection, retour.message);	
+								redirectTo(retour.redirection, retour.message);	
 							}else{
-								redirect('', "Bienvenue sur SpamTonProf ! ");	
+								redirectTo('', "Bienvenue sur SpamTonProf ! ");	
 							}
 							
 						}else{

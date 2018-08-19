@@ -8,7 +8,7 @@
 
 if(loggedProf.onboarding == "1"){
 	console.log("dedans");
-	redirect("dashboard-prof"); 
+	redirectTo("dashboard-prof"); 
 }
 
 ajaxEnCours = 0;
@@ -425,7 +425,7 @@ async function updateIbanProf(){
 
 
 					}else{
-						redirect("dashboard-prof" ,info = "Félicitations, nous avons bien reçu votre inscription. Nous allons vérifier tout ça et revenir vers vous rapidement."  )
+						redirectTo("dashboard-prof" ,info = "Félicitations, nous avons bien reçu votre inscription. Nous allons vérifier tout ça et revenir vers vous rapidement."  )
 					}
 
 

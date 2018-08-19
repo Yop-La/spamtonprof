@@ -76,11 +76,11 @@ var mySubmitController = Marionette.Object.extend( {
 					})
 					.done(function(retour){ 
 						if(retour == "account-exists"){
-							redirect('connexion', "Vous avez déjà un compte avec cette adresse email. Connectez vous !");
+							redirectTo('connexion', "Vous avez déjà un compte avec cette adresse email. Connectez vous !");
 						}else if(retour == "creation-compte-wp-prof"){
 							showMessage("Impossible de vous créer un compte. Veuillez raffraichir la page et réssayer. Contacter l'équipe si le problème persiste");
 						}else{
-							redirect('onboarding-prof', 
+							redirectTo('onboarding-prof', 
 							"Inscription bien validée !  Complétez votre profil pour pouvoir touchez vos premiers €€€ ! "); // on envoie le prof à onboarding-prof
 						}
 					})
