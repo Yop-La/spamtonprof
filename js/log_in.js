@@ -17,8 +17,6 @@ idPassword = "957";
 
 if(!domain.includes("localhost")){
 
-	console.log("dedans");
-	
 	idFormLogIn = "64";
 
 	idUsername = "916";
@@ -54,10 +52,6 @@ var mySubmitController = Marionette.Object.extend( {
 
 			username = response.data.fields[idUsername].value;
 			password = response.data.fields[idPassword].value;
-
-
-			console.log(username);
-			console.log(password);
 
 
 			jQuery.post(

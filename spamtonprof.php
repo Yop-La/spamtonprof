@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.5.6.8
+ * Version: 1.1.5.6.9
  *
  *
  *
@@ -81,10 +81,9 @@ add_action('template_redirect', 'handleRedirections');
 
 function handleRedirections()
 {
-    
     if (isset($_SESSION['age_message'])) {
         $_SESSION['age_message'] = $_SESSION['age_message'] + 1;
-    }else{
+    } else {
         $_SESSION['age_message'] = 1;
     }
     
@@ -92,8 +91,6 @@ function handleRedirections()
         unset($_SESSION['age_message']);
         unset($_SESSION['message']);
     }
-    
-    
     
     $current_user = wp_get_current_user();
     
@@ -124,8 +121,8 @@ function handleRedirections()
             }
             
             if ($prof->getOnboarding() && is_page('onboarding-prof')) {
+                $_SESSION['message'] = utf8_encode("Pas besoin de faire l'inscription deux fois  :) ");
                 if (wp_redirect(home_url('dashboard-prof'))) {
-                    $_SESSION['message'] = utf8_encode("Pas besoin de faire l'inscription deux fois  :) ");
                     exit();
                 }
             }
@@ -135,8 +132,8 @@ function handleRedirections()
             
             if (is_page('accueil')) {
                 
+                $_SESSION['message'] = utf8_encode("Bienvenue sur SpamTonProf !");
                 if (wp_redirect(home_url('dashboard-eleve'))) {
-                    $_SESSION['message'] = utf8_encode("Bienvenue sur SpamTonProf !");
                     exit();
                 }
             }
@@ -150,7 +147,7 @@ function stp_session_start()
 {
     if (! session_id()) {
         
-        @session_start();
+        session_start();
     }
 }
 
