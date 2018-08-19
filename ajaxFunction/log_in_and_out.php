@@ -61,18 +61,21 @@ function ajaxCheckLogIn()
         ));
         $user = $prof;
         
+        $message = "Bienvenue chez SpamTonProf";
         if ($prof->getOnboarding()) {
             
             $redirection = 'dashboard-prof';
+            $message = "Bienvenue chez SpamTonProf";
         } else {
             
             $redirection = 'onboarding-prof';
+            $message = "Terminez votre inscription pour pouvoir gagner vos premiers &euro;&euro; !";
         }
         
         $retour = array(
             "prof" => $user,
             "redirection" => $redirection,
-            "message" => "Terminez votre inscription pour pouvoir gagner vos premiers &euro;&euro; !"
+            "message" => $message
         );
     } elseif (array_key_exists("client", $user->get_role_caps())) {
         
