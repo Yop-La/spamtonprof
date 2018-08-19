@@ -40,10 +40,11 @@ jQuery( document ).ready( function( $ ) {
 				debut = debut.toLocaleString("fr-FR", {year: 'numeric', month: '2-digit', day: '2-digit'})
 				fin = fin.toLocaleString("fr-FR", {year: 'numeric', month: '2-digit', day: '2-digit'})
 				rowEssai.find(".date-essai").html("Du ".concat(debut, " au ",fin));
-			}else{
-				$(".essai-on").addClass("hide");
 				rowEssai.find(".prof").html(abo.prof.prenom.concat(" ",abo.prof.nom));
 				rowEssai.find(".adresse-prof").html(abo.prof.email_stp);
+				
+			}else{
+				$(".essai-on").addClass("hide");
 				
 			}
 			rowEssai.find(".ref-abo").val(i);
