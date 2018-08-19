@@ -13,6 +13,19 @@ idFormLogIn = "65";
 
 idUsername = "956";
 idPassword = "957";
+
+
+if(testMode == "false"){
+
+	idFormLogIn = "64";
+
+	idUsername = "916";
+	idPassword = "917";
+
+	
+	
+}
+
 ajaxEnCours = 0;
 wpUser = null;
 var mySubmitController = Marionette.Object.extend( {

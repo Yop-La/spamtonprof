@@ -14,6 +14,21 @@ idMobile = "982";
 idDob = "993";
 idSexe = "1044";
 
+if(testMode == "false"){
+
+	idForm = "65";
+	idFormContent= "#nf-form-".concat(idForm, "-cont");
+
+	idPrenom = "920";
+	idNom = "921";
+	idEmail = "922";
+	idMobile = "923";
+	idDob = "924";
+	idSexe = "925";
+
+}
+
+
 ajaxEnCours = 0;
 
 /*

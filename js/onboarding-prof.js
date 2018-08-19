@@ -11,6 +11,8 @@ if(loggedProf.onboarding == "1"){
 	redirect("dashboard-prof"); 
 }
 
+ajaxEnCours = 0;
+
 idFormPays = "69";
 idFormIds = '74';
 idFormIban = "70";
@@ -22,11 +24,28 @@ idVille = "1046";
 idCodePostal = "1047"; 
 idPays = "990";
 
-ajaxEnCours = 0;
-
 idTypeId = "1054";
 idRectoId = "1055";
 idVersoId = "1056";
+
+if(testMode == "false"){
+
+	idFormPays = "66";
+	idFormIds = '72';
+	idFormIban = "67";
+
+	idFormIbanContent= "#nf-form-".concat(idFormIban, "-cont");
+
+	idAdresse = "928";
+	idVille = "929";
+	idCodePostal = "930"; 
+	idPays = "931";
+
+	idTypeId = "981";
+	idRectoId = "982";
+	idVersoId = "983";
+	
+}
 
 var stripe = Stripe(publicStripeKey);
 var elements = stripe.elements();

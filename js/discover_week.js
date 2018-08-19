@@ -11,6 +11,8 @@ gClasseSelect = null;
 
 //id des champs du formulaire
 
+
+
 idFormEssai = "72";
 idFormContentEssai = "#nf-form-".concat(idFormEssai, "-cont");
 
@@ -46,7 +48,47 @@ idRemarque 	= "1029";
 
 idCode = "1032";
 
+if(testMode == "false"){
 
+	idFormEssai = "68";
+	idFormContentEssai = "#nf-form-".concat(idFormEssai, "-cont");
+
+	idPrenomEleve = "936";
+	idNomEleve = "941";
+	idEmailEleve = "937";
+	idPhoneEleve = "942";
+	idChoixProfil = "938";
+	idClasse = "943";
+	idMatieres = "939";
+	idProfil = "940";
+
+
+
+	idChapterMaths = "945";
+	idLacuneMaths = "946";
+	idNoteMaths = "947";
+
+	idChapterPhysique = "949";
+	idLacunePhysique = "950";
+	idNotePhysique = "951";
+
+	idChapterFrench = "953";
+	idLacuneFrench = "954";
+	idNoteFrench = "955";
+
+	idProche = "957";
+	idPrenomProche = "958";
+	idNomProche = "960";
+	idMailProche = "959";
+	idPhoneProche = "961";
+	idRemarque 	= "962";
+
+	idCode = "963";
+
+
+
+
+}
 
 /*
  * debut : faire la soumission du formulaire de la popup 
@@ -127,12 +169,12 @@ var mySubmitController = Marionette.Object.extend( {
 						'code' : code
 					})
 					.done(function(retour){ 
-						
+
 						error = retour.error;
 						message = retour.message;
-						
+
 						if(error){
-							
+
 							showMessage("Il y a un problème. Contacter l'équipe et donner leur ce message d'erreur : ".concat(message));
 							ajaxEnCours--;
 							if(ajaxEnCours == 0){
@@ -140,16 +182,16 @@ var mySubmitController = Marionette.Object.extend( {
 								$(".hide_loading").removeClass("hide");
 							}
 						}else{
-							
+
 							if(message == "compte_existe_deja"){
 								redirect("connexion" ,info = "Vous avez déjà un compte. Connectez vous ! " );
 							}else{
 								redirect("remerciement-eleve" ,"Félicitations. Tu pourras démarrer la semaine de découverte dans 1 jour !" );
 							}
-							
+
 						}
-						
-						
+
+
 					})
 					.fail(function(err){
 						console.log("erreur ajax");
@@ -184,9 +226,9 @@ var myCustomFieldController = Marionette.Object.extend( {
 	validateRequired: function( model ) {
 
 		if ( 'profil_1532954478855' != model.get( 'key' ) ) return false;
-		
+
 		value = model.get( 'value' );
-		
+
 		$(toFieldId(idProfil)).val(value);
 		$(toFieldId(idProfil)).trigger("change");
 
@@ -257,7 +299,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 
 //début jquery
 jQuery( document ).ready( function( $ ) {
-	
+
 	waitForEl(toFieldId(idClasse), function() {
 		gClasseSelect = $(toFieldId(idClasse));
 	});

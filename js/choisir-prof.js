@@ -10,6 +10,18 @@ idFormContentEssai = "#nf-form-".concat(idForm, "-cont");
 idRefAbonnement = "1041";
 idChoixProf = "1042";
 
+if(testMode == "false"){
+
+	idForm = "69";
+	idFormContentEssai = "#nf-form-".concat(idForm, "-cont");
+
+	idRefAbonnement = "967";
+	idChoixProf = "968";
+
+	
+	
+}
+
 ajaxEnCours = 0;
 
 attributionCourante = null;
