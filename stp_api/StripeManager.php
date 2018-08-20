@@ -34,43 +34,66 @@ class StripeManager
 
     private $testMode = true;
 
-    public function stopSubscription($subscriptionId){
-        
+    public function stopSubscription($subscriptionId)
+    {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         
         $subscription = \Stripe\Subscription::retrieve($subscriptionId);
         $subscription->cancel();
-        
     }
-    
-    public function transfertSubscriptionCharge($event_json){
+
+    public function transfertSubscriptionCharge($event_json)
+    {
+        $slack = new \spamtonprof\slack\Slack();
         
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         
-        $subId = $event_json->data->object->subscription;
-        
         $chargeId = $event_json->data->object->charge;
+        $subId;
+        $sub;
         
-        $sub = \Stripe\Subscription::retrieve($subId);
+        $messages = [];
         
-        $profId = $sub->metadata["stripe_prof_id"];
+        $messages[] = "---------";
+        $messages[] = "Nouveau paiement réussi";
+        $messages[] = "chargeId : " . $chargeId;
         
-        $charge = \Stripe\Charge::retrieve($chargeId);
-        $charge-> transfer_group = $charge->id; // on utilise la charge id comme id de groupage de transactions
-        $charge->save();
+        try {
+            $subId = $event_json->data->object->subscription;
+            $sub = \Stripe\Subscription::retrieve($subId);
+            
+            if ($sub->metadata["stripe_prof_id"] != "") {
+                
+                $profId = $sub->metadata["stripe_prof_id"];
+                
+                $charge = \Stripe\Charge::retrieve($chargeId);
+                $charge->transfer_group = $charge->id; // on utilise la charge id comme id de groupage de transactions
+                $charge->save();
+                
+                // on transfère 75 % au prof
+                $transfer = \Stripe\Transfer::create(array(
+                    "amount" => round(0.75 * $charge->amount),
+                    "currency" => "eur",
+                    "destination" => $profId,
+                    "transfer_group" => $charge->id,
+                    "source_transaction" => $charge->id
+                ));
+                
+                $messages[] = "Transfert vers : ".$profId. "réussi";
+                
+            } else {
+                $messages[] = "Un abonnement vient d'être facturé sans compte prof associé";
+            }
+        } catch (\Exception $e) {
+            $messages[] = $e->getMessage();
+            return;
+        }finally {
+            $slack->sendMessages("stripe", $messages);
+        }
         
-        // on transfère 75 % au prof
-        $transfer = \Stripe\Transfer::create(array(
-            "amount" => round(0.75*$charge->amount),
-            "currency" => "eur",
-            "destination" => $profId,
-            "transfer_group" => $charge->id,
-            "source_transaction" => $charge->id
-        ));
         
     }
-    
-    
+
     public function __construct($testMode = true)
     
     {

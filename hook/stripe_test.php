@@ -31,13 +31,10 @@ $event_json = json_decode($input);
 
 if ($event_json->type == "invoice.payment_succeeded") {
     
+        
     $stripeMg = new \spamtonprof\stp_api\StripeManager(true);
     
     $stripeMg->transfertSubscriptionCharge($event_json);
-
-    $slack->sendMessages("log", array(
-        "hook de test stripe reçu"
-    ));
     
 }
 

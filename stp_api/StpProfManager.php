@@ -43,6 +43,15 @@ class StpProfManager
             $q->bindValue(':email_perso', $emailPerso);
         }
         
+        if (array_key_exists('email_stp', $info)) {
+            
+            $emailStp = $info['email_stp'];
+            
+            $q = $this->_db->prepare('select * from stp_prof where lower(email_stp) like lower(:email_stp)');
+            
+            $q->bindValue(':email_stp', $emailStp);
+        }
+        
         if (array_key_exists('user_id_wp', $info)) {
             
             $userId = $info['user_id_wp'];

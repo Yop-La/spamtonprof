@@ -18,8 +18,6 @@ if(!domain.includes("localhost")){
 	idRefAbonnement = "967";
 	idChoixProf = "968";
 
-	
-	
 }
 
 ajaxEnCours = 0;
