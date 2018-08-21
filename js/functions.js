@@ -31,9 +31,11 @@ function redirectTo(slug ,info = "" ){
 }
 
 function showMessage(message){
-	$("#band-message").text(message);
-	$("#top-message").removeClass("hide");
-	window.scrollTo(0, 0);
+	waitForEl("#top-message", function() {
+		$("#band-message").text(message);
+		$("#top-message").removeClass("hide");
+		window.scrollTo(0, 0);
+	});
 }
 
 function hideMessage(){

@@ -299,65 +299,63 @@ jQuery( document ).ready( function( $ ) {
 
 
 
-//	if(isLogged == "true"){
-//
-//		waitForEl(".login", function() {
-//			$(".login").removeClass("hide");
-//		});
-//
+	if(isLogged == "true"){
+
+		waitForEl(".login", function() {
+			$(".login").removeClass("hide");
+		});
+
 //		if(userType == "proche"){
-//
-//			nbAbosEssai = abosEssai.length;
-//
-//			message = "Hello ".concat(loggedProche.prenom,", il y a encore 2 essais gratuits (un par enfant)");
-//			switch (nbAbosEssai) {
-//			case 0:
-//				message = "Hello ".concat(loggedProche.prenom,", il y a encore 2 essais gratuits (un par enfant)");
-//				break;
-//			case 1:
-//				aboEssai = abosEssai[0];
-//				message = "Hello ".concat(loggedProche.prenom,", il reste 1 essai gratuit pour le frère ou la soeur de ".concat(aboEssai.eleve.prenom));
-//				break;
-//			case 2:
-//				message = "Hello ".concat(loggedProche.prenom," il n'y a plus d'essai gratuit car il y a déjà deux essais en cours");
-//				break;
-//
-//			}
-//			showMessage(message);
-//
-//
-//
+
+		nbAbosEssai = abosEssai.length;
+
+		message = "Hello ".concat(loggedProche.prenom,", il y a encore 1 essai gratuit disponible.");
+		switch (nbAbosEssai) {
+		case 0:
+			message = "Hello ".concat(loggedProche.prenom,", il y a encore 1 essai gratuit disponible.");
+			break;
+		case 1:
+			aboEssai = abosEssai[0];
+			message = "Hello ".concat(loggedProche.prenom,", désolé, il n'y a plus d'essai gratuit.");
+			break;
+		case 2:
+			message = "Hello ".concat(loggedProche.prenom," désolé, il n'y a plus d'essai gratuit ");
+			break;
+
+		}
+		console.log(message);
+		showMessage(message);
+
 //		}
-//
+
 //		if(userType == "eleve"){
-//
-//			nbAbosEssai = abosEssai.length;
-//
-//			message = "Hello ".concat(loggedEleve.prenom,", il y a encore 2 essais gratuits (un pour toi et un pour ton frère ou ta soeur)");
-//			switch (nbAbosEssai) {
-//			case 0:
-//				message = "Hello ".concat(loggedEleve.prenom,", il y a encore 2 essais gratuits (un pour toi et un pour ton frère ou ta soeur)");
-//				break;
-//			case 1:
-//				aboEssai = abosEssai[0];
-//				message = "Hello ".concat(loggedEleve.prenom,", il reste 1 essai gratuit pour ton frère ou ta soeur ");
-//				break;
-//			case 2:
-//				message = "Hello ".concat(loggedEleve.prenom," il n'y a plus d'essai gratuit car il y a déjà deux essais en cours");
-//				break;
-//
-//			}
-//			showMessage(message);
-//
+
+//		nbAbosEssai = abosEssai.length;
+
+//		message = "Hello ".concat(loggedEleve.prenom,", il y a encore 2 essais gratuits (un pour toi et un pour ton frère ou ta soeur)");
+//		switch (nbAbosEssai) {
+//		case 0:
+//		message = "Hello ".concat(loggedEleve.prenom,", il y a encore 2 essais gratuits (un pour toi et un pour ton frère ou ta soeur)");
+//		break;
+//		case 1:
+//		aboEssai = abosEssai[0];
+//		message = "Hello ".concat(loggedEleve.prenom,", il reste 1 essai gratuit pour ton frère ou ta soeur ");
+//		break;
+//		case 2:
+//		message = "Hello ".concat(loggedEleve.prenom," il n'y a plus d'essai gratuit car il y a déjà deux essais en cours");
+//		break;
+
 //		}
-//
-//	}else{
-//
-//		waitForEl(".logout", function() {
-//			$(".logout").removeClass("hide");
-//		});
-//
-//	}
+//		showMessage(message);
+
+	}else{
+		waitForEl(".logout", function() {
+			$(".logout").removeClass("hide");
+		});
+
+		
+		
+	}
 
 
 	waitForEl(toFieldId(idClasse), function() {
@@ -412,10 +410,10 @@ jQuery( document ).ready( function( $ ) {
 
 
 			// charger tous les élèves du compte dans le select 
-				// si élève en essai -> écrire que élève a plus le droit à essai 
-					// si élève a déjà fait essai de cette matière -> dire que élève a plus le droit à esssai
-				// si élève pas en essai -> dire que l'élève a droit à esssai
-			
+			// si élève en essai -> écrire que élève a plus le droit à essai 
+			// si élève a déjà fait essai de cette matière -> dire que élève a plus le droit à esssai
+			// si élève pas en essai -> dire que l'élève a droit à esssai
+
 			// permettre d'ajouter un élève -> popup sur ajouter élève	
 
 		});
