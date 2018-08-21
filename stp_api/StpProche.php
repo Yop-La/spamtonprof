@@ -107,6 +107,16 @@ class StpProche implements \JsonSerializable
     {
         $this->statut_proche = $statut_proche;
     }
+    
+    public function toArray()
+    {
+        $retour = [];
+        
+        foreach ($this as $key => $value) {
+            $retour[$key] = $value;
+        }
+        return ($retour);
+    }
 
     
     public static function cast($proche) : \spamtonprof\stp_api\StpProche{

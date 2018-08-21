@@ -61,6 +61,16 @@ class StpEleve implements \JsonSerializable
         }
         
     }
+    
+    public function toArray()
+    {
+        $retour = [];
+        
+        foreach ($this as $key => $value) {
+            $retour[$key] = $value;
+        }
+        return ($retour);
+    }
 
     public function getEmail()
     {

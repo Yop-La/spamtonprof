@@ -4,9 +4,10 @@ namespace spamtonprof\stp_api;
 class StpProf implements \JsonSerializable
 {
 
-    protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $id_paper, $user_id_wp, $onboarding_step, $iban, $sexe, $stripe_id_test;
+    protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $id_paper, $user_id_wp, $onboarding_step, $iban, $sexe, $stripe_id_test, $history_id, $gmail_prof;
 
     /**
+     *
      * @return mixed
      */
     public function getStripe_id_test()
@@ -15,6 +16,7 @@ class StpProf implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $stripe_id_test
      */
     public function setStripe_id_test($stripe_id_test)
@@ -291,6 +293,40 @@ class StpProf implements \JsonSerializable
     {
         $this->sexe = $sexe;
     }
-    
-    
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getHistory_id()
+    {
+        return $this->history_id;
+    }
+
+    /**
+     *
+     * @param mixed $history_id
+     */
+    public function setHistory_id($history_id)
+    {
+        $this->history_id = $history_id;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getGmail_prof()
+    {
+        return $this->gmail_prof;
+    }
+
+    /**
+     *
+     * @param mixed $gmail_prof
+     */
+    public function setGmail_prof($gmail_prof)
+    {
+        $this->gmail_prof = $gmail_prof;
+    }
 }

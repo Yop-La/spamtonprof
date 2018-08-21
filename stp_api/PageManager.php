@@ -43,6 +43,107 @@ class PageManager
         $isLogged = $isLogged ? 'true' : 'false';
         wp_localize_script('functions_js', 'isLogged', $isLogged);
         
+        /* pour connaitre le type de user : prof, eleve, proche, autre */
+        $current_user = wp_get_current_user();
+        
+        $caps = $current_user->get_role_caps();
+        
+        if($caps["client"]){
+            
+            
+            
+        }
+            
+        if ($isLogged) {
+            
+            $procheMg = new \spamtonprof\stp_api\StpProcheManager();
+            $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
+            $profMg = new \spamtonprof\stp_api\StpProfManager();
+            
+            $prof = $profMg->get(array(
+                'user_id_wp' => $current_user->ID
+            ));
+            
+            $eleve = $eleveMg->get(array(
+                'ref_compte_wp' => $current_user->ID
+            ));
+            
+            $proche = $procheMg->get(array(
+                'ref_compte_wp' => $current_user->ID
+            ));
+            
+            $current_user = wp_get_current_user();
+            
+            if (current_user_can('client')) {
+                
+                $compteMg = new \spamtonprof\stp_api\StpCompteManager();
+                
+                $compte = $compteMg->get(array(
+                    'ref_compte_wp' => $current_user->ID
+                ));
+                
+                $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
+                
+                $abonnements = $abonnementMg->getAll(array(
+                    "ref_compte" => $compte->getRef_compte()
+                ), array(
+                    "construct" => array(
+                        'ref_eleve',
+                        'ref_formule',
+                        'ref_prof',
+                        'ref_parent',
+                        'ref_plan'
+                    ),
+                    "ref_eleve" => array(
+                        "construct" => array(
+                            'ref_classe',
+                            'ref_profil'
+                        )
+                    )
+                ));
+                
+                $abosActif = [];
+                $abosEssai = [];
+                $abosTermine = [];
+                
+                foreach ($abonnements as $abonnement) {
+                    
+                    switch ($abonnement->getRef_statut_abonnement()) {
+                        case $abonnement::ACTIF:
+                            $abosActif[] = $abonnement;
+                            break;
+                        case $abonnement::ESSAI:
+                            $abosEssai[] = $abonnement;
+                            break;
+                        case $abonnement::TERMINE:
+                            $abosTermine[] = $abonnement;
+                            break;
+                    }
+                }
+                
+                wp_localize_script('functions_js', 'abosActif', $abosActif);
+                wp_localize_script('functions_js', 'abosEssai', $abosEssai);
+                wp_localize_script('functions_js', 'abosTermine', $abosTermine);
+            }
+            
+            wp_localize_script('functions_js', 'userType', 'autre');
+            if ($proche) {
+                
+                wp_localize_script('functions_js', 'userType', 'proche');
+                wp_localize_script('functions_js', 'loggedProche', $proche->toArray());
+            }
+            
+            if ($eleve) {
+                wp_localize_script('functions_js', 'userType', 'eleve');
+                wp_localize_script('functions_js', 'loggedEleve', $eleve->toArray());
+            }
+            
+            if ($prof) {
+                wp_localize_script('functions_js', 'userType', 'prof');
+                wp_localize_script('functions_js', 'loggedProf', $prof->toArray());
+            }
+        }
+        
         /* avoir le domain */
         wp_localize_script('functions_js', 'domain', $this->domain);
     }
@@ -293,59 +394,7 @@ class PageManager
         
         wp_enqueue_script('stripe_main_js', 'https://js.stripe.com/v3/');
         
-        $current_user = wp_get_current_user();
-        
-        if (current_user_can('client')) {
-            
-            $compteMg = new \spamtonprof\stp_api\StpCompteManager();
-            
-            $compte = $compteMg->get(array(
-                'ref_compte_wp' => $current_user->ID
-            ));
-            
-            $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
-            
-            $abonnements = $abonnementMg->getAll(array(
-                "ref_compte" => $compte->getRef_compte()
-            ), array(
-                "construct" => array(
-                    'ref_eleve',
-                    'ref_formule',
-                    'ref_prof',
-                    'ref_parent',
-                    'ref_plan'
-                ),
-                "ref_eleve" => array(
-                    "construct" => array(
-                        'ref_classe',
-                        'ref_profil'
-                    )
-                )
-            ));
-            
-            $abosActif = [];
-            $abosEssai = [];
-            $abosTermine = [];
-            
-            foreach ($abonnements as $abonnement) {
-                
-                switch ($abonnement->getRef_statut_abonnement()) {
-                    case $abonnement::ACTIF:
-                        $abosActif[] = $abonnement;
-                        break;
-                    case $abonnement::ESSAI:
-                        $abosEssai[] = $abonnement;
-                        break;
-                    case $abonnement::TERMINE:
-                        $abosTermine[] = $abonnement;
-                        break;
-                }
-            }
-            
-            wp_localize_script('dashboard', 'abosActif', $abosActif);
-            wp_localize_script('dashboard', 'abosEssai', $abosEssai);
-            wp_localize_script('dashboard', 'abosTermine', $abosTermine);
-        }
+
     }
 }
 

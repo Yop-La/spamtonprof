@@ -57,6 +57,13 @@ class StpProcheManager
         }
         
         if (array_key_exists("ref_compte_wp", $info)) {
+            $refCompteWp = $info["ref_compte_wp"];
+            $q = $this->_db->prepare('select * from stp_proche where ref_compte_wp = :ref_compte_wp');
+            $q->bindValue(':ref_compte_wp', $refCompteWp);
+            $q->execute();
+        }
+        
+        if (array_key_exists("ref_compte_wp", $info)) {
             
             $refCompteWp = $info["ref_compte_wp"];
             

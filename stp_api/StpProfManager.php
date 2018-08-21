@@ -192,6 +192,19 @@ class StpProfManager
         
         return ($prof);
     }
+    
+    public function updateHistoryId(\spamtonprof\stp_api\StpProf $prof)
+    {
+        $q = $this->_db->prepare('update stp_prof set history_id = :history_id where ref_prof = :ref_prof');
+        
+        $q->bindValue(':history_id', $prof->getRef_prof());
+        
+        $q->bindValue(':ref_prof', $prof->getRef_prof());
+        
+        $q->execute();
+        
+        return ($prof);
+    }
 
     
     public function updatePays(\spamtonprof\stp_api\StpProf $prof)

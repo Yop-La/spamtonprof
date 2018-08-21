@@ -283,9 +283,6 @@ var myCustomFieldController = Marionette.Object.extend( {
 			}
 		}
 
-
-
-
 	}
 });
 
@@ -299,6 +296,69 @@ var myCustomFieldController = Marionette.Object.extend( {
 
 //début jquery
 jQuery( document ).ready( function( $ ) {
+
+
+
+//	if(isLogged == "true"){
+//
+//		waitForEl(".login", function() {
+//			$(".login").removeClass("hide");
+//		});
+//
+//		if(userType == "proche"){
+//
+//			nbAbosEssai = abosEssai.length;
+//
+//			message = "Hello ".concat(loggedProche.prenom,", il y a encore 2 essais gratuits (un par enfant)");
+//			switch (nbAbosEssai) {
+//			case 0:
+//				message = "Hello ".concat(loggedProche.prenom,", il y a encore 2 essais gratuits (un par enfant)");
+//				break;
+//			case 1:
+//				aboEssai = abosEssai[0];
+//				message = "Hello ".concat(loggedProche.prenom,", il reste 1 essai gratuit pour le frère ou la soeur de ".concat(aboEssai.eleve.prenom));
+//				break;
+//			case 2:
+//				message = "Hello ".concat(loggedProche.prenom," il n'y a plus d'essai gratuit car il y a déjà deux essais en cours");
+//				break;
+//
+//			}
+//			showMessage(message);
+//
+//
+//
+//		}
+//
+//		if(userType == "eleve"){
+//
+//			nbAbosEssai = abosEssai.length;
+//
+//			message = "Hello ".concat(loggedEleve.prenom,", il y a encore 2 essais gratuits (un pour toi et un pour ton frère ou ta soeur)");
+//			switch (nbAbosEssai) {
+//			case 0:
+//				message = "Hello ".concat(loggedEleve.prenom,", il y a encore 2 essais gratuits (un pour toi et un pour ton frère ou ta soeur)");
+//				break;
+//			case 1:
+//				aboEssai = abosEssai[0];
+//				message = "Hello ".concat(loggedEleve.prenom,", il reste 1 essai gratuit pour ton frère ou ta soeur ");
+//				break;
+//			case 2:
+//				message = "Hello ".concat(loggedEleve.prenom," il n'y a plus d'essai gratuit car il y a déjà deux essais en cours");
+//				break;
+//
+//			}
+//			showMessage(message);
+//
+//		}
+//
+//	}else{
+//
+//		waitForEl(".logout", function() {
+//			$(".logout").removeClass("hide");
+//		});
+//
+//	}
+
 
 	waitForEl(toFieldId(idClasse), function() {
 		gClasseSelect = $(toFieldId(idClasse));
@@ -314,42 +374,16 @@ jQuery( document ).ready( function( $ ) {
 
 	waitForEl('#choix-matieres', function() {
 
-		$("#select-box1").val('maths-physique');
-
-		$("#select-box1").on("click" , function() {
-
-			$(this).parent(".select-box").toggleClass("open");
-
-		});
-
-		$(document).mouseup(function (e)
-				{
-			var container = $(".select-box");
-
-			if (container.has(e.target).length === 0)
-			{
-				container.removeClass("open");
-			}
-				});
+		$('#select-box-matiere option[name= "defaut"]').prop('selected', true);
 
 
-		$("#select-box1").on("change" , function() {
+		waitForEl('.div-select-box-matiere', function() {
 
-			var selection = $(this).find("option:selected").text(),
-			labelFor = $(this).attr("id"),
-			label = $("[for='" + labelFor + "']");
+			checkUntil('.div-select-box-matiere' , 3);
 
-			label.find(".label-desc").html(selection);
+			$('#select-box-matiere').change(function(){
 
-		});
-
-		waitForEl('.select-box', function() {
-
-			checkUntil('.select-box' , 3);
-
-			$('#select-box1').change(function(){
-
-				var nouvelleMatiere = $('#select-box1	').val();
+				var nouvelleMatiere = $('#select-box-matiere').val();
 
 				if(nouvelleMatiere != matiere){
 
@@ -360,10 +394,7 @@ jQuery( document ).ready( function( $ ) {
 
 				}
 
-
 				setMatieresField(matieres);
-
-
 
 			});
 
@@ -371,6 +402,26 @@ jQuery( document ).ready( function( $ ) {
 
 
 		/* fin : customiser le select des matières et changer l'affichage du blco matière en fonction du choix*/
+
+
+		/* pour customiser le select des élèves et changer l'affichage en fonction du choix*/
+
+		waitForEl('#choix-eleves', function() {
+
+			$('#select-box-eleve option[name= "defaut"]').prop('selected', true);
+
+
+			// charger tous les élèves du compte dans le select 
+				// si élève en essai -> écrire que élève a plus le droit à essai 
+					// si élève a déjà fait essai de cette matière -> dire que élève a plus le droit à esssai
+				// si élève pas en essai -> dire que l'élève a droit à esssai
+			
+			// permettre d'ajouter un élève -> popup sur ajouter élève	
+
+		});
+
+
+		/* pour customiser le select des élèves et changer l'affichage en fonction du choix*/
 
 		/* debut : pour afficher popup et faire les bons affichages de matière dans la deuxième partie du formulaire */
 
