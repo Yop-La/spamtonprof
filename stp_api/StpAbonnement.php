@@ -6,7 +6,39 @@ class StpAbonnement implements \JsonSerializable
 
     const ACTIF = 1, ESSAI = 2, TERMINE = 3;
 
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $dateDernierStatut;
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact;
+
+    /**
+     * @return mixed
+     */
+    public function getDernier_contact()
+    {
+        return $this->dernier_contact;
+    }
+
+    /**
+     * @param mixed $dernier_contact
+     */
+    public function setDernier_contact($dernier_contact)
+    {
+        $this->dernier_contact = $dernier_contact;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStatut()
+    {
+        return $this->statut;
+    }
+
+    /**
+     * @param mixed $statut
+     */
+    public function setStatut($statut)
+    {
+        $this->statut = $statut;
+    }
 
     /**
      *
@@ -157,7 +189,6 @@ class StpAbonnement implements \JsonSerializable
      */
     public function setEleve($eleve)
     {
-        if (is_array($eleve)) {}
         
         $this->eleve = $eleve;
     }

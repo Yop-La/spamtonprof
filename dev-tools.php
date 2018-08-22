@@ -390,3 +390,11 @@ function generateClassAndManager($tableName, $path, $nameSpace)
     /* fin écriture du manager */
 }
 
+function extractFirstMail($string){
+    
+    $pattern = "/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i";
+    $emails = [];
+    preg_match_all($pattern, $string, $emails);
+    return($emails[0][0]);
+}
+

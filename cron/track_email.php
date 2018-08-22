@@ -9,6 +9,7 @@ use spamtonprof\slack\Slack;
  * - à stocker dans mail eleve - les messages des élèves
  * - à attribuer des libellées aux emails
  * - il tourne tous les 5 minutes
+ * - pas en prod
  */
 
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");

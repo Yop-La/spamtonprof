@@ -40,6 +40,9 @@ function ajaxInscriptionProf()
         
         $dob = DateTime::createFromFormat('j/m/Y', $dob);
         
+        $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+        
+        
         $StpProf = $StpProfMg->add(new \spamtonprof\stp_api\StpProf(array(
             'email_perso' => $email,
             'prenom' => $prenom,
@@ -47,8 +50,11 @@ function ajaxInscriptionProf()
             'telephone' => $mobile,
             'onboarding_step' => "step-0",
             'date_naissance' => $dob,
-            'sexe' => $sexe
+            'sexe' => $sexe,
+            'processing_date' => $now
         )));
+        
+        
         
         $StpProf -> setOnboarding(false);
         
@@ -81,7 +87,7 @@ function ajaxInscriptionProf()
 
             
             $slack->sendMessages('prof', array(
-                " -- Inscription d'un nouveau prof -- ",
+                " -- Inscription d'un nouveau prof : ".$StpProf->getPrenom(). "-- ",
                 "Voilà les actions à mener pour terminer son inscription : ",
                 " - 1°) lui attribuer une adresse spamtonprof ",
                 " - 2°) mettre à jour la table stp_prof avec son adresse pro ",

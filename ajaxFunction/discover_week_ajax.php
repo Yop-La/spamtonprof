@@ -317,15 +317,17 @@ function ajaxAfterSubmissionEssai()
             "ref_plan" => $plan->getRef_plan()
         ));
         
+        $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
+        
+        $abonnement = $abonnementMg->add($abonnement);
+        
+        
         $logAboMg = new \spamtonprof\stp_api\StpLogAbonnementManager();
         $logAboMg->add(new \spamtonprof\stp_api\StpLogAbonnement(array(
             "ref_abonnement" => $abonnement->getRef_abonnement(),
             "ref_statut_abo" => $abonnement->getRef_statut_abonnement()
         )));
         
-        $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
-        
-        $abonnement = $abonnementMg->add($abonnement);
         
         $abonnement->setRef_compte($compte->getRef_compte());
         $abonnementMg->updateRefCompte($abonnement);

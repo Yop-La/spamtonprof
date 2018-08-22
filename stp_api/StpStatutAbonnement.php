@@ -1,6 +1,8 @@
 <?php
 namespace spamtonprof\stp_api;
 
+use Monolog\Handler\NullHandler;
+
 class StpStatutAbonnement implements \JsonSerializable
 {
 
@@ -19,6 +21,11 @@ class StpStatutAbonnement implements \JsonSerializable
                 $this->$method($value);
             }
         }
+    }
+    
+    public static function cast(\spamtonprof\stp_api\StpStatutAbonnement $statut)
+    {
+        return ($statut);
     }
 
     public function getRef_statut_abonnement()

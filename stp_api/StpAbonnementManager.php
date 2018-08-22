@@ -111,6 +111,14 @@ class StpAbonnementManager
         $q->execute();
     }
     
+    public function updateDernierContact(\spamtonprof\stp_api\StpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set dernier_contact = :dernier_contact where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":dernier_contact", $abonnement->getDernier_contact());
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->execute();
+    }
+    
     public function updateRefStatutAbonnement(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set ref_statut_abonnement = :ref_statut_abonnement where ref_abonnement = :ref_abonnement");
@@ -241,6 +249,15 @@ class StpAbonnementManager
                     
                     $abonnement->setPlan($plan);
                     break;
+                    
+                case "ref_statut_abonnement":
+                    $statutAboMg = new \spamtonprof\stp_api\StpStatutAbonnementManager();
+                    $statutAbo = $statutAboMg ->get(array(
+                        'ref_statut_abonnement' => $abonnement->getRef_statut_abonnement()
+                    ));
+                    
+                    $abonnement->setStatut($statutAbo);
+                    break;
             }
         }
     }
@@ -292,6 +309,17 @@ class StpAbonnementManager
                 $refCompte = $info["ref_compte"];
                 $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte');
                 $q->bindValue(":ref_compte", $refCompte);
+                $q->execute();
+            }
+            
+            if (array_key_exists("ref_eleve", $info) && array_key_exists("ref_prof", $info)) {
+                
+                $refEleve = $info["ref_eleve"];
+                $refProf = $info["ref_prof"];
+                
+                $q = $this->_db->prepare('select * from stp_abonnement where ref_prof = :ref_prof and ref_eleve =:ref_eleve');
+                $q->bindValue(":ref_prof", $refProf);
+                $q->bindValue(":ref_eleve", $refEleve);
                 $q->execute();
             }
         }

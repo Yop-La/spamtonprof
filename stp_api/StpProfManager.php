@@ -13,8 +13,8 @@ class StpProfManager
 
     public function add(StpProf $StpProf)
     {
-        $q = $this->_db->prepare('insert into stp_prof(email_perso, prenom, nom, telephone, onboarding_step, date_naissance, sexe) 
-            values( :email_perso,:prenom,:nom,:telephone, :onboarding_step, :date_naissance, :sexe)');
+        $q = $this->_db->prepare('insert into stp_prof(email_perso, prenom, nom, telephone, onboarding_step, date_naissance, sexe, processing_date) 
+            values( :email_perso,:prenom,:nom,:telephone, :onboarding_step, :date_naissance, :sexe, :processing_date)');
         $q->bindValue(':email_perso', $StpProf->getEmail_perso());
         $q->bindValue(':prenom', $StpProf->getPrenom());
         $q->bindValue(':nom', $StpProf->getNom());
@@ -23,6 +23,8 @@ class StpProfManager
         $q->bindValue(':date_naissance', $StpProf->getDate_naissance()
             ->format(PG_DATE_FORMAT));
         $q->bindValue(':sexe', $StpProf->getSexe());
+        $q->bindValue(':processing_date', $StpProf->getProcessing_date()
+            ->format(PG_DATETIME_FORMAT));
         $q->execute();
         
         $StpProf->setRef_prof($this->_db->lastInsertId());
@@ -85,19 +87,51 @@ class StpProfManager
         }
     }
 
-    public function getAll()
+    public function getAll($info = null)
     {
         $profs = [];
+        $q = null;
         
-        $q = $this->_db->prepare('select * from stp_prof ');
+        if (is_array($info)) {
+            
+            if (array_key_exists("inbox_ready", $info)) {
+                
+                $inboxReady = $info["inbox_ready"];
+                
+                $q = $this->_db->prepare('select * from stp_prof where inbox_ready = :inbox_ready');
+                
+                $q->bindValue(":inbox_ready", $inboxReady, \PDO::PARAM_BOOL);
+                
+                $q->execute();
+            }
+        } else {
+            
+            $q = $this->_db->prepare('select * from stp_prof ');
+            
+            $q->execute();
+        }
         
-        $q->execute();
-       
         while ($data = $q->fetch(\PDO::FETCH_ASSOC)) {
             
             $profs[] = new \spamtonprof\stp_api\StpProf($data);
         }
-        return($profs);
+        return ($profs);
+    }
+
+    public function getNextInboxToProcess()
+    {
+        $q = $this->_db->prepare('select * from stp_prof where inbox_ready = true order by process_inbox desc;');
+        
+        $q->execute();
+        
+        $data = $q->fetch(\PDO::FETCH_ASSOC);
+        
+        if ($data) {
+            
+            return (new \spamtonprof\stp_api\StpProf($data));
+        } else {
+            return (false);
+        }
     }
 
     public function updateUserIdWp(\spamtonprof\stp_api\StpProf $prof)
@@ -138,7 +172,7 @@ class StpProfManager
         
         return ($prof);
     }
-    
+
     public function updateStripeIdTest(\spamtonprof\stp_api\StpProf $prof)
     {
         $q = $this->_db->prepare('update stp_prof set stripe_id_test = :stripe_id_test where ref_prof = :ref_prof');
@@ -151,7 +185,7 @@ class StpProfManager
         
         return ($prof);
     }
-    
+
     public function updateAdresse(\spamtonprof\stp_api\StpProf $prof)
     {
         $q = $this->_db->prepare('update stp_prof set adresse = :adresse where ref_prof = :ref_prof');
@@ -164,7 +198,6 @@ class StpProfManager
         
         return ($prof);
     }
-    
 
     public function updateVille(\spamtonprof\stp_api\StpProf $prof)
     {
@@ -179,7 +212,6 @@ class StpProfManager
         return ($prof);
     }
 
-    
     public function updateCodePostal(\spamtonprof\stp_api\StpProf $prof)
     {
         $q = $this->_db->prepare('update stp_prof set code_postal = :code_postal where ref_prof = :ref_prof');
@@ -192,7 +224,7 @@ class StpProfManager
         
         return ($prof);
     }
-    
+
     public function updateHistoryId(\spamtonprof\stp_api\StpProf $prof)
     {
         $q = $this->_db->prepare('update stp_prof set history_id = :history_id where ref_prof = :ref_prof');
@@ -206,7 +238,6 @@ class StpProfManager
         return ($prof);
     }
 
-    
     public function updatePays(\spamtonprof\stp_api\StpProf $prof)
     {
         $q = $this->_db->prepare('update stp_prof set pays = :pays where ref_prof = :ref_prof');
@@ -219,8 +250,7 @@ class StpProfManager
         
         return ($prof);
     }
-    
-    
+
     public function updateOnboarding_step(\spamtonprof\stp_api\StpProf $prof)
     {
         $q = $this->_db->prepare('update stp_prof set onboarding_step = :onboarding_step where ref_prof = :ref_prof');
@@ -246,8 +276,7 @@ class StpProfManager
         
         return ($prof);
     }
-    
-    
+
     public function cast(\spamtonprof\stp_api\StpProf $object)
     {
         return ($object);

@@ -18,7 +18,8 @@ header("Pragma: no-cache");
 /*
  * ce script va tourner tous les 5 minutes pour lire les nouveaux mails
  * de l'adresse mailsfromlbc@gmail.com. Il sert à lire les mails envoyés par les prospects depuis leboncoin
- * et à les enregistrer dans une table afin de leur répondre par la suite avec un autre script
+ * et à les enregistrer dans une table afin de leur répondre par la suite avec un autre script 
+ * c'est le script réponse automatique ( il n'est plus en prod pour le moment )
  *
  */
 

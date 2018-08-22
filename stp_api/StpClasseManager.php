@@ -13,33 +13,42 @@ class StpClasseManager
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
 
-    public function getAll($info)
+    public function getAll($info=null)
     {
         $classes = [];
+        $q = null;
         
-        if(array_key_exists("ref_profil", $info)){
-        
-            $refProfil = $info["ref_profil"];
+        if (is_array($info)) {
             
-            $q = $this->_db->prepare('select * from stp_classe where ref_profil = :ref_profil');
-            $q->bindValue(':ref_profil', $refProfil);
-            $q->execute();
-            
-            while($data = $q->fetch(\PDO::FETCH_ASSOC)){
+            if (array_key_exists("ref_profil", $info)) {
                 
-                $classes[] = new spamtonprof\stp_api\StpClasse($data);
+                $refProfil = $info["ref_profil"];
+                
+                $q = $this->_db->prepare('select * from stp_classe where ref_profil = :ref_profil');
+                $q->bindValue(':ref_profil', $refProfil);
+                $q->execute();
+                
                 
             }
-            return($classes);
+        } else {
+            
+            $q = $this->_db->prepare('select * from stp_classe ');
+            $q->execute();
+            
+            
+            
         }
         
+        while ($data = $q->fetch(\PDO::FETCH_ASSOC)) {
+            
+            $classes[] = new spamtonprof\stp_api\StpClasse($data);
+        }
+        return ($classes);
     }
-    
+
     public function get($info)
     {
-        
-        
-        if(array_key_exists("ref_classe", $info)){
+        if (array_key_exists("ref_classe", $info)) {
             
             $refClasse = $info["ref_classe"];
             
@@ -47,15 +56,12 @@ class StpClasseManager
             $q->bindValue(':ref_classe', $refClasse);
             $q->execute();
             
-            if($data = $q->fetch(\PDO::FETCH_ASSOC)){
+            if ($data = $q->fetch(\PDO::FETCH_ASSOC)) {
                 
-                return( new spamtonprof\stp_api\StpClasse($data));
-                
-            }else{
-                return(false);
+                return (new spamtonprof\stp_api\StpClasse($data));
+            } else {
+                return (false);
             }
-            
         }
-        
     }
 }

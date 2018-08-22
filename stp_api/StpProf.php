@@ -4,7 +4,71 @@ namespace spamtonprof\stp_api;
 class StpProf implements \JsonSerializable
 {
 
-    protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $id_paper, $user_id_wp, $onboarding_step, $iban, $sexe, $stripe_id_test, $history_id, $gmail_prof;
+    protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $user_id_wp, $onboarding_step, $sexe, $stripe_id_test, $ref_gmail_account, $inbox_ready, $processing_date;
+
+    /**
+     * @return mixed
+     */
+    public function getProcessing_date()
+    {
+        return $this->processing_date;
+    }
+
+    /**
+     * @param mixed $processing_date
+     */
+    public function setProcessing_date($processing_date)
+    {
+        $this->processing_date = $processing_date;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getInbox_ready()
+    {
+        return $this->inbox_ready;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getProcess_inbox()
+    {
+        return $this->process_inbox;
+    }
+
+    /**
+     * @param mixed $inbox_ready
+     */
+    public function setInbox_ready($inbox_ready)
+    {
+        $this->inbox_ready = $inbox_ready;
+    }
+
+    /**
+     * @param mixed $process_inbox
+     */
+    public function setProcess_inbox($process_inbox)
+    {
+        $this->process_inbox = $process_inbox;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRef_gmail_account()
+    {
+        return $this->ref_gmail_account;
+    }
+
+    /**
+     * @param mixed $ref_gmail_account
+     */
+    public function setRef_gmail_account($ref_gmail_account)
+    {
+        $this->ref_gmail_account = $ref_gmail_account;
+    }
 
     /**
      *
@@ -57,24 +121,6 @@ class StpProf implements \JsonSerializable
     public function setPrenom($prenom)
     {
         $this->prenom = $prenom;
-    }
-
-    /**
-     *
-     * @return mixed
-     */
-    public function getIban()
-    {
-        return $this->iban;
-    }
-
-    /**
-     *
-     * @param mixed $iban
-     */
-    public function setIban($iban)
-    {
-        $this->iban = $iban;
     }
 
     public function getNom()
@@ -175,16 +221,6 @@ class StpProf implements \JsonSerializable
     public function setStripe_id($stripe_id)
     {
         $this->stripe_id = $stripe_id;
-    }
-
-    public function getId_paper()
-    {
-        return $this->id_paper;
-    }
-
-    public function setId_paper($id_paper)
-    {
-        $this->id_paper = $id_paper;
     }
 
     public function jsonSerialize()
@@ -294,39 +330,4 @@ class StpProf implements \JsonSerializable
         $this->sexe = $sexe;
     }
 
-    /**
-     *
-     * @return mixed
-     */
-    public function getHistory_id()
-    {
-        return $this->history_id;
-    }
-
-    /**
-     *
-     * @param mixed $history_id
-     */
-    public function setHistory_id($history_id)
-    {
-        $this->history_id = $history_id;
-    }
-
-    /**
-     *
-     * @return mixed
-     */
-    public function getGmail_prof()
-    {
-        return $this->gmail_prof;
-    }
-
-    /**
-     *
-     * @param mixed $gmail_prof
-     */
-    public function setGmail_prof($gmail_prof)
-    {
-        $this->gmail_prof = $gmail_prof;
-    }
 }

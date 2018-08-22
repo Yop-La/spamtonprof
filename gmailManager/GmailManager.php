@@ -1,14 +1,13 @@
 <?php
 namespace spamtonprof\gmailManager;
 
-use \Exception;
+use Exception;
 use Google_Client;
 use Google_Service_Gmail;
 use Google_Service_Gmail_Message;
 use spamtonprof\stp_api\GmailLabelManager;
 use spamtonprof;
 use PHPMailer\PHPMailer\PHPMailer;
-
 
 class GmailManager
 {
@@ -29,7 +28,6 @@ class GmailManager
      */
     public function getClient($gmailAdress)
     {
-        
         $accountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
         
         $keyMg = new \spamtonprof\stp_api\KeyManager();
@@ -59,7 +57,7 @@ class GmailManager
             // Request authorization from the user.
             $authUrl = $client->createAuthUrl();
             
-            $authCode = "4/AACErhVdLqXrewrfiw5yKOps-5rB0KFdAYP_yep5si8copKBzBM0jqw"; // à remplir par ce qui sera donné par $authUrl
+            $authCode = "4/QgBGUz3qEnaP2Uy7SCUugow2yBZn9e3kaOJXyReRPzNLMKPSYkBfaTQ"; // à remplir par ce qui sera donné par $authUrl
             
             if ($authCode == "") {
                 echo ("la2");
@@ -69,7 +67,7 @@ class GmailManager
             // Exchange authorization code for an access token.
             $accessToken = $client->fetchAccessTokenWithAuthCode($authCode);
             
-            echo(json_encode($accessToken));
+            echo (json_encode($accessToken));
             
             $account->setCredential(json_encode($accessToken));
             $accountMg->updateCredential($account);
@@ -115,7 +113,7 @@ class GmailManager
                 $messagesResponse = $this->service->users_messages->listUsersMessages($this->userId, $opt_param);
                 if ($messagesResponse->getMessages()) {
                     $messages = array_merge($messages, $messagesResponse->getMessages());
-                
+                    
                     $pageToken = $messagesResponse->getNextPageToken();
                 }
             } catch (\Exception $e) {
@@ -133,7 +131,7 @@ class GmailManager
             $message = $this->service->users_messages->get($this->userId, $messageId, $format);
             return $message;
         } catch (\Exception $e) {
-            print 'An error occurred: ' . $e->getMessage();
+            return (false);
         }
     }
 
@@ -286,14 +284,11 @@ class GmailManager
         return ($labelsIds);
     }
 
-    public function getCustomLabelsToAdd(spamtonprof\stp_api\Account $account)
+    public function getCustomLabelsToAdd($labelsNameToAdd)
     {
-        $labelsNameToAdd = [];
+        
         $labelsIdToAdd = [];
         
-        $labelsNameToAdd[] = $account->statut();
-        
-        $labelsNameToAdd[] = $account->eleve()->classe();
         
         $labels = $this->getLabelsList();
         
@@ -338,19 +333,18 @@ class GmailManager
         
         return $histories;
     }
-    
-    function getMessageIdsInHistory($histories){
-        
+
+    function getMessageIdsInHistory($histories)
+    {
         $gmailIds = [];
-        foreach ($histories as $history){
+        foreach ($histories as $history) {
             $messages = $history->messages;
-            foreach ($messages as $message){
+            foreach ($messages as $message) {
                 $gmailIds[] = $message->id;
             }
         }
         
-        return($gmailIds);
-        
+        return ($gmailIds);
     }
 
     /*
@@ -372,50 +366,69 @@ class GmailManager
         return (null);
     }
 
-    function getNewMessages( $lastHistoryId)
+    function hasLabel($message, $label)
     {
-     
+        $labelIds = $message->labelIds;
+        
+        if (in_array($label, $labelIds)) {
+            return (true);
+        } else {
+            return (false);
+        }
+    }
+
+    function getNewMessages($lastHistoryId, $label = "INBOX")
+    {
+    
         $histories = $this->listHistory($lastHistoryId, $historyTypes = "messageAdded");
         
         $indexMessage = 0;
-        $messageLimit = 30;
+        $messageLimit = 20;
         
         $messages = [];
         
-        foreach ($histories as $history){
+        foreach ($histories as $history) {
             
+            $message = $history->messages[0];
             
+     
             
-            $message = $history -> messages[0];
+            $message = $this->getMessage($message->id, [
+                'format' => 'full'
+            ]);
             
-            $messages[] = $this->getMessage($message -> id, ['format' => 'full']);
-            
-            $indexMessage++;
+            if ($message) {
+                
+                if ($this->hasLabel($message, "INBOX")) {
+                    
+                    $messages[] = $message;
+                    
+                    $indexMessage ++;
+                    
+                }
+            }
             
             $lastHistoryId = $history->id;
             
-            if($indexMessage == $messageLimit){
+            if ($indexMessage == $messageLimit) {
                 break;
             }
-            
         }
         
-        return(array("messages" => $messages, "lastHistoryId" => $lastHistoryId));
-        
+        return (array(
+            "messages" => $messages,
+            "lastHistoryId" => $lastHistoryId
+        ));
     }
 
     /*
      * sert à créer un message pour l'envoyer à partir de gmail
-     * 
+     *
      */
-    
     private function createMessage($body, $subject, $to, $replyTo, $from, $fromName)
     {
-        
-        $mail  = new PHPMailer;
+        $mail = new PHPMailer();
         $mail->CharSet = "UTF-8";
-
-
         
         $mail->From = $from;
         $mail->FromName = $fromName;
@@ -462,7 +475,7 @@ class GmailManager
         $gMessage = $this->createMessage($body, $subject, $to, $replyTo, $from, $fromName);
         try {
             $gMessage = $this->service->users_messages->send($this->userId, $gMessage);
-            print 'Message with ID: ' . $gMessage->getId() . ' sent.<br>' ;
+            print 'Message with ID: ' . $gMessage->getId() . ' sent.<br>';
             return $gMessage;
         } catch (Exception $e) {
             print 'An error occurred: ' . $e->getMessage();
@@ -480,14 +493,13 @@ class GmailManager
         return $decodedMessage;
     }
 
-
-    function getBody($message)
+    function getBody($message, $type = "html")
     {
         $body = "";
         $message_array = json_decode(json_encode($message), True);
         $datas = $this->getDatas($message_array);
         
-        if (array_key_exists("text/html", $datas) ) {
+        if (array_key_exists("text/html", $datas) && $type == "html") {
             return ($this->decodeBody($datas["text/html"]));
         } else {
             return ($this->decodeBody($datas["text/plain"]));

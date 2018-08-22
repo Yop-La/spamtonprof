@@ -11,7 +11,7 @@ use spamtonprof\gmailManager\GmailManager;
  * - à attribuer des libellées aux emails
  *
  *
- * il tourne tous les 5 minutes
+ * il tourne tous les 5 minutes et il est en prod
  */
 
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
