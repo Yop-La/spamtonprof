@@ -30,7 +30,7 @@ $slack = new \spamtonprof\slack\Slack();
 
 $profMg = new \spamtonprof\stp_api\StpProfManager();
 
-$prof =  $profMg -> getNextInboxToProcess();
+$prof = $profMg->getNextInboxToProcess();
 
 $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
 
@@ -40,9 +40,26 @@ $profMg->updateProcessingDate($prof);
 $gmailAccountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
 $gmailAccount = $gmailAccountMg->get($prof->getRef_gmail_account());
 
-$gmailManager = new spamtonprof\gmailManager\GmailManager($gmailAccount->getEmail());
+try {
+    
+    $gmailManager = new spamtonprof\gmailManager\GmailManager($gmailAccount->getEmail());
+} catch (\Exception $e) {
+    
+    $smtpServerMg = new \spamtonprof\stp_api\SmtpServerManager();
+    
+    $smtpServer = $smtpServerMg->get(array(
+        'ref_smtp_server' => $smtpServerMg::smtp2Go
+    ));
+    
+    $smtpServer->sendEmail('Erreur connexion gmail ', 'alexandre@spamtonprof.com', "Impossible de se connecter à la boite : " . $gmailAccount->getEmail() . "Debug message : " . $e->getMessage(), 'alexandre@spamtonprof.com');
+    
+    exit(0);
+}
 
-$slack -> sendMessages("message_eleve", array(" ----- ","Lecture de : " . $gmailAccount->getEmail()));
+$slack->sendMessages("message_eleve", array(
+    " ----- ",
+    "Lecture de : " . $gmailAccount->getEmail()
+));
 
 $MessEleveMg = new \spamtonprof\stp_api\StpMessageEleveManager();
 
@@ -79,9 +96,7 @@ foreach ($messages as $message) {
         "email" => $from
     ));
     
-
     echo ("mail : " . $from . " -- date reception : " . $dateReception->format(PG_DATETIME_FORMAT) . " -- message id : " . $gmailId . "<br><br>");
-
     
     if ($eleve) {
         
@@ -103,7 +118,7 @@ foreach ($messages as $message) {
         ), $constructor);
         
         $nbAbos = count($abos);
-    
+        
         $labelsNameToAdd = [];
         switch ($nbAbos) {
             case 0:
@@ -113,10 +128,9 @@ foreach ($messages as $message) {
                 $labelsNameToAdd[] = 'error_double_formule';
                 break;
             case 1:
-    
+                
                 $abo = $abos[0];
                 
-      
                 // sauvegarder le message
                 $MessEleveMg->add(new \spamtonprof\stp_api\StpMessageEleve(array(
                     'ref_abonnement' => $abo->getRef_abonnement(),
@@ -133,8 +147,14 @@ foreach ($messages as $message) {
                 $classe = \spamtonprof\stp_api\StpClasse::cast($eleve->getClasse());
                 $statut = \spamtonprof\stp_api\StpStatutAbonnement::cast($statut);
                 
-                $slack -> sendMessages("message_eleve", array(" ---- ","Nouveau message de : " .$eleve->getPrenom(), $classe->getNom_complet(), $gmailId, $dateReception->format(PG_DATETIME_FORMAT), "Avec ".$prof->getPrenom()));
-                
+                $slack->sendMessages("message_eleve", array(
+                    " ---- ",
+                    "Nouveau message de : " . $eleve->getPrenom(),
+                    $classe->getNom_complet(),
+                    $gmailId,
+                    $dateReception->format(PG_DATETIME_FORMAT),
+                    "Avec " . $prof->getPrenom()
+                ));
                 
                 $labelsNameToAdd[] = $classe->getClasse();
                 $labelsNameToAdd[] = $statut->getStatut_abonnement();
@@ -148,7 +168,7 @@ foreach ($messages as $message) {
         
         // attribuer les libellés s
         $labelsToAdd = $gmailManager->getCustomLabelsToAdd($labelsNameToAdd);
-                
+        
         $gmailManager->modifyMessage($gmailId, $labelsToAdd, array());
     }
 }
