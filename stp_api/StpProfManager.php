@@ -120,7 +120,7 @@ class StpProfManager
 
     public function getNextInboxToProcess()
     {
-        $q = $this->_db->prepare('select * from stp_prof where inbox_ready = true order by process_inbox desc;');
+        $q = $this->_db->prepare('select * from stp_prof where inbox_ready = true order by processing_date desc;');
         
         $q->execute();
         

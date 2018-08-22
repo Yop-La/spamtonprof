@@ -30,12 +30,12 @@ $slack = new \spamtonprof\slack\Slack();
 
 $profMg = new \spamtonprof\stp_api\StpProfManager();
 
-$prof = $profs = $profMg -> getNextInboxToProcess();
+$prof =  $profMg -> getNextInboxToProcess();
 
 $gmailAccountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
 $gmailAccount = $gmailAccountMg->get($prof->getRef_gmail_account());
 
-$gmailManager = new spamtonprof\gmailManager\GmailManager();
+$gmailManager = new spamtonprof\gmailManager\GmailManager($gmailAccount->getEmail());
 
 $slack -> sendMessages("message-eleve", array(" ----- ","Lecture de : " . $gmailAccount->getEmail()));
 
@@ -47,8 +47,6 @@ $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
 // gestion last history id
 
 $lastHistoryId = $gmailAccount->getLast_history_id();
-
-$lastHistoryId = '70000';
 
 $retour = $gmailManager->getNewMessages($lastHistoryId);
 
