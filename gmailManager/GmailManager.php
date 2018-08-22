@@ -57,7 +57,7 @@ class GmailManager
             // Request authorization from the user.
             $authUrl = $client->createAuthUrl();
             
-            $authCode = "4/QwA5NrPy4ujNkrqD9ErZK_nutIUYFHhBxaVpbX0ohpm_86ueGYEzZRY"; // à remplir par ce qui sera donné par $authUrl
+            $authCode = "4/QwD3C591Xb4urr1v4bwTH6LFkLqFSJ5D9NzrE303Jo3YPCo-trSIEi4"; // à remplir par ce qui sera donné par $authUrl
             
             if ($authCode == "") {
                 echo ("la2");
