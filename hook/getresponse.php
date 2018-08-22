@@ -1,5 +1,5 @@
 <?php
-require_once (dirname(dirname(dirname(__FILE__))) . '/wp-config.php');
+require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/wp-config.php');
 $wp->init();
 $wp->parse_request();
 $wp->query_posts();
@@ -25,6 +25,7 @@ header("Pragma: no-cache");
  */
 
 $slack = new \spamtonprof\slack\slack();
+
 $accountMg = new \spamtonprof\stp_api\AccountManager();
 
 $msgs = array();
@@ -61,14 +62,9 @@ if ($action == "subscribe") {
         $resp = curl_exec($curl);
         // Close request to clear up some resources
         curl_close($curl);
-        
-        $msgs[] = " ---------- ";
-        $msgs[] = "ajout d'un email à une liste. Voir si ajout dans pagelife aussi";
-        $slack->sendMessages("log", $msgs);
     }
 } else if ($action == "unsubscribe") {
     
-
     $smtpServerMg = new \spamtonprof\stp_api\SmtpServerManager();
     
     $smtpServer = $smtpServerMg->get(array(
@@ -77,10 +73,8 @@ if ($action == "subscribe") {
     
     $body = file_get_contents(ABSPATH . "/wp-content/plugins/spamtonprof/emails/mail_desins_getresponse.txt");
     
+    $smtpServer->sendEmail('Vous nous quittez ? ', $adresseMail, $body, 'info@spamtonprof.com', utf8_encode("L'équipe de SpamTonProf"));
     
-    $smtpServer->sendEmail('Vous nous quittez ? ', $adresseMail,  $body ,'info@spamtonprof.com', "L'équipe de SpamTonProf");
-    
-
     $accounts = $accountMg->getList($adresseMail);
     
     foreach ($accounts as $account) {
