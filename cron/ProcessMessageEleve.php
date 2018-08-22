@@ -32,12 +32,17 @@ $profMg = new \spamtonprof\stp_api\StpProfManager();
 
 $prof =  $profMg -> getNextInboxToProcess();
 
+$now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+
+$prof->setProcessing_date($now->format(PG_DATETIME_FORMAT));
+$profMg->updateProcessingDate($prof);
+
 $gmailAccountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
 $gmailAccount = $gmailAccountMg->get($prof->getRef_gmail_account());
 
 $gmailManager = new spamtonprof\gmailManager\GmailManager($gmailAccount->getEmail());
 
-$slack -> sendMessages("message-eleve", array(" ----- ","Lecture de : " . $gmailAccount->getEmail()));
+$slack -> sendMessages("message_eleve", array(" ----- ","Lecture de : " . $gmailAccount->getEmail()));
 
 $MessEleveMg = new \spamtonprof\stp_api\StpMessageEleveManager();
 

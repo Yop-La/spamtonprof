@@ -146,6 +146,19 @@ class StpProfManager
         
         return ($prof);
     }
+    
+    public function updateProcessingDate(\spamtonprof\stp_api\StpProf $prof)
+    {
+        $q = $this->_db->prepare('update stp_prof set processing_date = :processing_date where ref_prof = :ref_prof');
+        
+        $q->bindValue(':processing_date', $prof->getProcessing_date());
+        
+        $q->bindValue(':ref_prof', $prof->getRef_prof());
+        
+        $q->execute();
+        
+        return ($prof);
+    }
 
     public function updateOnboarding(\spamtonprof\stp_api\StpProf $prof)
     {
