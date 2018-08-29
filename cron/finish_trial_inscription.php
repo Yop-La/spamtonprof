@@ -67,10 +67,10 @@ foreach ($abonnements as $abonnement) {
                 $listRetenu = "stp_parent_essai";
                 break;
             case 1:
-                $listRetenu = "stp_parent_essai_2";
+                $listRetenu = "stp_parent_essai";
                 break;
             case 2:
-                $listRetenu = "stp_parent_essai";
+                $listRetenu = "stp_parent_essai_2";
                 break;
         }
         
