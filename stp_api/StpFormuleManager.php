@@ -19,9 +19,18 @@ class StpFormuleManager
 
     public function add(\spamtonprof\stp_api\StpFormule $formule)
     {
-        $q = $this->_db->prepare("insert into stp_formule(formule) values(:formule);");
+        $q = $this->_db->prepare("insert into stp_formule(formule, classes, matieres) values(:formule, :classes, :matieres);");
+        
+        $classes = $formule->getClasses();
+        $matieres = $formule->getMatieres();
+        
+        $classesPar = toPgArray($classes);
+        $matieresPar = toPgArray($matieres);
         
         $q->bindValue(":formule", $formule->getFormule());
+        
+        $q->bindValue(":classes", $classesPar);
+        $q->bindValue(":matieres", $matieresPar);
         
         $q->execute();
         
@@ -51,12 +60,12 @@ class StpFormuleManager
         }
         return ($formules);
     }
-    
-    public function cast(\spamtonprof\stp_api\StpFormule $formule){
-        
-        return($formule);
+
+    public function cast(\spamtonprof\stp_api\StpFormule $formule)
+    {
+        return ($formule);
     }
-    
+
     public function updateRefProductStripe(\spamtonprof\stp_api\StpFormule $formule)
     {
         $q = $this->_db->prepare('update stp_formule set ref_product_stripe = :ref_product_stripe where ref_formule = :ref_formule');
@@ -66,7 +75,7 @@ class StpFormuleManager
         
         return ($formule);
     }
-    
+
     public function updateRefProductStripeTest(\spamtonprof\stp_api\StpFormule $formule)
     {
         $q = $this->_db->prepare('update stp_formule set ref_product_stripe_test = :ref_product_stripe_test where ref_formule = :ref_formule');
@@ -76,11 +85,9 @@ class StpFormuleManager
         
         return ($formule);
     }
-    
-    
+
     public function construct($constructor)
     {
-        
         $planMg = new \spamtonprof\stp_api\StpPlanManager();
         
         $formule = $this->cast($constructor["objet"]);
@@ -92,7 +99,7 @@ class StpFormuleManager
             switch ($constructOrder) {
                 case "plans":
                     $plans = $planMg->getAll(array(
-                    'ref_formule' => $formule->getRef_formule()
+                        'ref_formule' => $formule->getRef_formule()
                     ));
                     
                     $formule->setPlans($plans);

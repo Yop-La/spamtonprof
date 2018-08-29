@@ -390,11 +390,34 @@ function generateClassAndManager($tableName, $path, $nameSpace)
     /* fin écriture du manager */
 }
 
-function extractFirstMail($string){
-    
+function extractFirstMail($string)
+{
     $pattern = "/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i";
     $emails = [];
     preg_match_all($pattern, $string, $emails);
-    return($emails[0][0]);
+    return ($emails[0][0]);
+}
+
+function toPgArray(array $elements)
+{
+    
+    $nbElem = count($elements);
+    $arrayPar = "";
+    
+    for ($i = 0; $i < $nbElem; $i ++) {
+        $element = $elements[$i];
+        
+        if ($i == 0) {
+            
+            $arrayPar = $arrayPar . "{";
+        }
+        if ($i == $nbElem - 1) {
+            
+            $arrayPar = $arrayPar . $element . "}";
+        }else{
+            $arrayPar = $arrayPar . $element . ", ";
+        }
+    }
+    return($arrayPar);
 }
 
