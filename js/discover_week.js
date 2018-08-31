@@ -412,7 +412,7 @@ jQuery( document ).ready( function( $ ) {
 		if(nbAbosEssai == 2){
 			showMessage("Oups, on dirait que vous avez déjà deux essai en cours. Revenez quand il y aura un de terminé.");
 			$(".trial-row").addClass("hide");
-			$(".row-message").removeClass("hide")
+			$(".row-message").removeClass("hide");
 			$(".row-message p").html("Pour le moment, vous avez déjà deux essais en cours. Il sera possible de refaire un autre essai quand un de ces deux essai sera terminé.");
 			return;
 		}
@@ -420,9 +420,15 @@ jQuery( document ).ready( function( $ ) {
 		// quand fermeture de la popup ajout élève
 		jQuery('#pum-18754')
 		.on('pumBeforeClose', function () {
+			
+			
+			
 			if($('#eleve-select').val() == 'ajout-eleve'){
 				$('#eleve-select').val(null); // Select the option with a value of '0'
 				$('#eleve-select').trigger('change'); // Notify any JS components that the value changed
+				$(".trial-row").removeClass("hide");
+				$(".row-message").addClass("hide");
+				hideMessage();
 			}
 		});
 
