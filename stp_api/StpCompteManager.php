@@ -46,7 +46,12 @@ class StpCompteManager
                 $eleve = $eleveMg->get(array(
                     "ref_eleve" => $abonnementCompte->getRef_eleve()
                 ));
-                return ($eleve->getSeq_email_parent_essai());
+                
+                if($eleve->getSeq_email_parent_essai() != 0){ // si 0 alors parent pas encore dans liste
+                    return ($eleve->getSeq_email_parent_essai());
+                }
+                
+                
             }
         }
         return (0);
