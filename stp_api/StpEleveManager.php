@@ -60,8 +60,6 @@ class StpEleveManager
             $q = $this->_db->prepare('select * from stp_eleve where lower(email) like lower(:email)');
             $q->bindValue(':email', $email);
             $q->execute();
-            
-            
         }
         
         if (array_key_exists("ref_compte_wp", $info)) {
@@ -78,7 +76,6 @@ class StpEleveManager
             $q = $this->_db->prepare('select * from stp_eleve where ref_eleve = :ref_eleve');
             $q->bindValue(':ref_eleve', $refEleve);
             $q->execute();
-            
         }
         
         if (array_key_exists("ref_compte_wp", $info)) {
@@ -88,7 +85,6 @@ class StpEleveManager
             $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp = :ref_compte_wp');
             $q->bindValue(':ref_compte_wp', $refCompteWp);
             $q->execute();
-            
         }
         
         $data = $q->fetch(\PDO::FETCH_ASSOC);
@@ -135,7 +131,7 @@ class StpEleveManager
         }
     }
 
-    public function getAll($info)
+    public function getAll($info, $eleveAsArray = false)
     {
         $eleves = [];
         $q = null;
@@ -145,11 +141,14 @@ class StpEleveManager
             $q = $this->_db->prepare('select * from stp_eleve where ref_compte = :ref_compte ');
             $q->bindValue(":ref_compte", $refCompte);
             $q->execute();
-
         }
-        while($data = $q->fetch(PDO::FETCH_ASSOC)){
-            $eleves[] = new \spamtonprof\stp_api\StpEleve($data);
+        while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
+            $eleve = new \spamtonprof\stp_api\StpEleve($data);
+            if ($eleveAsArray) {
+                $eleve = $eleve->toArray();
+            }
+            $eleves[] = $eleve;
         }
-        return($eleves);
+        return ($eleves);
     }
 }

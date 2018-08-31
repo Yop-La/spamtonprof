@@ -13,6 +13,96 @@ add_action('wp_ajax_ajaxGetClasses', 'ajaxGetClasses');
 
 add_action('wp_ajax_nopriv_ajaxGetClasses', 'ajaxGetClasses');
 
+add_action('wp_ajax_ajaxAjoutEleve', 'ajaxAjoutEleve');
+
+add_action('wp_ajax_nopriv_ajaxAjoutEleve', 'ajaxAjoutEleve');
+
+function ajaxAjoutEleve()
+
+{
+    header('Content-type: application/json');
+    
+    $retour = new \stdClass();
+    
+    $retour->error = false;
+    $retour->message = "ok";
+    
+    $slack = new \spamtonprof\slack\Slack();
+    
+    // $slack->sendMessages("log", array(
+    // json_encode($_POST)
+    // ));
+    
+    $prenomEleve = $_POST["prenomEleve"];
+    $nomEleve = $_POST["nomEleve"];
+    $emailEleve = trim($_POST["emailEleve"]);
+    $phoneEleve = trim($_POST["phoneEleve"]);
+    $profil = $_POST["profil"];
+    $classe = $_POST["classe"];
+    
+    $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
+    $parentMg = new \spamtonprof\stp_api\StpProcheManager();
+    $compteMg = new \spamtonprof\stp_api\StpCompteManager();
+    $classeMg = new \spamtonprof\stp_api\StpClasseManager();
+    
+    $eleve = $eleveMg->get(array(
+        "email" => $emailEleve
+    ));
+    
+    if ($eleve) {
+        
+        $retour->error = false;
+        $retour->message = "compte_existe_deja";
+        
+        echo (json_encode($retour));
+        
+        die();
+    } else {
+        
+        // étape n°1 : on récupère le compte
+        $current_user = wp_get_current_user();
+        $compte = $compteMg->get(array(
+            'ref_compte_wp' => $current_user->ID
+        ));
+        // étape n°2 : recherche du parent si il existe
+        $parent = $parentMg->get(array(
+            "ref_proche" => $compte->getRef_proche()
+        ));
+        
+        $sameEmail = false;
+        if ($parent) {
+            if ($parent->getEmail() == $emailEleve) {
+                $sameEmail = true;
+            }
+        }
+        
+        // étape n°2 : classe
+        $classe = $classeMg->get(array(
+            "ref_classe" => $classe
+        ));
+        
+        // étape n°3 : ajout de l'élève
+        $eleve = new \spamtonprof\stp_api\StpEleve(array(
+            'email' => $emailEleve,
+            'prenom' => $prenomEleve,
+            'ref_classe' => $classe->getRef_classe(),
+            'nom' => $nomEleve,
+            'telephone' => $phoneEleve,
+            "same_email" => $sameEmail,
+            "ref_profil" => $classe->getRef_profil(),
+            "ref_compte" => $compte->getRef_compte()
+        ));
+        $eleve = $eleveMg->add($eleve);
+        
+        $eleve->setSeq_email_parent_essai(0);// pour dire qu'il n'est pas encore dans la liste d'essai
+        $eleveMg->updateSeqEmailParentEssai($eleve);
+                
+        $retour->eleve = $eleve;
+        echo (json_encode($retour));
+        die();
+    }
+}
+
 /* pour gérer la soumission du formulaire d'essai */
 function ajaxAfterSubmissionEssai()
 
@@ -165,7 +255,7 @@ function ajaxAfterSubmissionEssai()
         
         $eleve = $eleveMg->add($eleve);
         
-        $eleve->setSeq_email_parent_essai(1);
+        $eleve->setSeq_email_parent_essai(0); // pour dire qu'il n'est pas encore dans la liste d'essai
         $eleveMg->updateSeqEmailParentEssai($eleve);
         
         // étape n°6 : créer les nouveaux comptes wordpress
@@ -321,13 +411,11 @@ function ajaxAfterSubmissionEssai()
         
         $abonnement = $abonnementMg->add($abonnement);
         
-        
         $logAboMg = new \spamtonprof\stp_api\StpLogAbonnementManager();
         $logAboMg->add(new \spamtonprof\stp_api\StpLogAbonnement(array(
             "ref_abonnement" => $abonnement->getRef_abonnement(),
             "ref_statut_abo" => $abonnement->getRef_statut_abonnement()
         )));
-        
         
         $abonnement->setRef_compte($compte->getRef_compte());
         $abonnementMg->updateRefCompte($abonnement);

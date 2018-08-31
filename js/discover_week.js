@@ -48,6 +48,17 @@ idRemarque 	= "1029";
 
 idCode = "1032";
 
+idFormAjoutEleve = "75";
+
+idAjoutElevePrenom = "1063";
+idAjoutEleveNom = "1061";
+idAjoutEleveEmail = "1060";
+idAjoutElevePhone = "1059";
+idAjoutEleveChoixProfil = "1062";
+idAjoutEleveClasse = "1088";
+idAjoutEleveProfil = "1089";
+
+
 if(!domain.includes("localhost")){
 
 	idFormEssai = "68";
@@ -105,7 +116,7 @@ var mySubmitController = Marionette.Object.extend( {
 		console.log("form submitted");
 		console.log(response);
 
-		// titles form
+		// form essai
 		if(response.data.form_id == idFormEssai){
 			$("#loadingSpinner").removeClass("hide");
 			$(".hide_loading").addClass("hide");
@@ -205,6 +216,80 @@ var mySubmitController = Marionette.Object.extend( {
 					});
 		}
 
+		if(response.data.form_id == idFormAjoutEleve){
+			$("#loadingSpinner").removeClass("hide");
+			$(".hide_loading").addClass("hide");
+			PUM.close(18754);
+
+			//récupérationdes variables du form
+			classe = response.data.fields[idAjoutEleveClasse].value;
+			emailEleve = response.data.fields[idAjoutEleveEmail].value;
+			nomEleve = response.data.fields[idAjoutEleveNom].value;
+			phoneEleve = response.data.fields[idAjoutElevePhone].value;
+			prenomEleve = response.data.fields[idAjoutElevePrenom].value;
+			profil = response.data.fields[idAjoutEleveProfil].value;
+
+			// soumission ajax des champs du form pour création inscription
+			ajaxEnCours++;
+
+			jQuery.post(
+					ajaxurl,
+					{
+						'action' : 'ajaxAjoutEleve',
+						'classe' : classe,
+						'emailEleve' : emailEleve,
+						'nomEleve' : nomEleve,
+						'phoneEleve' : phoneEleve,
+						'profil' : profil,
+						'prenomEleve' : prenomEleve
+					})
+					.done(function(retour){ 
+
+						error = retour.error;
+						message = retour.message;
+
+						if(error){
+
+							showMessage("Il y a un problème. Contacter l'équipe et donner leur ce message d'erreur : ".concat(message));
+
+						}else{
+
+							showMessage("Tout se passe bien");
+							console.log("eleve");
+							eleve = retour.eleve;
+
+							//ajouter l'option au select élève
+
+							eleves.push(eleve);
+							nbEleves = eleves.length;
+
+							var newOption = new Option(eleve.prenom.concat(" ",eleve.nom), nbEleves-1, false, true);
+							$('#eleve-select').append(newOption).trigger('change').val(nbEleves-1);
+
+
+							showMessage(eleve.prenom.concat(" est bien ajouté ! Il ne reste plus qu'à faire l'inscription à la semaine découverte."));
+
+						}
+						ajaxEnCours--;
+						if(ajaxEnCours == 0){
+							$("#loadingSpinner").addClass("hide");
+							$(".hide_loading").removeClass("hide");
+						}
+
+
+					})
+					.fail(function(err){
+						console.log("erreur ajax");
+						console.log(err);
+						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
+						ajaxEnCours--;
+						if(ajaxEnCours == 0){
+							$("#loadingSpinner").addClass("hide");
+							$(".hide_loading").removeClass("hide");
+						}
+					});
+		}
+
 	},
 
 });
@@ -225,50 +310,63 @@ var myCustomFieldController = Marionette.Object.extend( {
 
 	validateRequired: function( model ) {
 
-		if ( 'profil_1532954478855' != model.get( 'key' ) ) return false;
-
-		value = model.get( 'value' );
-
-		$(toFieldId(idProfil)).val(value);
-		$(toFieldId(idProfil)).trigger("change");
 
 
-		jQuery.post(
-				ajaxurl,
-				{
-					'action' : 'ajaxGetClasses',
-					'ref_profil' : model.get( 'value' )
-				})
-				.done(function(classes){
+		if ( idChoixProfil == model.get( 'id' ) || idAjoutEleveChoixProfil == model.get( 'id' )) {
+
+			value = model.get( 'value' );
+
+			idProfilBis = idProfil;
+			idClasseBis = idClasse;
+
+			if(idAjoutEleveChoixProfil == model.get( 'id' )){
+
+				idProfilBis = idAjoutEleveProfil
+				idClasseBis = idAjoutEleveClasse;	
+
+			}
+
+
+			$(toFieldId(idProfilBis)).val(value);
+			$(toFieldId(idProfilBis)).trigger("change");
+
+
+			jQuery.post(
+					ajaxurl,
+					{
+						'action' : 'ajaxGetClasses',
+						'ref_profil' : model.get( 'value' )
+					})
+					.done(function(classes){
 
 
 
 
-					$(toFieldId(idClasse)).find('option').remove();
+						$(toFieldId(idClasseBis)).find('option').remove();
 
-					$(toFieldId(idClasse)).prepend("<option value='' selected='selected'></option>");
+						$(toFieldId(idClasseBis)).prepend("<option value='' selected='selected'></option>");
 
-					classes.forEach(function(classe) {
+						classes.forEach(function(classe) {
 
-						// ajouter options à form
-						$(toFieldId(idClasse)).append($('<option>', {
-							value: classe.ref_classe,
-							text: classe.nom_complet
-						}));
+							// ajouter options à form
+							$(toFieldId(idClasseBis)).append($('<option>', {
+								value: classe.ref_classe,
+								text: classe.nom_complet
+							}));
 
 
+
+						});
+
+						gClasseSelect = $(toFieldId(idClasseBis));
+
+					})
+					.fail(function(err){
+						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
 
 					});
 
-					gClasseSelect = $(toFieldId(idClasse));
-
-				})
-				.fail(function(err){
-					showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
-
-				});
-
-
+		}
 	},
 
 	renderView: function( view ) {
@@ -298,35 +396,101 @@ var myCustomFieldController = Marionette.Object.extend( {
 jQuery( document ).ready( function( $ ) {
 
 
+	// quand fermeture de la popup ajout élève
+	jQuery('#pum-18754')
+	.on('pumBeforeClose', function () {
+		if($('#eleve-select').val() == 'ajout-eleve'){
+			$('#eleve-select').val(null); // Select the option with a value of '0'
+			$('#eleve-select').trigger('change'); // Notify any JS components that the value changed
+		}
+	});
+
+	// affichage des deux selects en haut de page 
+	$('#eleve-select').select2({
+		placeholder: "Choisir pour qui",
+		width: '80%'
+	});
+
+
+	$('#matieres-select').select2({
+		placeholder: 'Choisir la/les matières',
+		width: '80%'
+	});
+
+	// reset des selects
+	$('#matieres-select').val(null); // Select the option with a value of '0'
+	$('#matieres-select').trigger('change'); // Notify any JS components that the value changed
+
+	// remettre le formulaire à 0
+	$('#eleve-select').val(null); // Select the option with a value of '0'
+	$('#eleve-select').trigger('change'); // Notify any JS components that the value changed
+
+	//preremplissage du select élève
+	$.each(eleves, function(index, eleve) {
+		$('#eleve-select').append(
+				$('<option></option>').val(index).html(eleve.prenom.concat(" ",eleve.nom))
+		);
+	});
+
+	// action quand selection d'une option eleve
+	$('#eleve-select').on('select2:select', function (e) {
+
+		var choixEleve = $('#eleve-select').val();
+
+		if(choixEleve == "ajout-eleve"){
+
+
+			PUM.open(18754);
+
+		}else{
+
+			//si eleve en essai
+			// afficher pas possible de faire un essai
+			//sinon
+			// préparer form nouvelle essai 
+
+			console.log(eleves[choixEleve]);
+
+		}
+
+
+	});
+
+	// fin affichage des deux selects en haut de page
+
 
 	if(isLogged == "true"){
+
+		waitForEl(".choix-logout", function() {
+			$(".choix-logout").remove();
+		});
 
 		waitForEl(".login", function() {
 			$(".login").removeClass("hide");
 		});
 
-//		if(userType == "proche"){
+		if(userType == "proche"){
 
-		nbAbosEssai = abosEssai.length;
+			nbAbosEssai = abosEssai.length;
 
-		message = "Hello ".concat(loggedProche.prenom,", il y a encore 1 essai gratuit disponible.");
-		switch (nbAbosEssai) {
-		case 0:
 			message = "Hello ".concat(loggedProche.prenom,", il y a encore 1 essai gratuit disponible.");
-			break;
-		case 1:
-			aboEssai = abosEssai[0];
-			message = "Hello ".concat(loggedProche.prenom,", désolé, il n'y a plus d'essai gratuit.");
-			break;
-		case 2:
-			message = "Hello ".concat(loggedProche.prenom," désolé, il n'y a plus d'essai gratuit ");
-			break;
+			switch (nbAbosEssai) {
+			case 0:
+				message = "Hello ".concat(loggedProche.prenom,", il y a encore 1 essai gratuit disponible.");
+				break;
+			case 1:
+				aboEssai = abosEssai[0];
+				message = "Hello ".concat(loggedProche.prenom,", désolé, il n'y a plus d'essai gratuit.");
+				break;
+			case 2:
+				message = "Hello ".concat(loggedProche.prenom," désolé, il n'y a plus d'essai gratuit ");
+				break;
+
+			}
+			console.log(message);
+			showMessage(message);
 
 		}
-		console.log(message);
-		showMessage(message);
-
-//		}
 
 //		if(userType == "eleve"){
 
@@ -349,12 +513,17 @@ jQuery( document ).ready( function( $ ) {
 //		showMessage(message);
 
 	}else{
+
+		waitForEl(".choix-login", function() {
+			$(".choix-login").remove();
+		});
+
 		waitForEl(".logout", function() {
 			$(".logout").removeClass("hide");
 		});
 
-		
-		
+
+
 	}
 
 
@@ -370,78 +539,73 @@ jQuery( document ).ready( function( $ ) {
 
 	/* pour customiser le select des matières et changer l'affichage du blco matière en fonction du choix*/
 
-	waitForEl('#choix-matieres', function() {
+	waitForEl('#matieres-select', function() {
 
-		$('#select-box-matiere option[name= "defaut"]').prop('selected', true);
+//		$('#select-box-matiere option[name= "defaut"]').prop('selected', true);
 
 
-		waitForEl('.div-select-box-matiere', function() {
 
-			checkUntil('.div-select-box-matiere' , 3);
+		checkUntil('.select2-container' , 2);
 
-			$('#select-box-matiere').change(function(){
+		$('#matieres-select').change(function(){
 
-				var nouvelleMatiere = $('#select-box-matiere').val();
+			var nouvelleMatiere = $('#matieres-select').val();
 
-				if(nouvelleMatiere != matiere){
+			if(nouvelleMatiere != matiere){
 
-					$(".".concat(nouvelleMatiere)).removeClass("hide");
-					$(".".concat(matiere)).addClass("hide");
-					matiere = nouvelleMatiere;
-					matieres  = nouvelleMatiere.split("-");
+				$(".".concat(nouvelleMatiere)).removeClass("hide");
+				$(".".concat(matiere)).addClass("hide");
+				matiere = nouvelleMatiere;
+				matieres  = nouvelleMatiere.split("-");
 
-				}
+			}
 
-				setMatieresField(matieres);
-
-			});
+			setMatieresField(matieres);
 
 		});
-
-
-		/* fin : customiser le select des matières et changer l'affichage du blco matière en fonction du choix*/
-
-
-		/* pour customiser le select des élèves et changer l'affichage en fonction du choix*/
-
-		waitForEl('#choix-eleves', function() {
-
-			$('#select-box-eleve option[name= "defaut"]').prop('selected', true);
-
-
-			// charger tous les élèves du compte dans le select 
-			// si élève en essai -> écrire que élève a plus le droit à essai 
-			// si élève a déjà fait essai de cette matière -> dire que élève a plus le droit à esssai
-			// si élève pas en essai -> dire que l'élève a droit à esssai
-
-			// permettre d'ajouter un élève -> popup sur ajouter élève	
-
-		});
-
-
-		/* pour customiser le select des élèves et changer l'affichage en fonction du choix*/
-
-		/* debut : pour afficher popup et faire les bons affichages de matière dans la deuxième partie du formulaire */
-
-		waitForEl('.pop-essai', function() {
-
-
-			$('.pop-essai').click(function(){
-
-				PUM.open(18006);
-
-				$($('.nf-breadcrumb')[0]).trigger('click');
-
-
-
-			});
-		});
-		/* fin : pour afficher popup et faire les bons affichages de matière dans la deuxième partie du formulaire */
-
-
-
 
 	});
+
+	/* fin : customiser le select des matières et changer l'affichage du blco matière en fonction du choix*/
+
+
+	/* pour customiser le select des élèves et changer l'affichage en fonction du choix*/
+
+//	waitForEl('#choix-eleves', function() {
+
+//	$('#select-box-eleve option[name= "defaut"]').prop('selected', true);
+
+
+//	// charger tous les élèves du compte dans le select 
+//	// si élève en essai -> écrire que élève a plus le droit à essai 
+//	// si élève a déjà fait essai de cette matière -> dire que élève a plus le droit à esssai
+//	// si élève pas en essai -> dire que l'élève a droit à esssai
+
+//	// permettre d'ajouter un élève -> popup sur ajouter élève	
+
+//	});
+
+
+//	/* fin pour customiser le select des élèves et changer l'affichage en fonction du choix*/
+
+	/* debut : pour afficher popup et faire les bons affichages de matière dans la deuxième partie du formulaire */
+
+	waitForEl('.pop-essai', function() {
+
+		$('.pop-essai').click(function(){
+
+			PUM.open(18006);
+
+			$($('.nf-breadcrumb')[0]).trigger('click');
+
+		});
+	});
+	/* fin : pour afficher popup et faire les bons affichages de matière dans la deuxième partie du formulaire */
+
+
+
+
+//	});
 
 
 	/* fin customiser le select des matières */
@@ -535,6 +699,18 @@ function setMatieresField(matieres){
 
 	});
 }
+
+function addEleve (state) {
+	if(state.id == ""){
+		return(state.text);
+	}
+	PUM.open(18006);
+	return("En attente d'un ajout ...");
+};
+
+
+
+
 
 
 

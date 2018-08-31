@@ -124,6 +124,9 @@ class PageManager
                 wp_localize_script('functions_js', 'abosActif', $abosActif);
                 wp_localize_script('functions_js', 'abosEssai', $abosEssai);
                 wp_localize_script('functions_js', 'abosTermine', $abosTermine);
+                
+                $eleves = $eleveMg->getAll(array("ref_compte" => $compte->getRef_compte()), true);
+                wp_localize_script('functions_js', 'eleves', $eleves);
             }
             
             wp_localize_script('functions_js', 'userType', 'autre');
@@ -274,7 +277,11 @@ class PageManager
         
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
         
+        wp_enqueue_style('css_dropdown', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css');
+        
         wp_enqueue_script('jquery_ui_js', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.js');
+        
+        wp_enqueue_script('jquery_dropdown', "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js" );
         
         wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
     }
