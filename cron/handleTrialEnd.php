@@ -31,31 +31,51 @@ header("Pragma: no-cache");
 
 $slack = new \spamtonprof\slack\Slack();
 
-$accountMg = new \spamtonprof\stp_api\AccountManager();
+$aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
 
-$refComptes = $accountMg->getTrialEndAccounts();
+$aboMg->getTrialCompleted();
 
-$accounts = $accountMg->getAll($refComptes);
-
-foreach ($accounts as $account) {
+foreach ($abos as $abo) {
     
-    $nbMessage = $accountMg -> getNbMessage($account->ref_compte());
+    $nbMessage = 0;
     
-    $slack->sendMessages("trial-end-account", array_merge(array(" 7 jours d'essai pour ce compte : " . $account->ref_compte(),
+    $eleve = $abo->getEleve();
+    $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
+    
+    $parent = $abo->getProche();
+    if ($parent) {
+        $parent = \spamtonprof\stp_api\StpProche::cast($parent);
+    }
+    
+    $formule = $abo -> getFormule();
+    $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
+    
+    $msgs = array(
+        " 7 jours d'essai pour ce compte : " . $account->ref_compte(),
         " -- eleve -- ",
-        $account->eleve()->prenom(),
-        $account->eleve()->nom(),
-        $account->eleve()->getTelephone(),
-        $account->eleve()->adresse_mail(),
-        " -- parent -- ",
-        $account->proche()->prenom(),
-        $account->proche()->nom(),
-        $account->proche()->getTelephone(),
-        $account->proche()->adresse_mail(),
-        " -- matières & activités  --"),
-        $account->getMatieres(),
-        array("nb messages : " .  $nbMessage, "           -                  "))
-        
+        $eleve->getPrenom(),
+        $eleve->getNom(),
+        $eleve->getTelephone(),
+        $eleve->getEmail()
     );
-
+    
+    if ($parent) {
+        
+        $msgs = array_merge($msgs, array(
+            " -- parent -- ",
+            $parent->getPrenom(),
+            $parent->getNom(),
+            $parent->getTelephone(),
+            $parent->getEmail()
+        ));
+    }
+    
+    $msgs = array_merge($msgs, array(
+        " -- matières & activités  --",
+        $formule->getFormule(),
+        "nb messages : " . $nbMessage,
+        "           -                  "
+    ));
+    
+    $slack->sendMessages("trial-end-account", $msgs);
 }

@@ -44,7 +44,11 @@ function ajaxStopSubscription()
     
     $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
     $prof = \spamtonprof\stp_api\StpProf::cast($prof);
+    
     $proche = \spamtonprof\stp_api\StpProche::cast($proche);
+    if ($proche) {
+        $proche = \spamtonprof\stp_api\StpProche::cast($proche);
+    }
     $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
     
     // résilier abonnement stripe
