@@ -33,7 +33,7 @@ $slack = new \spamtonprof\slack\Slack();
 
 $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
 
-$aboMg->getTrialCompleted();
+$abos = $aboMg->getTrialCompleted();
 
 foreach ($abos as $abo) {
     
@@ -51,7 +51,7 @@ foreach ($abos as $abo) {
     $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
     
     $msgs = array(
-        " 7 jours d'essai pour ce compte : " . $account->ref_compte(),
+        " 7 jours d'essai pour cet abonnement : " . $abo->getRef_abonnement(),
         " -- eleve -- ",
         $eleve->getPrenom(),
         $eleve->getNom(),
