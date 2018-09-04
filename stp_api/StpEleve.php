@@ -228,7 +228,7 @@ class StpEleve implements \JsonSerializable
         $this->profil = $profil;
     }
 
-    public static function cast($eleve): \spamtonprof\stp_api\StpEleve
+    public static function cast(\spamtonprof\stp_api\StpEleve $eleve)
     {
         return ($eleve);
     }

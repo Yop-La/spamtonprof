@@ -3,15 +3,16 @@ use spamtonprof\slack\Slack;
 use spamtonprof\gmailManager\GmailManager;
 
 /**
- * pour la boite mailsfromlbc@gmail.com - adaption possible sur d'autres boites
- *
  *
  * ce script sert :
- * - à enregistrer les messages de prospects dans la bdd
- * - à attribuer des libellées aux emails
+ * - à envoyer une notif slack de fin d'essai
+ *
+ * fonctionnnement :
+ *  - il récupère les abos en essai dont la date de fin d'essai + 1 est égale à la date d'aujourd'hui
+ *  - il envoie une notif dans slack pour chacun de ces abos
  *
  *
- * il tourne tous les 5 minutes
+ * il tourne chaque jour à 8h - en prod
  */
 
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
@@ -37,7 +38,7 @@ $abos = $aboMg->getTrialCompleted();
 
 foreach ($abos as $abo) {
     
-    $nbMessage = 0;
+    $nbMessage = $abo->getNb_message();
     
     $eleve = $abo->getEleve();
     $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);

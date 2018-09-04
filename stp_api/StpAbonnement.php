@@ -6,7 +6,23 @@ class StpAbonnement implements \JsonSerializable
 
     const ACTIF = 1, ESSAI = 2, TERMINE = 3;
 
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact;
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message;
+
+    /**
+     * @return mixed
+     */
+    public function getNb_message()
+    {
+        return $this->nb_message;
+    }
+
+    /**
+     * @param mixed $nb_message
+     */
+    public function setNb_message($nb_message)
+    {
+        $this->nb_message = $nb_message;
+    }
 
     /**
      * @return mixed

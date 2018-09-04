@@ -95,6 +95,44 @@ class StpAbonnementManager
         }
         return ($abonnements);
     }
+    
+    /*
+     * pour récupérer le nombre de message des abonnements durant les 7 derniers jours
+     */
+    public function getNbMessage()
+    {
+        $nbMessages = [];
+        
+        $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+        $oneWeekAgo = $now->sub(new \DateInterval("P7D"));
+        
+        
+        $q = $this->_db->prepare("
+        select ref_abonnement, count(ref_abonnement)  as nb_message from stp_message_eleve
+            where date_message >= :one_week_ago
+            group by ref_abonnement
+            order by nb_message desc");
+        $q->bindValue(':one_week_ago', $oneWeekAgo->format(PG_DATETIME_FORMAT));
+        $q->execute();
+        
+        while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
+            $nbMessages[] = array("ref_abonnement" => $data["ref_abonnement"], "nb_message" => $data["nb_message"]);
+        }
+        return ($nbMessages);
+    }
+    
+    /*
+     * 
+     * pour remettre à zéro messages tous les abonnements
+     * 
+     */
+    
+    public function resetNbMessage(){
+
+        $q = $this->_db->prepare("update stp_abonnement set nb_message = 0 where nb_message != 0 OR nb_message is null");
+        $q->execute();
+        
+    }
 
     // pour remonter les abonnements qui viennent de se voir attribuer un prof pour la première fois après l'inscription
     public function getHasNotFirstProfAssignement()
@@ -183,6 +221,14 @@ class StpAbonnementManager
         $q->execute();
     }
 
+    public function updateNbMessage(\spamtonprof\stp_api\StpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set nb_message = :nb_message where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->bindValue(":nb_message", $abonnement->getNb_message());
+        $q->execute();
+    }
+    
     public function updateFirstProfAssigned(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set first_prof_assigned = :first_prof_assigned where ref_abonnement = :ref_abonnement");
