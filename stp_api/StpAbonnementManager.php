@@ -87,7 +87,8 @@ class StpAbonnementManager
                 "construct" => array(
                     'ref_eleve',
                     'ref_formule',
-                    'ref_parent'
+                    'ref_parent',
+                    'ref_prof'
                 )
             ));
             $abonnements[] = $abonnement;

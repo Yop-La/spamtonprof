@@ -42,6 +42,9 @@ foreach ($abos as $abo) {
     $eleve = $abo->getEleve();
     $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
     
+    $prof = $abo->getProf();
+    $prof = \spamtonprof\stp_api\StpProf::cast($prof);
+    
     $parent = $abo->getProche();
     if ($parent) {
         $parent = \spamtonprof\stp_api\StpProche::cast($parent);
@@ -71,8 +74,9 @@ foreach ($abos as $abo) {
     }
     
     $msgs = array_merge($msgs, array(
-        " -- matières & activités  --",
+        " -- matières & activités  & prof --",
         $formule->getFormule(),
+        $prof->getPrenom() . " " . $prof->getNom(),
         "nb messages : " . $nbMessage,
         "           -                  "
     ));
