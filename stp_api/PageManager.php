@@ -24,6 +24,8 @@ class PageManager
         
         $this->domain = $host_split[0];
         
+        $_SESSION["domain"] = $this->domain;
+        
         $this->loadSessionVariable();
     }
 
@@ -222,6 +224,11 @@ class PageManager
             
             PageManager::dashboardEleve();
         }
+        
+//         if ($this->pageSlug == 'dashboard-prof') {
+            
+//             PageManager::dashboardProf();
+//         }
     }
 
     public static function abonnementApresEssaiLoader()
