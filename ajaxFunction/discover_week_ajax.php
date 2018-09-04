@@ -490,6 +490,7 @@ function ajaxAfterSubmissionEssai()
                 " Nom élève : " . $eleve->getNom(),
                 "Classe élève : " . $classe->getClasse(),
                 "Téléphone élève :" . $eleve->getTelephone(),
+                "Formule : " . $formule->getFormule(),
                 "------ Parent ----- ",
                 "Email parent : " . $proche->getEmail(),
                 "Prénom parent : " . $proche->getPrenom(),
@@ -504,7 +505,8 @@ function ajaxAfterSubmissionEssai()
                 "Prénom : " . $eleve->getPrenom(),
                 " Nom : " . $eleve->getNom(),
                 "Classe : " . $classe->getClasse(),
-                "Téléphone :" . $eleve->getTelephone()
+                "Téléphone :" . $eleve->getTelephone(),
+                "Formule : " . $formule->getFormule()
             );
         }
         $messages[] = " ---------- ";
