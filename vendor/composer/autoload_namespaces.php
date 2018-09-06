@@ -11,4 +11,5 @@ return array(
     'Hashids' => array($vendorDir . '/hashids/hashids/lib'),
     'Google_Service_' => array($vendorDir . '/google/apiclient-services/src'),
     'Google_' => array($vendorDir . '/google/apiclient/src'),
+    'AlgoliaSearch' => array($vendorDir . '/algolia/algoliasearch-client-php/src'),
 );

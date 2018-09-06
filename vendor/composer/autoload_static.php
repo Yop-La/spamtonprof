@@ -157,6 +157,13 @@ class ComposerStaticInit0ed64792fce90d099800fc7a244567d8
                 0 => __DIR__ . '/..' . '/google/apiclient/src',
             ),
         ),
+        'A' => 
+        array (
+            'AlgoliaSearch' => 
+            array (
+                0 => __DIR__ . '/..' . '/algolia/algoliasearch-client-php/src',
+            ),
+        ),
     );
 
     public static $classMap = array (

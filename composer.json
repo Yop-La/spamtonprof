@@ -7,6 +7,7 @@
         "wrapi/slack": "^1.0",
 		"hashids/hashids": "1.0.5",
 		"ifsnop/mysqldump-php":"2.*",
-		"sunra/php-simple-html-dom-parser": "1.5.2"
+		"sunra/php-simple-html-dom-parser": "1.5.2",
+        "algolia/algoliasearch-client-php": "^1.27"
     }
 }
