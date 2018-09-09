@@ -50,12 +50,8 @@ class PageManager
         
         $caps = $current_user->get_role_caps();
         
-        if($caps["client"]){
-            
-            
-            
-        }
-            
+        if ($caps["client"]) {}
+        
         if ($isLogged) {
             
             $procheMg = new \spamtonprof\stp_api\StpProcheManager();
@@ -127,7 +123,9 @@ class PageManager
                 wp_localize_script('functions_js', 'abosEssai', $abosEssai);
                 wp_localize_script('functions_js', 'abosTermine', $abosTermine);
                 
-                $eleves = $eleveMg->getAll(array("ref_compte" => $compte->getRef_compte()), true);
+                $eleves = $eleveMg->getAll(array(
+                    "ref_compte" => $compte->getRef_compte()
+                ), true);
                 wp_localize_script('functions_js', 'eleves', $eleves);
             }
             
@@ -225,10 +223,15 @@ class PageManager
             PageManager::dashboardEleve();
         }
         
-//         if ($this->pageSlug == 'dashboard-prof') {
+        if ($this->pageSlug == 'dashboard-prof') {
             
-//             PageManager::dashboardProf();
-//         }
+            PageManager::dashboardProf();
+        }
+        
+        if ($this->pageSlug == 'back-office') {
+            
+            PageManager::backOffice();
+        }
     }
 
     public static function abonnementApresEssaiLoader()
@@ -288,7 +291,7 @@ class PageManager
         
         wp_enqueue_script('jquery_ui_js', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.js');
         
-        wp_enqueue_script('jquery_dropdown', "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js" );
+        wp_enqueue_script('jquery_dropdown', "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js");
         
         wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
     }
@@ -407,8 +410,40 @@ class PageManager
         wp_enqueue_script('stripe_checkout_js', 'https://checkout.stripe.com/checkout.js');
         
         wp_enqueue_script('stripe_main_js', 'https://js.stripe.com/v3/');
-        
+    }
 
+    public static function backOffice()
+    
+    {
+        wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
+        
+        wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/back-office.css');
+        
+        // wp_enqueue_script('helper_js', "https://cdn.jsdelivr.net/npm/algoliasearch-helper@2.26.1/dist/algoliasearch.helper.min.js");
+        
+        wp_enqueue_script('algolia_js', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.js');
+        
+        wp_enqueue_script('dashboard', plugins_url() . '/spamtonprof/js/back-office.js', array(
+            
+            'nf-front-end'
+        
+        ), time());
+    }
+
+    public static function dashboardProf()
+    
+    {
+        wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
+        
+        wp_enqueue_style('dashboard_css', get_stylesheet_directory_uri() . '/css/pages/dashboard-prof.css');
+        
+        wp_enqueue_script('algolia_js', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.js');
+        
+        wp_enqueue_script('dashboard', plugins_url() . '/spamtonprof/js/dashboard-prof.js', array(
+            
+            'nf-front-end'
+        
+        ), time());
     }
 }
 

@@ -95,7 +95,7 @@ class StpAbonnementManager
         }
         return ($abonnements);
     }
-    
+
     /*
      * pour récupérer le nombre de message des abonnements durant les 7 derniers jours
      */
@@ -106,7 +106,6 @@ class StpAbonnementManager
         $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
         $oneWeekAgo = $now->sub(new \DateInterval("P7D"));
         
-        
         $q = $this->_db->prepare("
         select ref_abonnement, count(ref_abonnement)  as nb_message from stp_message_eleve
             where date_message >= :one_week_ago
@@ -116,22 +115,23 @@ class StpAbonnementManager
         $q->execute();
         
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
-            $nbMessages[] = array("ref_abonnement" => $data["ref_abonnement"], "nb_message" => $data["nb_message"]);
+            $nbMessages[] = array(
+                "ref_abonnement" => $data["ref_abonnement"],
+                "nb_message" => $data["nb_message"]
+            );
         }
         return ($nbMessages);
     }
-    
-    /*
-     * 
-     * pour remettre à zéro messages tous les abonnements
-     * 
-     */
-    
-    public function resetNbMessage(){
 
+    /*
+     *
+     * pour remettre à zéro messages tous les abonnements
+     *
+     */
+    public function resetNbMessage()
+    {
         $q = $this->_db->prepare("update stp_abonnement set nb_message = 0 where nb_message != 0 OR nb_message is null");
         $q->execute();
-        
     }
 
     // pour remonter les abonnements qui viennent de se voir attribuer un prof pour la première fois après l'inscription
@@ -228,7 +228,7 @@ class StpAbonnementManager
         $q->bindValue(":nb_message", $abonnement->getNb_message());
         $q->execute();
     }
-    
+
     public function updateFirstProfAssigned(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set first_prof_assigned = :first_prof_assigned where ref_abonnement = :ref_abonnement");
@@ -268,7 +268,7 @@ class StpAbonnementManager
 
     public function construct($constructor)
     {
-        $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
+        
         $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
         $profMg = new \spamtonprof\stp_api\StpProfManager();
         $procheMg = new \spamtonprof\stp_api\StpProcheManager();
@@ -281,6 +281,7 @@ class StpAbonnementManager
             
             switch ($constructOrder) {
                 case "ref_eleve":
+                    $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
                     $eleve = $eleveMg->get(array(
                         'ref_eleve' => $abonnement->getRef_eleve()
                     ));
@@ -294,6 +295,24 @@ class StpAbonnementManager
                     }
                     $abonnement->setEleve($eleve);
                     break;
+                
+                case "remarquesMatieres":
+                    
+                    $remarqueInscriptionMg = new \spamtonprof\stp_api\StpRemarqueInscriptionManager();
+                    $constructorRmqs = false;
+                    
+                    if (array_key_exists("remarquesMatieres", $constructor)) {
+                        
+                        $constructorRmqs = $constructor["remarquesMatieres"];
+                    }
+                    
+                    $rmqs = $remarqueInscriptionMg->getAll(array(
+                        "ref_abonnement" => $abonnement->getRef_abonnement()
+                    ), $constructorRmqs);
+                    
+                    $abonnement->setRemarquesMatieres($rmqs);
+                    break;
+                
                 case "ref_formule":
                     $formule = $formuleMg->get(array(
                         'ref_formule' => $abonnement->getRef_formule()
@@ -326,7 +345,6 @@ class StpAbonnementManager
                     
                     $abonnement->setPlan($plan);
                     break;
-                
                 case "ref_statut_abonnement":
                     $statutAboMg = new \spamtonprof\stp_api\StpStatutAbonnementManager();
                     $statutAbo = $statutAboMg->get(array(
@@ -396,6 +414,15 @@ class StpAbonnementManager
                 $q = $this->_db->prepare('select * from stp_abonnement where ref_prof = :ref_prof and ref_eleve =:ref_eleve');
                 $q->bindValue(":ref_prof", $refProf);
                 $q->bindValue(":ref_eleve", $refEleve);
+                $q->execute();
+            }
+            
+            if (array_key_exists("ref_prof", $info)) {
+                
+                $refProf = $info["ref_prof"];
+                
+                $q = $this->_db->prepare('select * from stp_abonnement where ref_prof = :ref_prof');
+                $q->bindValue(":ref_prof", $refProf);
                 $q->execute();
             }
         }

@@ -6,7 +6,7 @@ class StpAbonnement implements \JsonSerializable
 
     const ACTIF = 1, ESSAI = 2, TERMINE = 3;
 
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message;
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage;
 
     /**
      * @return mixed
@@ -25,6 +25,41 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     * @return boolean
+     */
+    public function getDateDernierStatut()
+    {
+        return $this->dateDernierStatut;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRemarquesMatieres()
+    {
+        return $this->remarquesMatieres;
+    }
+
+    /**
+     * @param boolean $dateDernierStatut
+     */
+    public function setDateDernierStatut($dateDernierStatut)
+    {
+        $this->dateDernierStatut = $dateDernierStatut;
+    }
+
+    /**
+     * @param mixed $remarquesMatieres
+     */
+    public function setRemarquesMatieres($remarquesMatieres)
+    {
+        
+        
+        
+        $this->remarquesMatieres = $remarquesMatieres;
+    }
+
+    /**
      * @return mixed
      */
     public function getDernier_contact()
@@ -38,6 +73,36 @@ class StpAbonnement implements \JsonSerializable
     public function setDernier_contact($dernier_contact)
     {
         $this->dernier_contact = $dernier_contact;
+        
+        if($this->dernier_contact){
+           
+            $dernierContact = \DateTime::createFromFormat(PG_DATETIME_FORMAT, $this->dernier_contact);
+            $now = new \DateTime(null,new \DateTimeZone("Europe/Paris"));
+            
+            $interval = date_diff($dernierContact, $now);
+            
+            $this->setNbJourSansMessage($interval->format('%a'));
+            
+        }else{
+            
+            $this->setNbJourSansMessage("infini");
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNbJourSansMessage()
+    {
+        return $this->nbJourSansMessage;
+    }
+
+    /**
+     * @param mixed $nbJourSansMessage
+     */
+    public function setNbJourSansMessage($nbJourSansMessage)
+    {
+        $this->nbJourSansMessage = $nbJourSansMessage;
     }
 
     /**

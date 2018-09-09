@@ -65,8 +65,6 @@ class StpProfManager
                 
                 if($userId == 211){ //seb le prof
                     $userId = 27;
-                    $slack -> sendMessages("log", array($userId . "mm", gettype($userId)));
-                    
                 }
                 
                 // on a l'adresse de co

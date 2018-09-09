@@ -41,5 +41,22 @@ class StpMatiereManager
                 return (false);
             }
         }
+        
+        if (array_key_exists('ref_matiere', $info)) {
+            
+            $refMatiere = $info['ref_matiere'];
+            
+            $q = $this->_db->prepare('select * from stp_matiere where ref_matiere = :ref_matiere');
+            $q->bindValue(':ref_matiere', $refMatiere);
+            $q->execute();
+            
+            $data = $q->fetch(\PDO::FETCH_ASSOC);
+            
+            if ($data) {
+                return (new \spamtonprof\stp_api\StpMatiere($data));
+            } else {
+                return (false);
+            }
+        }
     }
 }
