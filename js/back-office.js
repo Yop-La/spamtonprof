@@ -8,8 +8,7 @@ jQuery( document ).ready( function( $ ) {
 		indexName: 'support_client',
 		urlSync: true,
 		searchParameters: {
-			hitsPerPage: 10,
-			filters: 'ref_prof = 59'
+			hitsPerPage: 10
 		}
 	});
 
