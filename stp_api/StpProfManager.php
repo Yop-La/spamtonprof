@@ -58,20 +58,11 @@ class StpProfManager
             
             $userId = $info['user_id_wp'];
             
-            if($_SESSION["domain"] != 'https://spamtonprof.com/'){
-                $slack = new \spamtonprof\slack\Slack();
-                
-                
-                
+            
+            if (strpos($_SESSION["domain"], 'spamtonprof') === false) {
                 if($userId == 211){ //seb le prof
                     $userId = 27;
                 }
-                
-                // on a l'adresse de co
-                // on peut retrouver le user id dans stp prof ou stp proche ou stp eleve
-                // on a le profil
-                
-                
             }
             
             $q = $this->_db->prepare('select * from stp_prof where lower(user_id_wp) like lower(:user_id_wp)');

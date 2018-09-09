@@ -1,77 +1,77 @@
-$(document).ready(function(){
+jQuery( document ).ready( function( $ ) {
 
 
 
 	function printPriceBox() { 
 
-		if( $('input[name=maths]').is(':checked') && !$('input[name=physique]').is(':checked') && !$('input[name=francais]').is(':checked')){
-			$('.francais').hide();
-			$('.physique-chimie').hide();
-			$('.physique-chimie-maths').hide();
-			$('.maths').show();
-			$('.pas-dispo').hide();
-			$('.zero-matiere').hide();
-		}else if( !$('input[name=maths]').is(':checked') && $('input[name=physique]').is(':checked') && !$('input[name=francais]').is(':checked')){
-			$('.francais').hide();
-			$('.physique-chimie').show();
-			$('.physique-chimie-maths').hide();
-			$('.maths').hide();
-			$('.pas-dispo').hide();
-			$('.zero-matiere').hide();
-		}else if( !$('input[name=maths]').is(':checked') && !$('input[name=physique]').is(':checked') && $('input[name=francais]').is(':checked')){
+		if( jQuery('input[name=maths]').is(':checked') && !jQuery('input[name=physique]').is(':checked') && !jQuery('input[name=francais]').is(':checked')){
+			jQuery('.francais').hide();
+			jQuery('.physique-chimie').hide();
+			jQuery('.physique-chimie-maths').hide();
+			jQuery('.maths').show();
+			jQuery('.pas-dispo').hide();
+			jQuery('.zero-matiere').hide();
+		}else if( !jQuery('input[name=maths]').is(':checked') && jQuery('input[name=physique]').is(':checked') && !jQuery('input[name=francais]').is(':checked')){
+			jQuery('.francais').hide();
+			jQuery('.physique-chimie').show();
+			jQuery('.physique-chimie-maths').hide();
+			jQuery('.maths').hide();
+			jQuery('.pas-dispo').hide();
+			jQuery('.zero-matiere').hide();
+		}else if( !jQuery('input[name=maths]').is(':checked') && !jQuery('input[name=physique]').is(':checked') && jQuery('input[name=francais]').is(':checked')){
 
-			$('.francais').show();
-			$('.physique-chimie').hide();
-			$('.physique-chimie-maths').hide();
-			$('.maths').hide();
-			$('.pas-dispo').hide();
-			$('.zero-matiere').hide();
-		}else if( $('input[name=maths]').is(':checked') && $('input[name=physique]').is(':checked') && !$('input[name=francais]').is(':checked')){
+			jQuery('.francais').show();
+			jQuery('.physique-chimie').hide();
+			jQuery('.physique-chimie-maths').hide();
+			jQuery('.maths').hide();
+			jQuery('.pas-dispo').hide();
+			jQuery('.zero-matiere').hide();
+		}else if( jQuery('input[name=maths]').is(':checked') && jQuery('input[name=physique]').is(':checked') && !jQuery('input[name=francais]').is(':checked')){
 
-			$('.francais').hide();
-			$('.physique-chimie').hide();
-			$('.physique-chimie-maths').show();
-			$('.maths').hide();
-			$('.pas-dispo').hide();
-			$('.zero-matiere').hide();
-		}else if( $('input[name=maths]').is(':checked') && $('input[name=physique]').is(':checked') && $('input[name=francais]').is(':checked')){
+			jQuery('.francais').hide();
+			jQuery('.physique-chimie').hide();
+			jQuery('.physique-chimie-maths').show();
+			jQuery('.maths').hide();
+			jQuery('.pas-dispo').hide();
+			jQuery('.zero-matiere').hide();
+		}else if( jQuery('input[name=maths]').is(':checked') && jQuery('input[name=physique]').is(':checked') && jQuery('input[name=francais]').is(':checked')){
 
-			$('.francais').hide();
-			$('.physique-chimie').hide();
-			$('.physique-chimie-maths').hide();
-			$('.maths').hide();
-			$('.pas-dispo').show();
-			$('.zero-matiere').hide();
-		}else if( $('input[name=maths]').is(':checked') && !$('input[name=physique]').is(':checked') && $('input[name=francais]').is(':checked')){
+			jQuery('.francais').hide();
+			jQuery('.physique-chimie').hide();
+			jQuery('.physique-chimie-maths').hide();
+			jQuery('.maths').hide();
+			jQuery('.pas-dispo').show();
+			jQuery('.zero-matiere').hide();
+		}else if( jQuery('input[name=maths]').is(':checked') && !jQuery('input[name=physique]').is(':checked') && jQuery('input[name=francais]').is(':checked')){
 
-			$('.francais').hide();
-			$('.physique-chimie').hide();
-			$('.physique-chimie-maths').hide();
-			$('.maths').hide();
-			$('.pas-dispo').show();
-			$('.zero-matiere').hide();
-		}else if( !$('input[name=maths]').is(':checked') && $('input[name=physique]').is(':checked') && $('input[name=francais]').is(':checked')){
+			jQuery('.francais').hide();
+			jQuery('.physique-chimie').hide();
+			jQuery('.physique-chimie-maths').hide();
+			jQuery('.maths').hide();
+			jQuery('.pas-dispo').show();
+			jQuery('.zero-matiere').hide();
+		}else if( !jQuery('input[name=maths]').is(':checked') && jQuery('input[name=physique]').is(':checked') && jQuery('input[name=francais]').is(':checked')){
 
-			$('.francais').hide();
-			$('.physique-chimie').hide();
-			$('.physique-chimie-maths').hide();
-			$('.maths').hide();
-			$('.pas-dispo').show();
-			$('.zero-matiere').hide();
+			jQuery('.francais').hide();
+			jQuery('.physique-chimie').hide();
+			jQuery('.physique-chimie-maths').hide();
+			jQuery('.maths').hide();
+			jQuery('.pas-dispo').show();
+			jQuery('.zero-matiere').hide();
 
-		}else if( !$('input[name=maths]').is(':checked') && !$('input[name=physique]').is(':checked') && !$('input[name=francais]').is(':checked')){
-			$('.francais').hide();
-			$('.physique-chimie').hide();
-			$('.physique-chimie-maths').hide();
-			$('.maths').hide();
-			$('.pas-dispo').hide();
-			$('.zero-matiere').show();
+		}else if( !jQuery('input[name=maths]').is(':checked') && !jQuery('input[name=physique]').is(':checked') && !jQuery('input[name=francais]').is(':checked')){
+			jQuery('.francais').hide();
+			jQuery('.physique-chimie').hide();
+			jQuery('.physique-chimie-maths').hide();
+			jQuery('.maths').hide();
+			jQuery('.pas-dispo').hide();
+			jQuery('.zero-matiere').show();
 		}
 	}
 
-	 $('input[name=maths]').on( "click",function(){printPriceBox();});
-	 $('input[name=physique]').on( "click",function(){printPriceBox();});
-	 $('input[name=francais]').on( "click",function(){printPriceBox();});
+	 jQuery('input[name=maths]').on( "click",function(){printPriceBox();});
+	 jQuery('input[name=physique]').on( "click",function(){printPriceBox();});
+	 jQuery('input[name=francais]').on( "click",function(){printPriceBox();});
 
 
 });

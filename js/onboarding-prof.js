@@ -133,7 +133,7 @@ jQuery( document ).ready( function( $ ) {
 
 	waitForEl(stepId,function(){
 
-		$(stepId).removeClass("hide");
+		jQuery(stepId).removeClass("hide");
 
 	});
 
@@ -205,8 +205,8 @@ jQuery( document ).ready( function( $ ) {
 
 async function uploadDocsIds(urlRectoId, urlVersoId) {
 
-	$("#loadingSpinner").removeClass("hide");
-	$(".hide_loading").addClass("hide");
+	jQuery("#loadingSpinner").removeClass("hide");
+	jQuery(".hide_loading").addClass("hide");
 	ajaxEnCours++;
 
 
@@ -218,7 +218,7 @@ async function uploadDocsIds(urlRectoId, urlVersoId) {
 	data.append('purpose', 'identity_document');
 	const fileResult = await fetch('https://uploads.stripe.com/v1/files', {
 		method: 'POST',
-		headers: {'Authorization': `Bearer ${stripe._apiKey}`},
+		headers: {'Authorization': `Bearer jQuery{stripe._apiKey}`},
 		body: data,
 	});
 	const rectoFileData = await fileResult.json();
@@ -242,7 +242,7 @@ async function uploadDocsIds(urlRectoId, urlVersoId) {
 		data.append('purpose', 'identity_document');
 		const fileResult = await fetch('https://uploads.stripe.com/v1/files', {
 			method: 'POST',
-			headers: {'Authorization': `Bearer ${stripe._apiKey}`},
+			headers: {'Authorization': `Bearer jQuery{stripe._apiKey}`},
 			body: data,
 		});
 		const versoFileData = await fileResult.json();
@@ -271,9 +271,9 @@ async function uploadDocsIds(urlRectoId, urlVersoId) {
 
 				}else{
 
-					$("#step-2").removeClass("hide");
-					$("#step-1").addClass("hide");
-					$("#step-0").addClass("hide");
+					jQuery("#step-2").removeClass("hide");
+					jQuery("#step-1").addClass("hide");
+					jQuery("#step-0").addClass("hide");
 
 					showMessage("Il ne reste plus qu'à donner l'IBAN et on pourra commencer.");					
 
@@ -290,8 +290,8 @@ async function uploadDocsIds(urlRectoId, urlVersoId) {
 			.always(function() {
 				ajaxEnCours--;
 				if(ajaxEnCours == 0){
-					$("#loadingSpinner").addClass("hide");
-					$(".hide_loading").removeClass("hide");
+					jQuery("#loadingSpinner").addClass("hide");
+					jQuery(".hide_loading").removeClass("hide");
 				}
 
 			});
@@ -307,8 +307,8 @@ async function uploadDocsIds(urlRectoId, urlVersoId) {
 async function createCustomAccnt(adresse, ville, codePostal, pays) {
 
 
-	$("#loadingSpinner").removeClass("hide");
-	$(".hide_loading").addClass("hide");
+	jQuery("#loadingSpinner").removeClass("hide");
+	jQuery(".hide_loading").addClass("hide");
 	ajaxEnCours++;
 
 	dateNaissance = new Date(loggedProf.date_naissance);
@@ -359,8 +359,8 @@ async function createCustomAccnt(adresse, ville, codePostal, pays) {
 
 				}else{
 
-					$("#step-1").removeClass("hide");
-					$("#step-0").addClass("hide");
+					jQuery("#step-1").removeClass("hide");
+					jQuery("#step-0").addClass("hide");
 
 					showMessage("Plus que deux étapes et c'est fini !");
 
@@ -378,8 +378,8 @@ async function createCustomAccnt(adresse, ville, codePostal, pays) {
 			.always(function() {
 				ajaxEnCours--;
 				if(ajaxEnCours == 0){
-					$("#loadingSpinner").addClass("hide");
-					$(".hide_loading").removeClass("hide");
+					jQuery("#loadingSpinner").addClass("hide");
+					jQuery(".hide_loading").removeClass("hide");
 				}
 
 			});
@@ -401,13 +401,13 @@ async function updateIbanProf(){
 
 	if(error){
 
-		$(idFormIbanContent).effect( "shake" );
+		jQuery(idFormIbanContent).effect( "shake" );
 		showMessage("L'IBAN saisie est invalide. Veuillez saisir un IBAN correct.");
 
 	}else{
 
-		$("#loadingSpinner").removeClass("hide");
-		$(".hide_loading").addClass("hide");
+		jQuery("#loadingSpinner").removeClass("hide");
+		jQuery(".hide_loading").addClass("hide");
 		ajaxEnCours++;
 		jQuery.post(
 				ajaxurl,

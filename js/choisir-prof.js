@@ -34,8 +34,8 @@ var mySubmitController = Marionette.Object.extend( {
 
 		// titles form
 		if(response.data.form_id == idForm){
-			$("#fountainTextG").removeClass("hide");
-			$(".hide_loading").addClass("hide");
+			jQuery("#fountainTextG").removeClass("hide");
+			jQuery(".hide_loading").addClass("hide");
 
 
 			//récupérationdes variables du form
@@ -74,8 +74,8 @@ var mySubmitController = Marionette.Object.extend( {
 					.always(function(err){
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							$("#fountainTextG").addClass("hide");
-							$(".hide_loading").removeClass("hide");
+							jQuery("#fountainTextG").addClass("hide");
+							jQuery(".hide_loading").removeClass("hide");
 
 						}
 					});
@@ -102,8 +102,8 @@ jQuery( document ).ready( function( $ ) {
 
 		waitForEl(".row-choix-prof, .previous, .next, .pas_attribution", function() {
 		
-		$(".row-choix-prof, .previous, .next").remove();
-		$(".pas_attribution").removeClass("hide");
+		jQuery(".row-choix-prof, .previous, .next").remove();
+		jQuery(".pas_attribution").removeClass("hide");
 		
 		});
 		
@@ -117,7 +117,7 @@ jQuery( document ).ready( function( $ ) {
 
 		waitForEl(".previous", function() {
 
-			$(".previous").click(function(){
+			jQuery(".previous").click(function(){
 				hideMessage();
 				if(indiceCourant == 0){
 					showMessage("Oups, pas possible d'accéder à l'attribution précédente car c'est la première.")
@@ -137,7 +137,7 @@ jQuery( document ).ready( function( $ ) {
 
 		waitForEl(".next", function() {
 
-			$(".next").click(function(){
+			jQuery(".next").click(function(){
 				hideMessage()
 				if(indiceCourant == nbAttribution-1){
 					showMessage("Oups, pas possible d'accéder à l'attribution suivante car c'est la dernière.")
@@ -170,12 +170,12 @@ function fillAttribution(attributionCourante){
 	waitForEl(".row-choix-prof", function() {
 
 
-		$(".row-choix-prof").find("#profil").html(attributionCourante.eleve.profil.profil);
-		$(".row-choix-prof").find("#prenom-nom").html(attributionCourante.eleve.prenom.concat(' ',attributionCourante.eleve.nom));
-		$(".row-choix-prof").find("#date-creation").html(attributionCourante.date_creation);
-		$(".row-choix-prof").find("#matieres").html(attributionCourante.formule.formule);
-		$(".row-choix-prof").find("#classe").html(attributionCourante.eleve.classe.nom_complet);
-		$(".row-choix-prof").find("#remarques").html(attributionCourante.remarque_inscription);
+		jQuery(".row-choix-prof").find("#profil").html(attributionCourante.eleve.profil.profil);
+		jQuery(".row-choix-prof").find("#prenom-nom").html(attributionCourante.eleve.prenom.concat(' ',attributionCourante.eleve.nom));
+		jQuery(".row-choix-prof").find("#date-creation").html(attributionCourante.date_creation);
+		jQuery(".row-choix-prof").find("#matieres").html(attributionCourante.formule.formule);
+		jQuery(".row-choix-prof").find("#classe").html(attributionCourante.eleve.classe.nom_complet);
+		jQuery(".row-choix-prof").find("#remarques").html(attributionCourante.remarque_inscription);
 
 		affichageProf = "aucun";
 		if(attributionCourante.prof){
@@ -185,7 +185,7 @@ function fillAttribution(attributionCourante){
 			affichageProf = prenom.concat(" ", nom)  ;
 		}
 
-		$(".row-choix-prof").find("#prof").html(affichageProf);
+		jQuery(".row-choix-prof").find("#prof").html(affichageProf);
 
 	});
 
@@ -193,8 +193,8 @@ function fillAttribution(attributionCourante){
 	waitForEl(toFieldId(idRefAbonnement), function() {
 
 
-		$(toFieldId(idRefAbonnement)).val(attributionCourante.ref_abonnement);
-		$(toFieldId(idRefAbonnement)).trigger('change');
+		jQuery(toFieldId(idRefAbonnement)).val(attributionCourante.ref_abonnement);
+		jQuery(toFieldId(idRefAbonnement)).trigger('change');
 
 
 	});
@@ -202,7 +202,7 @@ function fillAttribution(attributionCourante){
 
 function updateIndice(indiceCourant, nbAttribution){
 	waitForEl("#indexFin", function() {
-		$("#indexCourant").html(indiceCourant+1);
-		$("#indexFin").html(nbAttribution);
+		jQuery("#indexCourant").html(indiceCourant+1);
+		jQuery("#indexFin").html(nbAttribution);
 	});
 }

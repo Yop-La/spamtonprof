@@ -44,8 +44,8 @@ var mySubmitController = Marionette.Object.extend( {
 
 		// titles form
 		if(response.data.form_id == idFormLogIn){
-			$("#loadingSpinner").removeClass("hide");
-			$(".hide_loading").addClass("hide");
+			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery(".hide_loading").addClass("hide");
 			ajaxEnCours++;
 
 			console.log('dedans');
@@ -65,8 +65,8 @@ var mySubmitController = Marionette.Object.extend( {
 					.done(function(retour){ 
 
 						if(retour){
-							$('#nf-field-'.concat(idUsername)).val('');
-							$('#nf-field-'.concat(idPassword)).val('');
+							jQuery('#nf-field-'.concat(idUsername)).val('');
+							jQuery('#nf-field-'.concat(idPassword)).val('');
 
 							if('client' in retour){
 								redirectTo(retour.redirection, "Bienvenue sur SpamTonProf ! ");	
@@ -78,8 +78,8 @@ var mySubmitController = Marionette.Object.extend( {
 							
 						}else{
 							showMessage("L'adresse mail ou le mot passe est incorrect");
-							$("#loadingSpinner").addClass("hide");
-							$(".hide_loading").removeClass("hide");
+							jQuery("#loadingSpinner").addClass("hide");
+							jQuery(".hide_loading").removeClass("hide");
 						}
 					})
 					.fail(function(err){
@@ -88,8 +88,8 @@ var mySubmitController = Marionette.Object.extend( {
 						showMessage("Il y a un problème. Veuillez raffraichir la page puis réessayer. Contactez l'équipe si le problème persiste");
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							$("#loadingSpinner").addClass("hide");
-							$(".hide_loading").removeClass("hide");
+							jQuery("#loadingSpinner").addClass("hide");
+							jQuery(".hide_loading").removeClass("hide");
 						}
 					});
 		}
@@ -109,8 +109,8 @@ jQuery( document ).ready( function( $ ) {
 	waitForEl(".hide_loading",function(){
 		
 		if(isLogged == "true"){
-			$(".hide_loading").addClass("hide");
-			$(".for_logged_user").removeClass("hide");
+			jQuery(".hide_loading").addClass("hide");
+			jQuery(".for_logged_user").removeClass("hide");
 		}
 		
 	});

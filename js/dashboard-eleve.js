@@ -16,7 +16,7 @@ jQuery( document ).ready( function( $ ) {
 
 
 		if(nbAbosEssai == 0){
-			$(".bloc-essai").addClass("hide");
+			jQuery(".bloc-essai").addClass("hide");
 		}
 
 
@@ -24,7 +24,7 @@ jQuery( document ).ready( function( $ ) {
 
 			abo = abosEssai[i];
 
-			rowEssai = $(".row-essai-template").clone();
+			rowEssai = jQuery(".row-essai-template").clone();
 			rowEssai.insertAfter(".row-essai-template");
 			rowEssai.removeClass("row-essai-template");
 
@@ -34,7 +34,7 @@ jQuery( document ).ready( function( $ ) {
 
 			if(abo.debut_essai != null){
 				
-				$(".essai-off").addClass("hide");
+				jQuery(".essai-off").addClass("hide");
 				debut = new Date(abo.debut_essai);
 				fin = new Date(abo.fin_essai);
 				debut = debut.toLocaleString("fr-FR", {year: 'numeric', month: '2-digit', day: '2-digit'})
@@ -44,7 +44,7 @@ jQuery( document ).ready( function( $ ) {
 				rowEssai.find(".adresse-prof").html(abo.prof.email_stp);
 				
 			}else{
-				$(".essai-on").addClass("hide");
+				jQuery(".essai-on").addClass("hide");
 				
 			}
 			rowEssai.find(".ref-abo").val(i);
@@ -71,9 +71,9 @@ jQuery( document ).ready( function( $ ) {
 		});
 
 		// pour attacher la popup de paiement cb au bouton payer 
-		$('.payer').click(function(e) {
+		jQuery('.payer').click(function(e) {
 
-			indiceAbo = $(this).parents(".row-essai").find(".ref-abo").val();
+			indiceAbo = jQuery(this).parents(".row-essai").find(".ref-abo").val();
 			aboClique = abosEssai[indiceAbo];
 
 			montant = aboClique.plan.tarif;
@@ -116,14 +116,14 @@ jQuery( document ).ready( function( $ ) {
 		nbAbos = abosActif.length;
 
 		if(nbAbos == 0){
-			$(".bloc-actif").addClass("hide");
+			jQuery(".bloc-actif").addClass("hide");
 		}
 
 		for(var i = 0; i< nbAbos ; i++){
 
 			abo = abosActif[i];
 
-			rowAbo = $(".row-abo-template").clone();
+			rowAbo = jQuery(".row-abo-template").clone();
 			rowAbo.insertAfter(".row-abo-template");
 			rowAbo.removeClass("row-abo-template");
 
@@ -142,7 +142,7 @@ jQuery( document ).ready( function( $ ) {
 		}
 
 		// pour attacher la popup d'annulation ou d'interruption au bouton d'annulation
-		$('.pause').click(function(e) {
+		jQuery('.pause').click(function(e) {
 
 
 
@@ -151,10 +151,10 @@ jQuery( document ).ready( function( $ ) {
 			e.preventDefault();
 		});
 
-		$('.arreter').click(function(e) {
+		jQuery('.arreter').click(function(e) {
 
-			indiceAbo = $(this).parents(".row-abo").find(".ref-abo").val();
-			$("#popmake-".concat(popupArret," .ref-abo")).val(indiceAbo);
+			indiceAbo = jQuery(this).parents(".row-abo").find(".ref-abo").val();
+			jQuery("#popmake-".concat(popupArret," .ref-abo")).val(indiceAbo);
 
 
 
@@ -175,8 +175,8 @@ jQuery( document ).ready( function( $ ) {
 
 	waitForEl(".confirmer-arret", function() {
 
-		$(".confirmer-arret").click(function(){
-			indiceAbo = $(this).parents("#popmake-".concat(popupArret)).find(".ref-abo").val();
+		jQuery(".confirmer-arret").click(function(){
+			indiceAbo = jQuery(this).parents("#popmake-".concat(popupArret)).find(".ref-abo").val();
 			aboClique = abosActif[indiceAbo];
 
 			console.log(aboClique);
@@ -195,14 +195,14 @@ jQuery( document ).ready( function( $ ) {
 		nbAbos = abosTermine.length;
 
 		if(nbAbos == 0){
-			$(".bloc-resilie").addClass("hide");
+			jQuery(".bloc-resilie").addClass("hide");
 		}
 
 		for(var i = 0; i< nbAbos ; i++){
 
 			abo = abosTermine[i];
 
-			rowAbo = $(".row-abo-fini-template").clone();
+			rowAbo = jQuery(".row-abo-fini-template").clone();
 			rowAbo.insertAfter(".row-abo-fini-template");
 			rowAbo.removeClass("row-abo-fini-template");
 
@@ -219,7 +219,7 @@ jQuery( document ).ready( function( $ ) {
 		}
 
 		// pour attacher la popup d'annulation ou d'interruption au bouton d'annulation
-		$('.pause').click(function(e) {
+		jQuery('.pause').click(function(e) {
 
 
 
@@ -228,10 +228,10 @@ jQuery( document ).ready( function( $ ) {
 			e.preventDefault();
 		});
 
-		$('.arreter').click(function(e) {
+		jQuery('.arreter').click(function(e) {
 
-			indiceAbo = $(this).parents(".row-abo").find(".ref-abo").val();
-			$("#popmake-".concat(popupArret," .ref-abo")).val(indiceAbo);
+			indiceAbo = jQuery(this).parents(".row-abo").find(".ref-abo").val();
+			jQuery("#popmake-".concat(popupArret," .ref-abo")).val(indiceAbo);
 
 
 
@@ -253,8 +253,8 @@ jQuery( document ).ready( function( $ ) {
 	function resilierAbonnement(abo){
 
 
-		$("#fountainTextG").removeClass("hide");
-		$(".hide_loading").addClass("hide");
+		jQuery("#fountainTextG").removeClass("hide");
+		jQuery(".hide_loading").addClass("hide");
 		PUM.close(popupArret);
 
 		ajaxEnCours++;
@@ -271,8 +271,8 @@ jQuery( document ).ready( function( $ ) {
 				showMessage('Ooops : il y a eu un problème : '.concat(retour.message,'. Veuillez réessayer ou contacter l\'équipe.'));
 				ajaxEnCours--;
 				if(ajaxEnCours == 0){
-					$(".hide_loading").removeClass("hide");
-					$("#fountainTextG").addClass("hide");
+					jQuery(".hide_loading").removeClass("hide");
+					jQuery("#fountainTextG").addClass("hide");
 				}
 			}else{
 				redirectTo('dashboard-eleve','L\'abonnement va être bientôt résilié (un mail de confirmation va être envoyé)');
@@ -282,8 +282,8 @@ jQuery( document ).ready( function( $ ) {
 			showMessage('Oops : il y a eu un problème avec le paiement. Veuillez réessayer ou contacter l\'équipe. ');
 			ajaxEnCours--;
 			if(ajaxEnCours == 0){
-				$(".hide_loading").removeClass("hide");
-				$("#fountainTextG").addClass("hide");
+				jQuery(".hide_loading").removeClass("hide");
+				jQuery("#fountainTextG").addClass("hide");
 			}
 		});
 	}
@@ -293,8 +293,8 @@ jQuery( document ).ready( function( $ ) {
 
 	function createSubscription(refAbonnement, source, testMode){
 
-		$("#fountainTextG").removeClass("hide");
-		$(".hide_loading").addClass("hide");
+		jQuery("#fountainTextG").removeClass("hide");
+		jQuery(".hide_loading").addClass("hide");
 
 		ajaxEnCours++;
 		jQuery.post(
@@ -311,8 +311,8 @@ jQuery( document ).ready( function( $ ) {
 				showMessage('Ooops : il y a eu un problème : '.concat(retour.message,'. Veuillez réessayer ou contacter l\'équipe.'));
 				ajaxEnCours--;
 				if(ajaxEnCours == 0){
-					$(".hide_loading").removeClass("hide");
-					$("#fountainTextG").addClass("hide");
+					jQuery(".hide_loading").removeClass("hide");
+					jQuery("#fountainTextG").addClass("hide");
 				}
 			}else{
 				redirectTo('dashboard-eleve','Félicitations : le paiement est passé. L\'inscription est bien validé.');
@@ -322,8 +322,8 @@ jQuery( document ).ready( function( $ ) {
 			showMessage('Oops : il y a eu un problème avec le paiement. Veuillez réessayer ou contacter l\'équipe. ');
 			ajaxEnCours--;
 			if(ajaxEnCours == 0){
-				$(".hide_loading").removeClass("hide");
-				$("#fountainTextG").addClass("hide");
+				jQuery(".hide_loading").removeClass("hide");
+				jQuery("#fountainTextG").addClass("hide");
 			}
 		});
 	}

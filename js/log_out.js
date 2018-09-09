@@ -8,7 +8,7 @@ jQuery( document ).ready( function( $ ) {
 
 	waitForEl('.deco-button', function() {
 		console.log('deco button exist');
-		$('.deco-button').click(function(){
+		jQuery('.deco-button').click(function(){
 
 				jQuery.post(
 						ajaxurl,

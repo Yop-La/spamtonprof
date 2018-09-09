@@ -48,8 +48,8 @@ var mySubmitController = Marionette.Object.extend( {
 
 		// titles form
 		if(response.data.form_id == idForm){
-			$("#loadingSpinner").removeClass("hide");
-			$(".hide_loading").addClass("hide");
+			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery(".hide_loading").addClass("hide");
 
 
 

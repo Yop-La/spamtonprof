@@ -17,32 +17,32 @@ var waitForEl = function(selector, callback) {
 
 
 function isEmail(email) {
-	var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+	var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+jQuery/;
 	return regex.test(email);
 }
 
 function redirectTo(slug ,info = "" ){
 	info = htmlentities.encode(info);
 	waitForEl("#info",function(){
-		$("#hidden-form").attr("action", homeUrl.concat("/",slug) );
-		$("#info").val($("<div>").html(info).text());
-		$("#hidden-form").submit();
+		jQuery("#hidden-form").attr("action", homeUrl.concat("/",slug) );
+		jQuery("#info").val(jQuery("<div>").html(info).text());
+		jQuery("#hidden-form").submit();
 	});
 }
 
 function showMessage(message){
 	waitForEl("#top-message", function() {
-		$("#band-message").text(message);
-		$("#top-message").removeClass("hide");
+		jQuery("#band-message").text(message);
+		jQuery("#top-message").removeClass("hide");
 		window.scrollTo(0, 0);
 	});
 }
 
 function hideMessage(){
 
-	if(!$("#top-message").hasClass('hide')){
+	if(!jQuery("#top-message").hasClass('hide')){
 
-		$("#top-message").addClass("hide");
+		jQuery("#top-message").addClass("hide");
 
 	}
 }

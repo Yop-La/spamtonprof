@@ -11,16 +11,16 @@ jQuery( document ).ready( function( $ ) {
 
 	waitForEl(buttonEcritId,function(){
 
-		$(buttonEcritId).click(function(){
+		jQuery(buttonEcritId).click(function(){
 
-			if(!$( ".video" ).hasClass( "hide" )){
+			if(!jQuery( ".video" ).hasClass( "hide" )){
 
 				console.log("click ecrit");
 				
-				$("#video-row").addClass("hide");
-				$("#ecrit-row").removeClass("hide");
+				jQuery("#video-row").addClass("hide");
+				jQuery("#ecrit-row").removeClass("hide");
 			
-//				$(".titre-ecrit").get(0).scrollIntoView();
+//				jQuery(".titre-ecrit").get(0).scrollIntoView();
 			}
 		});
 
@@ -28,16 +28,16 @@ jQuery( document ).ready( function( $ ) {
 
 	waitForEl(buttonVideoId,function(){
 
-		$(buttonVideoId).click(function(){
+		jQuery(buttonVideoId).click(function(){
 
-			if(!$( ".ecrit" ).hasClass( "hide" )){
+			if(!jQuery( ".ecrit" ).hasClass( "hide" )){
 
 				console.log("click video");
 				
-				$("#ecrit-row").addClass("hide");
-				$("#video-row").removeClass("hide");
+				jQuery("#ecrit-row").addClass("hide");
+				jQuery("#video-row").removeClass("hide");
 
-//				$(".titre-video").get(0).scrollIntoView();
+//				jQuery(".titre-video").get(0).scrollIntoView();
 
 			}
 

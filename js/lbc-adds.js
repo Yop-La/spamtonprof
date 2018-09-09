@@ -51,8 +51,8 @@ var mySubmitController = Marionette.Object.extend( {
 
 		// titles form
 		if(response.data.form_id == idTitleForm){
-			$("#loadingSpinner").removeClass("hide");
-			$("#onglets").addClass("hide");
+			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#onglets").addClass("hide");
 
 			typeTitle = response.data.fields[idSelectTitleForm].value;
 			console.log(typeTitle);
@@ -67,12 +67,12 @@ var mySubmitController = Marionette.Object.extend( {
 					.done(function(titles){ 
 						console.log("okay");
 
-						$('#csvTitles').empty();
-						$('#csvTitles').append('<a href="' .concat(titles.csvPath,'">Download as csv</a>'));
+						jQuery('#csvTitles').empty();
+						jQuery('#csvTitles').append('<a href="' .concat(titles.csvPath,'">Download as csv</a>'));
 
-						$("#titleTable tr").remove();
+						jQuery("#titleTable tr").remove();
 
-						$.each(titles.titles, function (i, item) {
+						jQuery.each(titles.titles, function (i, item) {
 
 
 							var table = document.getElementById("titleTable");
@@ -93,8 +93,8 @@ var mySubmitController = Marionette.Object.extend( {
 					.always(function() {
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							$("#loadingSpinner").addClass("hide");
-							$("#onglets").removeClass("hide");
+							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#onglets").removeClass("hide");
 						}
 					});
 
@@ -106,8 +106,8 @@ var mySubmitController = Marionette.Object.extend( {
 			typeTexte = response.data.fields[idSelectTextForm].value;
 			console.log(typeTexte);
 
-			$("#loadingSpinner").removeClass("hide");
-			$("#onglets").addClass("hide");
+			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#onglets").addClass("hide");
 			ajaxEnCours++;
 			jQuery.post(
 					ajaxurl,
@@ -118,12 +118,12 @@ var mySubmitController = Marionette.Object.extend( {
 					.done(function(textes){ 
 						console.log("okay");
 
-						$('#csvTextes').empty();
-						$('#csvTextes').append('<a href="' .concat(textes.csvPath,'">Download as csv</a>'));
+						jQuery('#csvTextes').empty();
+						jQuery('#csvTextes').append('<a href="' .concat(textes.csvPath,'">Download as csv</a>'));
 
-						$("#texteTable tr").remove();
+						jQuery("#texteTable tr").remove();
 
-						$.each(textes.textes, function (i, item) {
+						jQuery.each(textes.textes, function (i, item) {
 
 							console.log(item);
 							var table = document.getElementById("texteTable");
@@ -142,8 +142,8 @@ var mySubmitController = Marionette.Object.extend( {
 					.always(function() {
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							$("#loadingSpinner").addClass("hide");
-							$("#onglets").removeClass("hide");
+							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#onglets").removeClass("hide");
 						}
 					});
 		}
@@ -169,8 +169,8 @@ var mySubmitController = Marionette.Object.extend( {
 
 			}
 
-			$("#loadingSpinner").removeClass("hide");
-			$("#onglets").addClass("hide");
+			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#onglets").addClass("hide");
 			ajaxEnCours++;
 			jQuery.post(
 					ajaxurl,
@@ -219,8 +219,8 @@ var mySubmitController = Marionette.Object.extend( {
 					.always(function() {
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							$("#loadingSpinner").addClass("hide");
-							$("#onglets").removeClass("hide");
+							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#onglets").removeClass("hide");
 						}
 					});
 
@@ -229,9 +229,9 @@ var mySubmitController = Marionette.Object.extend( {
 
 		// chargement d'une cat de texte pour rédaction
 		if(response.data.form_id == idLoadCat){
-			$("#loadingSpinner").removeClass("hide");
-			$("#onglets").addClass("hide");
-			$("#writing-area").removeClass("hide");
+			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#onglets").addClass("hide");
+			jQuery("#writing-area").removeClass("hide");
 			console.log("chargement d'une cat de texte pour rédaction");
 			nomCat = response.data.fields[idNomCatLoaded].value;
 			nomCatLoaded = nomCat;
@@ -253,22 +253,22 @@ var mySubmitController = Marionette.Object.extend( {
 
 							nbTextTot = textCat.nb_texte;
 
-							$("#nbTexte").text(nbTextTot);
-							$("#nbParagraphe").text(nbPara);
-							$("#nomCat").text(textCat.nom_cat);
+							jQuery("#nbTexte").text(nbTextTot);
+							jQuery("#nbParagraphe").text(nbPara);
+							jQuery("#nomCat").text(textCat.nom_cat);
 
 
-							nbMaxPar = $(idAddTextCont.concat(' textarea')).size() - 1;
-							$.each($(idAddTextCont.concat(' .nf-row')), function (i, item) {
+							nbMaxPar = jQuery(idAddTextCont.concat(' textarea')).size() - 1;
+							jQuery.each(jQuery(idAddTextCont.concat(' .nf-row')), function (i, item) {
 
 								if(i>=nbPara && i <= nbMaxPar){
-									$(item).remove();	
+									jQuery(item).remove();	
 								}
 							});
 
 							loadTextCat();
 							loadBaseTextes();
-							$(idNomCatLoaded).prop(nomCatLoaded, true);
+							jQuery(idNomCatLoaded).prop(nomCatLoaded, true);
 
 
 
@@ -291,16 +291,16 @@ var mySubmitController = Marionette.Object.extend( {
 					.always(function() {
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							$("#loadingSpinner").addClass("hide");
-							$("#onglets").removeClass("hide");
+							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#onglets").removeClass("hide");
 						}
 					});
 		}
 
 		// ajout ou modification d'un texte
 		if(response.data.form_id == idAddText){
-			$("#loadingSpinner").removeClass("hide");
-			$("#onglets").addClass("hide");
+			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#onglets").addClass("hide");
 			console.log("demande d'éditiion d'un texte");
 
 			pars = {};
@@ -345,8 +345,8 @@ var mySubmitController = Marionette.Object.extend( {
 						.always(function() {
 							ajaxEnCours--;
 							if(ajaxEnCours == 0){
-								$("#loadingSpinner").addClass("hide");
-								$("#onglets").removeClass("hide");
+								jQuery("#loadingSpinner").addClass("hide");
+								jQuery("#onglets").removeClass("hide");
 							}
 						});
 
@@ -375,8 +375,8 @@ var mySubmitController = Marionette.Object.extend( {
 						.always(function() {
 							ajaxEnCours--;
 							if(ajaxEnCours == 0){
-								$("#loadingSpinner").addClass("hide");
-								$("#onglets").removeClass("hide");
+								jQuery("#loadingSpinner").addClass("hide");
+								jQuery("#onglets").removeClass("hide");
 							}
 						});
 
@@ -397,7 +397,7 @@ jQuery( document ).ready( function( $ ) {
 	loadTextesCat();
 
 	waitForEl('.generateText', function() {
-		$('.generateText').click(function(){
+		jQuery('.generateText').click(function(){
 
 			if(!nomCatLoaded){
 
@@ -408,8 +408,8 @@ jQuery( document ).ready( function( $ ) {
 
 			if(nbTextTot -nbTextesWritted <= 0){
 
-				$("#loadingSpinner").removeClass("hide");
-				$("#onglets").addClass("hide");
+				jQuery("#loadingSpinner").removeClass("hide");
+				jQuery("#onglets").addClass("hide");
 
 				showMessage("Génération des textes en cours ... " );
 
@@ -436,8 +436,8 @@ jQuery( document ).ready( function( $ ) {
 						.always(function() {
 							ajaxEnCours--;
 							if(ajaxEnCours == 0){
-								$("#loadingSpinner").addClass("hide");
-								$("#onglets").removeClass("hide");
+								jQuery("#loadingSpinner").addClass("hide");
+								jQuery("#onglets").removeClass("hide");
 							}
 						});
 			}else{
@@ -449,24 +449,24 @@ jQuery( document ).ready( function( $ ) {
 
 
 	waitForEl('#text-row-template', function() {
-		textRowTemplate = $( '#text-row-template' ).clone();
-		$( '#text-row-template' ).remove();
+		textRowTemplate = jQuery( '#text-row-template' ).clone();
+		jQuery( '#text-row-template' ).remove();
 	});
 
 	waitForEl('#text-col', function() {
-		textCol = $( '#text-col' );
+		textCol = jQuery( '#text-col' );
 	});
 
 	waitForEl(idAddTextCont, function() {
-		$(idAddTextCont).addClass("hide");
+		jQuery(idAddTextCont).addClass("hide");
 	});
 
 	// chargement des options du formulaire des titres
 	waitForEl('#nf-field-'.concat(idSelectTitleForm), function() {
 
 
-		$("#loadingSpinner").removeClass("hide");
-		$("#onglets").addClass("hide");
+		jQuery("#loadingSpinner").removeClass("hide");
+		jQuery("#onglets").addClass("hide");
 		ajaxEnCours++;
 
 		jQuery.post(
@@ -476,14 +476,14 @@ jQuery( document ).ready( function( $ ) {
 				})
 				.done(function(titleTypes){ 
 
-					$.each(titleTypes, function (i, item) {
-						$('#nf-field-'.concat(idSelectTitleForm)).append($('<option>', { 
+					jQuery.each(titleTypes, function (i, item) {
+						jQuery('#nf-field-'.concat(idSelectTitleForm)).append(jQuery('<option>', { 
 							value: item,
 							text : item 
 						}));
 
 					});
-					$('#nf-field-'.concat(idSelectTitleForm)).prepend("<option value='' selected='selected'></option>");
+					jQuery('#nf-field-'.concat(idSelectTitleForm)).prepend("<option value='' selected='selected'></option>");
 
 				})
 				.fail(function(err){
@@ -494,8 +494,8 @@ jQuery( document ).ready( function( $ ) {
 				.always(function() {
 					ajaxEnCours--;
 					if(ajaxEnCours == 0){
-						$("#loadingSpinner").addClass("hide");
-						$("#onglets").removeClass("hide");
+						jQuery("#loadingSpinner").addClass("hide");
+						jQuery("#onglets").removeClass("hide");
 					}
 				});
 
@@ -515,9 +515,9 @@ jQuery( document ).ready( function( $ ) {
 
 function loadTextCat(){
 	waitForEl('#nf-field-'.concat(idNomCatLoaded), function() {
-		$("#loadingSpinner").removeClass("hide");
-		$("#onglets").addClass("hide");
-		$('#nf-field-'.concat(idNomCatLoaded))
+		jQuery("#loadingSpinner").removeClass("hide");
+		jQuery("#onglets").addClass("hide");
+		jQuery('#nf-field-'.concat(idNomCatLoaded))
 		.find('option')
 		.remove();
 
@@ -528,17 +528,17 @@ function loadTextCat(){
 					'action' : 'ajaxGetTexteCats'
 				})
 				.done(function(texteCats){ 
-					$.each(texteCats, function (i, item) {
+					jQuery.each(texteCats, function (i, item) {
 						console.log(item.nom_cat);
-						$('#nf-field-'.concat(idNomCatLoaded)).append($('<option>', { 
+						jQuery('#nf-field-'.concat(idNomCatLoaded)).append(jQuery('<option>', { 
 							value: item.nom_cat,
 							text : item.nom_cat 
 						}));
 
 					});
-					$('#nf-field-'.concat(idNomCatLoaded)).prepend("<option value='' selected='selected'></option>");
-					$(idAddTextCont).removeClass("hide");
-					$('#nf-field-'.concat(idNomCatLoaded,' option[value="',nomCatLoaded,'"]')).prop('selected', true);
+					jQuery('#nf-field-'.concat(idNomCatLoaded)).prepend("<option value='' selected='selected'></option>");
+					jQuery(idAddTextCont).removeClass("hide");
+					jQuery('#nf-field-'.concat(idNomCatLoaded,' option[value="',nomCatLoaded,'"]')).prop('selected', true);
 				})
 				.fail(function(err){
 					console.log("erreur ajax chaargement catégorie de textes");
@@ -548,8 +548,8 @@ function loadTextCat(){
 				.always(function() {
 					ajaxEnCours--;
 					if(ajaxEnCours == 0){
-						$("#loadingSpinner").addClass("hide");
-						$("#onglets").removeClass("hide");
+						jQuery("#loadingSpinner").addClass("hide");
+						jQuery("#onglets").removeClass("hide");
 					}
 				});
 
@@ -563,11 +563,11 @@ function loadBaseTextes(){
 		console.log("---------");
 		console.log("load base texts");
 		console.log("---------");
-		$("#loadingSpinner").removeClass("hide");
-		$("#onglets").addClass("hide");
+		jQuery("#loadingSpinner").removeClass("hide");
+		jQuery("#onglets").addClass("hide");
 		ajaxEnCours++;
 
-		$(textCol).html('');
+		jQuery(textCol).html('');
 
 		jQuery.post(
 				ajaxurl,
@@ -579,42 +579,42 @@ function loadBaseTextes(){
 					baseTextes = textes;
 
 					nbTexte = 1;
-					$.each(textes, function (key, value) {
+					jQuery.each(textes, function (key, value) {
 
-						textRow = $(textRowTemplate).clone();
-						$(textRow).attr('id',key);
-						$(textRow).find("strong").html("Texte n° ".concat(nbTexte,'   '));
-						$(textRow).find("a").attr("href","#top");
+						textRow = jQuery(textRowTemplate).clone();
+						jQuery(textRow).attr('id',key);
+						jQuery(textRow).find("strong").html("Texte n° ".concat(nbTexte,'   '));
+						jQuery(textRow).find("a").attr("href","#top");
 						textContent = "";
-						$.each(value, function (i, item) {
+						jQuery.each(value, function (i, item) {
 							textContent = textContent.concat(' -- para ',i+1,' -- \n', item,'\n\n');
 
 						});
-						$(textRow).find(".text-content").text(textContent);
-						$(textCol).append(textRow);
+						jQuery(textRow).find(".text-content").text(textContent);
+						jQuery(textCol).append(textRow);
 						nbTexte++;
 					});
 
-					$(".modifier-texte").click(function(){
-						textRow = $(this).parent().parent();
+					jQuery(".modifier-texte").click(function(){
+						textRow = jQuery(this).parent().parent();
 						texteId = textRow.attr("id");
 						fillTextForm();
 						modeEdition = "update";
 						showMessage("Texte ajouté dans le formulaire de rédaction. Faites vos modifications et soumettez le texte pour enregistrer vos modifications.");
 
 					});
-					$(".copier-texte").click(function(){
+					jQuery(".copier-texte").click(function(){
 						modeEdition = "ajout";
-						textRow = $(this).parent().parent();
+						textRow = jQuery(this).parent().parent();
 						console.log(" this copy : ");
-						console.log($(this));
+						console.log(jQuery(this));
 						texteId = textRow.attr("id");
 						fillTextForm();
 						showMessage("Texte copié dans le formulaire de rédaction. Modifiez le et ajouter le pour enregistrer un nouveau texte à la catégorie choisie");
 
 					});
-					$(".supprimer-texte").click(function(){
-						textRow = $(this).parent().parent();
+					jQuery(".supprimer-texte").click(function(){
+						textRow = jQuery(this).parent().parent();
 						texteId = textRow.attr("id");
 
 
@@ -640,8 +640,8 @@ function loadBaseTextes(){
 								.always(function() {
 									ajaxEnCours--;
 									if(ajaxEnCours == 0){
-										$("#loadingSpinner").addClass("hide");
-										$("#onglets").removeClass("hide");
+										jQuery("#loadingSpinner").addClass("hide");
+										jQuery("#onglets").removeClass("hide");
 									}
 								});
 
@@ -661,8 +661,8 @@ function loadBaseTextes(){
 				.always(function() {
 					ajaxEnCours--;
 					if(ajaxEnCours == 0){
-						$("#loadingSpinner").addClass("hide");
-						$("#onglets").removeClass("hide");
+						jQuery("#loadingSpinner").addClass("hide");
+						jQuery("#onglets").removeClass("hide");
 					}
 				});
 
@@ -675,8 +675,8 @@ function fillTextForm(){
 		paras = baseTextes[texteId];
 		console.log(texteId);
 		console.log(baseTextes);
-		$.each(paras, function (i, item) {
-			$('#nf-field-'.concat(idFirstPara+i)).val(item);
+		jQuery.each(paras, function (i, item) {
+			jQuery('#nf-field-'.concat(idFirstPara+i)).val(item);
 		});
 
 	});
@@ -694,7 +694,7 @@ function fillNbTextToWrite(){
 				})
 				.done(function(nbTextes){
 					nbTextesWritted = nbTextes;
-					$('#nbTexteRestant').text(nbTextTot - nbTextesWritted);
+					jQuery('#nbTexteRestant').text(nbTextTot - nbTextesWritted);
 				})
 				.fail(function(err){
 					console.log("erreur ajax exist");
@@ -705,8 +705,8 @@ function fillNbTextToWrite(){
 				.always(function() {
 					ajaxEnCours--;
 					if(ajaxEnCours == 0){
-						$("#loadingSpinner").addClass("hide");
-						$("#onglets").removeClass("hide");
+						jQuery("#loadingSpinner").addClass("hide");
+						jQuery("#onglets").removeClass("hide");
 					}
 				});
 
@@ -720,8 +720,8 @@ function loadTextesCat(){
 	// chargement des options du formulaire des textes
 	waitForEl('#nf-field-'.concat(idSelectTextForm), function() {
 
-		$("#loadingSpinner").removeClass("hide");
-		$("#onglets").addClass("hide");
+		jQuery("#loadingSpinner").removeClass("hide");
+		jQuery("#onglets").addClass("hide");
 		ajaxEnCours++;		
 		jQuery.post(
 				ajaxurl,
@@ -730,14 +730,14 @@ function loadTextesCat(){
 				})
 				.done(function(titleTypes){ 
 
-					$.each(titleTypes, function (i, item) {
-						$('#nf-field-'.concat(idSelectTextForm)).append($('<option>', { 
+					jQuery.each(titleTypes, function (i, item) {
+						jQuery('#nf-field-'.concat(idSelectTextForm)).append(jQuery('<option>', { 
 							value: item,
 							text : item 
 						}));
 
 					});
-					$('#nf-field-'.concat(idSelectTextForm)).prepend("<option value='' selected='selected'></option>");
+					jQuery('#nf-field-'.concat(idSelectTextForm)).prepend("<option value='' selected='selected'></option>");
 
 				})
 				.fail(function(err){
@@ -748,8 +748,8 @@ function loadTextesCat(){
 				.always(function() {
 					ajaxEnCours--;
 					if(ajaxEnCours == 0){
-						$("#loadingSpinner").addClass("hide");
-						$("#onglets").removeClass("hide");
+						jQuery("#loadingSpinner").addClass("hide");
+						jQuery("#onglets").removeClass("hide");
 					}
 				});
 
