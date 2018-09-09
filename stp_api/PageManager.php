@@ -198,6 +198,11 @@ class PageManager
             PageManager::logIn();
         }
         
+        if ($this->pageSlug == 'tarifs') {
+            
+            PageManager::tarifs();
+        }
+        
         if ($this->pageSlug == 'inscription-prof') {
             
             PageManager::inscriptionProf();
@@ -440,6 +445,16 @@ class PageManager
         wp_enqueue_script('algolia_js', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.js');
         
         wp_enqueue_script('dashboard', plugins_url() . '/spamtonprof/js/dashboard-prof.js', array(
+            
+            'nf-front-end'
+        
+        ), time());
+    }
+
+    public static function tarifs()
+    
+    {
+        wp_enqueue_script('tarifs', plugins_url() . '/spamtonprof/js/tarifs.js', array(
             
             'nf-front-end'
         
