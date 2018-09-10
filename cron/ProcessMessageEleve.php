@@ -9,6 +9,9 @@ use spamtonprof\slack\Slack;
  * - à stocker dans mail eleve - les messages des élèves
  * - à attribuer des libellées aux emails
  * - il tourne tous les 5 minutes
+ * - à mettre à jour la date de dernier contact
+ *
+ * en prod
  */
 
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
@@ -31,6 +34,10 @@ $slack = new \spamtonprof\slack\Slack();
 $profMg = new \spamtonprof\stp_api\StpProfManager();
 
 $prof = $profMg->getNextInboxToProcess();
+
+echo ('<br>');
+echo ($prof->getPrenom());
+echo ('<br>');
 
 $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
 
@@ -159,11 +166,15 @@ foreach ($messages as $message) {
                 $labelsNameToAdd[] = $classe->getClasse();
                 $labelsNameToAdd[] = $statut->getStatut_abonnement();
                 
+                
                 // mettre à jour la date de dernier contact
                 $abo->setDernier_contact($dateReception->format(PG_DATETIME_FORMAT));
                 $aboMg->updateDernierContact($abo);
                 
                 break;
+            default:
+                $slack -> sendMessages("log", array("Nb d'abonnements incohérent au moment du tracking des élèves. Voir ProcessMessageEleve.php"));
+                exit(0);
         }
         
         // attribuer les libellés s

@@ -57,7 +57,19 @@ class StpEleveManager
             
             $email = $info["email"];
             
-            $q = $this->_db->prepare('select * from stp_eleve where lower(email) like lower(:email)');
+            $pos = strpos($email, '@');
+            
+            $radical = substr($email, 0,$pos);
+            
+            $radical = str_replace(".","",$radical);
+            
+            $radical = implode('[\.]?',str_split($radical));
+            
+            $domain = substr($email, $pos);
+            
+            $email = $radical . $domain;
+            
+            $q = $this->_db->prepare('select * from stp_eleve where lower(email) ~ lower(:email)');
             $q->bindValue(':email', $email);
             $q->execute();
         }

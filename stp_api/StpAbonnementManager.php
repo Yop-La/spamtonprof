@@ -268,7 +268,6 @@ class StpAbonnementManager
 
     public function construct($constructor)
     {
-        
         $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
         $profMg = new \spamtonprof\stp_api\StpProfManager();
         $procheMg = new \spamtonprof\stp_api\StpProcheManager();
@@ -391,21 +390,6 @@ class StpAbonnementManager
         
         if (is_array($info)) {
             
-            if (array_key_exists("ref_eleve", $info)) {
-                
-                $refEleve = $info["ref_eleve"];
-                $q = $this->_db->prepare('select * from stp_abonnement where ref_eleve = :ref_eleve');
-                $q->bindValue(":ref_eleve", $refEleve);
-                $q->execute();
-            }
-            if (array_key_exists("ref_compte", $info)) {
-                
-                $refCompte = $info["ref_compte"];
-                $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte');
-                $q->bindValue(":ref_compte", $refCompte);
-                $q->execute();
-            }
-            
             if (array_key_exists("ref_eleve", $info) && array_key_exists("ref_prof", $info)) {
                 
                 $refEleve = $info["ref_eleve"];
@@ -415,9 +399,21 @@ class StpAbonnementManager
                 $q->bindValue(":ref_prof", $refProf);
                 $q->bindValue(":ref_eleve", $refEleve);
                 $q->execute();
-            }
-            
-            if (array_key_exists("ref_prof", $info)) {
+            } 
+            else if (array_key_exists("ref_eleve", $info)) {
+                
+                $refEleve = $info["ref_eleve"];
+                $q = $this->_db->prepare('select * from stp_abonnement where ref_eleve = :ref_eleve');
+                $q->bindValue(":ref_eleve", $refEleve);
+                $q->execute();
+            } else if (array_key_exists("ref_compte", $info)) {
+                
+                $refCompte = $info["ref_compte"];
+                $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte');
+                $q->bindValue(":ref_compte", $refCompte);
+                $q->execute();
+            } 
+            else if (array_key_exists("ref_prof", $info)) {
                 
                 $refProf = $info["ref_prof"];
                 
