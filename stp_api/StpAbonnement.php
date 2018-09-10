@@ -6,7 +6,23 @@ class StpAbonnement implements \JsonSerializable
 
     const ACTIF = 1, ESSAI = 2, TERMINE = 3;
 
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage;
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage, $objectID;
+
+    /**
+     * @return mixed
+     */
+    public function getObjectID()
+    {
+        return $this->objectID;
+    }
+
+    /**
+     * @param mixed $objectID
+     */
+    public function setObjectID($objectID)
+    {
+        $this->objectID = $objectID;
+    }
 
     /**
      * @return mixed
@@ -81,11 +97,11 @@ class StpAbonnement implements \JsonSerializable
             
             $interval = date_diff($dernierContact, $now);
             
-            $this->setNbJourSansMessage($interval->format('%a'));
+            $this->setNbJourSansMessage(intval($interval->format('%a')));
             
         }else{
             
-            $this->setNbJourSansMessage("infini");
+            $this->setNbJourSansMessage(100);
         }
     }
 

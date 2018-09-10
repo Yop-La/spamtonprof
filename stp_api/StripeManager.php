@@ -464,6 +464,13 @@ class StripeManager
     public function deleteAllProductsAndPlans()
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+     
+        
+        $subs = \Stripe\Subscription::all(array('limit'=>100));
+        foreach ($subs as $sub) {
+            
+            $sub->cancel();
+        }
         
         $plans = \Stripe\Plan::all(array(
             
