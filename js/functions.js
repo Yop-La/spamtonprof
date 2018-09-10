@@ -89,6 +89,6 @@ function toFieldId(id){
 
 
 
-if(numMessage){
+if(numMessage.print == "1"){
 	showMessage(numMessage.message);
 }

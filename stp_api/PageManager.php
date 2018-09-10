@@ -162,10 +162,11 @@ class PageManager
                 $printNum = true;
             }
             
-            if ($printNum) {
-                $numMessage = 'Vous venez de découvrir notre site ? Et si on en discutait au téléphone ? Appelez nous au 04-34-10-25-49.';
-                wp_localize_script('functions_js', 'numMessage', array('message' => utf8_encode($numMessage)));
-            }
+            $numMessage = 'Vous venez de découvrir notre site ? Et si on en discutait au téléphone ? Appelez nous au 04-34-10-25-49.';
+            wp_localize_script('functions_js', 'numMessage', array(
+                'message' => utf8_encode($numMessage),
+                'print' => $printNum
+            ));
         }
         
         /* avoir le domain */
