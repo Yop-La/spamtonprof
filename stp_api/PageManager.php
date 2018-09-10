@@ -42,7 +42,7 @@ class PageManager
         
         /* pour savoir si le user est loggé */
         $isLogged = is_user_logged_in();
-        $isLogged = $isLogged ? 'true' : 'false';
+        $isLogged = ($isLogged == 'true');
         wp_localize_script('functions_js', 'isLogged', $isLogged);
         
         /* pour connaitre le type de user : prof, eleve, proche, autre */
@@ -144,6 +144,27 @@ class PageManager
             if ($prof) {
                 wp_localize_script('functions_js', 'userType', 'prof');
                 wp_localize_script('functions_js', 'loggedProf', $prof->toArray());
+            }
+        } else {
+            
+            $printNum = false;
+            $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+            $hour = $now->format('H');
+            $pageNums = [
+                'accueil',
+                'tarifs',
+                'semaine-decouverte',
+                'decouvrir-spamtonprof',
+                'temoignages'
+            ];
+            
+            if ((11 <= $hour && $hour < 14) || (18 <= $hour && $hour < 20) && in_array($this->pageSlug, $pageNums)) {
+                $printNum = true;
+            }
+            
+            if ($printNum) {
+                $numMessage = 'Vous venez de découvrir notre site ? Et si on en discutait au téléphone ? Appelez nous au 04-34-10-25-49.';
+                wp_localize_script('functions_js', 'numMessage', array('message' => utf8_encode($numMessage)));
             }
         }
         

@@ -4,6 +4,7 @@
  */
 
 
+
 var waitForEl = function(selector, callback) {
 	if (jQuery(selector).length) {
 		callback();
@@ -85,3 +86,9 @@ function toFieldId(id){
 			}
 	};
 })(window);
+
+
+
+if(numMessage){
+	showMessage(numMessage.message);
+}
