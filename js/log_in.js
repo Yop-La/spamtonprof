@@ -104,6 +104,8 @@ jQuery( document ).ready( function( $ ) {
 
 	console.log("jquery begin");
 	
+	showMessage("Si c'est votre première connexion, cliquez sur mot de passe oublié et saisissez l'adresse mail utilisée à l'inscription.");
+	
 	new mySubmitController();
 	
 	waitForEl(".hide_loading",function(){
