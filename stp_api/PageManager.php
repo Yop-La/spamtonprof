@@ -147,7 +147,7 @@ class PageManager
             }
         } else {
             
-            $printNum = false;
+            $printNum = "false";
             $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
             $hour = $now->format('H');
             $pageNums = [
@@ -159,7 +159,7 @@ class PageManager
             ];
             
             if ((11 <= $hour && $hour < 14) || (18 <= $hour && $hour < 20) && in_array($this->pageSlug, $pageNums)) {
-                $printNum = true;
+                $printNum = "true";
             }
             
             $numMessage = 'Vous venez de découvrir notre site ? Et si on en discutait au téléphone ? Appelez nous au 04-34-10-25-49.';
