@@ -171,6 +171,10 @@ foreach ($messages as $message) {
                 $abo->setDernier_contact($dateReception->format(PG_DATETIME_FORMAT));
                 $aboMg->updateDernierContact($abo);
                 
+                //mise à jour de l'index
+                $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+                $algoliaMg->updateAbonnement($abo->getRef_abonnement(), false);
+                
                 break;
             default:
                 $slack -> sendMessages("log", array("Nb d'abonnements incohérent au moment du tracking des élèves. Voir ProcessMessageEleve.php"));

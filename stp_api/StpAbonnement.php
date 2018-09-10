@@ -233,6 +233,7 @@ class StpAbonnement implements \JsonSerializable
     public function setRef_abonnement($ref_abonnement)
     {
         $this->ref_abonnement = $ref_abonnement;
+        $this->setObjectID($ref_abonnement);
     }
 
     public function getDate_creation()

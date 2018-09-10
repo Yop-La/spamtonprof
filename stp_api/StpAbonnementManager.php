@@ -436,7 +436,6 @@ class StpAbonnementManager
                 $constructor["objet"] = $abonnement;
                 $this->construct($constructor);
             }
-            $abonnement->setObjectID($abonnement->getRef_abonnement());
             $abonnements[] = $abonnement;
         }
         return ($abonnements);

@@ -42,5 +42,8 @@ foreach ($nbMessages as $nbMessage) {
     $abo->setNb_message($nbMessage["nb_message"]);
     $aboMg->updateNbMessage($abo);
     
+    $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+    $algoliaMg->updateAbonnement($abo->getRef_abonnement(), false);
+    
 }
 

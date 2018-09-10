@@ -94,9 +94,9 @@ function ajaxAjoutEleve()
         ));
         $eleve = $eleveMg->add($eleve);
         
-        $eleve->setSeq_email_parent_essai(0);// pour dire qu'il n'est pas encore dans la liste d'essai
+        $eleve->setSeq_email_parent_essai(0); // pour dire qu'il n'est pas encore dans la liste d'essai
         $eleveMg->updateSeqEmailParentEssai($eleve);
-                
+        
         $retour->eleve = $eleve;
         echo (json_encode($retour));
         die();
@@ -553,6 +553,11 @@ function ajaxAfterSubmissionEssai()
         }
         
         echo (json_encode($retour));
+        
+        // étape n°14 : mettre à jour l'index
+        
+        $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+        $algoliaMg->addAbonnement($abonnement->getRef_abonnement());
         
         die();
     }

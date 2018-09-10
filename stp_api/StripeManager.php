@@ -79,19 +79,16 @@ class StripeManager
                     "source_transaction" => $charge->id
                 ));
                 
-                $messages[] = "Transfert vers : ".$profId. "réussi";
-                
+                $messages[] = "Transfert vers : " . $profId . "réussi";
             } else {
                 $messages[] = "Un abonnement vient d'être facturé sans compte prof associé";
             }
         } catch (\Exception $e) {
             $messages[] = $e->getMessage();
             return;
-        }finally {
+        } finally {
             $slack->sendMessages("stripe", $messages);
         }
-        
-        
     }
 
     public function __construct($testMode = true)
@@ -464,9 +461,10 @@ class StripeManager
     public function deleteAllProductsAndPlans()
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-     
         
-        $subs = \Stripe\Subscription::all(array('limit'=>100));
+        $subs = \Stripe\Subscription::all(array(
+            'limit' => 100
+        ));
         foreach ($subs as $sub) {
             
             $sub->cancel();
@@ -499,6 +497,26 @@ class StripeManager
             
             $product->delete();
         }
+    }
+
+    /* pour faire des transferts manuels vers le compte d'un prof */
+    public function manualTransfert($emailProf, $amount, $description)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        
+        $profMg = new \spamtonprof\stp_api\StpProfManager();
+        $prof = $profMg->get(array(
+            'email_stp' => $emailProf
+        ));
+        
+        $transfert = \Stripe\Transfer::create(array(
+            "amount" => $amount * 100,
+            "currency" => "eur",
+            "destination" => $prof->getStripe_id(),
+            "description" => $description
+        ));
+        
+        return ($transfert);
     }
 
     // pour créer tous les produits et les plans définis dans la base stp

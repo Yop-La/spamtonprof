@@ -231,5 +231,10 @@ foreach ($abonnements as $abonnement) {
     
     $abonnement->setFirst_prof_assigned(true);
     $abonnementMg->updateFirstProfAssigned($abonnement);
+    
+    //mise à jour de l'index
+    $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+    $algoliaMg->updateAbonnement($abonnement->getRef_abonnement(), false);
+    
 }
 
