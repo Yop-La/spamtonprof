@@ -47,6 +47,7 @@ class PageManager
         $isLogged = ($isLogged) ? 'true' : 'false';
         
         wp_localize_script('functions_js', 'isLogged', $isLogged);
+        $printNum = "false";
         
         /* pour connaitre le type de user : prof, eleve, proche, autre */
         $current_user = wp_get_current_user();
@@ -150,7 +151,7 @@ class PageManager
             }
         } else {
             
-            $printNum = "false";
+           
             $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
             $hour = $now->format('H');
             $pageNums = [
@@ -165,12 +166,13 @@ class PageManager
                 $printNum = "true";
             }
             
-            $numMessage = 'Vous venez de découvrir notre site ? Et si on en discutait au téléphone ? Appelez nous au 04-34-10-25-49.';
-            wp_localize_script('functions_js', 'numMessage', array(
-                'message' => utf8_encode($numMessage),
-                'print' => $printNum
-            ));
+
         }
+        $numMessage = 'Vous venez de découvrir notre site ? Et si on en discutait au téléphone ? Appelez nous au 04-34-10-25-49.';
+        wp_localize_script('functions_js', 'numMessage', array(
+            'message' => utf8_encode($numMessage),
+            'print' => $printNum
+        ));
         
         /* avoir le domain */
         wp_localize_script('functions_js', 'domain', $this->domain);
