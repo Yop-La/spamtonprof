@@ -42,7 +42,10 @@ class PageManager
         
         /* pour savoir si le user est loggé */
         $isLogged = is_user_logged_in();
-        $isLogged = ($isLogged == 'true');
+        
+        
+        $isLogged = ($isLogged) ? 'true' : 'false';
+        
         wp_localize_script('functions_js', 'isLogged', $isLogged);
         
         /* pour connaitre le type de user : prof, eleve, proche, autre */
@@ -52,7 +55,7 @@ class PageManager
         
         if ($caps["client"]) {}
         
-        if ($isLogged) {
+        if ($isLogged == "true") {
             
             $procheMg = new \spamtonprof\stp_api\StpProcheManager();
             $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
