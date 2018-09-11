@@ -11,42 +11,40 @@ gClasseSelect = null;
 
 //id des champs du formulaire
 
-
-
-idFormEssai = "72";
+idFormEssai = "68";
 idFormContentEssai = "#nf-form-".concat(idFormEssai, "-cont");
 
-idPrenomEleve = "1006";
-idNomEleve = "1007";
-idEmailEleve = "1009";
-idPhoneEleve = "1010";
-idChoixProfil = "1008";
-idClasse = "1037";
-idMatieres = "1039";
-idProfil = "1040";
+idPrenomEleve = "936";
+idNomEleve = "941";
+idEmailEleve = "937";
+idPhoneEleve = "942";
+idChoixProfil = "938";
+idClasse = "943";
+idMatieres = "939";
+idProfil = "940";
 
 
 
-idChapterMaths = "1011";
-idLacuneMaths = "1012";
-idNoteMaths = "1015";
+idChapterMaths = "945";
+idLacuneMaths = "946";
+idNoteMaths = "947";
 
-idChapterPhysique = "1019";
-idLacunePhysique = "1020";
-idNotePhysique = "1021";
+idChapterPhysique = "949";
+idLacunePhysique = "950";
+idNotePhysique = "951";
 
-idChapterFrench = "1034";
-idLacuneFrench = "1035";
-idNoteFrench = "1036";
+idChapterFrench = "953";
+idLacuneFrench = "954";
+idNoteFrench = "955";
 
-idProche = "1014";
-idPrenomProche = "1022";
-idNomProche = "1025";
-idMailProche = "1023";
-idPhoneProche = "1026";
-idRemarque 	= "1029";
+idProche = "957";
+idPrenomProche = "958";
+idNomProche = "960";
+idMailProche = "959";
+idPhoneProche = "961";
+idRemarque 	= "962";
 
-idCode = "1032";
+idCode = "963";
 
 idFormAjoutEleve = "75";
 
@@ -59,47 +57,7 @@ idAjoutEleveClasse = "1088";
 idAjoutEleveProfil = "1089";
 
 
-if(!domain.includes("localhost")){
 
-	idFormEssai = "68";
-	idFormContentEssai = "#nf-form-".concat(idFormEssai, "-cont");
-
-	idPrenomEleve = "936";
-	idNomEleve = "941";
-	idEmailEleve = "937";
-	idPhoneEleve = "942";
-	idChoixProfil = "938";
-	idClasse = "943";
-	idMatieres = "939";
-	idProfil = "940";
-
-
-
-	idChapterMaths = "945";
-	idLacuneMaths = "946";
-	idNoteMaths = "947";
-
-	idChapterPhysique = "949";
-	idLacunePhysique = "950";
-	idNotePhysique = "951";
-
-	idChapterFrench = "953";
-	idLacuneFrench = "954";
-	idNoteFrench = "955";
-
-	idProche = "957";
-	idPrenomProche = "958";
-	idNomProche = "960";
-	idMailProche = "959";
-	idPhoneProche = "961";
-	idRemarque 	= "962";
-
-	idCode = "963";
-
-
-
-
-}
 
 /*
  * debut : faire la soumission du formulaire de la popup 
@@ -406,9 +364,9 @@ jQuery( document ).ready( function( $ ) {
 
 
 	if(isLogged == "true"){
-		
+
 		nbAbosEssai = abosEssai.length;
-		
+
 		if(nbAbosEssai == 2){
 			showMessage("Oups, on dirait que vous avez déjà deux essai en cours. Revenez quand il y aura un de terminé.");
 			jQuery(".trial-row").addClass("hide");
@@ -420,9 +378,9 @@ jQuery( document ).ready( function( $ ) {
 		// quand fermeture de la popup ajout élève
 		jQuery('#pum-18754')
 		.on('pumBeforeClose', function () {
-			
-			
-			
+
+
+
 			if(jQuery('#eleve-select').val() == 'ajout-eleve'){
 				jQuery('#eleve-select').val(null); // Select the option with a value of '0'
 				jQuery('#eleve-select').trigger('change'); // Notify any JS components that the value changed
@@ -465,14 +423,14 @@ jQuery( document ).ready( function( $ ) {
 				hideMessage();
 				jQuery(".trial-row").removeClass("hide");
 				jQuery(".row-message").addClass("hide");
-				
+
 				abosEssai.forEach(function(aboEssai) {
 					eleveChoisi = eleves[choixEleve];
 					if(aboEssai.ref_eleve == eleveChoisi.ref_eleve){
-						
+
 						jQuery(".trial-row").addClass("hide");
 						jQuery(".row-message").removeClass("hide");
-						
+
 						showMessage("Tu es déjà entrain de faire un essai ".concat(eleveChoisi.prenom,". Reviens en demander un quand tu auras fini."));
 					}
 				});
@@ -500,7 +458,7 @@ jQuery( document ).ready( function( $ ) {
 
 //		if(userType == "eleve"){
 
-//		
+
 
 //		message = "Hello ".concat(loggedEleve.prenom,", il y a encore 2 essais gratuits (un pour toi et un pour ton frère ou ta soeur)");
 //		switch (nbAbosEssai) {

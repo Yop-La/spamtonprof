@@ -33,7 +33,7 @@ jQuery( document ).ready( function( $ ) {
 			rowEssai.find(".nom-formule").html(abo.formule.formule);
 
 			if(abo.debut_essai != null){
-				
+
 				jQuery(".essai-off").addClass("hide");
 				debut = new Date(abo.debut_essai);
 				fin = new Date(abo.fin_essai);
@@ -42,10 +42,10 @@ jQuery( document ).ready( function( $ ) {
 				rowEssai.find(".date-essai").html("Du ".concat(debut, " au ",fin));
 				rowEssai.find(".prof").html(abo.prof.prenom.concat(" ",abo.prof.nom));
 				rowEssai.find(".adresse-prof").html(abo.prof.email_stp);
-				
+
 			}else{
 				jQuery(".essai-on").addClass("hide");
-				
+
 			}
 			rowEssai.find(".ref-abo").val(i);
 

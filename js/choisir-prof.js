@@ -4,21 +4,15 @@
  * 
  */
 
-idForm = "73";
+
+
+idForm = "69";
 idFormContentEssai = "#nf-form-".concat(idForm, "-cont");
 
-idRefAbonnement = "1041";
-idChoixProf = "1042";
+idRefAbonnement = "967";
+idChoixProf = "968";
 
-if(!domain.includes("localhost")){
 
-	idForm = "69";
-	idFormContentEssai = "#nf-form-".concat(idForm, "-cont");
-
-	idRefAbonnement = "967";
-	idChoixProf = "968";
-
-}
 
 ajaxEnCours = 0;
 
@@ -101,12 +95,12 @@ jQuery( document ).ready( function( $ ) {
 	if(nbAttribution == 0){
 
 		waitForEl(".row-choix-prof, .previous, .next, .pas_attribution", function() {
-		
-		jQuery(".row-choix-prof, .previous, .next").remove();
-		jQuery(".pas_attribution").removeClass("hide");
-		
+
+			jQuery(".row-choix-prof, .previous, .next").remove();
+			jQuery(".pas_attribution").removeClass("hide");
+
 		});
-		
+
 	}else{
 
 		var indiceCourant = 0;

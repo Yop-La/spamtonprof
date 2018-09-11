@@ -9,29 +9,24 @@
  * 
  */
 
-idFormLogIn = "65";
-
-idUsername = "956";
-idPassword = "957";
 
 
-if(!domain.includes("localhost")){
 
-	idFormLogIn = "64";
+idFormLogIn = "64";
 
-	idUsername = "916";
-	idPassword = "917";
+idUsername = "916";
+idPassword = "917";
 
-	
-	
-}
+
+
+
 
 ajaxEnCours = 0;
 wpUser = null;
 var mySubmitController = Marionette.Object.extend( {
 
-	
-	
+
+
 	initialize: function() {
 		this.listenTo( Backbone.Radio.channel( 'forms' ), 'submit:response', this.actionSubmit );
 		console.log("submit controler loaded");
@@ -75,7 +70,7 @@ var mySubmitController = Marionette.Object.extend( {
 							}else{
 								redirectTo('', "Bienvenue sur SpamTonProf ! ");	
 							}
-							
+
 						}else{
 							showMessage("L'adresse mail ou le mot passe est incorrect");
 							jQuery("#loadingSpinner").addClass("hide");
@@ -103,18 +98,18 @@ var mySubmitController = Marionette.Object.extend( {
 jQuery( document ).ready( function( $ ) {
 
 	console.log("jquery begin");
-	
+
 	showMessage("Si c'est votre première connexion, cliquez sur mot de passe oublié et saisissez l'adresse mail utilisée à l'inscription.");
-	
+
 	new mySubmitController();
-	
+
 	waitForEl(".hide_loading",function(){
-		
+
 		if(isLogged == "true"){
 			jQuery(".hide_loading").addClass("hide");
 			jQuery(".for_logged_user").removeClass("hide");
 		}
-		
+
 	});
 
 });
