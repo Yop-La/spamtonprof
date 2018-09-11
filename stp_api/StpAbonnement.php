@@ -6,9 +6,10 @@ class StpAbonnement implements \JsonSerializable
 
     const ACTIF = 1, ESSAI = 2, TERMINE = 3;
 
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage, $objectID;
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage, $objectID, $teleprospection;
 
     /**
+     *
      * @return mixed
      */
     public function getObjectID()
@@ -17,6 +18,7 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $objectID
      */
     public function setObjectID($objectID)
@@ -25,6 +27,25 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
+     * @return mixed
+     */
+    public function getTeleprospection()
+    {
+        return $this->teleprospection;
+    }
+
+    /**
+     *
+     * @param mixed $teleprospection
+     */
+    public function setTeleprospection($teleprospection)
+    {
+        $this->teleprospection = $teleprospection;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getNb_message()
@@ -33,6 +54,7 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $nb_message
      */
     public function setNb_message($nb_message)
@@ -41,6 +63,7 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @return boolean
      */
     public function getDateDernierStatut()
@@ -49,6 +72,7 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getRemarquesMatieres()
@@ -57,6 +81,7 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @param boolean $dateDernierStatut
      */
     public function setDateDernierStatut($dateDernierStatut)
@@ -65,17 +90,16 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $remarquesMatieres
      */
     public function setRemarquesMatieres($remarquesMatieres)
     {
-        
-        
-        
         $this->remarquesMatieres = $remarquesMatieres;
     }
 
     /**
+     *
      * @return mixed
      */
     public function getDernier_contact()
@@ -84,28 +108,29 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $dernier_contact
      */
     public function setDernier_contact($dernier_contact)
     {
         $this->dernier_contact = $dernier_contact;
         
-        if($this->dernier_contact){
-           
+        if ($this->dernier_contact) {
+            
             $dernierContact = \DateTime::createFromFormat(PG_DATETIME_FORMAT, $this->dernier_contact);
-            $now = new \DateTime(null,new \DateTimeZone("Europe/Paris"));
+            $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
             
             $interval = date_diff($dernierContact, $now);
             
             $this->setNbJourSansMessage(intval($interval->format('%a')));
-            
-        }else{
+        } else {
             
             $this->setNbJourSansMessage(100);
         }
     }
 
     /**
+     *
      * @return mixed
      */
     public function getNbJourSansMessage()
@@ -114,6 +139,7 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $nbJourSansMessage
      */
     public function setNbJourSansMessage($nbJourSansMessage)
@@ -122,6 +148,7 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getStatut()
@@ -130,6 +157,7 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $statut
      */
     public function setStatut($statut)
@@ -287,7 +315,6 @@ class StpAbonnement implements \JsonSerializable
      */
     public function setEleve($eleve)
     {
-        
         $this->eleve = $eleve;
     }
 

@@ -1,0 +1,9 @@
+Bien joué Anima !!
+
+Une nouvelle personne vient de rejoindre SpamTonProf grâce à toi !
+
+Nice !
+
+Plus d'infos sur l'inscription
+[[prenom_eleve]] [[nom_eleve]]
+Ref abo : [[ref_abo]]

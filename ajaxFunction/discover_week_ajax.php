@@ -140,6 +140,7 @@ function ajaxAfterSubmissionEssai()
     $phoneProche = trim($_POST["phoneProche"]);
     $remarque = $_POST["remarque"];
     $code = $_POST["code"];
+    $teleprospection = $_POST["teleprospection"];
     
     $maths = false;
     $physique = false;
@@ -429,6 +430,10 @@ function ajaxAfterSubmissionEssai()
         $abonnement->setFirst_prof_assigned(false);
         $abonnementMg->updateFirstProfAssigned($abonnement);
         
+        
+        $abonnement->setTeleprospection($teleprospection);
+        $abonnementMg->updateTeleprospection($abonnement);
+        
         // étape n° 11 - insérer les remarques d'inscription
         
         $stpRemarqueMg = new \spamtonprof\stp_api\StpRemarqueInscriptionManager();
@@ -495,7 +500,8 @@ function ajaxAfterSubmissionEssai()
                 "Email parent : " . $proche->getEmail(),
                 "Prénom parent : " . $proche->getPrenom(),
                 " Nom parent : " . $proche->getNom(),
-                "Téléphone parent :" . $proche->getTelephone()
+                "Téléphone parent :" . $proche->getTelephone(),
+                "Amina :" . $abonnement->getTeleprospection()
             );
         } else {
             $messages = array(
@@ -506,7 +512,8 @@ function ajaxAfterSubmissionEssai()
                 " Nom : " . $eleve->getNom(),
                 "Classe : " . $classe->getClasse(),
                 "Téléphone :" . $eleve->getTelephone(),
-                "Formule : " . $formule->getFormule()
+                "Formule : " . $formule->getFormule(),
+                "Amina :" . $abonnement->getTeleprospection()
             );
         }
         $messages[] = " ---------- ";
@@ -559,7 +566,23 @@ function ajaxAfterSubmissionEssai()
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
         $algoliaMg->addAbonnement($abonnement->getRef_abonnement());
         
+    
+        //étape n°15 : envoyer mail amina si inscription faite avec lui
+        
+        if($abonnement->getTeleprospection() == "oui"){
+            
+            $body = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/amina_teleprospection.txt");
+            $body = str_replace("[[prenom_eleve]]", $eleve->getPrenom(), $body);
+            $body = str_replace("[[nom_eleve]]", $eleve->getNom(), $body);
+            $body = str_replace("[[ref_abo]]", $abonnement->getRef_abonnement(), $body);
+            
+            $smtp->sendEmail("Nouvelle inscription !! ", 'amina.harouf@gmail.com', $body, $expe->getEmail(), "Alexandre de SpamTonProf", false);
+            
+        }
+        
         die();
+        
+        
     }
 }
 

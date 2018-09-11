@@ -56,7 +56,7 @@ idAjoutEleveChoixProfil = "1062";
 idAjoutEleveClasse = "1088";
 idAjoutEleveProfil = "1089";
 
-
+idTeleprospection = "985";
 
 
 /*
@@ -105,7 +105,10 @@ var mySubmitController = Marionette.Object.extend( {
 			phoneProche = response.data.fields[idPhoneProche].value;
 			remarque = response.data.fields[idRemarque].value;
 			code = response.data.fields[idCode].value;
+			teleprospection = response.data.fields[idTeleprospection].value;
 
+			
+			
 			// soumission ajax des champs du form pour création inscription
 			ajaxEnCours++;
 			jQuery.post(
@@ -134,7 +137,8 @@ var mySubmitController = Marionette.Object.extend( {
 						'phoneProche' : phoneProche,
 						'remarque' : remarque,
 						'matieres' : matieres,
-						'code' : code
+						'code' : code,
+						'teleprospection': teleprospection
 					})
 					.done(function(retour){ 
 
