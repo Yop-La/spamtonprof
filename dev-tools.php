@@ -1,5 +1,10 @@
 <?php
 
+function isNotNull($var)
+{
+    return (! is_null($var));
+}
+
 function printInfoCompteTest()
 {
     $accountManager = new \spamtonprof\stp_api\AccountManager();
@@ -400,7 +405,6 @@ function extractFirstMail($string)
 
 function toPgArray(array $elements)
 {
-    
     $nbElem = count($elements);
     $arrayPar = "";
     
@@ -414,10 +418,10 @@ function toPgArray(array $elements)
         if ($i == $nbElem - 1) {
             
             $arrayPar = $arrayPar . $element . "}";
-        }else{
+        } else {
             $arrayPar = $arrayPar . $element . ", ";
         }
     }
-    return($arrayPar);
+    return ($arrayPar);
 }
 

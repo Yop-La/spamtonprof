@@ -80,4 +80,18 @@ class StpRemarqueInscriptionManager
     {
         return ($object);
     }
+    
+    public function delete(\spamtonprof\stp_api\StpRemarqueInscription $rem)
+    {
+        $q = $this->_db->prepare("delete from stp_remarque_inscription where ref_remarque =:ref_remarque");
+        $q->bindValue(":ref_remarque", $rem->getRef_remarque());
+        $q->execute();
+    }
+    
+    public function deleteAll($info)
+    {
+        $q = $this->_db->prepare("delete from stp_remarque_inscription where ref_abonnement =:ref_abonnement");
+        $q->bindValue(":ref_abonnement", $info);
+        $q->execute();
+    }
 }

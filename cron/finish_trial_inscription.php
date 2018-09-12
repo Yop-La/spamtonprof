@@ -233,8 +233,16 @@ foreach ($abonnements as $abonnement) {
     $abonnementMg->updateFirstProfAssigned($abonnement);
     
     //mise à jour de l'index
+    
     $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
-    $algoliaMg->updateAbonnement($abonnement->getRef_abonnement(), false);
+    
+    $constructor = array(
+        "construct" => array(
+            'ref_prof'
+        )
+    );
+    
+    $algoliaMg->updateAbonnement($abonnement->getRef_abonnement(), $constructor);
     
 }
 

@@ -42,4 +42,11 @@ class StpLogAbonnementManager
             return (false);
         }
     }
+    
+    public function deleteAll($info)
+    {
+        $q = $this->_db->prepare("delete from stp_log_abonnement where ref_abonnement =:ref_abonnement");
+        $q->bindValue(":ref_abonnement", $info);
+        $q->execute();
+    }
 }

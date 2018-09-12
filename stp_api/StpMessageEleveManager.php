@@ -24,4 +24,11 @@ class StpMessageEleveManager
         
         return ($StpMessageEleve);
     }
+    
+    public function deleteAll($info)
+    {
+        $q = $this->_db->prepare("delete from stp_message_eleve where ref_abonnement =:ref_abonnement");
+        $q->bindValue(":ref_abonnement", $info);
+        $q->execute();
+    }
 }

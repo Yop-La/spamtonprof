@@ -99,9 +99,7 @@ class AlgoliaManager
             'ref_abonnement' => $refAbo
         ), $constructor);
         
-        
-        $abonnement = array_filter(json_decode(json_encode($abonnement),true),'strlen');
-        
+        $abonnement = array_filter(json_decode(json_encode($abonnement), true), 'isNotNull');
         
         $index->partialUpdateObject($abonnement);
     }
