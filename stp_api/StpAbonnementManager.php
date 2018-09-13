@@ -37,7 +37,7 @@ class StpAbonnementManager
     {
         $abonnements = [];
         
-        $q = $this->_db->prepare("select * from stp_abonnement where ref_prof is null order by date_creation ");
+        $q = $this->_db->prepare("select * from stp_abonnement where ref_prof is null and ref_statut_abonnement not in (4) order by date_creation ");
         
         $q->execute();
         
