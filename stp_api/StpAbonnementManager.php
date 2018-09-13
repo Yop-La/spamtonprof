@@ -426,6 +426,29 @@ class StpAbonnementManager
                 $q = $this->_db->prepare('select * from stp_abonnement where ref_prof = :ref_prof');
                 $q->bindValue(":ref_prof", $refProf);
                 $q->execute();
+            } else if (array_key_exists("email", $info)) {
+                
+                $email = $info["email"];
+                
+                $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
+                $procheMg = new \spamtonprof\stp_api\StpProcheManager();
+                
+                $proches = $procheMg->getAll(array(
+                    "email" => "yopla"
+                ));
+                $eleves = $eleveMg->getAll(array(
+                    "email" => "yopla"
+                ));
+                
+                $refEleves = extractAttribute($eleves, "ref_eleve");
+                
+                $refProches = extractAttribute($proches, "ref_proche");
+                
+                $refEleves = toPgArray($refEleves,true);
+                $refProches = toPgArray($refProches,true);
+                
+                $q = $this->_db->prepare('select * from stp_abonnement where ref_proche in '.$refProches.' or ref_eleve in '.$refEleves);
+                $q->execute();
             }
         }
         
@@ -445,5 +468,20 @@ class StpAbonnementManager
             $abonnements[] = $abonnement;
         }
         return ($abonnements);
+    }
+    
+    
+    // pour désactier les comptes tests . $email peut valoir yopla ou test pex ( tout dépend de la convenation de nommage des emails test
+    function desactiveTestAccount($email)
+    {
+        
+        $abonnements = $this->getAll(array(
+            "email" => $email
+        ));
+        
+        foreach ($abonnements as $abonnement) {
+            $abonnement->setRef_statut_abonnement($abonnement::DESACTIVE);
+            $this->updateRefStatutAbonnement($abonnement);
+        }
     }
 }

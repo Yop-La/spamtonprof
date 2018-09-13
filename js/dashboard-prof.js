@@ -3,7 +3,7 @@ jQuery( document ).ready( function( $ ) {
 
 	filter = '';
 	if (typeof loggedProf !== 'undefined') {
-		filter = 'ref_prof = '.concat(loggedProf.ref_prof);
+		filter = 'ref_prof = '.concat(loggedProf.ref_prof,' AND (ref_statut_abonnement = 1 OR ref_statut_abonnement = 2) ');
 	}
 
 	var search = instantsearch({

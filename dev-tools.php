@@ -403,8 +403,17 @@ function extractFirstMail($string)
     return ($emails[0][0]);
 }
 
-function toPgArray(array $elements)
+function toPgArray(array $elements, $parenthese = false)
 {
+
+    $rBracket = "}";
+    $lBracket = "{";
+    
+    if($parenthese){
+        $rBracket = ")";
+        $lBracket = "(";
+    }
+    
     $nbElem = count($elements);
     $arrayPar = "";
     
@@ -413,15 +422,28 @@ function toPgArray(array $elements)
         
         if ($i == 0) {
             
-            $arrayPar = $arrayPar . "{";
+            $arrayPar = $arrayPar . $lBracket;
         }
         if ($i == $nbElem - 1) {
             
-            $arrayPar = $arrayPar . $element . "}";
+            $arrayPar = $arrayPar . $element . $rBracket;
         } else {
             $arrayPar = $arrayPar . $element . ", ";
         }
     }
     return ($arrayPar);
+}
+
+function extractAttribute(array $objects, string $attribute)
+{
+    $retour = [];
+    
+    foreach ($objects as $object) {
+        
+        $object = json_decode(json_encode($object), true);
+        
+        $retour[] = $object[$attribute];
+    }
+    return ($retour);
 }
 

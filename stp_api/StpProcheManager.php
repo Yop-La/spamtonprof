@@ -1,6 +1,8 @@
 <?php
 namespace spamtonprof\stp_api;
 
+use PDO;
+
 class StpProcheManager
 {
 
@@ -80,5 +82,30 @@ class StpProcheManager
             return (false);
         }
     }
-    
+
+    public function getAll($info)
+    {
+        $proches = [];
+        $q = null;
+        
+        if (is_array($info)) {
+            
+            if (array_key_exists("email", $info)) {
+                
+                $email = $info["email"];
+                
+                $q = $this->_db->prepare('select * from stp_proche where email like :email ');
+                $q->bindValue(":email", '%' . $email . '%');
+                $q->execute();
+            }
+        }
+        
+        while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
+            
+            $proche = new \spamtonprof\stp_api\StpProche($data);
+            
+            $proches[] = $proche;
+        }
+        return ($proches);
+    }
 }

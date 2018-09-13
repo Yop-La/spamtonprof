@@ -8,7 +8,8 @@ jQuery( document ).ready( function( $ ) {
 		indexName: 'support_client',
 		urlSync: true,
 		searchParameters: {
-			hitsPerPage: 10
+			hitsPerPage: 10,
+			filters: "ref_statut_abonnement = 1 OR ref_statut_abonnement = 2"
 		}
 	});
 

@@ -59,11 +59,11 @@ class StpEleveManager
             
             $pos = strpos($email, '@');
             
-            $radical = substr($email, 0,$pos);
+            $radical = substr($email, 0, $pos);
             
-            $radical = str_replace(".","",$radical);
+            $radical = str_replace(".", "", $radical);
             
-            $radical = implode('[\.]?',str_split($radical));
+            $radical = implode('[\.]?', str_split($radical));
             
             $domain = substr($email, $pos);
             
@@ -153,7 +153,15 @@ class StpEleveManager
             $q = $this->_db->prepare('select * from stp_eleve where ref_compte = :ref_compte ');
             $q->bindValue(":ref_compte", $refCompte);
             $q->execute();
+        } else if (array_key_exists("email", $info)) {
+            
+            $email = $info["email"];
+            
+            $q = $this->_db->prepare('select * from stp_eleve where email like :email ');
+            $q->bindValue(":email", '%' . $email . '%');
+            $q->execute();
         }
+        
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
             $eleve = new \spamtonprof\stp_api\StpEleve($data);
             if ($eleveAsArray) {
