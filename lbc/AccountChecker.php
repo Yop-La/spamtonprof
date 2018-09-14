@@ -23,34 +23,45 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-/* ce script retourne les comptes lbc à checker par zennoposter 
+/*
+ * ce script retourne les comptes lbc à checker par zennoposter
  * Il se contente de retourner une liste de (ref_compte , code promo ) des comptes à checker
  * Les comptes à checker sont les comptes :
- *  - avec des annonces : 
- *      - dont l'état est  'enAttenteModeration'
- *      - dont la date de publication est supérieur ou égale au 30/05/2018 ( date de mise en place des codes promo )
- *      
+ * - avec des annonces :
+ * - dont l'état est 'enAttenteModeration'
+ * - dont la date de publication est supérieur ou égale au 30/05/2018 ( date de mise en place des codes promo )
+ *
  * Ce script retourne en priorité les comptes avec des annonces plus anciennes
- * 
- * 
- * */
+ *
+ *
+ */
+
+
+serializeTemp($_POST);
 
 $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
 
-$accounts = $lbcAccountMg->getAccountToScrap();
-
-$table = array();
-
-foreach($accounts as $account){
-//     $account = new \spamtonprof\stp_api\LbcAccount();
-    $row = array();
-    $row["ref_compte"] = $account->getRef_compte();
-    $row["code_promo"] = $account->getCode_promo();
-    $table[] = $row;
+if (count($_GET) != 0) {
+    
+    $nbCompte = $_GET["nbCompte"];
+    
+    $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
+    
+    $lbcAccountMg->desactivateDeadAccounts();
+    
+    $accounts = $lbcAccountMg->getAccountToScrap($nbCompte);
+    
+    $retour = new \stdClass();
+    $retour->accounts = $accounts;
+    
+    prettyPrint($retour);
+} else if (count($_POST) != 0) {
+    
+    serializeTemp($_POST);
+    
+//     $obj = urldecode($json["accounts"]);
+//     $rows = explode("\r\n", $obj);
+    
+//     $lbcAccountMg->updateAfterScraping($rows);
 }
-$retour = new \stdClass();
-$retour->accounts = $table;
-
-prettyPrint($retour);
-
 

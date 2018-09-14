@@ -93,8 +93,7 @@ class LbcAccountManager
             $account = new \spamtonprof\stp_api\LbcAccount($donnees);
             $accounts[] = $account;
         }
-        return($accounts);
-        
+        return ($accounts);
     }
 
     public function updateDisabled(\spamtonprof\stp_api\LbcAccount $lbcAccount)
@@ -112,7 +111,7 @@ class LbcAccountManager
         $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
         $q->execute();
     }
-    
+
     public function updateCodePromo(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
         $q = $this->_db->prepare("update compte_lbc set code_promo = :code_promo where ref_compte = :ref_compte");
@@ -120,34 +119,70 @@ class LbcAccountManager
         $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
         $q->execute();
     }
-    
-    public function getAccountToScrap(){
-        
+
+    public function getAccountToScrap($nbCompte)
+    {
         $accounts = [];
         
-        $q = $this->_db->prepare("
-            select distinct(ref_compte) as ref_compte
-            from adds_lbc 
-                where DATE_PART('day',  now() -  date_publication)  * 24 + DATE_PART('hour', now() -  date_publication ) >= 0
-                    and date_publication >= '2018-05-30'
-                    and etat = 'enAttenteModeration'
-             order by ref_compte");
-
+        $q = $this->_db->prepare("select * from compte_lbc where disabled = false or disabled is null  order by ref_compte desc limit :nb_compte");
+        $q->bindValue(":nb_compte", $nbCompte);
         $q->execute();
         
-        while($data = $q-> fetch(PDO::FETCH_ASSOC)){
-            $accounts[] = $this->get(array("ref_compte" => $data["ref_compte"]));
+        while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
+            $accounts[] = new \spamtonprof\stp_api\LbcAccount($data);
         }
         
-        if(count($accounts) == 0){
-            return(false);
-        }else{
-            return($accounts);
-        }
-        
-        
+        return ($accounts);
     }
-    
+
+    public function desactivateDeadAccounts()
+    {
+        $q1 = $this->_db->prepare("select * from compte_lbc where code_promo is null and (disabled is null or disabled = false)");
+        $q1->execute();
+        
+        $refComptes = [];
+        while ($data = $q1->fetch(PDO::FETCH_ASSOC)) {
+            
+            $refComptes[] = $data["ref_compte"];
+        }
+        
+        $in = "(" . join(',', array_fill(0, count($refComptes), '?')) . ")";
+        
+        $q2 = $this->_db->prepare("update compte_lbc set disabled = true where ref_compte in " . $in);
+        $q2->execute($refComptes);
+        
+        $q3 = $this->_db->prepare("delete from adds_lbc where ref_compte in " . $in);
+        $q3->execute($refComptes);
+    }
 
 
+
+    public function updateAfterScraping(array $rows)
+    {
+        $refComptes = [];
+        foreach ($rows as $row) {
+            
+            $cols = explode(";", $row);
+            $refCompte = $cols[0];
+            $nbAnnonces = $cols[2];
+            
+            $disabled = false;
+            
+            if ($nbAnnonces == 0) {
+                $disabled = true;
+                $refComptes[] = $refCompte;
+            }
+            
+            $q1 = $this->_db->prepare("update compte_lbc set set disabled = :disabled, nb_annonces_online = :nb_annonces_online where ref_compte= :ref_compte");
+            $q1 -> bindValue(":ref_compte", $refCompte);
+            $q1 -> bindValue(":disabled", $disabled,PDO::PARAM_BOOL);
+            $q1->bindValue(":nb_annonces_online", $nbAnnonces);
+            
+            $q1->execute();
+        }
+        
+        $in = "(" . join(',', array_fill(0, count($refComptes), '?')) . ")";
+        $q3 = $this->_db->prepare("delete from adds_lbc where ref_compte in " . $in);
+        $q3->execute($refComptes);
+    }
 }
