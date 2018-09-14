@@ -40,6 +40,17 @@ class StpEleveManager
         return ($eleve);
     }
 
+    public function updateEmail(StpEleve $eleve)
+    {
+        $q = $this->_db->prepare('update stp_eleve set email = :email, same_email = :same_email where ref_eleve = :ref_eleve');
+        $q->bindValue(':email', $eleve->getEmail());
+        $q->bindValue(':same_email', $eleve->getSame_email(),PDO::PARAM_BOOL);
+        $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
+        $q->execute();
+        
+        return ($eleve);
+    }
+
     public function updateSeqEmailParentEssai(StpEleve $eleve)
     {
         $q = $this->_db->prepare('update stp_eleve set seq_email_parent_essai = :seq_email_parent_essai where ref_eleve = :ref_eleve');

@@ -173,10 +173,13 @@ class LbcAccountManager
                 $refComptes[] = $refCompte;
             }
             
+            
+            
             $q1 = $this->_db->prepare("update compte_lbc set set disabled = :disabled, nb_annonces_online = :nb_annonces_online where ref_compte= :ref_compte");
             $q1 -> bindValue(":ref_compte", $refCompte);
             $q1 -> bindValue(":disabled", $disabled,PDO::PARAM_BOOL);
             $q1->bindValue(":nb_annonces_online", $nbAnnonces);
+           
             
             $q1->execute();
         }

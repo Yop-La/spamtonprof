@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.6.0.0
+ * Version: 1.1.6.0.1
  *
  *
  *
@@ -74,6 +74,8 @@ require_once (dirname(__FILE__) . '/ajaxFunction/onboarding_prof_ajax.php');
 require_once (dirname(__FILE__) . '/ajaxFunction/choisir-prof.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/ajax_dashboard_eleve.php');
+
+require_once (dirname(__FILE__) . '/ajaxFunction/ajax_bo.php');
 
 require_once (dirname(__FILE__) . '/ninjaFormHooks/afterSubmission.php');
 

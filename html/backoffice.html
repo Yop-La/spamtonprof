@@ -1,0 +1,78 @@
+    <script type="text/html" id="hit-template">
+      <div class="hit">
+        <div class="hit-content">
+
+          <div class="grid-container">
+
+
+            <div class="item1">{{{_highlightResult.eleve.prenom.value}}} {{{_highlightResult.eleve.nom.value}}} en {{eleve.classe.nom_complet}} -- {{statut.statut_abonnement}}</div>
+            <div class="item2">
+              <span class = "grid-title">Infos abonnement</span><br>
+              Nombre de jours d'inactivité : {{nbJourSansMessage}}<br>
+              Nombre de message 7 derniers jours : {{nb_message}} <br>
+              Date inscription: {{date_creation}}<br>
+              Formule : {{formule.formule}}<br>
+              Ref abonnement :: <span class='ref_abonnement'>{{ref_abonnement}}</span><br>
+            </div>
+            <div class="item3">
+              <span class = "grid-title">Élève</span><span class = 'update_eleve update_button'>Update</span><br>
+              {{{_highlightResult.eleve.prenom.value}}} {{{_highlightResult.eleve.nom.value}}}<br>
+              email : <span contenteditable="true" class='email single-line'>{{{_highlightResult.eleve.email.value}}}</span><br>
+              Tél : {{eleve.telephone}}<br>
+            </div>  
+            
+            <div class="item4">
+              <span class = "grid-title">Parent</span><br>
+              {{#proche}}
+              {{{_highlightResult.proche.prenom.value}}} {{{_highlightResult.proche.nom.value}}}<br>
+              email : {{{_highlightResult.proche.email.value}}}<br>
+              Tél : {{telephone}}<br>
+              {{/proche}}
+            </div>
+
+
+            
+            <div class="item5">
+
+              {{#remarquesMatieres.0}}
+              <span class = "grid-title">Niveau {{matiere.matiere}}</span><br>
+              <span class = "grid-subtitle">Chapitres</span><br>
+              {{chapitre}}<br>
+              <span class = "grid-subtitle">Difficultées</span><br>
+              {{difficule}}<br>
+              <span class = "grid-subtitle">Notes</span><br>
+              {{note}}<br>
+              {{/remarquesMatieres.0}}
+            </div>      
+            <div class="item6">
+
+              {{#remarquesMatieres.1}}
+              <span class = "grid-title">Niveau {{matiere.matiere}}</span><br>
+              <span class = "grid-subtitle">Chapitres</span><br>
+              {{chapitre}}<br>
+              <span class = "grid-subtitle">Difficultées</span><br>
+              {{difficule}}<br>
+              <span class = "grid-subtitle">Notes</span><br>
+              {{note}}<br>
+              {{/remarquesMatieres.1}}
+
+            </div>
+            <div class="item7">
+              <span class = "grid-title">Prof</span><br>
+              {{#prof}}
+              {{prenom}} {{nom}}<br>
+              {{email_stp}}<br>
+              {{/prof}}
+              <span class = "grid-title">Remarques</span><br>
+              {{remarque_inscription}}<br>
+              <span class = "grid-title">Amina</span><br>
+              {{teleprospection}}<br>
+            </div>      
+
+
+          </div>
+
+
+        </div>
+      </div>
+    </script>

@@ -699,12 +699,12 @@ class GetResponse
         return http_build_query($result);
     }
 
-    public function addEleveInTrialSequence(\spamtonprof\stp_api\StpEleve $eleve, \spamtonprof\stp_api\StpProf $prof, \spamtonprof\stp_api\StpFormule $formule)
+    public function addEleveInTrialSequence(\spamtonprof\stp_api\StpEleve $eleve, \spamtonprof\stp_api\StpProf $prof, \spamtonprof\stp_api\StpFormule $formule,$dayOfCycle = 0)
     {
         $params = '{
             "name": "' . $eleve->getPrenom() . '",
             "email": "' . $eleve->getEmail() . '",
-            "dayOfCycle": "0",
+            "dayOfCycle": '.$dayOfCycle.',
             "campaign": {
                 "campaignId": "' . $this->StpEleveEssaiId . '"
             },
