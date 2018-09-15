@@ -202,11 +202,11 @@ async function uploadDocsIds(urlRectoId, urlVersoId) {
 	data.append('purpose', 'identity_document');
 	const fileResult = await fetch('https://uploads.stripe.com/v1/files', {
 		method: 'POST',
-		headers: {'Authorization': `Bearer jQuery{stripe._apiKey}`},
+		headers: {'Authorization': 'Bearer '.concat(publicStripeKey)},
 		body: data,
 	});
 	const rectoFileData = await fileResult.json();
-
+	
 	fields = {
 			legal_entity: {
 				verification: {
@@ -317,7 +317,6 @@ async function createCustomAccnt(adresse, ville, codePostal, pays) {
 		},
 		tos_shown_and_accepted: true,
 	});
-
 
 	jQuery.post(
 			ajaxurl,

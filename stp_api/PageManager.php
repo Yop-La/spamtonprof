@@ -52,10 +52,6 @@ class PageManager
         /* pour connaitre le type de user : prof, eleve, proche, autre */
         $current_user = wp_get_current_user();
         
-        $caps = $current_user->get_role_caps();
-        
-        if ($caps["client"]) {}
-        
         if ($isLogged == "true") {
             
             $procheMg = new \spamtonprof\stp_api\StpProcheManager();
