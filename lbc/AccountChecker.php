@@ -36,16 +36,11 @@ header("Pragma: no-cache");
  *
  */
 
-
-serializeTemp($_POST);
-
 $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
 
 if (count($_GET) != 0) {
     
     $nbCompte = $_GET["nbCompte"];
-    
-    $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
     
     $lbcAccountMg->desactivateDeadAccounts();
     
@@ -57,11 +52,16 @@ if (count($_GET) != 0) {
     prettyPrint($retour);
 } else if (count($_POST) != 0) {
     
-    serializeTemp($_POST);
+    $obj = urldecode($_POST["accounts"]);
     
-//     $obj = urldecode($json["accounts"]);
-//     $rows = explode("\r\n", $obj);
+    $rows = explode("\r\n", $obj);
     
-//     $lbcAccountMg->updateAfterScraping($rows);
+    $nbTot = $lbcAccountMg->updateAfterScraping($rows);
+    
+    $slack = new \spamtonprof\slack\Slack();
+    $slack->sendMessages("log", array(
+        "contrôles des annonces réalisés",
+        "Il y a au moins " . $nbTot . " en ligne"
+    ));
 }
 

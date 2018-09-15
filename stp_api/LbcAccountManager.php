@@ -159,23 +159,27 @@ class LbcAccountManager
 
     public function updateAfterScraping(array $rows)
     {
+        $nbTot = 0;
         $refComptes = [];
         foreach ($rows as $row) {
             
             $cols = explode(";", $row);
             $refCompte = $cols[0];
             $nbAnnonces = $cols[2];
+            $nbTot = $nbTot + intval($nbAnnonces);
+            
+            
             
             $disabled = false;
             
-            if ($nbAnnonces == 0) {
+            if ($nbAnnonces <= 10) {
                 $disabled = true;
                 $refComptes[] = $refCompte;
             }
             
             
             
-            $q1 = $this->_db->prepare("update compte_lbc set set disabled = :disabled, nb_annonces_online = :nb_annonces_online where ref_compte= :ref_compte");
+            $q1 = $this->_db->prepare("update compte_lbc set disabled = :disabled, nb_annonces_online = :nb_annonces_online where ref_compte= :ref_compte");
             $q1 -> bindValue(":ref_compte", $refCompte);
             $q1 -> bindValue(":disabled", $disabled,PDO::PARAM_BOOL);
             $q1->bindValue(":nb_annonces_online", $nbAnnonces);
@@ -187,5 +191,7 @@ class LbcAccountManager
         $in = "(" . join(',', array_fill(0, count($refComptes), '?')) . ")";
         $q3 = $this->_db->prepare("delete from adds_lbc where ref_compte in " . $in);
         $q3->execute($refComptes);
+        
+        return($nbTot);
     }
 }
