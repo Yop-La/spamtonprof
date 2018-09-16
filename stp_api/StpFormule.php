@@ -4,7 +4,23 @@ namespace spamtonprof\stp_api;
 class StpFormule implements \JsonSerializable
 {
 
-    protected $formule, $ref_formule, $matieres, $plans, $classes, $ref_product_stripe_test, $ref_product_stripe;
+    protected $formule, $ref_formule, $matieres, $plans, $classes, $ref_product_stripe_test, $ref_product_stripe, $defaultPlan;
+
+    /**
+     * @return mixed
+     */
+    public function getDefaultPlan()
+    {
+        return $this->defaultPlan;
+    }
+
+    /**
+     * @param mixed $defaultPlan
+     */
+    public function setDefaultPlan($defaultPlan)
+    {
+        $this->defaultPlan = $defaultPlan;
+    }
 
     /**
      * @return mixed
