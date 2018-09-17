@@ -122,4 +122,29 @@ class AlgoliaManager
 
         $index->partialUpdateObject($abonnement);
     }
+    
+
+    
+    public function updateReportingLbc()
+    {
+        
+        $index = $this->client->initIndex('reportingLbc');
+        
+        $compteLbcMg = new \spamtonprof\stp_api\LbcAccountManager();
+        
+        $comptes = $compteLbcMg -> getAll("lastTwenty");
+        
+        $comptes = array_filter(json_decode(json_encode($comptes), true), 'isNotNull');
+        
+        $index->saveObjects($comptes);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

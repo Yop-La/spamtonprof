@@ -261,6 +261,11 @@ class PageManager
             
             PageManager::formule();
         }
+        
+        if ($this->pageSlug == 'reporting-lbc') {
+            
+            PageManager::reportingLbc();
+        }
     }
 
     public static function abonnementApresEssaiLoader()
@@ -482,6 +487,21 @@ class PageManager
 
         wp_enqueue_script('formule_js', plugins_url() . '/spamtonprof/js/formule.js', array(
 
+            'nf-front-end'
+        ), time());
+    }
+    
+    public static function reportingLbc()
+    
+    {
+        wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
+        
+        wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/reporting-lbc.css');
+        
+        wp_enqueue_script('algolia_js', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.js');
+        
+        wp_enqueue_script('formule_js', plugins_url() . '/spamtonprof/js/reporting-lbc.js', array(
+            
             'nf-front-end'
         ), time());
     }

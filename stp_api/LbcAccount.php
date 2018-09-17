@@ -27,7 +27,24 @@ class LbcAccount implements \JsonSerializable
     $ref_expe,
     $expe,
     $code_promo,
-    $end_pack;
+    $end_pack,
+    $objectID;
+
+    /**
+     * @return mixed
+     */
+    public function getObjectID()
+    {
+        return $this->objectID;
+    }
+
+    /**
+     * @param mixed $objectID
+     */
+    public function setObjectID($objectID)
+    {
+        $this->objectID = $objectID;
+    }
 
     public function __construct(array $donnees = array())
 
@@ -188,6 +205,7 @@ class LbcAccount implements \JsonSerializable
     public function setRef_compte($ref_compte)
     {
         $this->ref_compte = $ref_compte;
+        $this->setObjectID($ref_compte);
     }
 
     /**

@@ -24,17 +24,13 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 /*
- * ce script retourne les comptes lbc à checker par zennoposter
- * Il se contente de retourner une liste de (ref_compte , code promo ) des comptes à checker
- * Les comptes à checker sont les comptes :
- * - avec des annonces :
- * - dont l'état est 'enAttenteModeration'
- * - dont la date de publication est supérieur ou égale au 30/05/2018 ( date de mise en place des codes promo )
- *
- * Ce script retourne en priorité les comptes avec des annonces plus anciennes
- *
- *
+ * ce script est utilisé par le template check adds de zennoposter
+ * Au début, ce template envoie une requête get pour avoir une liste des comptes à checker 
+ * A la fin, il envoie une requête pour donner le résultat du contrôles des annonces (un tableau de code_promo, nb_annonces, ref_compte)
+ * 
  */
+
+
 
 $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
 
@@ -64,4 +60,8 @@ if (count($_GET) != 0) {
         "Il y a au moins " . $nbTot . " en ligne"
     ));
 }
+
+$agoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+
+$algoliaMg -> updateReportingLbc();
 

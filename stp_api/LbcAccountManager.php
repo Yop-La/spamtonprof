@@ -82,12 +82,19 @@ class LbcAccountManager
         return $account;
     }
 
-    public function getAll()
+    public function getAll($info = false)
     {
         $accounts = [];
-        
-        $q = $this->_db->prepare("select * from compte_lbc");
-        $q->execute();
+        $q = null;
+        if ($info == "lastTwenty") {
+            
+            $q = $this->_db->prepare("select * from compte_lbc limit 20");
+            $q->execute();
+        } else if (! $info) {
+            
+            $q = $this->_db->prepare("select * from compte_lbc");
+            $q->execute();
+        }
         
         while ($donnees = $q->fetch(PDO::FETCH_ASSOC)) {
             $account = new \spamtonprof\stp_api\LbcAccount($donnees);
@@ -155,8 +162,6 @@ class LbcAccountManager
         $q3->execute($refComptes);
     }
 
-
-
     public function updateAfterScraping(array $rows)
     {
         $nbTot = 0;
@@ -168,8 +173,6 @@ class LbcAccountManager
             $nbAnnonces = $cols[2];
             $nbTot = $nbTot + intval($nbAnnonces);
             
-            
-            
             $disabled = false;
             
             if ($nbAnnonces <= 10) {
@@ -177,13 +180,10 @@ class LbcAccountManager
                 $refComptes[] = $refCompte;
             }
             
-            
-            
             $q1 = $this->_db->prepare("update compte_lbc set disabled = :disabled, nb_annonces_online = :nb_annonces_online where ref_compte= :ref_compte");
-            $q1 -> bindValue(":ref_compte", $refCompte);
-            $q1 -> bindValue(":disabled", $disabled,PDO::PARAM_BOOL);
+            $q1->bindValue(":ref_compte", $refCompte);
+            $q1->bindValue(":disabled", $disabled, PDO::PARAM_BOOL);
             $q1->bindValue(":nb_annonces_online", $nbAnnonces);
-           
             
             $q1->execute();
         }
@@ -192,6 +192,6 @@ class LbcAccountManager
         $q3 = $this->_db->prepare("delete from adds_lbc where ref_compte in " . $in);
         $q3->execute($refComptes);
         
-        return($nbTot);
+        return ($nbTot);
     }
 }
