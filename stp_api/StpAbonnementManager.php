@@ -107,10 +107,10 @@ class StpAbonnementManager
         $oneWeekAgo = $now->sub(new \DateInterval("P7D"));
         
         $q = $this->_db->prepare("
-        select ref_abonnement, count(ref_abonnement)  as nb_message from stp_message_eleve
-            where date_message >= :one_week_ago
-            group by ref_abonnement
-            order by nb_message desc");
+            select ref_abonnement, count(ref_abonnement)  as nb_message from stp_message_eleve
+                where date_message >= :one_week_ago
+                group by ref_abonnement
+                order by nb_message desc");
         $q->bindValue(':one_week_ago', $oneWeekAgo->format(PG_DATETIME_FORMAT));
         $q->execute();
         
@@ -444,10 +444,10 @@ class StpAbonnementManager
                 
                 $refProches = extractAttribute($proches, "ref_proche");
                 
-                $refEleves = toPgArray($refEleves,true);
-                $refProches = toPgArray($refProches,true);
+                $refEleves = toPgArray($refEleves, true);
+                $refProches = toPgArray($refProches, true);
                 
-                $q = $this->_db->prepare('select * from stp_abonnement where ref_proche in '.$refProches.' or ref_eleve in '.$refEleves);
+                $q = $this->_db->prepare('select * from stp_abonnement where ref_proche in ' . $refProches . ' or ref_eleve in ' . $refEleves);
                 $q->execute();
             }
         }
@@ -469,12 +469,10 @@ class StpAbonnementManager
         }
         return ($abonnements);
     }
-    
-    
+
     // pour désactier les comptes tests . $email peut valoir yopla ou test pex ( tout dépend de la convenation de nommage des emails test
     function desactiveTestAccount($email)
     {
-        
         $abonnements = $this->getAll(array(
             "email" => $email
         ));
@@ -483,5 +481,75 @@ class StpAbonnementManager
             $abonnement->setRef_statut_abonnement($abonnement::DESACTIVE);
             $this->updateRefStatutAbonnement($abonnement);
         }
+    }
+
+    function updateProf($refAbo, $mailProfStp)
+    {
+        $profMg = new \spamtonprof\stp_api\StpProfManager();
+        
+        $prof = $profMg->get(array(
+            "email_stp" => $mailProfStp
+        ));
+        
+        $abo = $this->get(array(
+            "ref_abonnement" => $refAbo
+        ));
+        $abo->setRef_prof($prof->getRef_prof());
+        $this->updateRefProf($abo);
+        
+        if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ESSAI) {
+            
+            $gr = new \GetResponse();
+            $gr->updateTrialList($refAbo);
+        }
+        // mise à jour algolia
+        
+        $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+        
+        $constructor = array(
+            "construct" => array(
+                'ref_prof'
+            )
+        );
+        
+        $algoliaMg->updateAbonnement($abo->getRef_abonnement(), $constructor);
+    }
+
+    // champs de $fields : prenom, nom
+    function updateEleve($refAbo, array $fields)
+    {
+        $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
+        
+        $constructor = array(
+            "construct" => array(
+                'ref_eleve'
+            )
+        );
+        
+        $abo = $this->get(array(
+            "ref_abonnement" => $refAbo
+        ), $constructor);
+        
+        $eleve = $abo->getEleve();
+        $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
+        
+        if (array_key_exists("prenom", $fields)) {
+            $eleve->setPrenom($fields["prenom"]);
+            $eleveMg->updatePrenom($eleve);
+        }
+        
+        if (array_key_exists("nom", $fields)) {
+            $eleve->setNom($fields["nom"]);
+            $eleveMg->updateNom($eleve);
+        }
+        
+        if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ESSAI) {
+            $gr = new \GetResponse();
+            $gr->updateTrialList($refAbo);
+        }
+        
+        // mise à jour algolia
+        $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+        $algoliaMg->updateAbonnement($abo->getRef_abonnement(), $constructor);
     }
 }

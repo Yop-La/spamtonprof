@@ -44,7 +44,7 @@ class StpEleveManager
     {
         $q = $this->_db->prepare('update stp_eleve set email = :email, same_email = :same_email where ref_eleve = :ref_eleve');
         $q->bindValue(':email', $eleve->getEmail());
-        $q->bindValue(':same_email', $eleve->getSame_email(),PDO::PARAM_BOOL);
+        $q->bindValue(':same_email', $eleve->getSame_email(), PDO::PARAM_BOOL);
         $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
         $q->execute();
         
@@ -55,6 +55,26 @@ class StpEleveManager
     {
         $q = $this->_db->prepare('update stp_eleve set seq_email_parent_essai = :seq_email_parent_essai where ref_eleve = :ref_eleve');
         $q->bindValue(':seq_email_parent_essai', $eleve->getSeq_email_parent_essai());
+        $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
+        $q->execute();
+        
+        return ($eleve);
+    }
+
+    public function updatePrenom(StpEleve $eleve)
+    {
+        $q = $this->_db->prepare('update stp_eleve set prenom = :prenom where ref_eleve = :ref_eleve');
+        $q->bindValue(':prenom', $eleve->getPrenom());
+        $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
+        $q->execute();
+        
+        return ($eleve);
+    }
+
+    public function updateNom(StpEleve $eleve)
+    {
+        $q = $this->_db->prepare('update stp_eleve set nom = :nom where ref_eleve = :ref_eleve');
+        $q->bindValue(':nom', $eleve->getNom());
         $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
         $q->execute();
         
