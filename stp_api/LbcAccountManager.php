@@ -89,7 +89,7 @@ class LbcAccountManager
         if ($info == "lastTwentyForReportingLbcIndex") {
             
             $q = $this->_db->prepare("select prenom_client, nom_client, ref_compte, code_promo, controle_date, nb_annonces_online
-                from compte_lbc, client where compte_lbc.ref_client = client.ref_client limit 20");
+                from compte_lbc, client where compte_lbc.ref_client = client.ref_client  order by ref_compte desc limit 20");
             $q->execute();
         } else if (! $info) {
             

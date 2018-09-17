@@ -160,7 +160,6 @@ class AlgoliaManager
         $comptes = json_decode(json_encode($comptes), true);
         
         
-        
         for ($i = 0; $i < count($comptes); $i ++) {
             
             $compte = $comptes[$i];
@@ -169,7 +168,6 @@ class AlgoliaManager
                 return (! is_null($v));
             }, ARRAY_FILTER_USE_BOTH);
         }
-        
         
         $index->partialUpdateObjects($comptes);
     }
