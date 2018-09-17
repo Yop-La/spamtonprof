@@ -53,7 +53,7 @@ class GetResponse
         if (! empty($api_url)) {
             $this->api_url = $api_url;
         }
-        
+
         $this->profNameId = $this->getCustomFieldId("prof_name");
         $this->profName2Id = $this->getCustomFieldId("prof_name_2");
         $this->mailProfId = $this->getCustomFieldId("mail_prof");
@@ -64,10 +64,10 @@ class GetResponse
         $this->matieres2Id = $this->getCustomFieldId("matieres_2");
         $this->nameProcheId = $this->getCustomFieldId("name_proche");
         $this->nameProche2Id = $this->getCustomFieldId("name_proche_2");
-        
+
         $this->StpEleveEssaiId = $this->getCampagnId('stp_eleve_essai');
         $this->stpParentEssaiId1 = $this->getCampagnId('stp_parent_essai');
-        $this->stpParentEssaiId2 = $this    ->getCampagnId('stp_parent_essai_2');
+        $this->stpParentEssaiId2 = $this->getCampagnId('stp_parent_essai_2');
     }
 
     /**
@@ -266,7 +266,7 @@ class GetResponse
     }
 
     /**
-     * mettre à jour le champ personnalisé d'un contact
+     * mettre Ã  jour le champ personnalisÃ© d'un contact
      *
      * @param array $params
      * @param
@@ -519,9 +519,9 @@ class GetResponse
         if (is_null($this->customFields)) {
             $this->customFields = $this->getCustomFields();
         }
-        
+
         foreach ($this->customFields as $customField) {
-            
+
             if ($customField->name == $name)
                 return ($customField->customFieldId);
         }
@@ -532,29 +532,29 @@ class GetResponse
         if (is_null($this->campaigns)) {
             $this->campaigns = $this->getCampaigns();
         }
-        
+
         foreach ($this->campaigns as $campaign) {
-            
+
             if ($campaign->name == $name)
                 return ($campaign->campaignId);
         }
     }
 
     /*
-     * pour savoir si une adresse email dans une sequence email est apr�s un nombre jour ($limitDay ).
-     * return false si le contact n'est pas apr�s la deadline
+     * pour savoir si une adresse email dans une sequence email est après un nombre jour ($limitDay ).
+     * return false si le contact n'est pas après la deadline
      */
     function isAfterDeadline($contact, $limitDay)
     {
         if (! is_null($contact->dayOfCycle)) {
-            
+
             $dayOfCycle = intval($contact->dayOfCycle);
-            
+
             if ($dayOfCycle >= $limitDay) {
-                
+
                 return ($contact);
             } else {
-                
+
                 return (false);
             }
         }
@@ -568,7 +568,7 @@ class GetResponse
     function moveContact($sequenceName, $contactId)
     {
         $campaignId = $this->getCampagnId($sequenceName);
-        
+
         $params = '
         {
             "dayOfCycle": "0",
@@ -577,9 +577,9 @@ class GetResponse
             }
         }
         ';
-        
+
         $params = json_decode($params);
-        
+
         $ret = $this->updateContact($contactId, $params);
         return ($ret);
     }
@@ -587,22 +587,22 @@ class GetResponse
     function getContactInList($email, $listName)
     {
         $campaignId = $this->getCampagnId($listName);
-        
+
         $params = array(
             "query" => array(
                 "email" => $email,
                 "campaignId" => $campaignId
             )
         );
-        
+
         $contacts = $this->getContacts($params);
-        
+
         if (empty((array) $contacts)) {
             return (false);
         }
-        
+
         foreach ($contacts as $contact) { // on boucle sur un contact uniquement car il ne peut y avoir qu'un
-            
+
             return ($contact);
         }
     }
@@ -610,26 +610,26 @@ class GetResponse
     function getFreeParentEssaiList($emailParent)
     {
         $contact = $this->getContactInList($emailParent, "stp_parent_essai");
-        
+
         if ($contact) {
-            
+
             $contact = $this->isAfterDeadline("stp_parent_essai", 7, $proche->getEmail());
-            
+
             if ($contact) {
-                
+
                 return ("stp_parent_essai");
             }
         } else {
             return ("stp_parent_essai");
         }
         $contact = $this->getContactInList($emailParent, "stp_parent_essai_2");
-        
+
         if ($contact) {
-            
+
             $contact = $this->isAfterDeadline("stp_parent_essai_2", 7, $proche->getEmail());
-            
+
             if ($contact) {
-                
+
                 return ("stp_parent_essai_2");
             }
         } else {
@@ -699,12 +699,12 @@ class GetResponse
         return http_build_query($result);
     }
 
-    public function addEleveInTrialSequence(\spamtonprof\stp_api\StpEleve $eleve, \spamtonprof\stp_api\StpProf $prof, \spamtonprof\stp_api\StpFormule $formule,$dayOfCycle = 0)
+    public function addEleveInTrialSequence(\spamtonprof\stp_api\StpEleve $eleve, \spamtonprof\stp_api\StpProf $prof, \spamtonprof\stp_api\StpFormule $formule, $dayOfCycle = 0)
     {
         $params = '{
             "name": "' . $eleve->getPrenom() . '",
             "email": "' . $eleve->getEmail() . '",
-            "dayOfCycle": '.$dayOfCycle.',
+            "dayOfCycle": ' . $dayOfCycle . ',
             "campaign": {
                 "campaignId": "' . $this->StpEleveEssaiId . '"
             },
@@ -735,11 +735,11 @@ class GetResponse
                 }
             ]
         }';
-        
+
         $params = json_decode($params);
-        
+
         $rep = $this->addContact($params);
-        
+
         return ($rep);
     }
 
@@ -785,11 +785,11 @@ class GetResponse
                 }
             ]
         }';
-        
+
         $params = json_decode($params);
-        
+
         $rep = $this->addContact($params);
-        
+
         return ($rep);
     }
 
@@ -835,13 +835,165 @@ class GetResponse
                 }
             ]
         }';
+
+        $params = json_decode($params);
+
+        $rep = $this->addContact($params);
+
+        return ($rep);
+    }
+
+    function updateEleveInTrialList(int $refAbo)
+    {
+        $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
+
+        $constructor = array(
+            "construct" => array(
+                'ref_eleve',
+                'ref_formule',
+                'ref_prof'
+            )
+        );
+
+        $abo = $aboMg->get(array(
+            "ref_abonnement" => $refAbo
+        ), $constructor);
+
+        $eleve = $abo->getEleve();
+        $formule = $abo->getFormule();
+        $prof = $abo->getFormule();
+
+        $contact = $this->getContactInList($eleve->getEmail(), $this->StpEleveEssaiId);
+
+        
+        
+        $params = '{
+            "name": "' . $eleve->getPrenom() . '",
+            "customFieldValues": [
+                {
+                    "customFieldId": "' . $this->profNameId . '",
+                    "value": [
+                        "' . $prof->getPrenom() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $this->mailProfId . '",
+                    "value": [
+                        "' . $prof->getEmail_stp() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $this->sexeProfId . '",
+                    "value": [
+                        "' . $prof->getSexe() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $this->matieresId . '",
+                    "value": [
+                        "' . $formule->toGetResponse() . '"
+                    ]
+                }
+            ]
+        }';
+
+        $params = json_decode($params);
+
+        $this->updateContact($contact->contactId, $params);
+    }
+    
+    function updateParentInTrialList(int $refAbo)
+    {
+        $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
+        
+        $constructor = array(
+            "construct" => array(
+                'ref_eleve',
+                'ref_formule',
+                'ref_prof'
+            )
+        );
+        
+        $abo = $aboMg->get(array(
+            "ref_abonnement" => $refAbo
+        ), $constructor);
+        
+        $eleve = $abo->getEleve();
+        $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
+        $formule = $abo->getFormule();
+        $prof = $abo->getFormule();
+        $proche = $abo->getProche();
+        
+        
+        $stpParentEssai = $this->stpParentEssaiId1;
+        $profNameId = $this->profNameId;
+        $mailProfId = $this->mailProfId;
+        $sexeProfId = $this->sexeProfId;
+        $matieresId = $this->matieresId;
+        $nameProcheId = $this->nameProcheId;
+        if($eleve->getSeq_email_parent_essai() == 1){
+            $stpParentEssai = $this->stpParentEssaiId1;
+            $profNameId = $this->profNameId;
+            $mailProfId = $this->mailProfId;
+            $sexeProfId = $this->sexeProfId;
+            $matieresId = $this->matieresId;
+            $nameProcheId = $this->nameProcheId;
+        }else if($eleve->getSeq_email_parent_essai() == 1){
+            $stpParentEssai = $this->stpParentEssaiId2;
+            $profNameId = $this->profName2Id;
+            $mailProfId = $this->mailProf2Id;
+            $sexeProfId = $this->sexeProf2Id;
+            $matieresId = $this->matieres2Id;
+            $nameProcheId = $this->nameProche2Id;
+        }else{
+            exit(0);
+        }
+        
+        $contact = $this->getContactInList($proche->getEmail(), $stpParentEssai);
+        
+        $params = '{
+            "name": "' . $proche->getPrenom() . '",,
+            "customFieldValues": [
+                {
+                    "customFieldId": "' . $profNameId . '",
+                    "value": [
+                        "' . $prof->getPrenom() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $mailProfId . '",
+                    "value": [
+                        "' . $prof->getEmail_stp() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $sexeProfId . '",
+                    "value": [
+                        "' . $prof->getSexe() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $matieresId . '",
+                    "value": [
+                        "' . $formule->toGetResponse() . '"
+                    ]
+                },
+                {
+                    "customFieldId": "' . $nameProcheId . '",
+                    "value": [
+                        "' . $eleve->getPrenom() . '"
+                    ]
+                }
+            ]
+        }';
         
         $params = json_decode($params);
         
-        $rep = $this->addContact($params);
-        
-        return ($rep);
+        $this->updateContact($contact->contactId, $params);
     }
+    
+    
+    
 }
 
 ?>

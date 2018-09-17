@@ -9,6 +9,9 @@ popupArret = "18626";
 jQuery( document ).ready( function( $ ) {
 
 
+
+
+
 	waitForEl(".row-essai", function() {
 
 		// pour charger et remplir les lignes d'essai 
@@ -140,6 +143,47 @@ jQuery( document ).ready( function( $ ) {
 
 
 		}
+		
+		
+		/** début formulaire de paiement stripe **/
+
+		var handler2 = StripeCheckout.configure({
+			key: publicStripeKey,
+			image: 'https://spamtonprof.com/wp-content/uploads/2018/03/logo-stripe.png',
+			locale: 'auto',
+			allowRememberMe: false,
+			token: function(token) {
+
+				aboClique = abosEssai[indiceAbo];
+
+				createSubscription(aboClique.ref_abonnement, token.id, testMode);
+
+			}
+		});
+		
+		waitForEl(".updatecb", function() {
+
+
+			jQuery('.updatecb').click(function() {
+
+				// Open Checkout with further options:
+				handler2.open({
+					name: 'SpamTonProf',
+					description: 'Mise à jour de la carte bancaire',
+					zipCode: false,
+					panelLabel: "Mettre à jour la CB"
+				});
+				e.preventDefault();
+
+
+			});
+		});
+		
+		// Close Checkout on page navigation:
+		window.addEventListener('popstate', function() {
+			handler2.close();
+		});
+
 
 		// pour attacher la popup d'annulation ou d'interruption au bouton d'annulation
 		jQuery('.pause').click(function(e) {
@@ -161,12 +205,6 @@ jQuery( document ).ready( function( $ ) {
 			console.log("fr");
 
 			e.preventDefault();
-		});
-
-
-		// Close Checkout on page navigation:
-		window.addEventListener('popstate', function() {
-			handler.close();
 		});
 
 
@@ -241,10 +279,7 @@ jQuery( document ).ready( function( $ ) {
 		});
 
 
-		// Close Checkout on page navigation:
-		window.addEventListener('popstate', function() {
-			handler.close();
-		});
+
 
 
 	});
