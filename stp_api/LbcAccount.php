@@ -28,7 +28,58 @@ class LbcAccount implements \JsonSerializable
     $expe,
     $code_promo,
     $end_pack,
+    $prenom_client,
+    $nom_client,
+    $controle_date,
     $objectID;
+
+    /**
+     * @return mixed
+     */
+    public function getControle_date()
+    {
+        return $this->controle_date;
+    }
+
+    /**
+     * @param mixed $controle_date
+     */
+    public function setControle_date($controle_date)
+    {
+        $this->controle_date = $controle_date;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPrenom_client()
+    {
+        return $this->prenom_client;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNom_client()
+    {
+        return $this->nom_client;
+    }
+
+    /**
+     * @param mixed $prenom_client
+     */
+    public function setPrenom_client($prenom_client)
+    {
+        $this->prenom_client = $prenom_client;
+    }
+
+    /**
+     * @param mixed $nom_client
+     */
+    public function setNom_client($nom_client)
+    {
+        $this->nom_client = $nom_client;
+    }
 
     /**
      * @return mixed

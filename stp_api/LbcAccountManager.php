@@ -86,14 +86,23 @@ class LbcAccountManager
     {
         $accounts = [];
         $q = null;
-        if ($info == "lastTwenty") {
+        if ($info == "lastTwentyForReportingLbcIndex") {
             
-            $q = $this->_db->prepare("select * from compte_lbc limit 20");
+            $q = $this->_db->prepare("select prenom_client, nom_client, ref_compte, code_promo, controle_date, nb_annonces_online
+                from compte_lbc, client where compte_lbc.ref_client = client.ref_client limit 20");
             $q->execute();
         } else if (! $info) {
             
             $q = $this->_db->prepare("select * from compte_lbc");
             $q->execute();
+        }else if("forReportingLbcIndex") {
+            
+            
+            $q = $this->_db->prepare("select prenom_client, nom_client, ref_compte, code_promo, controle_date, nb_annonces_online
+                from compte_lbc, client where compte_lbc.ref_client = client.ref_client");
+            $q->execute();
+            
+            
         }
         
         while ($donnees = $q->fetch(PDO::FETCH_ASSOC)) {
@@ -180,10 +189,14 @@ class LbcAccountManager
                 $refComptes[] = $refCompte;
             }
             
-            $q1 = $this->_db->prepare("update compte_lbc set disabled = :disabled, nb_annonces_online = :nb_annonces_online where ref_compte= :ref_compte");
+            $now = new \DateTime(null, new  \DateTimeZone("Europe/Paris"));
+            
+            
+            $q1 = $this->_db->prepare("update compte_lbc set controle_date = :controle_date, disabled = :disabled, nb_annonces_online = :nb_annonces_online where ref_compte= :ref_compte");
             $q1->bindValue(":ref_compte", $refCompte);
             $q1->bindValue(":disabled", $disabled, PDO::PARAM_BOOL);
             $q1->bindValue(":nb_annonces_online", $nbAnnonces);
+            $q1->bindValue(":controle_date", $now->format(PG_DATETIME_FORMAT));
             
             $q1->execute();
         }
