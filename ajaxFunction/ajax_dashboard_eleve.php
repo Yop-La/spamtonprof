@@ -222,6 +222,17 @@ function ajaxCreateSubscription()
         $body_prof = str_replace("[[formule]]", $formule->getFormule(), $body_prof);
         $body_prof = str_replace("[[tarif]]", $plan->getTarif(), $body_prof);
         $smtp->sendEmail("Bravo, une semaine d'essai concluante pour " . $eleve->getPrenom() . "! ", $prof->getEmail_stp(), $body_prof, $expe->getEmail(), "Alexandre de SpamTonProf", true);
+        
+        $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+        
+        $constructor = array(
+            "construct" => array(
+                'ref_statut_abonnement'
+            )
+        );
+        
+        $algoliaMg->updateAbonnement($abonnement->getRef_abonnement(), $constructor);
+        
     }
     
     echo (json_encode($retour));
