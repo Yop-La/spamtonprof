@@ -8,17 +8,17 @@
             <div class="item1">{{{_highlightResult.eleve.prenom.value}}} {{{_highlightResult.eleve.nom.value}}} en {{eleve.classe.nom_complet}} -- {{statut.statut_abonnement}}</div>
             <div class="item2">
               <span class = "grid-title">Infos abonnement</span><br>
-              Nombre de jours d'inactivitÃ© : {{nbJourSansMessage}}<br>
+              Nombre de jours d'inactivité : {{nbJourSansMessage}}<br>
               Nombre de message 7 derniers jours : {{nb_message}} <br>
               Date inscription: {{date_creation}}<br>
               Formule : {{formule.formule}}<br>
               Ref abonnement :: <span class='ref_abonnement'>{{ref_abonnement}}</span><br>
             </div>
             <div class="item3">
-              <span class = "grid-title">Ã‰lÃ¨ve</span><span class = 'update_eleve update_button'>Update</span><br>
+              <span class = "grid-title">Élève</span><span class = 'update_eleve update_button'>Update</span><br>
               {{{_highlightResult.eleve.prenom.value}}} {{{_highlightResult.eleve.nom.value}}}<br>
               email : <span contenteditable="true" class='email single-line'>{{{_highlightResult.eleve.email.value}}}</span><br>
-              TÃ©l : {{eleve.telephone}}<br>
+              Tél : {{eleve.telephone}}<br>
             </div>  
             
             <div class="item4">
@@ -26,7 +26,7 @@
               {{#proche}}
               {{{_highlightResult.proche.prenom.value}}} {{{_highlightResult.proche.nom.value}}}<br>
               email : {{{_highlightResult.proche.email.value}}}<br>
-              TÃ©l : {{telephone}}<br>
+              Tél : {{telephone}}<br>
               {{/proche}}
             </div>
 
@@ -38,7 +38,7 @@
               <span class = "grid-title">Niveau {{matiere.matiere}}</span><br>
               <span class = "grid-subtitle">Chapitres</span><br>
               {{chapitre}}<br>
-              <span class = "grid-subtitle">DifficultÃ©es</span><br>
+              <span class = "grid-subtitle">Difficultées</span><br>
               {{difficule}}<br>
               <span class = "grid-subtitle">Notes</span><br>
               {{note}}<br>
@@ -50,7 +50,7 @@
               <span class = "grid-title">Niveau {{matiere.matiere}}</span><br>
               <span class = "grid-subtitle">Chapitres</span><br>
               {{chapitre}}<br>
-              <span class = "grid-subtitle">DifficultÃ©es</span><br>
+              <span class = "grid-subtitle">Difficultées</span><br>
               {{difficule}}<br>
               <span class = "grid-subtitle">Notes</span><br>
               {{note}}<br>
