@@ -552,4 +552,43 @@ class StpAbonnementManager
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
         $algoliaMg->updateAbonnement($abo->getRef_abonnement(), $constructor);
     }
+    
+    // mise à jour du plan de paiement et de la formule
+    function updateFormule($refAbo, int $refFormule)
+    {
+        
+        $abo = $this->get(array(
+            "ref_abonnement" => $refAbo
+        ));
+        
+        
+        $planMg = new \spamtonprof\stp_api\StpPlanManager();
+        
+        $plan = $planMg -> getDefault(array("ref_formule" => $refFormule));
+        
+        
+        $q = $this->_db->prepare("update stp_abonnement set ref_formule = :ref_formule, ref_plan = :ref_plan where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_formule", $refFormule);
+        $q->bindValue(":ref_plan", $plan->getRef_plan());
+        $q->bindValue(":ref_abonnement", $refAbo);
+        $q->execute();
+        
+        if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ESSAI) {
+            $gr = new \GetResponse();
+            $gr->updateTrialList($refAbo);
+        }
+        
+        // mise à jour algolia
+        $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+        
+        
+        $constructor = array(
+            "construct" => array(
+                'ref_formule',
+                'ref_plan'
+            )
+        );
+        
+        $algoliaMg->updateAbonnement($abo->getRef_abonnement(), $constructor);
+    }
 }
