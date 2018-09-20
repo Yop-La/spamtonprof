@@ -28,6 +28,16 @@ header("Pragma: no-cache");
  * Au début, ce template envoie une requête get pour avoir une liste des comptes à checker 
  * A la fin, il envoie une requête pour donner le résultat du contrôles des annonces (un tableau de code_promo, nb_annonces, ref_compte)
  * 
+ * 
+ * Etapes :
+ *  - Etape 1 : le template zenno envoie une requete get :
+ *      - cette requete get désactive les comptes sans code promo ( publication qui a échoué , ils ne seront plus contrôles) et 
+ *      - elle retourne la liste des comptes à contrôler par zenno
+ *  - Etape 2 : le template zenno contrôle les comptes données par la requête get ( les comptes sans code promo ne sont pas dans cette liste )
+ *  - Etape 3 : le template zenno envoie une requete post qui contient le resultat de la publication array( code_promo, ref_compte, nb_annonces)
+ *      - le script met ensuite à jour la date de contrôle de ces comptes
+ *      - mise à jour du compte activé/désactivé
+ *      - mise à jour du nombre d'annonces
  */
 
 
