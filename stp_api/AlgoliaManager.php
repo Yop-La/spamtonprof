@@ -169,6 +169,7 @@ class AlgoliaManager
             }, ARRAY_FILTER_USE_BOTH);
         }
         
+        
         $index->saveObjects($comptes);
     }
 }

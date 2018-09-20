@@ -34,6 +34,8 @@ header("Pragma: no-cache");
 
 $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
 
+$slack = new \spamtonprof\slack\Slack();
+
 if (count($_GET) != 0) {
     
     $nbCompte = $_GET["nbCompte"];
@@ -53,15 +55,15 @@ if (count($_GET) != 0) {
     $rows = explode("\r\n", $obj);
     
     $nbTot = $lbcAccountMg->updateAfterScraping($rows);
+
+    $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
     
-    $slack = new \spamtonprof\slack\Slack();
+    $algoliaMg -> updateReportingLbc();
+    
+    
     $slack->sendMessages("log", array(
         "contrôles des annonces réalisés",
         "Il y a au moins " . $nbTot . " en ligne"
     ));
+
 }
-
-$agoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
-
-$algoliaMg -> updateReportingLbc();
-

@@ -95,14 +95,11 @@ class LbcAccountManager
             
             $q = $this->_db->prepare("select * from compte_lbc");
             $q->execute();
-        }else if("forReportingLbcIndex") {
-            
+        } else if ("forReportingLbcIndex") {
             
             $q = $this->_db->prepare("select prenom_client, nom_client, ref_compte, code_promo, controle_date, nb_annonces_online
                 from compte_lbc, client where compte_lbc.ref_client = client.ref_client");
             $q->execute();
-            
-            
         }
         
         while ($donnees = $q->fetch(PDO::FETCH_ASSOC)) {
@@ -164,8 +161,12 @@ class LbcAccountManager
         
         $in = "(" . join(',', array_fill(0, count($refComptes), '?')) . ")";
         
-        $q2 = $this->_db->prepare("update compte_lbc set disabled = true where ref_compte in " . $in);
+        $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+        
+        $q2 = $this->_db->prepare("update compte_lbc set controle_date = :controle_date, disabled = true where ref_compte in " . $in);
+        $q2->bindValue(":controle_date", $now->format(PG_DATETIME_FORMAT));
         $q2->execute($refComptes);
+        
         
         $q3 = $this->_db->prepare("delete from adds_lbc where ref_compte in " . $in);
         $q3->execute($refComptes);
@@ -189,8 +190,7 @@ class LbcAccountManager
                 $refComptes[] = $refCompte;
             }
             
-            $now = new \DateTime(null, new  \DateTimeZone("Europe/Paris"));
-            
+            $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
             
             $q1 = $this->_db->prepare("update compte_lbc set controle_date = :controle_date, disabled = :disabled, nb_annonces_online = :nb_annonces_online where ref_compte= :ref_compte");
             $q1->bindValue(":ref_compte", $refCompte);
