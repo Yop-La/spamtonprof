@@ -25,6 +25,12 @@ class PageManager
         $this->domain = $host_split[0];
 
         $_SESSION["domain"] = $this->domain;
+        
+        $_SESSION["prod"] = true;
+        if( strpos($_SESSION["domain"], 'localhost') !== false){
+            $_SESSION["prod"] = false;
+        }
+            
 
         $this->loadSessionVariable();
     }
@@ -125,6 +131,14 @@ class PageManager
                 $eleves = $eleveMg->getAll(array(
                     "ref_compte" => $compte->getRef_compte()
                 ), true);
+
+                for ($i = 0; $i < count($eleves); $i ++) {
+
+                    $eleveTemp = $eleves[$i];
+                    $eleveTemp["inTrial"] = $eleveMg->isInTrial($eleveTemp["ref_eleve"]);
+                    $eleves[$i] = $eleveTemp;
+                }
+
                 wp_localize_script('functions_js', 'eleves', $eleves);
             }
 
@@ -160,6 +174,7 @@ class PageManager
                 $printNum = "true";
             }
         }
+
         $numMessage = 'Vous venez de découvrir notre site ? Et si on en discutait au téléphone ? Appelez nous au 04-34-10-25-49.';
         wp_localize_script('functions_js', 'numMessage', array(
             'message' => utf8_encode($numMessage),
@@ -256,14 +271,14 @@ class PageManager
 
             PageManager::backOffice();
         }
-        
+
         if ($this->pageSlug == 'formule') {
-            
+
             PageManager::formule();
         }
-        
+
         if ($this->pageSlug == 'reporting-lbc') {
-            
+
             PageManager::reportingLbc();
         }
     }
@@ -315,6 +330,9 @@ class PageManager
             'nf-front-end'
         ), time());
 
+        wp_enqueue_style('dw_css', get_stylesheet_directory_uri() . '/css/pages/discover-week.css');
+        
+        
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
 
         wp_enqueue_style('css_dropdown', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css');
@@ -324,6 +342,11 @@ class PageManager
         wp_enqueue_script('jquery_dropdown', "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js");
 
         wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
+
+        $classeMg = new \spamtonprof\stp_api\StpClasseManager();
+
+        $classes = $classeMg->getAll("byprofil");
+        wp_localize_script('discover_week', 'classesByProfil', $classes);
     }
 
     public static function passwordReset()
@@ -490,18 +513,18 @@ class PageManager
             'nf-front-end'
         ), time());
     }
-    
+
     public static function reportingLbc()
-    
+
     {
         wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
-        
+
         wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/reporting-lbc.css');
-        
+
         wp_enqueue_script('algolia_js', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.js');
-        
+
         wp_enqueue_script('formule_js', plugins_url() . '/spamtonprof/js/reporting-lbc.js', array(
-            
+
             'nf-front-end'
         ), time());
     }

@@ -24,7 +24,7 @@ class StpEleveManager
         $q->bindValue(':same_email', $StpEleve->getSame_email(), \PDO::PARAM_BOOL);
         $q->bindValue(':ref_profil', $StpEleve->getRef_profil());
         $q->bindValue(':ref_compte', $StpEleve->getRef_compte());
-        
+
         $q->execute();
         $StpEleve->setRef_eleve($this->_db->lastInsertId());
         return ($StpEleve);
@@ -32,11 +32,21 @@ class StpEleveManager
 
     public function updateRefCompteWp(StpEleve $eleve)
     {
-        $q = $this->_db->prepare('update stp_eleve set ref_compte_wp = :ref_compte_wp where ref_eleve = :ref_eleve');
-        $q->bindValue(':ref_compte_wp', $eleve->getRef_compte_wp());
+        
+        $refCompteWp = $eleve->getRef_compte_wp();
+        
+        $q =null;
+        if(!$_SESSION["prod"]){
+            $q = $this->_db->prepare('update stp_eleve set ref_compte_wp_test = :ref_compte_wp_test where ref_eleve = :ref_eleve');
+            $q->bindValue(':ref_compte_wp_test', $refCompteWp);
+        }else{
+            $q = $this->_db->prepare('update stp_eleve set ref_compte_wp = :ref_compte_wp where ref_eleve = :ref_eleve');
+            $q->bindValue(':ref_compte_wp', $refCompteWp);
+        }
+        
         $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
         $q->execute();
-        
+
         return ($eleve);
     }
 
@@ -47,7 +57,7 @@ class StpEleveManager
         $q->bindValue(':same_email', $eleve->getSame_email(), PDO::PARAM_BOOL);
         $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
         $q->execute();
-        
+
         return ($eleve);
     }
 
@@ -57,7 +67,7 @@ class StpEleveManager
         $q->bindValue(':seq_email_parent_essai', $eleve->getSeq_email_parent_essai());
         $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
         $q->execute();
-        
+
         return ($eleve);
     }
 
@@ -67,7 +77,7 @@ class StpEleveManager
         $q->bindValue(':prenom', $eleve->getPrenom());
         $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
         $q->execute();
-        
+
         return ($eleve);
     }
 
@@ -77,7 +87,7 @@ class StpEleveManager
         $q->bindValue(':nom', $eleve->getNom());
         $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
         $q->execute();
-        
+
         return ($eleve);
     }
 
@@ -85,53 +95,53 @@ class StpEleveManager
     {
         $data = false;
         if (array_key_exists("email", $info)) {
-            
+
             $email = $info["email"];
-            
+
             $pos = strpos($email, '@');
-            
+
             $radical = substr($email, 0, $pos);
-            
+
             $radical = str_replace(".", "", $radical);
-            
+
             $radical = implode('[\.]?', str_split($radical));
-            
+
             $domain = substr($email, $pos);
-            
+
             $email = $radical . $domain;
-            
+
             $q = $this->_db->prepare('select * from stp_eleve where lower(email) ~ lower(:email)');
             $q->bindValue(':email', $email);
             $q->execute();
         }
-        
+
         if (array_key_exists("ref_compte_wp", $info)) {
             $refCompteWp = $info["ref_compte_wp"];
-            $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp = :ref_compte_wp');
-            $q->bindValue(':ref_compte_wp', $refCompteWp);
+            
+            $q=null;
+            if(!$_SESSION["prod"]){
+                $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp_test = :ref_compte_wp_test');
+                $q->bindValue(':ref_compte_wp_test', $refCompteWp);
+            }else{
+                $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp = :ref_compte_wp');
+                $q->bindValue(':ref_compte_wp', $refCompteWp);
+            }
+            
             $q->execute();
         }
-        
+
         if (array_key_exists("ref_eleve", $info)) {
-            
+
             $refEleve = $info["ref_eleve"];
-            
+
             $q = $this->_db->prepare('select * from stp_eleve where ref_eleve = :ref_eleve');
             $q->bindValue(':ref_eleve', $refEleve);
             $q->execute();
         }
-        
-        if (array_key_exists("ref_compte_wp", $info)) {
-            
-            $refCompteWp = $info["ref_compte_wp"];
-            
-            $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp = :ref_compte_wp');
-            $q->bindValue(':ref_compte_wp', $refCompteWp);
-            $q->execute();
-        }
-        
+
+
         $data = $q->fetch(\PDO::FETCH_ASSOC);
-        
+
         if ($data) {
             return (new \spamtonprof\stp_api\StpEleve($data));
         } else {
@@ -148,30 +158,48 @@ class StpEleveManager
     {
         $classeMg = new \spamtonprof\stp_api\StpClasseManager();
         $profilMg = new \spamtonprof\stp_api\StpProfilManager();
-        
+
         $eleve = $this->cast($constructor["objet"]);
-        
+
         $constructOrders = $constructor["construct"];
-        
+
         foreach ($constructOrders as $constructOrder) {
-            
+
             switch ($constructOrder) {
                 case "ref_classe":
                     $classe = $classeMg->get(array(
                         'ref_classe' => $eleve->getRef_classe()
                     ));
-                    
+
                     $eleve->setClasse($classe);
                     break;
                 case "ref_profil":
                     $profil = $profilMg->get(array(
                         'ref_profil' => $eleve->getRef_profil()
                     ));
-                    
+
                     $eleve->setProfil($profil);
                     break;
             }
         }
+    }
+
+    public function isInTrial($refEleve)
+    {
+        $q = $this->_db->prepare("select count(*) as nb_abo_essai from stp_abonnement where ref_statut_abonnement = 2 and ref_eleve = :ref_eleve");
+        $q->bindValue(':ref_eleve', $refEleve);
+        $q->execute();
+        
+        $data = $q->fetch(PDO::FETCH_ASSOC);
+        
+        $nbEssai = $data["nb_abo_essai"];
+        
+        if($nbEssai == 0){
+            return(false);
+        }else{
+            return(true);
+        }
+        
     }
 
     public function getAll($info, $eleveAsArray = false)
@@ -179,20 +207,20 @@ class StpEleveManager
         $eleves = [];
         $q = null;
         if (array_key_exists("ref_compte", $info)) {
-            
+
             $refCompte = $info["ref_compte"];
             $q = $this->_db->prepare('select * from stp_eleve where ref_compte = :ref_compte ');
             $q->bindValue(":ref_compte", $refCompte);
             $q->execute();
         } else if (array_key_exists("email", $info)) {
-            
+
             $email = $info["email"];
-            
+
             $q = $this->_db->prepare('select * from stp_eleve where email like :email ');
             $q->bindValue(":email", '%' . $email . '%');
             $q->execute();
         }
-        
+
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
             $eleve = new \spamtonprof\stp_api\StpEleve($data);
             if ($eleveAsArray) {

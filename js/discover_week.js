@@ -9,6 +9,8 @@ matieres  = "maths-physique".split("-");
 ajaxEnCours = 0;
 gClasseSelect = null;
 
+choixEleveValide = false; // pour savoir si le choix de l'élève est valide
+
 //id des champs du formulaire
 
 idFormEssai = "68";
@@ -22,8 +24,6 @@ idChoixProfil = "938";
 idClasse = "943";
 idMatieres = "939";
 idProfil = "940";
-
-
 
 idChapterMaths = "945";
 idLacuneMaths = "946";
@@ -42,21 +42,53 @@ idPrenomProche = "958";
 idNomProche = "960";
 idMailProche = "959";
 idPhoneProche = "961";
+
+
 idRemarque 	= "962";
 
 idCode = "963";
-
-idFormAjoutEleve = "75";
-
-idAjoutElevePrenom = "1063";
-idAjoutEleveNom = "1061";
-idAjoutEleveEmail = "1060";
-idAjoutElevePhone = "1059";
-idAjoutEleveChoixProfil = "1062";
-idAjoutEleveClasse = "1088";
-idAjoutEleveProfil = "1089";
-
 idTeleprospection = "985";
+
+//form ajout élève
+
+idFormAjoutEleve = "74";
+
+idAjoutElevePrenom = "1018";
+idAjoutEleveNom = "1023";
+idAjoutEleveEmail = "1019";
+idAjoutElevePhone = "1024";
+idAjoutEleveChoixProfil = "1020";
+idAjoutEleveClasse = "1025";
+idAjoutEleveProfil = "1022";
+
+//form inscription essai pour client
+idFormEssaiClient = "75";
+
+idBisMatieres = "1084";
+idBisRefEleve = "1086";
+
+
+idBisChapterMaths = "1060";
+idBisLacuneMaths = "1061";
+idBisNoteMaths = "1062";
+
+idBisChapterPhysique = "1064";
+idBisLacunePhysique = "1065";
+idBisNotePhysique = "1066";
+
+idBisChapterFrench = "1068";
+idBisLacuneFrench = "1069";
+idBisNoteFrench = "1070";
+
+idBisProche = "1072";
+idBisPrenomProche = "1073";
+idBisNomProche = "1075";
+idBisMailProche = "1074";
+idBisPhoneProche = "1076";
+idBisRemarque 	= "1077";
+
+idBisCode = "1078";
+
 
 
 /*
@@ -107,8 +139,8 @@ var mySubmitController = Marionette.Object.extend( {
 			code = response.data.fields[idCode].value;
 			teleprospection = response.data.fields[idTeleprospection].value;
 
-			
-			
+
+
 			// soumission ajax des champs du form pour création inscription
 			ajaxEnCours++;
 			jQuery.post(
@@ -177,10 +209,93 @@ var mySubmitController = Marionette.Object.extend( {
 					});
 		}
 
+
+		// form essai
+		if(response.data.form_id == idFormEssaiClient){
+			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery(".hide_loading").addClass("hide");
+			PUM.close(19166);
+
+			//récupérationdes variables du form
+
+			matieres = response.data.fields[idBisMatieres].value;
+			refEleve = response.data.fields[idBisRefEleve].value;
+
+			chapterMaths = response.data.fields[idBisChapterMaths].value;
+			lacuneMaths = response.data.fields[idBisLacuneMaths].value;
+			noteMaths = response.data.fields[idBisNoteMaths].value;
+			chapterPhysique = response.data.fields[idBisChapterPhysique].value;
+			lacunePhysique = response.data.fields[idBisLacunePhysique].value;
+			notePhysique = response.data.fields[idBisNotePhysique].value;
+			chapterFrench = response.data.fields[idBisChapterFrench].value;
+			lacuneFrench = response.data.fields[idBisLacuneFrench].value;
+			noteFrench = response.data.fields[idBisNoteFrench].value;
+			remarque = response.data.fields[idBisRemarque].value;
+			code = response.data.fields[idBisCode].value;
+
+
+
+			// soumission ajax des champs du form pour création inscription
+			ajaxEnCours++;
+			jQuery.post(
+					ajaxurl,
+					{
+						'action' : 'ajaxNewEssaiClient',
+						'refEleve' : refEleve,
+						'chapterMaths' : chapterMaths,
+						'lacuneMaths' : lacuneMaths,
+						'noteMaths' : noteMaths,
+						'chapterPhysique' : chapterPhysique,
+						'lacunePhysique' : lacunePhysique,
+						'notePhysique' : notePhysique,
+						'chapterFrench' : chapterFrench,
+						'lacuneFrench' : lacuneFrench,
+						'noteFrench' : noteFrench,
+						'remarque' : remarque,
+						'matieres' : matieres,
+						'code' : code
+					})
+					.done(function(retour){ 
+
+						error = retour.error;
+						message = retour.message;
+
+						if(error){
+
+							showMessage("Il y a un problème. Contacter l'équipe et donner leur ce message d'erreur : ".concat(message));
+							ajaxEnCours--;
+							if(ajaxEnCours == 0){
+								jQuery("#loadingSpinner").addClass("hide");
+								jQuery(".hide_loading").removeClass("hide");
+							}
+						}else{
+
+							if(message == "compte_existe_deja"){
+								redirectTo("connexion" ,info = "Vous avez déjà un compte. Connectez vous ! " );
+							}else{
+								redirectTo("remerciement-eleve" ,"Félicitations. Tu pourras démarrer la semaine de découverte dans 1 jour !" );
+							}
+
+						}
+
+
+					})
+					.fail(function(err){
+						console.log("erreur ajax");
+						console.log(err);
+						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
+						ajaxEnCours--;
+						if(ajaxEnCours == 0){
+							jQuery("#loadingSpinner").addClass("hide");
+							jQuery(".hide_loading").removeClass("hide");
+						}
+					});
+		}
+
 		if(response.data.form_id == idFormAjoutEleve){
 			jQuery("#loadingSpinner").removeClass("hide");
 			jQuery(".hide_loading").addClass("hide");
-			PUM.close(18754);
+			PUM.close(19151);
 
 			//récupérationdes variables du form
 			classe = response.data.fields[idAjoutEleveClasse].value;
@@ -189,6 +304,7 @@ var mySubmitController = Marionette.Object.extend( {
 			phoneEleve = response.data.fields[idAjoutElevePhone].value;
 			prenomEleve = response.data.fields[idAjoutElevePrenom].value;
 			profil = response.data.fields[idAjoutEleveProfil].value;
+
 
 			// soumission ajax des champs du form pour création inscription
 			ajaxEnCours++;
@@ -215,8 +331,6 @@ var mySubmitController = Marionette.Object.extend( {
 
 						}else{
 
-							showMessage("Tout se passe bien");
-							console.log("eleve");
 							eleve = retour.eleve;
 
 							//ajouter l'option au select élève
@@ -225,11 +339,13 @@ var mySubmitController = Marionette.Object.extend( {
 							nbEleves = eleves.length;
 
 							var newOption = new Option(eleve.prenom.concat(" ",eleve.nom), nbEleves-1, false, true);
+							jQuery(newOption).attr("intrial",false);
 							jQuery('#eleve-select').append(newOption).trigger('change').val(nbEleves-1);
 
 
 							showMessage(eleve.prenom.concat(" est bien ajouté ! Il ne reste plus qu'à faire l'inscription à la semaine découverte."));
 
+							jQuery("#eleve-select + .select2-container .select2-selection").removeClass("red-border");
 						}
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
@@ -254,6 +370,11 @@ var mySubmitController = Marionette.Object.extend( {
 	},
 
 });
+
+/*
+ * fin : faire la soumission du formulaire de la popup 
+ * 
+ */
 
 //pour changer les choix de classe en fonction du profil
 var myCustomFieldController = Marionette.Object.extend( {
@@ -281,51 +402,30 @@ var myCustomFieldController = Marionette.Object.extend( {
 			idClasseBis = idClasse;
 
 			if(idAjoutEleveChoixProfil == model.get( 'id' )){
-
 				idProfilBis = idAjoutEleveProfil
 				idClasseBis = idAjoutEleveClasse;	
-
 			}
-
 
 			jQuery(toFieldId(idProfilBis)).val(value);
 			jQuery(toFieldId(idProfilBis)).trigger("change");
 
+			classes = classesByProfil[value];
 
-			jQuery.post(
-					ajaxurl,
-					{
-						'action' : 'ajaxGetClasses',
-						'ref_profil' : model.get( 'value' )
-					})
-					.done(function(classes){
+			jQuery(toFieldId(idClasseBis)).find('option').remove();
 
+			jQuery(toFieldId(idClasseBis)).prepend("<option value='' selected='selected'></option>");
 
+			classes.forEach(function(classe) {
 
+				// ajouter options à form
+				jQuery(toFieldId(idClasseBis)).append(jQuery('<option>', {
+					value: classe.ref_classe,
+					text: classe.nom_complet
+				}));
 
-						jQuery(toFieldId(idClasseBis)).find('option').remove();
+			});
 
-						jQuery(toFieldId(idClasseBis)).prepend("<option value='' selected='selected'></option>");
-
-						classes.forEach(function(classe) {
-
-							// ajouter options à form
-							jQuery(toFieldId(idClasseBis)).append(jQuery('<option>', {
-								value: classe.ref_classe,
-								text: classe.nom_complet
-							}));
-
-
-
-						});
-
-						gClasseSelect = jQuery(toFieldId(idClasseBis));
-
-					})
-					.fail(function(err){
-						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
-
-					});
+			gClasseSelect = jQuery(toFieldId(idClasseBis));
 
 		}
 	},
@@ -347,15 +447,8 @@ var myCustomFieldController = Marionette.Object.extend( {
 
 
 
-
-/*
- * fin : faire la soumission du formulaire de la popup 
- * 
- */
-
 //début jquery
 jQuery( document ).ready( function( $ ) {
-
 
 	jQuery('.matieres-select').select2({
 		placeholder: 'Choisir la/les matières',
@@ -376,20 +469,16 @@ jQuery( document ).ready( function( $ ) {
 			jQuery(".trial-row").addClass("hide");
 			jQuery(".row-message").removeClass("hide");
 			jQuery(".row-message p").html("Pour le moment, vous avez déjà deux essais en cours. Il sera possible de refaire un autre essai quand un de ces deux essai sera terminé.");
-			return;
 		}
 		console.log("here");
 		// quand fermeture de la popup ajout élève
-		jQuery('#pum-18754')
+		jQuery('#pum-19151')
 		.on('pumBeforeClose', function () {
-
 
 
 			if(jQuery('#eleve-select').val() == 'ajout-eleve'){
 				jQuery('#eleve-select').val(null); // Select the option with a value of '0'
 				jQuery('#eleve-select').trigger('change'); // Notify any JS components that the value changed
-				jQuery(".trial-row").removeClass("hide");
-				jQuery(".row-message").addClass("hide");
 				hideMessage();
 			}
 		});
@@ -407,7 +496,7 @@ jQuery( document ).ready( function( $ ) {
 		//preremplissage du select élève
 		jQuery.each(eleves, function(index, eleve) {
 			jQuery('#eleve-select').append(
-					jQuery('<option></option>').val(index).html(eleve.prenom.concat(" ",eleve.nom))
+					jQuery('<option></option>').val(index).attr("inTrial",eleve.inTrial).html(eleve.prenom.concat(" ",eleve.nom))
 			);
 		});
 
@@ -416,35 +505,49 @@ jQuery( document ).ready( function( $ ) {
 
 			var choixEleve = jQuery('#eleve-select').val();
 
+			console.log(choixEleve);
+			choixEleveValide = false; 
+
+			erreur = false;
+			message = "";
+
 			if(choixEleve == "ajout-eleve"){
 
 
-				PUM.open(18754);
+				PUM.open(19151);
 
-			}else{
+			}else if(choixEleve == ""){
 
-				jQuery("#eleve-select + .select2-container .select2-selection").removeClass("red-border")
-				hideMessage();
-				jQuery(".trial-row").removeClass("hide");
-				jQuery(".row-message").addClass("hide");
+				message = "Veuillez choisir celui ou celle qui va faire la semaine d'essai.";
+				erreur = true;
 
-				abosEssai.forEach(function(aboEssai) {
-					eleveChoisi = eleves[choixEleve];
-					if(aboEssai.ref_eleve == eleveChoisi.ref_eleve){
+			}else{ // si choix d'un élève
 
-						jQuery(".trial-row").addClass("hide");
-						jQuery(".row-message").removeClass("hide");
-
-						showMessage("Tu es déjà entrain de faire un essai ".concat(eleveChoisi.prenom,". Reviens en demander un quand tu auras fini."));
-					}
-				});
-
-				//si eleve en essai
-				// afficher pas possible de faire un essai
-				//sinon
-				// préparer form nouvelle essai 
+				inTrial = jQuery('#eleve-select option:selected').attr("intrial");
+				eleveChoisi = eleves[choixEleve];
 
 
+				if(inTrial == "true"){
+					message = "Tu es déjà entrain de faire un essai ".concat(eleveChoisi.prenom,". Reviens en demander un quand tu auras fini.");
+					erreur = true;
+
+				}else{
+
+					choixEleveValide = true;
+
+					jQuery("#eleve-select + .select2-container .select2-selection").removeClass("red-border");
+					hideMessage();
+				}
+
+
+
+
+			}
+
+			if(erreur){
+				jQuery("#eleve-select + .select2-container .select2-selection").addClass("red-border")
+				checkUntil("#eleve-select + .select2-container" , 1);
+				showMessage(message);
 			}
 
 
@@ -484,6 +587,7 @@ jQuery( document ).ready( function( $ ) {
 
 		waitForEl(".choix-login", function() {
 			jQuery(".choix-login").remove();
+
 		});
 
 		waitForEl(".logout", function() {
@@ -503,7 +607,9 @@ jQuery( document ).ready( function( $ ) {
 
 	new myCustomFieldController();
 
-	setMatieresField(matieres);
+	setMatieresField(matieres, idMatieres);
+	setMatieresField(matieres, idBisMatieres);
+
 
 	/* pour customiser le select des matières et changer l'affichage du blco matière en fonction du choix*/
 
@@ -528,7 +634,8 @@ jQuery( document ).ready( function( $ ) {
 
 			}
 
-			setMatieresField(matieres);
+			setMatieresField(matieres, idMatieres);
+			setMatieresField(matieres, idBisMatieres);
 
 		});
 
@@ -574,22 +681,35 @@ jQuery( document ).ready( function( $ ) {
 
 			}else{
 
-				if(jQuery("#eleve-select").val() == ""){
+				if(nbAbosEssai >= 2){
+					showMessage("Oups, on dirait que vous avez déjà deux essai en cours. Revenez quand il y aura un de terminé.");
+					jQuery(".trial-row").addClass("hide");
+					jQuery(".row-message").removeClass("hide");
+					jQuery(".row-message p").html("Pour le moment, vous avez déjà deux essais en cours. Il sera possible de refaire un autre essai quand un de ces deux essai sera terminé.");
+				}else if(!choixEleveValide){
 
-					showMessage("Veuillez d'abord choisir celui ou celle qui va faire la semaine découverte");
 
-					jQuery("#eleve-select + .select2-container .select2-selection").addClass("red-border")
-
-					checkUntil("#eleve-select + .select2-container" , 1);
+					jQuery('#eleve-select').trigger('select2:select'); // s'occupe de l'affichage des erreurs utilisateur
 
 				}else{
 
-
-					PUM.open(18788);
+					PUM.open(19166);
 
 					jQuery(jQuery('.nf-breadcrumb')[0]).trigger('click');
 
+					//récupérer l'élève choisi
+
+					indexEleve = jQuery('#eleve-select').val();
+
+					eleve = eleves[indexEleve];
+
+					console.log(eleve);
+
+					jQuery('#prenomEleve').text(eleve.prenom);
+					jQuery(toFieldId(idBisRefEleve)).val(eleve.ref_eleve);
+
 				}
+
 			}
 
 
@@ -667,7 +787,7 @@ function checkUntil(selector, nbShake) {
 
 /* pour remplir le champ caché matières */
 
-function setMatieresField(matieres){
+function setMatieresField(matieres,idMatieres){
 
 
 
