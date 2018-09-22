@@ -159,17 +159,21 @@ class LbcAccountManager
             $refComptes[] = $data["ref_compte"];
         }
         
-        $in = "(" . join(',', array_fill(0, count($refComptes), '?')) . ")";
-        
-        $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-        
-        $q2 = $this->_db->prepare("update compte_lbc set controle_date = :controle_date, disabled = true where ref_compte in " . $in);
-        $q2->bindValue(":controle_date", $now->format(PG_DATETIME_FORMAT));
-        $q2->execute($refComptes);
-        
-        
-        $q3 = $this->_db->prepare("delete from adds_lbc where ref_compte in " . $in);
-        $q3->execute($refComptes);
+        if (count($refComptes) != 0) {
+            
+            $in = "(" . join(',', array_fill(0, count($refComptes), '?')) . ")";
+            
+            $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+            
+            $q2 = $this->_db->prepare("update compte_lbc set controle_date = :controle_date, disabled = true where ref_compte in " . $in);
+            $q2->bindValue(":controle_date", $now->format(PG_DATETIME_FORMAT));
+            $q2->execute($refComptes);
+            
+            $q3 = $this->_db->prepare("delete from adds_lbc where ref_compte in " . $in);
+            $q3->execute($refComptes);
+        } else {
+            return;
+        }
     }
 
     public function updateAfterScraping(array $rows)
