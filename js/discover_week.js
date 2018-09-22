@@ -54,40 +54,33 @@ idTeleprospection = "985";
 idFormAjoutEleve = "74";
 
 idAjoutElevePrenom = "1018";
-idAjoutEleveNom = "1023";
+idAjoutEleveNom = "1022";
 idAjoutEleveEmail = "1019";
-idAjoutElevePhone = "1024";
+idAjoutElevePhone = "1023";
 idAjoutEleveChoixProfil = "1020";
-idAjoutEleveClasse = "1025";
-idAjoutEleveProfil = "1022";
+idAjoutEleveClasse = "1024";
+idAjoutEleveProfil = "1021";
 
 //form inscription essai pour client
 idFormEssaiClient = "75";
 
-idBisMatieres = "1084";
-idBisRefEleve = "1086";
+idBisMatieres = "1039";
+idBisRefEleve = "1040";
 
+idBisChapterMaths = "1028";
+idBisLacuneMaths = "1029";
+idBisNoteMaths = "1030";
 
-idBisChapterMaths = "1060";
-idBisLacuneMaths = "1061";
-idBisNoteMaths = "1062";
+idBisChapterPhysique = "1032";
+idBisLacunePhysique = "1033";
+idBisNotePhysique = "1034";
 
-idBisChapterPhysique = "1064";
-idBisLacunePhysique = "1065";
-idBisNotePhysique = "1066";
+idBisChapterFrench = "1036";
+idBisLacuneFrench = "1037";
+idBisNoteFrench = "1038";
 
-idBisChapterFrench = "1068";
-idBisLacuneFrench = "1069";
-idBisNoteFrench = "1070";
-
-idBisProche = "1072";
-idBisPrenomProche = "1073";
-idBisNomProche = "1075";
-idBisMailProche = "1074";
-idBisPhoneProche = "1076";
-idBisRemarque 	= "1077";
-
-idBisCode = "1078";
+idBisRemarque 	= "1041";
+idBisCode = "1042";
 
 
 
@@ -214,7 +207,7 @@ var mySubmitController = Marionette.Object.extend( {
 		if(response.data.form_id == idFormEssaiClient){
 			jQuery("#loadingSpinner").removeClass("hide");
 			jQuery(".hide_loading").addClass("hide");
-			PUM.close(19166);
+			PUM.close(19464);
 
 			//récupérationdes variables du form
 
@@ -295,7 +288,7 @@ var mySubmitController = Marionette.Object.extend( {
 		if(response.data.form_id == idFormAjoutEleve){
 			jQuery("#loadingSpinner").removeClass("hide");
 			jQuery(".hide_loading").addClass("hide");
-			PUM.close(19151);
+			PUM.close(19463);
 
 			//récupérationdes variables du form
 			classe = response.data.fields[idAjoutEleveClasse].value;
@@ -472,7 +465,7 @@ jQuery( document ).ready( function( $ ) {
 		}
 		console.log("here");
 		// quand fermeture de la popup ajout élève
-		jQuery('#pum-19151')
+		jQuery('#pum-19463')
 		.on('pumBeforeClose', function () {
 
 
@@ -514,7 +507,7 @@ jQuery( document ).ready( function( $ ) {
 			if(choixEleve == "ajout-eleve"){
 
 
-				PUM.open(19151);
+				PUM.open(19463);
 
 			}else if(choixEleve == ""){
 
@@ -693,7 +686,7 @@ jQuery( document ).ready( function( $ ) {
 
 				}else{
 
-					PUM.open(19166);
+					PUM.open(19464);
 
 					jQuery(jQuery('.nf-breadcrumb')[0]).trigger('click');
 

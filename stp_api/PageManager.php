@@ -329,9 +329,6 @@ class PageManager
 
             'nf-front-end'
         ), time());
-
-        wp_enqueue_style('dw_css', get_stylesheet_directory_uri() . '/css/pages/discover-week.css');
-        
         
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
 

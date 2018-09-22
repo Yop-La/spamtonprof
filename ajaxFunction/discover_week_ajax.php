@@ -746,6 +746,10 @@ function ajaxNewEssaiClient()
 
     $abonnement->setFirst_prof_assigned(false);
     $abonnementMg->updateFirstProfAssigned($abonnement);
+    
+    $abonnement->setTeleprospection("non");
+    $abonnementMg->updateTeleprospection($abonnement);
+    
 
     // étape n° 8 - insérer les remarques d'inscription
 
@@ -801,7 +805,7 @@ function ajaxNewEssaiClient()
     if ($proche) {
 
         $messages = array(
-            "Nouvelle inscription : bien joué la team prospection !!",
+            "Une inscription supplémentaire pour ce compte : ",
             "------ Eleve ----- ",
             "Email élève : " . $eleve->getEmail(),
             "Prénom élève : " . $eleve->getPrenom(),
@@ -818,7 +822,7 @@ function ajaxNewEssaiClient()
         );
     } else {
         $messages = array(
-            "Nouvelle inscription : bien joué la team prospection !!",
+            "Une inscription supplémentaire pour ce compte : ",
             "------ Étudiant/Adulte ----- ",
             "Email : " . $eleve->getEmail(),
             "Prénom : " . $eleve->getPrenom(),
