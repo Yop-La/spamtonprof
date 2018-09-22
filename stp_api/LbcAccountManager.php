@@ -165,8 +165,9 @@ class LbcAccountManager
             
             $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
             
-            $q2 = $this->_db->prepare("update compte_lbc set controle_date = :controle_date, disabled = true where ref_compte in " . $in);
-            $q2->bindValue(":controle_date", $now->format(PG_DATETIME_FORMAT));
+            array_unshift($refComptes, $now->format(PG_DATETIME_FORMAT));
+            
+            $q2 = $this->_db->prepare("update compte_lbc set controle_date = ?, disabled = true where ref_compte in " . $in);
             $q2->execute($refComptes);
             
             $q3 = $this->_db->prepare("delete from adds_lbc where ref_compte in " . $in);
