@@ -24,9 +24,9 @@ class StpAbonnementManager
         $q->bindValue(':remarque_inscription', $StpAbonnement->getRemarque_inscription());
         $q->bindValue(':ref_plan', $StpAbonnement->getRef_plan());
         $q->execute();
-        
+
         $StpAbonnement->setRef_abonnement($this->_db->lastInsertId());
-        
+
         return ($StpAbonnement);
     }
 
@@ -36,15 +36,15 @@ class StpAbonnementManager
     public function getAbonnementsSansProf()
     {
         $abonnements = [];
-        
+
         $q = $this->_db->prepare("select * from stp_abonnement where ref_prof is null and ref_statut_abonnement not in (4) order by date_creation ");
-        
+
         $q->execute();
-        
+
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
-            
+
             $abonnement = new \spamtonprof\stp_api\StpAbonnement($data);
-            
+
             $this->construct(array(
                 "objet" => $abonnement,
                 "construct" => array(
@@ -58,7 +58,6 @@ class StpAbonnementManager
                         'ref_profil'
                     )
                 )
-            
             ));
             $abonnements[] = $abonnement;
         }
@@ -71,17 +70,17 @@ class StpAbonnementManager
     public function getTrialCompleted()
     {
         $abonnements = [];
-        
+
         $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-        
+
         $q = $this->_db->prepare("select * from stp_abonnement where ref_statut_abonnement = 2 and fin_essai + integer '1' = :now");
         $q->bindValue(':now', $now->format(PG_DATE_FORMAT));
         $q->execute();
-        
+
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
-            
+
             $abonnement = new \spamtonprof\stp_api\StpAbonnement($data);
-            
+
             $this->construct(array(
                 "objet" => $abonnement,
                 "construct" => array(
@@ -102,10 +101,10 @@ class StpAbonnementManager
     public function getNbMessage()
     {
         $nbMessages = [];
-        
+
         $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
         $oneWeekAgo = $now->sub(new \DateInterval("P7D"));
-        
+
         $q = $this->_db->prepare("
             select ref_abonnement, count(ref_abonnement)  as nb_message from stp_message_eleve
                 where date_message >= :one_week_ago
@@ -113,7 +112,7 @@ class StpAbonnementManager
                 order by nb_message desc");
         $q->bindValue(':one_week_ago', $oneWeekAgo->format(PG_DATETIME_FORMAT));
         $q->execute();
-        
+
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
             $nbMessages[] = array(
                 "ref_abonnement" => $data["ref_abonnement"],
@@ -138,18 +137,18 @@ class StpAbonnementManager
     public function getHasNotFirstProfAssignement()
     {
         $abonnements = [];
-        
+
         $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-        
+
         $q = $this->_db->prepare("select * from stp_abonnement where first_prof_assigned = false and date_attribution_prof <= :now");
         $q->bindValue(":now", $now->format(PG_DATETIME_FORMAT));
-        
+
         $q->execute();
-        
+
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
-            
+
             $abonnement = new \spamtonprof\stp_api\StpAbonnement($data);
-            
+
             $this->construct(array(
                 "objet" => $abonnement,
                 "construct" => array(
@@ -165,7 +164,6 @@ class StpAbonnementManager
                         'ref_profil'
                     )
                 )
-            
             ));
             $abonnements[] = $abonnement;
         }
@@ -216,8 +214,12 @@ class StpAbonnementManager
     {
         $q = $this->_db->prepare("update stp_abonnement set date_attribution_prof = :date_attribution_prof where ref_abonnement = :ref_abonnement");
         $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
-        $q->bindValue(":date_attribution_prof", $abonnement->getDate_attribution_prof()
-            ->format(PG_DATETIME_FORMAT));
+        if ($abonnement->getDate_attribution_prof()) {
+            $q->bindValue(":date_attribution_prof", $abonnement->getDate_attribution_prof()
+                ->format(PG_DATETIME_FORMAT));
+        } else {
+            $q->bindValue(":date_attribution_prof", $abonnement->getDate_attribution_prof());
+        }
         $q->execute();
     }
 
@@ -279,59 +281,59 @@ class StpAbonnementManager
         $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
         $profMg = new \spamtonprof\stp_api\StpProfManager();
         $procheMg = new \spamtonprof\stp_api\StpProcheManager();
-        
+
         $abonnement = $this->cast($constructor["objet"]);
-        
+
         $constructOrders = $constructor["construct"];
-        
+
         foreach ($constructOrders as $constructOrder) {
-            
+
             switch ($constructOrder) {
                 case "ref_eleve":
                     $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
                     $eleve = $eleveMg->get(array(
                         'ref_eleve' => $abonnement->getRef_eleve()
                     ));
-                    
+
                     if (array_key_exists("ref_eleve", $constructor)) {
-                        
+
                         $constructorEleve = $constructor["ref_eleve"];
                         $constructorEleve["objet"] = $eleve;
-                        
+
                         $eleveMg->construct($constructorEleve);
                     }
                     $abonnement->setEleve($eleve);
                     break;
-                
+
                 case "remarquesMatieres":
-                    
+
                     $remarqueInscriptionMg = new \spamtonprof\stp_api\StpRemarqueInscriptionManager();
                     $constructorRmqs = false;
-                    
+
                     if (array_key_exists("remarquesMatieres", $constructor)) {
-                        
+
                         $constructorRmqs = $constructor["remarquesMatieres"];
                     }
-                    
+
                     $rmqs = $remarqueInscriptionMg->getAll(array(
                         "ref_abonnement" => $abonnement->getRef_abonnement()
                     ), $constructorRmqs);
-                    
+
                     $abonnement->setRemarquesMatieres($rmqs);
                     break;
-                
+
                 case "ref_formule":
                     $formule = $formuleMg->get(array(
                         'ref_formule' => $abonnement->getRef_formule()
                     ));
-                    
+
                     $abonnement->setFormule($formule);
                     break;
                 case "ref_prof":
                     $prof = $profMg->get(array(
                         'ref_prof' => $abonnement->getRef_prof()
                     ));
-                    
+
                     $abonnement->setProf($prof);
                     break;
                 case "ref_parent":
@@ -340,7 +342,7 @@ class StpAbonnementManager
                         $proche = $procheMg->get(array(
                             'ref_proche' => $abonnement->getRef_proche()
                         ));
-                        
+
                         $abonnement->setProche($proche);
                     }
                     break;
@@ -349,7 +351,7 @@ class StpAbonnementManager
                     $plan = $planMg->get(array(
                         'ref_plan' => $abonnement->getRef_plan()
                     ));
-                    
+
                     $abonnement->setPlan($plan);
                     break;
                 case "ref_statut_abonnement":
@@ -357,7 +359,7 @@ class StpAbonnementManager
                     $statutAbo = $statutAboMg->get(array(
                         'ref_statut_abonnement' => $abonnement->getRef_statut_abonnement()
                     ));
-                    
+
                     $abonnement->setStatut($statutAbo);
                     break;
             }
@@ -367,25 +369,25 @@ class StpAbonnementManager
     public function get($info, $constructor = false)
     {
         $q = null;
-        
+
         if (array_key_exists("ref_abonnement", $info)) {
-            
+
             $refAbonnement = $info["ref_abonnement"];
             $q = $this->_db->prepare("select * from stp_abonnement where ref_abonnement =:ref_abonnement");
             $q->bindValue(":ref_abonnement", $refAbonnement);
             $q->execute();
         }
-        
+
         $data = $q->fetch(PDO::FETCH_ASSOC);
-        
+
         if ($data) {
             $abonnement = new \spamtonprof\stp_api\StpAbonnement($data);
-            
+
             if ($constructor) {
                 $constructor["objet"] = $abonnement;
                 $this->construct($constructor);
             }
-            
+
             return ($abonnement);
         }
         return (false);
@@ -395,72 +397,113 @@ class StpAbonnementManager
     {
         $abonnements = [];
         $q = null;
-        
+
         if (is_array($info)) {
-            
+
             if (array_key_exists("ref_eleve", $info) && array_key_exists("ref_prof", $info)) {
-                
+
                 $refEleve = $info["ref_eleve"];
                 $refProf = $info["ref_prof"];
-                
+
                 $q = $this->_db->prepare('select * from stp_abonnement where ref_prof = :ref_prof and ref_eleve =:ref_eleve');
                 $q->bindValue(":ref_prof", $refProf);
                 $q->bindValue(":ref_eleve", $refEleve);
                 $q->execute();
             } else if (array_key_exists("ref_eleve", $info)) {
-                
+
                 $refEleve = $info["ref_eleve"];
                 $q = $this->_db->prepare('select * from stp_abonnement where ref_eleve = :ref_eleve');
                 $q->bindValue(":ref_eleve", $refEleve);
                 $q->execute();
+            } else if (array_key_exists("ref_proche", $info)) {
+
+                $refProche = $info["ref_proche"];
+                $q = $this->_db->prepare('select * from stp_abonnement where ref_proche = :ref_proche');
+                $q->bindValue(":ref_proche", $refProche);
+                $q->execute();
             } else if (array_key_exists("ref_compte", $info)) {
-                
+
                 $refCompte = $info["ref_compte"];
                 $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte');
                 $q->bindValue(":ref_compte", $refCompte);
                 $q->execute();
             } else if (array_key_exists("ref_prof", $info)) {
-                
+
                 $refProf = $info["ref_prof"];
-                
+
                 $q = $this->_db->prepare('select * from stp_abonnement where ref_prof = :ref_prof');
                 $q->bindValue(":ref_prof", $refProf);
                 $q->execute();
             } else if (array_key_exists("email", $info)) {
-                
+
                 $email = $info["email"];
-                
+
                 $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
                 $procheMg = new \spamtonprof\stp_api\StpProcheManager();
-                
+
                 $proches = $procheMg->getAll(array(
                     "email" => "yopla"
                 ));
                 $eleves = $eleveMg->getAll(array(
                     "email" => "yopla"
                 ));
-                
+
                 $refEleves = extractAttribute($eleves, "ref_eleve");
-                
+
                 $refProches = extractAttribute($proches, "ref_proche");
-                
+
                 $refEleves = toPgArray($refEleves, true);
                 $refProches = toPgArray($refProches, true);
-                
+
                 $q = $this->_db->prepare('select * from stp_abonnement where ref_proche in ' . $refProches . ' or ref_eleve in ' . $refEleves);
+                $q->execute();
+            } else if (array_key_exists("telephones", $info) && array_key_exists("teleprospection", $info) && array_key_exists("remarques", $info)) {
+
+                $nums = $info["telephones"];
+                $tele = $info["teleprospection"];
+                $remarques = $info["remarques"];
+
+                $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
+                $procheMg = new \spamtonprof\stp_api\StpProcheManager();
+
+                $eleves = $eleveMg->getAll(array(
+                    "telephones" => $nums
+                ));
+                $proches = $procheMg->getAll(array(
+                    "telephones" => $nums
+                ));
+
+                $refEleves = [];
+                $refProches = [];
+
+                foreach ($eleves as $eleve) {
+                    $refEleves[] = $eleve->getRef_eleve();
+                }
+
+                foreach ($proches as $proche) {
+                    $refProches[] = $proche->getRef_proche();
+                }
+                $refProches = toPgArray($refProches, true);
+                $refEleves = toPgArray($refEleves, true);
+
+                $q = $this->_db->prepare('select * from stp_abonnement where ref_proche in ' . $refProches . ' or ref_eleve in ' . $refEleves . ' 
+                    or teleprospection = :teleprospection 
+                    or lower(remarque_inscription) like unaccent(:remarques) order by ref_proche,date_creation');
+                $q->bindValue(":teleprospection", $tele);
+                $q->bindValue(":remarques", "%" . $remarques . "%");
                 $q->execute();
             }
         }
-        
+
         if ($info == "all") {
             $q = $this->_db->prepare('select * from stp_abonnement');
             $q->execute();
         }
-        
+
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
-            
+
             $abonnement = new \spamtonprof\stp_api\StpAbonnement($data);
-            
+
             if ($constructor) {
                 $constructor["objet"] = $abonnement;
                 $this->construct($constructor);
@@ -476,42 +519,44 @@ class StpAbonnementManager
         $abonnements = $this->getAll(array(
             "email" => $email
         ));
-        
+
         foreach ($abonnements as $abonnement) {
             $abonnement->setRef_statut_abonnement($abonnement::DESACTIVE);
+            $abonnement->setDate_attribution_prof(null);
             $this->updateRefStatutAbonnement($abonnement);
+            $this->updateDateAttributionProf($abonnement);
         }
     }
 
     function updateProf($refAbo, $mailProfStp)
     {
         $profMg = new \spamtonprof\stp_api\StpProfManager();
-        
+
         $prof = $profMg->get(array(
             "email_stp" => $mailProfStp
         ));
-        
+
         $abo = $this->get(array(
             "ref_abonnement" => $refAbo
         ));
         $abo->setRef_prof($prof->getRef_prof());
         $this->updateRefProf($abo);
-        
+
         if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ESSAI) {
-            
+
             $gr = new \GetResponse();
             $gr->updateTrialList($refAbo);
         }
         // mise à jour algolia
-        
+
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
-        
+
         $constructor = array(
             "construct" => array(
                 'ref_prof'
             )
         );
-        
+
         $algoliaMg->updateAbonnement($abo->getRef_abonnement(), $constructor);
     }
 
@@ -519,76 +564,85 @@ class StpAbonnementManager
     function updateEleve($refAbo, array $fields)
     {
         $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
-        
+
         $constructor = array(
             "construct" => array(
                 'ref_eleve'
             )
         );
-        
+
         $abo = $this->get(array(
             "ref_abonnement" => $refAbo
         ), $constructor);
-        
+
         $eleve = $abo->getEleve();
         $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
-        
+
         if (array_key_exists("prenom", $fields)) {
             $eleve->setPrenom($fields["prenom"]);
             $eleveMg->updatePrenom($eleve);
         }
-        
+
         if (array_key_exists("nom", $fields)) {
             $eleve->setNom($fields["nom"]);
             $eleveMg->updateNom($eleve);
         }
-        
+
         if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ESSAI) {
             $gr = new \GetResponse();
             $gr->updateTrialList($refAbo);
         }
-        
+
         // mise à jour algolia
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
         $algoliaMg->updateAbonnement($abo->getRef_abonnement(), $constructor);
     }
-    
+
     // mise à jour du plan de paiement et de la formule
     function updateFormule($refAbo, int $refFormule)
     {
-        
         $abo = $this->get(array(
             "ref_abonnement" => $refAbo
         ));
-        
-        
+
         $planMg = new \spamtonprof\stp_api\StpPlanManager();
-        
-        $plan = $planMg -> getDefault(array("ref_formule" => $refFormule));
-        
-        
+
+        $plan = $planMg->getDefault(array(
+            "ref_formule" => $refFormule
+        ));
+
         $q = $this->_db->prepare("update stp_abonnement set ref_formule = :ref_formule, ref_plan = :ref_plan where ref_abonnement = :ref_abonnement");
         $q->bindValue(":ref_formule", $refFormule);
         $q->bindValue(":ref_plan", $plan->getRef_plan());
         $q->bindValue(":ref_abonnement", $refAbo);
         $q->execute();
-        
+
         if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ESSAI) {
             $gr = new \GetResponse();
             $gr->updateTrialList($refAbo);
         }
-        
+
         // mise à jour algolia
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
-        
-        
+
         $constructor = array(
             "construct" => array(
                 'ref_formule',
                 'ref_plan'
             )
         );
-        
+
         $algoliaMg->updateAbonnement($abo->getRef_abonnement(), $constructor);
+    }
+
+    // pour avoir les conversions de Amina à partir d'un tableau de numéro de téléphone non formaté
+    function getAnimaSubscription($nums)
+    {
+        $abonnements = $this->getAll(array(
+            "telephones" => $nums,
+            "teleprospection" => "oui",
+            "remarques" => "chloe "
+        ));
+        prettyPrint($abonnements);
     }
 }

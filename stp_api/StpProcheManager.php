@@ -57,17 +57,14 @@ class StpProcheManager
             $q = $this->_db->prepare('select * from stp_proche where lower(email) like lower(:email)');
             $q->bindValue(':email', $email);
             $q->execute();
-        }
-        if (array_key_exists("ref_proche", $info)) {
+        }else if (array_key_exists("ref_proche", $info)) {
 
             $refProche = $info["ref_proche"];
 
             $q = $this->_db->prepare('select * from stp_proche where ref_proche = :ref_proche');
             $q->bindValue(':ref_proche', $refProche);
             $q->execute();
-        }
-
-        if (array_key_exists("ref_compte_wp", $info)) {
+        }else if (array_key_exists("ref_compte_wp", $info)) {
             $refCompteWp = $info["ref_compte_wp"];
 
             $q = null;
@@ -80,7 +77,16 @@ class StpProcheManager
             }
 
             $q->execute();
+        }else if (array_key_exists("telephone", $info)) {
+            
+            $telephone = $info["telephone"];
+            
+            $q = $this->_db->prepare("select * from stp_proche where regexp_replace(telephone, '[^01234536789]', '','g') like :telephone");
+            $q->bindValue(':telephone', '%' . $telephone . '%');
+            $q->execute();
         }
+        
+        
 
         $data = $q->fetch(\PDO::FETCH_ASSOC);
 
@@ -104,6 +110,14 @@ class StpProcheManager
 
                 $q = $this->_db->prepare('select * from stp_proche where email like :email ');
                 $q->bindValue(":email", '%' . $email . '%');
+                $q->execute();
+            }else if (array_key_exists("telephones", $info)) {
+                
+                $nums = formatNums($info["telephones"]);
+                
+                $nums = toSimilarTo($nums);
+                
+                $q = $this->_db->prepare("select * from stp_proche where regexp_replace(telephone, '[^01234536789]', '','g') SIMILAR TO '" . $nums . "'");
                 $q->execute();
             }
         }

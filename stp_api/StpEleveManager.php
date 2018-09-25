@@ -32,18 +32,17 @@ class StpEleveManager
 
     public function updateRefCompteWp(StpEleve $eleve)
     {
-        
         $refCompteWp = $eleve->getRef_compte_wp();
-        
-        $q =null;
-        if(!$_SESSION["prod"]){
+
+        $q = null;
+        if (! $_SESSION["prod"]) {
             $q = $this->_db->prepare('update stp_eleve set ref_compte_wp_test = :ref_compte_wp_test where ref_eleve = :ref_eleve');
             $q->bindValue(':ref_compte_wp_test', $refCompteWp);
-        }else{
+        } else {
             $q = $this->_db->prepare('update stp_eleve set ref_compte_wp = :ref_compte_wp where ref_eleve = :ref_eleve');
             $q->bindValue(':ref_compte_wp', $refCompteWp);
         }
-        
+
         $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
         $q->execute();
 
@@ -113,32 +112,27 @@ class StpEleveManager
             $q = $this->_db->prepare('select * from stp_eleve where lower(email) ~ lower(:email)');
             $q->bindValue(':email', $email);
             $q->execute();
-        }
-
-        if (array_key_exists("ref_compte_wp", $info)) {
+        } else if (array_key_exists("ref_compte_wp", $info)) {
             $refCompteWp = $info["ref_compte_wp"];
-            
-            $q=null;
-            if(!$_SESSION["prod"]){
+
+            $q = null;
+            if (! $_SESSION["prod"]) {
                 $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp_test = :ref_compte_wp_test');
                 $q->bindValue(':ref_compte_wp_test', $refCompteWp);
-            }else{
+            } else {
                 $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp = :ref_compte_wp');
                 $q->bindValue(':ref_compte_wp', $refCompteWp);
             }
-            
-            $q->execute();
-        }
 
-        if (array_key_exists("ref_eleve", $info)) {
+            $q->execute();
+        } else if (array_key_exists("ref_eleve", $info)) {
 
             $refEleve = $info["ref_eleve"];
 
             $q = $this->_db->prepare('select * from stp_eleve where ref_eleve = :ref_eleve');
             $q->bindValue(':ref_eleve', $refEleve);
             $q->execute();
-        }
-
+        } 
 
         $data = $q->fetch(\PDO::FETCH_ASSOC);
 
@@ -189,17 +183,16 @@ class StpEleveManager
         $q = $this->_db->prepare("select count(*) as nb_abo_essai from stp_abonnement where ref_statut_abonnement = 2 and ref_eleve = :ref_eleve");
         $q->bindValue(':ref_eleve', $refEleve);
         $q->execute();
-        
+
         $data = $q->fetch(PDO::FETCH_ASSOC);
-        
+
         $nbEssai = $data["nb_abo_essai"];
-        
-        if($nbEssai == 0){
-            return(false);
-        }else{
-            return(true);
+
+        if ($nbEssai == 0) {
+            return (false);
+        } else {
+            return (true);
         }
-        
     }
 
     public function getAll($info, $eleveAsArray = false)
@@ -218,6 +211,14 @@ class StpEleveManager
 
             $q = $this->_db->prepare('select * from stp_eleve where email like :email ');
             $q->bindValue(":email", '%' . $email . '%');
+            $q->execute();
+        }else if (array_key_exists("telephones", $info)) {
+            
+            $nums = formatNums($info["telephones"]);
+            
+            $nums = toSimilarTo($nums);
+            
+            $q = $this->_db->prepare("select * from stp_eleve where regexp_replace(telephone, '[^01234536789]', '','g') SIMILAR TO '" . $nums . "'");
             $q->execute();
         }
 
