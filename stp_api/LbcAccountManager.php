@@ -186,13 +186,15 @@ class LbcAccountManager
 
             $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
 
-            array_unshift($refComptes, $now->format(PG_DATETIME_FORMAT));
+            $params2 = $refComptes;
+            $params3 = $refComptes;
+            array_unshift($params2, $now->format(PG_DATETIME_FORMAT));
 
             $q2 = $this->_db->prepare("update compte_lbc set controle_date = ?, disabled = true, nb_annonces_online = 0 where ref_compte in " . $in);
-            $q2->execute($refComptes);
+            $q2->execute($params2);
 
             $q3 = $this->_db->prepare("delete from adds_lbc where ref_compte in " . $in);
-            $q3->execute($refComptes);
+            $q3->execute($params3);
         } else {
             return;
         }
