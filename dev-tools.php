@@ -17,6 +17,17 @@ function formatNums($nums)
     return ($nums);
 }
 
+function formatNum($num){
+    $num = str_replace([
+        " ",
+        ".",
+        "/",
+        "\\",
+        "-"
+    ], "", $num);
+    return($num);
+}
+
 function isNotNull($var)
 {
     return (! is_null($var));
