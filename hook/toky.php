@@ -43,11 +43,13 @@ if ($event_json->direction == "Inbound") {
             "date" => $now->format(PG_DATETIME_FORMAT)
         ));
         
-        // on enregistre l'appel
-        $appelMg->add($stpAppel);
         
         // on vérifie que le num est pas déjà en base
         $appels = $appelMg -> getAll(array("from" => $from));
+        
+        // on enregistre l'appel
+        $appelMg->add($stpAppel);
+        
         
         if(!empty($appels)){
             $slack->sendMessages("missed-call", array("sms déjà envoyé auparavant"));
