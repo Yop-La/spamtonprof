@@ -88,17 +88,16 @@ class LbcAccountManager
         $q = null;
 
         if (is_array($info)) {
-            
-            if(array_key_exists("refComptes", $info)){
+
+            if (array_key_exists("refComptes", $info)) {
                 $refComptes = $info["refComptes"];
-                
-                $in  = "(" . str_repeat('?,', count($refComptes) - 1) . '?' . ")";
-                
-                $q = $this->_db->prepare("select ref_compte, mail, password from compte_lbc where ref_compte in ".$in);
+
+                $in = "(" . str_repeat('?,', count($refComptes) - 1) . '?' . ")";
+
+                $q = $this->_db->prepare("select prenom_client, nom_client, ref_compte, code_promo, controle_date, nb_annonces_online
+                from compte_lbc, client where compte_lbc.ref_client = client.ref_client and compte_lbc.ref_compte in " . $in);
                 $q->execute($refComptes);
-                
             }
-            
         } else {
 
             if ($info == "lastTwentyForReportingLbcIndex") {
@@ -164,15 +163,21 @@ class LbcAccountManager
         return ($accounts);
     }
 
-    public function desactivateDeadAccounts()
+    public function desactivateDeadAccounts($info = false)
     {
-        $q1 = $this->_db->prepare("select * from compte_lbc where code_promo is null and (disabled is null or disabled = false)");
-        $q1->execute();
-
         $refComptes = [];
-        while ($data = $q1->fetch(PDO::FETCH_ASSOC)) {
+        if (! $info) {
 
-            $refComptes[] = $data["ref_compte"];
+            $q1 = $this->_db->prepare("select * from compte_lbc where code_promo is null and (disabled is null or disabled = false)");
+            $q1->execute();
+
+            $refComptes = [];
+            while ($data = $q1->fetch(PDO::FETCH_ASSOC)) {
+
+                $refComptes[] = $data["ref_compte"];
+            }
+        } else if (is_array($info)) {
+            $refComptes = $info;
         }
 
         if (count($refComptes) != 0) {
@@ -183,7 +188,7 @@ class LbcAccountManager
 
             array_unshift($refComptes, $now->format(PG_DATETIME_FORMAT));
 
-            $q2 = $this->_db->prepare("update compte_lbc set controle_date = ?, disabled = true where ref_compte in " . $in);
+            $q2 = $this->_db->prepare("update compte_lbc set controle_date = ?, disabled = true, nb_annonces_online = 0 where ref_compte in " . $in);
             $q2->execute($refComptes);
 
             $q3 = $this->_db->prepare("delete from adds_lbc where ref_compte in " . $in);

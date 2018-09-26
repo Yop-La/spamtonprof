@@ -21,17 +21,18 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
+$slack = new \spamtonprof\slack\Slack();
+$slack->sendMessages("log", array(
+    "hook reçu"
+));
 
 $json = urldecode($_POST["accounts"]);
 $refComptes = json_decode($json);
 
 $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
 
-$lbcAccounts = $lbcAccountMg->getAll(array(
-    "refComptes" => $refComptes
-));
+$lbcAccountMg->desactivateDeadAccounts($refComptes);
 
+$algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
 
-prettyPrint($lbcAccounts);
-
-
+$algoliaMg -> updateReportingLbc($refComptes);
