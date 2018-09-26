@@ -11,7 +11,7 @@ class LbcAccountManager
 
     // Instance de PDO
     public function __construct()
-    
+
     {
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
         // todostp faire pareil pour getresponse_api
@@ -25,26 +25,26 @@ class LbcAccountManager
     {
         $accounts = [];
         $nbHours = $nbHours . " hours";
-        
+
         $q = $this->_db->prepare("select distinct(adds_lbc.ref_compte) as ref_compte from adds_lbc, compte_lbc 
             where (date_publication ) < (  NOW() - INTERVAL '" . $nbHours . "' ) and disabled is null
             and adds_lbc.ref_compte = compte_lbc.ref_compte");
         $q->execute();
-        
+
         $donnees = $q->fetch(PDO::FETCH_ASSOC);
-        
+
         if (! $donnees) {
             return false;
         }
-        
+
         while ($donnees) {
-            
+
             $accounts[] = $this->get(array(
                 "ref_compte" => $donnees["ref_compte"]
             ));
             $donnees = $q->fetch(PDO::FETCH_ASSOC);
         }
-        
+
         return $accounts;
     }
 
@@ -57,28 +57,28 @@ class LbcAccountManager
             $q->execute(array(
                 "ref_compte" => $refCompte
             ));
-            
+
             $donnees = $q->fetch(PDO::FETCH_ASSOC);
         }
-        
+
         if (array_key_exists("mail", $info)) {
-            
+
             $mail = $info["mail"];
             $mail = trim($mail);
             $q = $this->_db->prepare("select * from compte_lbc where mail = :mail");
             $q->execute(array(
                 "mail" => $mail
             ));
-            
+
             $donnees = $q->fetch(PDO::FETCH_ASSOC);
         }
-        
+
         if (! $donnees) {
             return false;
         }
-        
+
         $account = new \spamtonprof\stp_api\LbcAccount($donnees);
-        
+
         return $account;
     }
 
@@ -86,22 +86,38 @@ class LbcAccountManager
     {
         $accounts = [];
         $q = null;
-        if ($info == "lastTwentyForReportingLbcIndex") {
+
+        if (is_array($info)) {
             
-            $q = $this->_db->prepare("select prenom_client, nom_client, ref_compte, code_promo, controle_date, nb_annonces_online
+            if(array_key_exists("refComptes", $info)){
+                $refComptes = $info["refComptes"];
+                
+                $in  = "(" . str_repeat('?,', count($refComptes) - 1) . '?' . ")";
+                
+                $q = $this->_db->prepare("select * from compte_lbc where ref_compte in ".$in);
+                $q->execute($refComptes);
+                
+            }
+            
+        } else {
+
+            if ($info == "lastTwentyForReportingLbcIndex") {
+
+                $q = $this->_db->prepare("select prenom_client, nom_client, ref_compte, code_promo, controle_date, nb_annonces_online
                 from compte_lbc, client where compte_lbc.ref_client = client.ref_client  order by ref_compte desc limit 20");
-            $q->execute();
-        } else if (! $info) {
-            
-            $q = $this->_db->prepare("select * from compte_lbc");
-            $q->execute();
-        } else if ("forReportingLbcIndex") {
-            
-            $q = $this->_db->prepare("select prenom_client, nom_client, ref_compte, code_promo, controle_date, nb_annonces_online
+                $q->execute();
+            } else if (! $info) {
+
+                $q = $this->_db->prepare("select * from compte_lbc");
+                $q->execute();
+            } else if ("forReportingLbcIndex") {
+
+                $q = $this->_db->prepare("select prenom_client, nom_client, ref_compte, code_promo, controle_date, nb_annonces_online
                 from compte_lbc, client where compte_lbc.ref_client = client.ref_client");
-            $q->execute();
+                $q->execute();
+            }
         }
-        
+
         while ($donnees = $q->fetch(PDO::FETCH_ASSOC)) {
             $account = new \spamtonprof\stp_api\LbcAccount($donnees);
             $accounts[] = $account;
@@ -136,15 +152,15 @@ class LbcAccountManager
     public function getAccountToScrap($nbCompte)
     {
         $accounts = [];
-        
+
         $q = $this->_db->prepare("select * from compte_lbc where disabled = false or disabled is null  order by ref_compte desc limit :nb_compte");
         $q->bindValue(":nb_compte", $nbCompte);
         $q->execute();
-        
+
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
             $accounts[] = new \spamtonprof\stp_api\LbcAccount($data);
         }
-        
+
         return ($accounts);
     }
 
@@ -152,24 +168,24 @@ class LbcAccountManager
     {
         $q1 = $this->_db->prepare("select * from compte_lbc where code_promo is null and (disabled is null or disabled = false)");
         $q1->execute();
-        
+
         $refComptes = [];
         while ($data = $q1->fetch(PDO::FETCH_ASSOC)) {
-            
+
             $refComptes[] = $data["ref_compte"];
         }
-        
+
         if (count($refComptes) != 0) {
-            
+
             $in = "(" . join(',', array_fill(0, count($refComptes), '?')) . ")";
-            
+
             $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-            
+
             array_unshift($refComptes, $now->format(PG_DATETIME_FORMAT));
-            
+
             $q2 = $this->_db->prepare("update compte_lbc set controle_date = ?, disabled = true where ref_compte in " . $in);
             $q2->execute($refComptes);
-            
+
             $q3 = $this->_db->prepare("delete from adds_lbc where ref_compte in " . $in);
             $q3->execute($refComptes);
         } else {
@@ -182,34 +198,34 @@ class LbcAccountManager
         $nbTot = 0;
         $refComptes = [];
         foreach ($rows as $row) {
-            
+
             $cols = explode(";", $row);
             $refCompte = $cols[0];
             $nbAnnonces = $cols[2];
             $nbTot = $nbTot + intval($nbAnnonces);
-            
+
             $disabled = false;
-            
+
             if ($nbAnnonces <= 10) {
                 $disabled = true;
                 $refComptes[] = $refCompte;
             }
-            
+
             $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-            
+
             $q1 = $this->_db->prepare("update compte_lbc set controle_date = :controle_date, disabled = :disabled, nb_annonces_online = :nb_annonces_online where ref_compte= :ref_compte");
             $q1->bindValue(":ref_compte", $refCompte);
             $q1->bindValue(":disabled", $disabled, PDO::PARAM_BOOL);
             $q1->bindValue(":nb_annonces_online", $nbAnnonces);
             $q1->bindValue(":controle_date", $now->format(PG_DATETIME_FORMAT));
-            
+
             $q1->execute();
         }
-        
+
         $in = "(" . join(',', array_fill(0, count($refComptes), '?')) . ")";
         $q3 = $this->_db->prepare("delete from adds_lbc where ref_compte in " . $in);
         $q3->execute($refComptes);
-        
+
         return ($nbTot);
     }
 }
