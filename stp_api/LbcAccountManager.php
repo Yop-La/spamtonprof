@@ -94,7 +94,7 @@ class LbcAccountManager
                 
                 $in  = "(" . str_repeat('?,', count($refComptes) - 1) . '?' . ")";
                 
-                $q = $this->_db->prepare("select * from compte_lbc where ref_compte in ".$in);
+                $q = $this->_db->prepare("select ref_compte, mail, password from compte_lbc where ref_compte in ".$in);
                 $q->execute($refComptes);
                 
             }
