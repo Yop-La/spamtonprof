@@ -573,4 +573,5 @@ class StripeManager
             }
         }
     }
+
 }

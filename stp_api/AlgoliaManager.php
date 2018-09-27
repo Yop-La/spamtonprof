@@ -19,6 +19,24 @@ class AlgoliaManager
         $this->client = new \AlgoliaSearch\Client('3VXJH73YCI', ALGOLIA_SECRET);
     }
 
+    /**
+     *
+     * @return \AlgoliaSearch\Client
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     *
+     * @param \AlgoliaSearch\Client $client
+     */
+    public function setClient($client)
+    {
+        $this->client = $client;
+    }
+
     public function resetSupportClientIndex()
     {
         $index = $this->client->initIndex('support_client');
@@ -175,5 +193,68 @@ class AlgoliaManager
         }
 
         $index->saveObjects($comptes);
+    }
+
+    public function resetAbonnement()
+    {
+
+        // ajout à l'index
+        $index = $this->client->initIndex('abonnement');
+        $index->clearIndex();
+
+        $now = new \DateTime("2018-09-01");
+        \Stripe\Stripe::setApiKey(PROD_SECRET_KEY_STRP);
+
+        $subs = \Stripe\Subscription::all(array(
+            'limit' => 5000,
+            "created" => array(
+                "gte" => $now->getTimestamp()
+            )
+        ));
+
+        $subs = $subs->data;
+
+        $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
+
+        $abos = [];
+
+        foreach ($subs as $sub) {
+
+            $abo = new \spamtonprof\stripe\Subscription($sub);
+
+            $constructor = array(
+                "construct" => array(
+                    'ref_eleve'
+                )
+            );
+
+            if ($abo->getRefAbonnement()) {
+
+                $stpAbo = $aboMg->get(array(
+                    "ref_abonnement" => $abo->getRefAbonnement()
+                ), $constructor);
+
+                $eleve = $stpAbo->getEleve();
+                $abo->prenom = $eleve->getPrenom();
+                $abo->nom = $eleve->getNom();
+            }
+            
+            $abos[] = $abo;
+        }
+
+        $index->addObjects($abos);
+    }
+    
+    public function addAbo($abo)
+    {
+        $index = $this->client->initIndex('abonnement');
+        $index->addObject($abo);
+    }
+    
+    public function updateAbo($abo)
+    {
+        $index = $this->client->initIndex('abonnement');
+        $abo = json_decode(json_encode($abo),true);
+        $index->saveObject($abo);
     }
 }

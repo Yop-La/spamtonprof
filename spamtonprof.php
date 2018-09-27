@@ -39,6 +39,8 @@
  */
 require_once (dirname(__FILE__) . '/inc/autoloader_stp.php'); // autoloader des classes stp
 
+require_once (dirname(__FILE__) . '/inc/autoloader_stripe.php'); // autoloader des classes stripe
+
 require_once (dirname(__FILE__) . '/inc/autoloader_getresponse.php'); // autoloader les custom classes de getresponse
 
 require_once (dirname(__FILE__) . '/inc/autoloader_gmail.php'); // autoloader les custom classes de getresponse

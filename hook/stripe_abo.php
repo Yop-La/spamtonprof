@@ -21,18 +21,30 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-\Stripe\Stripe::setApiKey(PROD_SECRET_KEY_STRP);
+$slack = new \spamtonprof\slack\Slack();
+$slack->sendMessages("log", array(
+    "hook recu"
+));
 
 $input = @file_get_contents("php://input");
 
 $event_json = json_decode($input);
 
-if ($event_json->type == "invoice.payment_succeeded") {
-    
-    $stripeMg = new \spamtonprof\stp_api\StripeManager(false);
-    
-    $stripeMg->transfertSubscriptionCharge($event_json);
-    
+$object = $event_json->data->object;
+
+$algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+
+switch ($event_json->type) {
+    case "customer.subscription.created":
+        $abo = new \spamtonprof\stripe\Subscription($object);
+        $algoliaMg->addAbo($abo);
+        break;
+    case "customer.subscription.updated":
+        $abo = new \spamtonprof\stripe\Subscription($object);
+        $algoliaMg->updateAbo($abo);
+        break;
+    case "customer.subscription.deleted":
+        $abo = new \spamtonprof\stripe\Subscription($object);
+        $algoliaMg->updateAbo($abo);
+        break;
 }
-
-
