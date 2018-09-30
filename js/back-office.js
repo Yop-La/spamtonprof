@@ -12,7 +12,7 @@ jQuery( document ).ready( function( $ ) {
 		urlSync: true,
 		searchParameters: {
 			hitsPerPage: 10,
-			filters: "ref_statut_abonnement = 1 OR ref_statut_abonnement = 2"
+			filters: "ref_statut_abonnement = 1 OR ref_statut_abonnement = 2 OR ref_statut_abonnement = 3 "
 		}
 	});
 
