@@ -35,10 +35,11 @@ class StpEleveManager
         $refCompteWp = $eleve->getRef_compte_wp();
 
         $q = null;
-        if (! $_SESSION["prod"]) {
-            $q = $this->_db->prepare('update stp_eleve set ref_compte_wp_test = :ref_compte_wp_test where ref_eleve = :ref_eleve');
-            $q->bindValue(':ref_compte_wp_test', $refCompteWp);
-        } else {
+
+        $q = $this->_db->prepare('update stp_eleve set ref_compte_wp_test = :ref_compte_wp_test where ref_eleve = :ref_eleve');
+        $q->bindValue(':ref_compte_wp_test', $refCompteWp);
+
+        if ($_SESSION["prod"]) {
             $q = $this->_db->prepare('update stp_eleve set ref_compte_wp = :ref_compte_wp where ref_eleve = :ref_eleve');
             $q->bindValue(':ref_compte_wp', $refCompteWp);
         }
@@ -132,7 +133,7 @@ class StpEleveManager
             $q = $this->_db->prepare('select * from stp_eleve where ref_eleve = :ref_eleve');
             $q->bindValue(':ref_eleve', $refEleve);
             $q->execute();
-        } 
+        }
 
         $data = $q->fetch(\PDO::FETCH_ASSOC);
 
@@ -212,12 +213,12 @@ class StpEleveManager
             $q = $this->_db->prepare('select * from stp_eleve where email like :email ');
             $q->bindValue(":email", '%' . $email . '%');
             $q->execute();
-        }else if (array_key_exists("telephones", $info)) {
-            
+        } else if (array_key_exists("telephones", $info)) {
+
             $nums = formatNums($info["telephones"]);
-            
+
             $nums = toSimilarTo($nums);
-            
+
             $q = $this->_db->prepare("select * from stp_eleve where regexp_replace(telephone, '[^01234536789]', '','g') SIMILAR TO '" . $nums . "'");
             $q->execute();
         }

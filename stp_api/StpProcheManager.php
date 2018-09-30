@@ -31,15 +31,14 @@ class StpProcheManager
     public function updateRefCompteWp(StpProche $proche)
     {
         $q = null;
-        if (! $_SESSION["prod"]) {
-
-            $q = $this->_db->prepare('update stp_proche set ref_compte_wp_test = :ref_compte_wp_test where ref_proche = :ref_proche');
-            $q->bindValue(':ref_compte_wp_test', $proche->getRef_compte_wp());
-        } else {
+        if ($_SESSION["prod"]) {
 
             $q = $this->_db->prepare('update stp_proche set ref_compte_wp = :ref_compte_wp where ref_proche = :ref_proche');
             $q->bindValue(':ref_compte_wp', $proche->getRef_compte_wp());
         }
+
+        $q = $this->_db->prepare('update stp_proche set ref_compte_wp_test = :ref_compte_wp_test where ref_proche = :ref_proche');
+        $q->bindValue(':ref_compte_wp_test', $proche->getRef_compte_wp());
 
         $q->bindValue(':ref_proche', $proche->getRef_proche());
         $q->execute();
@@ -68,9 +67,13 @@ class StpProcheManager
             $refCompteWp = $info["ref_compte_wp"];
 
             $q = null;
-
-            $q = $this->_db->prepare('select * from stp_proche where ref_compte_wp = :ref_compte_wp');
-            $q->bindValue(':ref_compte_wp', $refCompteWp);
+            if (! $_SESSION["prod"]) {
+                $q = $this->_db->prepare('select * from stp_proche where ref_compte_wp_test = :ref_compte_wp_test');
+                $q->bindValue(':ref_compte_wp_test', $refCompteWp);
+            } else {
+                $q = $this->_db->prepare('select * from stp_proche where ref_compte_wp = :ref_compte_wp');
+                $q->bindValue(':ref_compte_wp', $refCompteWp);
+            }
 
             $q->execute();
         } else if (array_key_exists("telephone", $info)) {
