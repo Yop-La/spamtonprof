@@ -195,6 +195,8 @@ class AlgoliaManager
         $index->saveObjects($comptes);
     }
 
+    /* ------------------        début index abonnements           --------------  */
+    
     public function resetAbonnement()
     {
 
@@ -240,5 +242,44 @@ class AlgoliaManager
         $index = $this->client->initIndex('abonnement');
         $abo = json_decode(json_encode($abo), true);
         $index->saveObject($abo);
+    }
+    
+    /* ------------------        fin index abonnements           --------------  */
+    
+    
+    /* ------------------        début index transferts           --------------  */
+    
+    public function resetTransfert()
+    {
+        
+        // ajout à l'index
+        $index = $this->client->initIndex('transfert');
+        $index->clearIndex();
+        
+        $now = new \DateTime("2018-09-01");
+        \Stripe\Stripe::setApiKey(PROD_SECRET_KEY_STRP);
+        
+        $subs = \Stripe\Subscription::all(array(
+            'limit' => 5000,
+            "created" => array(
+                "gte" => $now->getTimestamp()
+            )
+        ));
+        
+        $subs = $subs->data;
+        
+        
+        $abos = [];
+        
+        foreach ($subs as $sub) {
+            
+            $abo = new \spamtonprof\stripe\Subscription($sub);
+            
+            $abo ->toAlgoliaFormat();
+            
+            $abos[] = $abo;
+        }
+        
+        $index->addObjects($abos);
     }
 }
