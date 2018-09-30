@@ -105,6 +105,19 @@ function ajaxStopSubscription()
     
     $smtp->sendEmail("Tu peux récupérer un témoignage ! ", $prof->getEmail_stp(), $body_prof, $expe->getEmail(), "Alexandre de SpamTonProf", true);
     
+    //mise à jour de l'index
+    $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+    
+    $constructor = array(
+        "construct" => array(
+            'ref_statut_abonnement'
+        )
+    );
+    
+    $algoliaMg->updateAbonnement($abonnement->getRef_abonnement(), $constructor);
+    
+    
+    
     echo (json_encode($retour));
     
     die();
