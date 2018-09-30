@@ -52,7 +52,7 @@ function ajaxStopSubscription()
     $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
     
     // résilier abonnement stripe
-    $stripeMg = new \spamtonprof\stp_api\StripeManager();
+    $stripeMg = new \spamtonprof\stp_api\StripeManager($testMode);
     $stripeMg->stopSubscription($abonnement->getSubs_Id());
     
     // statut abonnement de actif à pas actif
