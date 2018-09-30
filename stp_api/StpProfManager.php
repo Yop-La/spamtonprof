@@ -58,13 +58,8 @@ class StpProfManager
 
             $userId = $info['user_id_wp'];
 
-            if (! $_SESSION["prod"]) {
-                $q = $this->_db->prepare('select * from stp_prof where ref_compte_wp_test = :ref_compte_wp_test');
-                $q->bindValue(':ref_compte_wp_test', $userId);
-            } else {
-                $q = $this->_db->prepare('select * from stp_prof where lower(user_id_wp) like lower(:user_id_wp)');
-                $q->bindValue(':user_id_wp', $userId);
-            }
+            $q = $this->_db->prepare('select * from stp_prof where lower(user_id_wp) like lower(:user_id_wp)');
+            $q->bindValue(':user_id_wp', $userId);
         }
 
         if (array_key_exists('ref_prof', $info)) {
@@ -141,16 +136,15 @@ class StpProfManager
     public function updateUserIdWp(\spamtonprof\stp_api\StpProf $prof)
     {
         $q = null;
-        if(!$_SESSION["prod"]){
+        if (! $_SESSION["prod"]) {
             $q = $this->_db->prepare('update stp_prof set ref_compte_wp = :ref_compte_wp where ref_prof = :ref_prof');
             $q->bindValue(':ref_compte_wp', $prof->getUser_id_wp());
-        }else{
-            
+        } else {
+
             $q = $this->_db->prepare('update stp_prof set user_id_wp = :user_id_wp where ref_prof = :ref_prof');
             $q->bindValue(':user_id_wp', $prof->getUser_id_wp());
         }
-        
-        
+
         $q->bindValue(':ref_prof', $prof->getRef_prof());
 
         $q->execute();

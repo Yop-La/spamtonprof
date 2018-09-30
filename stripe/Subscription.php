@@ -9,20 +9,24 @@ namespace spamtonprof\stripe;
 class Subscription implements \JsonSerializable
 {
 
-    protected $id, $objectID, $created, $status, $refCompte, $refAbonnement, $stripeProdId;
+    protected $id, $objectID, $status, $refCompte, $refAbonnement, $stripeProdId, $dateCreation;
 
     public function __construct($sub)
 
     {
         $this->objectID = $sub->id;
         $this->id = $sub->id;
-        $this->created = $sub->created;
+
+        // pour stocker la date de création
+        $dateCreation = new \DateTime(null);
+        $dateCreation->setTimestamp($sub->created);
+        $this->dateCreation = $dateCreation->format(PG_DATETIME_FORMAT);
+
         $this->status = $sub->status;
-        $metadata = json_decode(json_encode($sub->metadata),true);
-        
+        $metadata = json_decode(json_encode($sub->metadata), true);
+
         if (array_key_exists("ref_compte", $metadata)) {
             $this->refCompte = $metadata["ref_compte"];
-
         }
         if (array_key_exists("ref_abonnement", $metadata)) {
             $this->refAbonnement = $metadata["ref_abonnement"];
@@ -32,8 +36,8 @@ class Subscription implements \JsonSerializable
         }
     }
 
-
     /**
+     *
      * @return mixed
      */
     public function getRefCompte()
@@ -41,7 +45,29 @@ class Subscription implements \JsonSerializable
         return $this->refCompte;
     }
 
+    public function toAlgoliaFormat()
+    {
+        $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
+
+        if ($this->getRefAbonnement()) {
+
+            $constructor = array(
+                "construct" => array(
+                    'ref_eleve'
+                )
+            );
+
+            $stpAbo = $aboMg->get(array(
+                "ref_abonnement" => $this->getRefAbonnement()
+            ), $constructor);
+
+            $eleve = $stpAbo->getEleve();
+            $this->prenom = $eleve->getPrenom() . " " . $eleve->getNom();
+        }
+    }
+
     /**
+     *
      * @return mixed
      */
     public function getRefAbonnement()
@@ -50,6 +76,7 @@ class Subscription implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getStripeProdId()
@@ -58,6 +85,7 @@ class Subscription implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $refCompte
      */
     public function setRefCompte($refCompte)
@@ -66,6 +94,7 @@ class Subscription implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $refAbonnement
      */
     public function setRefAbonnement($refAbonnement)
@@ -74,6 +103,7 @@ class Subscription implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $stripeProdId
      */
     public function setStripeProdId($stripeProdId)

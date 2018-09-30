@@ -214,7 +214,6 @@ class AlgoliaManager
 
         $subs = $subs->data;
 
-        $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
 
         $abos = [];
 
@@ -222,39 +221,24 @@ class AlgoliaManager
 
             $abo = new \spamtonprof\stripe\Subscription($sub);
 
-            $constructor = array(
-                "construct" => array(
-                    'ref_eleve'
-                )
-            );
-
-            if ($abo->getRefAbonnement()) {
-
-                $stpAbo = $aboMg->get(array(
-                    "ref_abonnement" => $abo->getRefAbonnement()
-                ), $constructor);
-
-                $eleve = $stpAbo->getEleve();
-                $abo->prenom = $eleve->getPrenom();
-                $abo->nom = $eleve->getNom();
-            }
+            $abo ->toAlgoliaFormat();
             
             $abos[] = $abo;
         }
 
         $index->addObjects($abos);
     }
-    
+
     public function addAbo($abo)
     {
         $index = $this->client->initIndex('abonnement');
         $index->addObject($abo);
     }
-    
+
     public function updateAbo($abo)
     {
         $index = $this->client->initIndex('abonnement');
-        $abo = json_decode(json_encode($abo),true);
+        $abo = json_decode(json_encode($abo), true);
         $index->saveObject($abo);
     }
 }

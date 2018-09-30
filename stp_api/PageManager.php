@@ -281,6 +281,10 @@ class PageManager
 
             PageManager::reportingLbc();
         }
+        if ($this->pageSlug == 'tes-abonnements') {
+            
+            PageManager::tesAbonnements();
+        }
     }
 
     public static function abonnementApresEssaiLoader()
@@ -512,7 +516,6 @@ class PageManager
     }
 
     public static function reportingLbc()
-
     {
         wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
 
@@ -522,6 +525,20 @@ class PageManager
 
         wp_enqueue_script('formule_js', plugins_url() . '/spamtonprof/js/reporting-lbc.js', array(
 
+            'nf-front-end'
+        ), time());
+    }
+    
+    public static function tesAbonnements()
+    {
+        wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
+        
+        wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/tes-abonnements.css');
+        
+        wp_enqueue_script('algolia_js', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.js');
+        
+        wp_enqueue_script('formule_js', plugins_url() . '/spamtonprof/js/tes-abonnements.js', array(
+            
             'nf-front-end'
         ), time());
     }

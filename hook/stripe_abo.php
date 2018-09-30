@@ -34,17 +34,22 @@ $object = $event_json->data->object;
 
 $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
 
+
+
 switch ($event_json->type) {
     case "customer.subscription.created":
         $abo = new \spamtonprof\stripe\Subscription($object);
+        $abo ->toAlgoliaFormat();
         $algoliaMg->addAbo($abo);
         break;
     case "customer.subscription.updated":
         $abo = new \spamtonprof\stripe\Subscription($object);
+        $abo ->toAlgoliaFormat();
         $algoliaMg->updateAbo($abo);
         break;
     case "customer.subscription.deleted":
         $abo = new \spamtonprof\stripe\Subscription($object);
+        $abo ->toAlgoliaFormat();
         $algoliaMg->updateAbo($abo);
         break;
 }
