@@ -158,17 +158,17 @@ class PageManager
                 wp_localize_script('functions_js', 'userType', 'prof');
                 wp_localize_script('functions_js', 'loggedProf', $prof->toArray());
             }
-        } else {
+        } else { // si pas loggé (simple visiteur)
 
-            $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-            $hour = $now->format('H');
-            $pageNums = [
-                'accueil',
-                'tarifs',
-                'semaine-decouverte',
-                'decouvrir-spamtonprof',
-                'temoignages'
-            ];
+//             $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+//             $hour = $now->format('H');
+//             $pageNums = [
+//                 'accueil',
+//                 'tarifs',
+//                 'semaine-decouverte',
+//                 'decouvrir-spamtonprof',
+//                 'temoignages'
+//             ];
 
 //             if ((11 <= $hour && $hour < 14) || (18 <= $hour && $hour < 20) && in_array($this->pageSlug, $pageNums)) {
 //                 $printNum = "true";
