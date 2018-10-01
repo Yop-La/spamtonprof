@@ -607,7 +607,7 @@ class StpAbonnementManager
     }
 
     // mise à jour du plan de paiement et de la formule
-    function updateFormule($refAbo, int $refFormule)
+    function updateFormule($refAbo, int $refFormule, bool $testMode = true)
     {
         
         $constructor = array(
@@ -635,7 +635,7 @@ class StpAbonnementManager
             $gr->updateTrialList($refAbo);
         }else if($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ACTIF) {
             
-            $stripe = new \spamtonprof\stp_api\StripeManager();
+            $stripe = new \spamtonprof\stp_api\StripeManager($testMode);
             $stripe -> updateSubscriptionPlan($abo->getSubs_Id(), $plan);
             
         }
