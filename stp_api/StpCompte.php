@@ -4,11 +4,27 @@ namespace spamtonprof\stp_api;
 class StpCompte implements \JsonSerializable
 {
 
-    protected $ref_compte, $date_creation, $ref_proche;
+    protected $ref_compte, $date_creation, $ref_proche, $stripe_client;
 
     public function __construct(array $donnees = array())
     {
         $this->hydrate($donnees);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStripe_client()
+    {
+        return $this->stripe_client;
+    }
+
+    /**
+     * @param mixed $stripe_client
+     */
+    public function setStripe_client($stripe_client)
+    {
+        $this->stripe_client = $stripe_client;
     }
 
     public function hydrate(array $donnees)
@@ -21,6 +37,12 @@ class StpCompte implements \JsonSerializable
         }
     }
 
+    public static function cast(\spamtonprof\stp_api\StpCompte $compte)
+    {
+        return ($compte);
+    }
+    
+    
     public function getRef_compte()
     {
         return $this->ref_compte;

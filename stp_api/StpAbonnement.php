@@ -6,7 +6,25 @@ class StpAbonnement implements \JsonSerializable
 
     const ACTIF = 1, ESSAI = 2, TERMINE = 3, DESACTIVE = 4;
 
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage, $objectID, $teleprospection;
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage, $objectID, $teleprospection, $compte;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getCompte()
+    {
+        return $this->compte;
+    }
+
+    /**
+     *
+     * @param mixed $compte
+     */
+    public function setCompte($compte)
+    {
+        $this->compte = $compte;
+    }
 
     /**
      *
@@ -114,17 +132,17 @@ class StpAbonnement implements \JsonSerializable
     public function setDernier_contact($dernier_contact)
     {
         $this->dernier_contact = $dernier_contact;
-        
+
         if ($this->dernier_contact) {
-            
+
             $dernierContact = \DateTime::createFromFormat(PG_DATETIME_FORMAT, $this->dernier_contact);
             $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-            
+
             $interval = date_diff($dernierContact, $now);
-            
+
             $this->setNbJourSansMessage(intval($interval->format('%a')));
         } else {
-            
+
             $this->setNbJourSansMessage(100);
         }
     }
@@ -186,11 +204,11 @@ class StpAbonnement implements \JsonSerializable
     public function __construct(array $donnees = array())
     {
         $this->hydrate($donnees);
-        
+
         $stpLogAboMg = new \spamtonprof\stp_api\StpLogAbonnementManager();
-        
+
         if ($this->getRef_abonnement()) {
-            
+
             $this->dateDernierStatut = $stpLogAboMg->getDateDernierStatut($this->getRef_abonnement());
         }
     }

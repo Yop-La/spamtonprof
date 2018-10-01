@@ -145,9 +145,12 @@ function ajaxCreateSubscription()
             'ref_eleve',
             'ref_parent',
             'ref_formule',
-            'ref_plan'
+            'ref_plan',
+            'ref_compte'
         )
     );
+    
+    
     
     $abonnement = $abonnementMg->get(array(
         "ref_abonnement" => $refAbonnement
@@ -158,8 +161,10 @@ function ajaxCreateSubscription()
     $prof = $abonnement->getProf();
     $plan = $abonnement->getPlan();
     $formule = $abonnement->getFormule();
+    $compte = $abonnement->getCompte();
     
-    $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
+    
+    $compte = \spamtonprof\stp_api\StpCompte::cast($compte);
     $prof = \spamtonprof\stp_api\StpProf::cast($prof);
     $plan = \spamtonprof\stp_api\StpPlan::cast($plan);
     $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
@@ -176,16 +181,15 @@ function ajaxCreateSubscription()
     // on ajoute l'abonnement à stripe pour débiter le client de manière récurrente
     $stripeMg = new \spamtonprof\stp_api\StripeManager($testMode);
     
-    $subscriptionCreated = false;
     if ($testMode == "true") {
         
-        $subsId = $stripeMg->addConnectSubscription($emailClient, $source, $abonnement->getRef_compte(), $plan->getRef_plan_stripe_test(), $prof->getStripe_id_test(), $abonnement->getRef_abonnement());
+        $ids = $stripeMg->addConnectSubscription($emailClient, $source, $abonnement->getRef_compte(), $plan->getRef_plan_stripe_test(), $prof->getStripe_id_test(), $abonnement->getRef_abonnement(), $compte);
     } else {
         
-        $subsId = $stripeMg->addConnectSubscription($emailClient, $source, $abonnement->getRef_compte(), $plan->getRef_plan_stripe(), $prof->getStripe_id(), $abonnement->getRef_abonnement());
+        $ids = $stripeMg->addConnectSubscription($emailClient, $source, $abonnement->getRef_compte(), $plan->getRef_plan_stripe(), $prof->getStripe_id(), $abonnement->getRef_abonnement(), $compte);
     }
     
-    if (! $subsId) {
+    if (! $ids) {
         
         $retour->error = true;
         $retour->message = utf8_encode("Impossible de débiter votre moyen de paiement");
@@ -193,8 +197,12 @@ function ajaxCreateSubscription()
         die();
     } else {
         
-        $abonnement->setSubs_Id($subsId);
+        $abonnement->setSubs_Id($ids["subId"]);
         $abonnementMg->updateSubsId($abonnement);
+        
+        $compteMg = new \spamtonprof\stp_api\StpCompteManager();
+        $compte->setStripe_client($ids["cusId"]);
+        $compteMg -> updateStripeClient($compte);
         
         $abonnement->setRef_statut_abonnement(\spamtonprof\stp_api\StpStatutAbonnementManager::ACTIF);
         $abonnementMg->updateRefStatutAbonnement($abonnement);
