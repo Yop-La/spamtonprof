@@ -115,8 +115,9 @@ class StpFormuleManager
         }
     }
 
-    public function get($info)
+    public function get($info, $constructor = false)
     {
+        $q = null;
         if (is_array($info)) {
 
             if (array_key_exists("formule", $info)) {
@@ -126,16 +127,6 @@ class StpFormuleManager
                 $q = $this->_db->prepare("select * from stp_formule where formule = :formule");
 
                 $q->bindValue(":formule", $nomFormule);
-
-                $q->execute();
-
-                $data = $q->fetch(PDO::FETCH_ASSOC);
-
-                if ($data) {
-                    return (new \spamtonprof\stp_api\StpFormule($data));
-                } else {
-                    return (false);
-                }
             } else if (array_key_exists('classe', $info) && array_key_exists('matieres', $info)) {
 
                 $classe = $info['classe'];
@@ -156,32 +147,30 @@ class StpFormuleManager
 
                 $q = $this->_db->prepare('SELECT * FROM stp_formule where :classe like ANY (classes) and matieres = ' . $matieresParam);
                 $q->bindValue(':classe', $classe->getClasse());
-
-                $q->execute();
-
-                $data = $q->fetch();
-
-                if ($data) {
-                    return (new \spamtonprof\stp_api\StpFormule($data));
-                } else {
-                    return ($data);
-                }
             } else if (array_key_exists('ref_formule', $info)) {
 
                 $refFormule = $info['ref_formule'];
 
                 $q = $this->_db->prepare('SELECT * FROM stp_formule where ref_formule = :ref_formule');
                 $q->bindValue(':ref_formule', $refFormule);
+            }
 
-                $q->execute();
+            $q->execute();
 
-                $data = $q->fetch();
+            $data = $q->fetch();
 
-                if ($data) {
-                    return (new \spamtonprof\stp_api\StpFormule($data));
-                } else {
-                    return ($data);
+            if ($data) {
+
+                $formule = new \spamtonprof\stp_api\StpFormule($data);
+                if ($constructor) {
+
+                    $constructor["objet"] = $formule;
+                    $this->construct($constructor);
                 }
+
+                return ($formule);
+            } else {
+                return ($data);
             }
         }
     }

@@ -634,8 +634,10 @@ class StpAbonnementManager
             $gr = new \GetResponse();
             $gr->updateTrialList($refAbo);
         }else if($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ACTIF) {
-            $plan = $abo->getPlan();
-            $plan = \spamtonprof\stp_api\StpPlan::cast($plan);
+            
+            $stripe = new \spamtonprof\stp_api\StripeManager();
+            $stripe -> updateSubscriptionPlan($abo->getSubs_Id(), $plan);
+            
         }
             
         // mise à jour du plan et de la formule dans la base

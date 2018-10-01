@@ -162,9 +162,12 @@ class StripeManager
                 "Ref abonnement stripe : " . $subscription->id
             ));
 
-            return (array("subId" => $subscription->id, "cusId" => $customer->id));
+            return (array(
+                "subId" => $subscription->id,
+                "cusId" => $customer->id
+            ));
         } catch (Exception $e) {
-            return(false);
+            return (false);
 
             $slack->sendMessages("abonnement", array(
 
@@ -178,63 +181,31 @@ class StripeManager
 
                 "Erreur : " . $e->getMessage()
             ));
-
         }
     }
 
-    public function createSubscription($emailParent, $source, $refCompte, $planStripe)
-
+    public function updateSubscriptionPlan($subId, \spamtonprof\stp_api\StpPlan $plan)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
-        try {
-
-            $customer = \Stripe\Customer::create(array(
-
-                'email' => $emailParent,
-
-                'source' => $source,
-
-                "metadata" => array(
-
-                    "compte" => $refCompte
-                )
-            ));
-
-            $subscription = \Stripe\Subscription::create(array(
-
-                "customer" => $customer->id,
-
-                "items" => array(
-
-                    array(
-
-                        "plan" => $planStripe
-                    )
-                )
-            ));
-
-            to_log_abonnement(array(
-
-                "str1" => "ref compte : " . $refCompte,
-
-                "str2" => "emailParent : " . $emailParent,
-
-                "str3" => "ref abonnement stripe : " . $subscription->id
-            ));
-
-            return ($subscription);
-        } catch (Exception $e) {
-
-            to_log_slack(array(
-
-                "str1" => "error paiement apres essai" . $e->getMessage(),
-
-                "str2" => $emailParent
-            ));
-
-            return (null);
+        $planId = $plan->getRef_plan_stripe();
+        if ($this->testMode) {
+            $planId = $plan->getRef_plan_stripe_test();
         }
+
+        // mise à jour de l'abonnement stripe
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        $sub = \Stripe\Subscription::retrieve($subId);
+
+        \Stripe\Subscription::update($subId, [
+            'cancel_at_period_end' => false,
+            'items' => [
+                [
+                    'id' => $sub->items->data[0]->id,
+                    'plan' => $planId
+                ]
+            ]
+        ]);
+
+        $sub->save();
     }
 
     public function getPublicStripeKey()
