@@ -170,9 +170,9 @@ class PageManager
                 'temoignages'
             ];
 
-            if ((11 <= $hour && $hour < 14) || (18 <= $hour && $hour < 20) && in_array($this->pageSlug, $pageNums)) {
-                $printNum = "true";
-            }
+//             if ((11 <= $hour && $hour < 14) || (18 <= $hour && $hour < 20) && in_array($this->pageSlug, $pageNums)) {
+//                 $printNum = "true";
+//             }
         }
 
         $numMessage = 'Vous venez de découvrir notre site ? Et si on en discutait au téléphone ? Appelez nous au 04-34-10-25-49.';
