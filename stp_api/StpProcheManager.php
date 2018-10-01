@@ -32,13 +32,12 @@ class StpProcheManager
     {
         $q = null;
         if ($_SESSION["prod"]) {
-
-            $q = $this->_db->prepare('update stp_proche set ref_compte_wp = :ref_compte_wp where ref_proche = :ref_proche');
+            $q = $this->_db->prepare('update stp_proche set ref_compte_wp = :ref_compte_wp, local = false where ref_proche = :ref_proche');
             $q->bindValue(':ref_compte_wp', $proche->getRef_compte_wp());
+        } else {
+            $q = $this->_db->prepare('update stp_proche set ref_compte_wp_test = :ref_compte_wp_test, local = true where ref_proche = :ref_proche');
+            $q->bindValue(':ref_compte_wp_test', $proche->getRef_compte_wp());
         }
-
-        $q = $this->_db->prepare('update stp_proche set ref_compte_wp_test = :ref_compte_wp_test where ref_proche = :ref_proche');
-        $q->bindValue(':ref_compte_wp_test', $proche->getRef_compte_wp());
 
         $q->bindValue(':ref_proche', $proche->getRef_proche());
         $q->execute();
@@ -68,8 +67,8 @@ class StpProcheManager
 
             $q = null;
             if (! $_SESSION["prod"]) {
-                $q = $this->_db->prepare('select * from stp_proche where ref_compte_wp_test = :ref_compte_wp_test');
-                $q->bindValue(':ref_compte_wp_test', $refCompteWp);
+                $q = $this->_db->prepare('select * from stp_proche where ref_compte_wp_test = :ref_compte_wp or ref_compte_wp = :ref_compte_wp order by local desc');
+                $q->bindValue(':ref_compte_wp', $refCompteWp);
             } else {
                 $q = $this->_db->prepare('select * from stp_proche where ref_compte_wp = :ref_compte_wp');
                 $q->bindValue(':ref_compte_wp', $refCompteWp);

@@ -36,12 +36,14 @@ class StpEleveManager
 
         $q = null;
 
-        $q = $this->_db->prepare('update stp_eleve set ref_compte_wp_test = :ref_compte_wp_test where ref_eleve = :ref_eleve');
-        $q->bindValue(':ref_compte_wp_test', $refCompteWp);
 
         if ($_SESSION["prod"]) {
-            $q = $this->_db->prepare('update stp_eleve set ref_compte_wp = :ref_compte_wp where ref_eleve = :ref_eleve');
+            $q = $this->_db->prepare('update stp_eleve set ref_compte_wp = :ref_compte_wp, local = false where ref_eleve = :ref_eleve');
             $q->bindValue(':ref_compte_wp', $refCompteWp);
+        }else{
+            $q = $this->_db->prepare('update stp_eleve set ref_compte_wp_test = :ref_compte_wp_test, local = true where ref_eleve = :ref_eleve');
+            $q->bindValue(':ref_compte_wp_test', $refCompteWp);
+            
         }
 
         $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
@@ -118,8 +120,8 @@ class StpEleveManager
 
             $q = null;
             if (! $_SESSION["prod"]) {
-                $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp_test = :ref_compte_wp_test');
-                $q->bindValue(':ref_compte_wp_test', $refCompteWp);
+                $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp_test = :ref_compte_wp or ref_compte_wp = :ref_compte_wp order by local desc');
+                $q->bindValue(':ref_compte_wp', $refCompteWp);
             } else {
                 $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp = :ref_compte_wp');
                 $q->bindValue(':ref_compte_wp', $refCompteWp);
