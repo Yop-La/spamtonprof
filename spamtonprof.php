@@ -78,8 +78,6 @@ require_once (dirname(__FILE__) . '/ajaxFunction/ajax_dashboard_eleve.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/ajax_bo.php');
 
-require_once (dirname(__FILE__) . '/ninjaFormHooks/afterSubmission.php');
-
 add_action('template_redirect', 'handleRedirections');
 
 function handleRedirections()
