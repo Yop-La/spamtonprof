@@ -23,7 +23,7 @@ header("Pragma: no-cache");
 
 
 
-$message = json_decode($_GET["message"]);
+$message = explode("-",$_GET["message"]);
 $channel = $_GET["channel"];
 
 $slack = new \spamtonprof\slack\Slack();
