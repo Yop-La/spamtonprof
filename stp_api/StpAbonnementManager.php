@@ -121,6 +121,8 @@ class StpAbonnementManager
         }
         return ($nbMessages);
     }
+    
+
 
     /*
      *
@@ -505,6 +507,9 @@ class StpAbonnementManager
 
         if ($info == "all") {
             $q = $this->_db->prepare('select * from stp_abonnement');
+            $q->execute();
+        }else if($info == "no_messages"){
+            $q = $this->_db->prepare('select * from stp_abonnement where nb_message = 0');
             $q->execute();
         }
 

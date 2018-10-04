@@ -25,14 +25,19 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-$slack = new \spamtonprof\slack\Slack();
-
 $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
 
+//récupérer les messages et les comptes des abonnements avec nb_messages != 0
 $nbMessages = $aboMg->getNbMessage();
 
+// mettre tous les messages à zéro
 $aboMg->resetNbMessage();
 
+//reset de l'index
+$algolia = new \spamtonprof\stp_api\AlgoliaManager();
+$algolia -> resetNbMessage();
+
+// mettre à jour les messages non nulles dans algolia : 
 foreach ($nbMessages as $nbMessage) {
     
     $abo = $aboMg->get(array(
