@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class LbcProcessManager
 {
 
-    public $slack, $gmailManager, $prospectLbcMg, $messProspectMg, $expeMg, $lbcAccountMg, $msgs, $errors, $gmailAccountMg, $gmailAccount;
+    public $slack, $gmailManager, $prospectLbcMg, $messProspectMg, $lbcAccountMg, $msgs, $errors, $gmailAccountMg, $gmailAccount;
 
     public function __construct()
     {
@@ -14,7 +14,6 @@ class LbcProcessManager
         $this->prospectLbcMg = new \spamtonprof\stp_api\ProspectLbcManager();
         $this->messProspectMg = new \spamtonprof\stp_api\MessageProspectLbcManager();
         $this->lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
-        $this->expeMg = new \spamtonprof\stp_api\ExpeLbcManager();
         $this->gmailAccountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
         $this->messageTypeMg = new \spamtonprof\stp_api\LeadMessageTypeManager();
         
@@ -253,19 +252,6 @@ class LbcProcessManager
             return;
         }
         
-        // attribution d'un compte expe au compte leboncon si il n'existe pas
-        if (is_null($compteLbc->getRef_expe())) {
-            
-            $refExpe = $this->expeMg->getRefExpe($emailAccountLbc);
-            if (! $refExpe) {
-                $this->errors[] = "impossible de trouver la ref expe de ce compte lbc : ";
-                $this->errors[] = $emailAccountLbc;
-                return;
-            }
-            
-            $compteLbc->setRef_expe($refExpe);
-            $this->lbcAccountMg->updateRefExpe($compteLbc);
-        }
         
         // enregistrement du prospect si il n'existe pas
         $prospectLbc = $this->prospectLbcMg->get(array(
@@ -306,16 +292,13 @@ class LbcProcessManager
                 "ref_compte" => $message->getRef_compte_lbc()
             ));
             
-            $expe = $compteLbc->getExpe();
             
-            $smtpServer = $expe->getSmtpServer();
             
             $lead = $this->prospectLbcMg->get(array(
                 "ref_prospect_lbc" => $message->getRef_prospect_lbc()
             ));
             
-            $smtpServerMg = new SmtpServerManager();
-            
+           
             $subject = 'Re: ' . str_replace('leboncoin', 'lebonc...', $message->getSubject());
             $body = $message->getReply();
             
@@ -328,7 +311,7 @@ class LbcProcessManager
                 return ("");
             }, $body);
             
-            $send = $this->sendLeadReply($compteLbc, $expe, $subject, $to, $body, $message);
+            $send = $this->sendLeadReply($compteLbc, $subject, $to, $body, $message);
             
             if ($send) {
                 
@@ -340,7 +323,6 @@ class LbcProcessManager
                 $msgs[] = "Réponse automatique au mail : " . $message->getRef_message();
                 $msgs[] = "Lead concerné : " . $lead->getAdresse_mail();
                 $msgs[] = "Compte Lbc concerné et expediteur : " . $compteLbc->getMail();
-                $msgs[] = "Sender : " . $expe->getExpe();
                 $msgs[] = "Réponse : ";
                 $msgs[] = $subject;
                 $msgs[] = strip_tags($body);
@@ -361,12 +343,16 @@ class LbcProcessManager
         }
     }
     
-    public function sendLeadReply($compteLbc,\spamtonprof\stp_api\ExpeLbc $expe, $subject, $to, $body, $message){
+    public function sendLeadReply(\spamtonprof\stp_api\LbcAccount $compteLbc,$subject, $to, $body, $message){
 
-        $smtpServer = $expe -> getSmtpServer();
+        $smtpServerMg = new \spamtonprof\stp_api\SmtpServerManager();
+        $smtpServer = $smtpServerMg->get(array("ref_smtp_server" => $smtpServerMg::smtp2Go));
+        
+        $clientMg =new \spamtonprof\stp_api\LbcClientManager();
+        $client = $clientMg -> get(array("ref_client" => $compteLbc->getRef_client()));
    
-        $send1 = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), $expe->getFrom_name(), $html = true);
-        $send2 = $smtpServer->sendEmail("Stp Reply : |--|".$message->getRef_message(). "|--|" .$subject, "lebureaudesprofs@gmail.com", $body, $compteLbc->getMail(), $expe -> getFrom_name(), $html = true);
+        $send1 = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), $client->getPrenom_client(), true);
+        $send2 = $smtpServer->sendEmail("Stp Reply : |--|".$message->getRef_message(). "|--|" .$subject, "lebureaudesprofs@gmail.com", $body, $compteLbc->getMail(), $client->getPrenom_client(), true);
         
         return($send1 && $send2);
         
@@ -392,41 +378,5 @@ class LbcProcessManager
     }
 
     public function testZone()
-    {
-        $message = $this->messProspectMg->get(array(
-            "ref_message" => 12086
-        ));
-        
-        if ($message) {
-            
-            $compteLbc = $this->lbcAccountMg->get(array(
-                "ref_compte" => $message->getRef_compte_lbc()
-            ));
-            
-            $expe = $compteLbc->getExpe();
-           
-            $lead = $this->prospectLbcMg->get(array(
-                "ref_prospect_lbc" => $message->getRef_prospect_lbc()
-            ));
-            
-            $smtpServerMg = new SmtpServerManager();
-            
-            $subject = 'Re: ' . str_replace('leboncoin', 'lebonc...', $message->getSubject());
-            $body = $message->getReply();
-            
-            // on supprime la partie écrite par 33mail.
-            
-            $to = $lead->getAdresse_mail(); // 'alex.guillemine@gmail.com'
-            
-            $pattern = '/(<div align="center">.*?<\/div><\/div>)|(This email was sent to the alias(.*?)[\r\n])/';
-            $body = preg_replace_callback($pattern, function ($m) {
-                return ("");
-            }, $body);
-            
-            $body = str_replace(9, 5, $body);
-            
-            $this->sendLeadReply($compteLbc, $expe, $subject, $to, $body, $message);
-            
-        }
-    }
+    {}
 }

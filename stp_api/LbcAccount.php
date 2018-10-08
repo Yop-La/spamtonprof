@@ -6,131 +6,78 @@ use Exception;
 /**
  *
  * @author alexg
- *         
+ *        
  */
 class LbcAccount implements \JsonSerializable
 {
 
-    protected $column_name,
-    $ref_compte,$mail,
-    $password,
-    $nb_annonces_online,
-    $date_dernier_control,
-    $pseudo,
-    $redirection,
-    $date_derniere_activite,
-    $date_avant_peremption,
-    $disabled,
-    $date_of_disabling,
-    $ref_client,
-    $pack_booster,
-    $ref_expe,
-    $expe,
-    $code_promo,
-    $end_pack,
-    $prenom_client,
-    $nom_client,
-    $controle_date,
-    $objectID;
-
-    /**
-     * @return mixed
-     */
-    public function getControle_date()
-    {
-        return $this->controle_date;
-    }
-
-    /**
-     * @param mixed $controle_date
-     */
-    public function setControle_date($controle_date)
-    {
-        $this->controle_date = $controle_date;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPrenom_client()
-    {
-        return $this->prenom_client;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getNom_client()
-    {
-        return $this->nom_client;
-    }
-
-    /**
-     * @param mixed $prenom_client
-     */
-    public function setPrenom_client($prenom_client)
-    {
-        $this->prenom_client = $prenom_client;
-    }
-
-    /**
-     * @param mixed $nom_client
-     */
-    public function setNom_client($nom_client)
-    {
-        $this->nom_client = $nom_client;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getObjectID()
-    {
-        return $this->objectID;
-    }
-
-    /**
-     * @param mixed $objectID
-     */
-    public function setObjectID($objectID)
-    {
-        $this->objectID = $objectID;
-    }
+    protected $ref_compte, $mail, $password, $nb_annonces_online, $date_derniere_activite, $disabled, $date_of_disabling, $ref_client, $ref_expe, $expe, $code_promo, $prenom_client, $nom_client, $controle_date, $objectID, $date_creation, $telephone;
 
     public function __construct(array $donnees = array())
 
-{
-    $this->hydrate($donnees);
-}
+    {
+        $this->hydrate($donnees);
+    }
+    
+    
+
+    /**
+     * @return mixed
+     */
+    public function getTelephone()
+    {
+        return $this->telephone;
+    }
+
+    /**
+     * @param mixed $telephone
+     */
+    public function setTelephone($telephone)
+    {
+        $this->telephone = $telephone;
+    }
 
     public function hydrate(array $donnees)
-    
+
     {
         foreach ($donnees as $key => $value) {
-            
+
             $method = 'set' . ucfirst($key);
-            
+
             if (method_exists($this, $method)) {
-                
+
                 $this->$method($value);
             }
         }
     }
-      public function jsonSerialize()
-    {
-        $vars = get_object_vars($this);
-        
-        return $vars;
-    }
+
     /**
+     *
      * @return mixed
      */
-    public function getColumn_name()
+    public function getDate_creation()
     {
-        return $this->column_name;
+        return $this->date_creation;
     }
 
     /**
+     *
+     * @param mixed $date_creation
+     */
+    public function setDate_creation($date_creation)
+    {
+        $this->date_creation = $date_creation;
+    }
+
+    public function jsonSerialize()
+    {
+        $vars = get_object_vars($this);
+
+        return $vars;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getRef_compte()
@@ -139,6 +86,7 @@ class LbcAccount implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getMail()
@@ -147,6 +95,7 @@ class LbcAccount implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getPassword()
@@ -155,6 +104,7 @@ class LbcAccount implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getNb_annonces_online()
@@ -163,30 +113,7 @@ class LbcAccount implements \JsonSerializable
     }
 
     /**
-     * @return mixed
-     */
-    public function getDate_dernier_control()
-    {
-        return $this->date_dernier_control;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPseudo()
-    {
-        return $this->pseudo;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getRedirection()
-    {
-        return $this->redirection;
-    }
-
-    /**
+     *
      * @return mixed
      */
     public function getDate_derniere_activite()
@@ -195,14 +122,7 @@ class LbcAccount implements \JsonSerializable
     }
 
     /**
-     * @return mixed
-     */
-    public function getDate_avant_peremption()
-    {
-        return $this->date_avant_peremption;
-    }
-
-    /**
+     *
      * @return mixed
      */
     public function getDisabled()
@@ -211,6 +131,7 @@ class LbcAccount implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getDate_of_disabling()
@@ -219,6 +140,7 @@ class LbcAccount implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getRef_client()
@@ -227,142 +149,7 @@ class LbcAccount implements \JsonSerializable
     }
 
     /**
-     * @return mixed
-     */
-    public function getPack_booster()
-    {
-        return $this->pack_booster;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getEnd_pack()
-    {
-        return $this->end_pack;
-    }
-
-    /**
-     * @param mixed $column_name
-     */
-    public function setColumn_name($column_name)
-    {
-        $this->column_name = $column_name;
-    }
-
-    /**
-     * @param mixed $ref_compte
-     */
-    public function setRef_compte($ref_compte)
-    {
-        $this->ref_compte = $ref_compte;
-        $this->setObjectID($ref_compte);
-    }
-
-    /**
-     * @param mixed $mail
-     */
-    public function setMail($mail)
-    {
-        $this->mail = $mail;
-    }
-
-    /**
-     * @param mixed $password
-     */
-    public function setPassword($password)
-    {
-        $this->password = $password;
-    }
-
-    /**
-     * @param mixed $nb_annonces_online
-     */
-    public function setNb_annonces_online($nb_annonces_online)
-    {
-        $this->nb_annonces_online = $nb_annonces_online;
-    }
-
-    /**
-     * @param mixed $date_dernier_control
-     */
-    public function setDate_dernier_control($date_dernier_control)
-    {
-        $this->date_dernier_control = $date_dernier_control;
-    }
-
-    /**
-     * @param mixed $pseudo
-     */
-    public function setPseudo($pseudo)
-    {
-        $this->pseudo = $pseudo;
-    }
-
-    /**
-     * @param mixed $redirection
-     */
-    public function setRedirection($redirection)
-    {
-        $this->redirection = $redirection;
-    }
-
-    /**
-     * @param mixed $date_derniere_activite
-     */
-    public function setDate_derniere_activite($date_derniere_activite)
-    {
-        $this->date_derniere_activite = $date_derniere_activite;
-    }
-
-    /**
-     * @param mixed $date_avant_peremption
-     */
-    public function setDate_avant_peremption($date_avant_peremption)
-    {
-        $this->date_avant_peremption = $date_avant_peremption;
-    }
-
-    /**
-     * @param mixed $disabled
-     */
-    public function setDisabled($disabled)
-    {
-        $this->disabled = $disabled;
-    }
-
-    /**
-     * @param mixed $date_of_disabling
-     */
-    public function setDate_of_disabling($date_of_disabling)
-    {
-        $this->date_of_disabling = $date_of_disabling;
-    }
-
-    /**
-     * @param mixed $ref_client
-     */
-    public function setRef_client($ref_client)
-    {
-        $this->ref_client = $ref_client;
-    }
-
-    /**
-     * @param mixed $pack_booster
-     */
-    public function setPack_booster($pack_booster)
-    {
-        $this->pack_booster = $pack_booster;
-    }
-
-    /**
-     * @param mixed $end_pack
-     */
-    public function setEnd_pack($end_pack)
-    {
-        $this->end_pack = $end_pack;
-    }
-    /**
+     *
      * @return mixed
      */
     public function getRef_expe()
@@ -371,17 +158,7 @@ class LbcAccount implements \JsonSerializable
     }
 
     /**
-     * @param mixed $ref_expe
-     */
-    public function setRef_expe($ref_expe)
-    {
-        $this->ref_expe = $ref_expe;
-        
-        $expeMg = new \spamtonprof\stp_api\ExpeLbcManager();
-        
-        $this->expe = $expeMg -> get(array("ref_expe" => $ref_expe));
-    }
-    /**
+     *
      * @return mixed
      */
     public function getExpe()
@@ -390,13 +167,7 @@ class LbcAccount implements \JsonSerializable
     }
 
     /**
-     * @param mixed $expe
-     */
-    public function setExpe($expe)
-    {
-        $this->expe = $expe;
-    }
-    /**
+     *
      * @return mixed
      */
     public function getCode_promo()
@@ -405,6 +176,133 @@ class LbcAccount implements \JsonSerializable
     }
 
     /**
+     *
+     * @return mixed
+     */
+    public function getPrenom_client()
+    {
+        return $this->prenom_client;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getNom_client()
+    {
+        return $this->nom_client;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getControle_date()
+    {
+        return $this->controle_date;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getObjectID()
+    {
+        return $this->objectID;
+    }
+
+    /**
+     *
+     * @param mixed $ref_compte
+     */
+    public function setRef_compte($ref_compte)
+    {
+        $this->ref_compte = $ref_compte;
+    }
+
+    /**
+     *
+     * @param mixed $mail
+     */
+    public function setMail($mail)
+    {
+        $this->mail = $mail;
+    }
+
+    /**
+     *
+     * @param mixed $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
+    /**
+     *
+     * @param mixed $nb_annonces_online
+     */
+    public function setNb_annonces_online($nb_annonces_online)
+    {
+        $this->nb_annonces_online = $nb_annonces_online;
+    }
+
+    /**
+     *
+     * @param mixed $date_derniere_activite
+     */
+    public function setDate_derniere_activite($date_derniere_activite)
+    {
+        $this->date_derniere_activite = $date_derniere_activite;
+    }
+
+    /**
+     *
+     * @param mixed $disabled
+     */
+    public function setDisabled($disabled)
+    {
+        $this->disabled = $disabled;
+    }
+
+    /**
+     *
+     * @param mixed $date_of_disabling
+     */
+    public function setDate_of_disabling($date_of_disabling)
+    {
+        $this->date_of_disabling = $date_of_disabling;
+    }
+
+    /**
+     *
+     * @param mixed $ref_client
+     */
+    public function setRef_client($ref_client)
+    {
+        $this->ref_client = $ref_client;
+    }
+
+    /**
+     *
+     * @param mixed $ref_expe
+     */
+    public function setRef_expe($ref_expe)
+    {
+        $this->ref_expe = $ref_expe;
+    }
+
+    /**
+     *
+     * @param mixed $expe
+     */
+    public function setExpe($expe)
+    {
+        $this->expe = $expe;
+    }
+
+    /**
+     *
      * @param mixed $code_promo
      */
     public function setCode_promo($code_promo)
@@ -412,13 +310,40 @@ class LbcAccount implements \JsonSerializable
         $this->code_promo = $code_promo;
     }
 
+    /**
+     *
+     * @param mixed $prenom_client
+     */
+    public function setPrenom_client($prenom_client)
+    {
+        $this->prenom_client = $prenom_client;
+    }
 
-    
+    /**
+     *
+     * @param mixed $nom_client
+     */
+    public function setNom_client($nom_client)
+    {
+        $this->nom_client = $nom_client;
+    }
 
+    /**
+     *
+     * @param mixed $controle_date
+     */
+    public function setControle_date($controle_date)
+    {
+        $this->controle_date = $controle_date;
+    }
 
-    
-    
-
-  
+    /**
+     *
+     * @param mixed $objectID
+     */
+    public function setObjectID($objectID)
+    {
+        $this->objectID = $objectID;
+    }
 }
 
