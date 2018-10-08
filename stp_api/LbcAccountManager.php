@@ -50,15 +50,13 @@ class LbcAccountManager
 
     public function get($info)
     {
-        $donnees = false;
+        $q = null;
         if (array_key_exists("ref_compte", $info)) {
             $refCompte = $info["ref_compte"];
             $q = $this->_db->prepare("select * from compte_lbc where ref_compte = :ref_compte");
             $q->execute(array(
                 "ref_compte" => $refCompte
             ));
-
-            $donnees = $q->fetch(PDO::FETCH_ASSOC);
         }
 
         if (array_key_exists("mail", $info)) {
@@ -69,10 +67,22 @@ class LbcAccountManager
             $q->execute(array(
                 "mail" => $mail
             ));
-
-            $donnees = $q->fetch(PDO::FETCH_ASSOC);
         }
 
+        if (array_key_exists("refClient", $info) && array_key_exists("query", $info)) {
+
+            $refClient = $info["refClient"];
+            $query = $info["query"];
+
+            if ($query == "shortestEmail") {
+                $q = $this->_db->prepare("select * from compte_lbc 
+                where ref_client = :refClient and length(mail) in ( select  min(length(mail)) from compte_lbc  where ref_client = :refClient) limit 1");
+                $q->bindValue(":refClient", $refClient);
+                $q->execute();
+            }
+        }
+
+        $donnees = $q->fetch(PDO::FETCH_ASSOC);
         if (! $donnees) {
             return false;
         }
@@ -130,6 +140,23 @@ class LbcAccountManager
         $q->bindValue(":disabled", $lbcAccount->getDisabled(), PDO::PARAM_BOOL);
         $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
         $q->execute();
+    }
+
+    public function add(\spamtonprof\stp_api\LbcAccount $lbcAccount)
+    {
+        $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+        $q = $this->_db->prepare("insert into compte_lbc(mail, password, nb_annonces_online, disabled, ref_client, telephone, date_creation) 
+            values(:mail, :password, 0, false, :ref_client, :telephone, :date_creation)");
+        $q->bindValue(":mail", $lbcAccount->getMail());
+        $q->bindValue(":password", $lbcAccount->getPassword());
+        $q->bindValue(":ref_client", $lbcAccount->getRef_client());
+        $q->bindValue(":telephone", $lbcAccount->getTelephone());
+        $q->bindValue(":date_creation", $now->format(PG_DATETIME_FORMAT));
+        $q->execute();
+        
+        $lbcAccount->setRef_compte($this->_db->lastInsertId());
+        
+        return($lbcAccount);
     }
 
     public function updateRefExpe(\spamtonprof\stp_api\LbcAccount $lbcAccount)
