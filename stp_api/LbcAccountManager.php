@@ -136,8 +136,26 @@ class LbcAccountManager
 
     public function updateDisabled(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
-        $q = $this->_db->prepare("update compte_lbc set disabled = :disabled where ref_compte = :ref_compte");
+        $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+        $q = $this->_db->prepare("update compte_lbc set disabled = :disabled, date_of_disabling = :date_of_disabling where ref_compte = :ref_compte");
         $q->bindValue(":disabled", $lbcAccount->getDisabled(), PDO::PARAM_BOOL);
+        $q->bindValue(":date_of_disabling", $now->format(PG_DATETIME_FORMAT));
+        $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
+        $q->execute();
+    }
+    
+    public function updateControleDate(\spamtonprof\stp_api\LbcAccount $lbcAccount)
+    {
+        $q = $this->_db->prepare("update compte_lbc set controle_date = :controle_date where ref_compte = :ref_compte");
+        $q->bindValue(":controle_date", $lbcAccount->getControle_date()->format(PG_DATETIME_FORMAT));
+        $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
+        $q->execute();
+    }
+    
+    public function updateNbAnnonceOnline(\spamtonprof\stp_api\LbcAccount $lbcAccount)
+    {
+        $q = $this->_db->prepare("update compte_lbc set nb_annonces_online = :nb_annonces_online where ref_compte = :ref_compte");
+        $q->bindValue(":nb_annonces_online", $lbcAccount->getNb_annonces_online());
         $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
         $q->execute();
     }
@@ -178,15 +196,16 @@ class LbcAccountManager
     public function getAccountToScrap($nbCompte)
     {
         $accounts = [];
-
-        $q = $this->_db->prepare("select * from compte_lbc where disabled = false or disabled is null  order by ref_compte desc limit :nb_compte");
+        
+        $q = $this->_db->prepare("select * from compte_lbc 
+        where code_promo is not null and now() - interval '2 hour' > date_creation and (disabled = false or disabled = null)
+            order by ref_compte desc limit :nb_compte");
         $q->bindValue(":nb_compte", $nbCompte);
         $q->execute();
 
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
             $accounts[] = new \spamtonprof\stp_api\LbcAccount($data);
         }
-
         return ($accounts);
     }
 
