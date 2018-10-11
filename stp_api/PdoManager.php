@@ -22,6 +22,9 @@ class PdoManager
 //                 self::$bdd = new PDO('pgsql:host=' . DB_HOST_PG_LOCAL . ';port=5432;application_name=stp;dbname=' . DB_NAME_PG_LOCAL . ';user=' . DB_USER_PG_LOCAL . ';password=' . DB_PASSWORD_PG_LOCAL);
                 
                 // to_log_slack(array("str1" => "connection bdd" ));
+                
+                self::$bdd->exec("SET TIME ZONE 'Europe/Paris';");
+                
             } catch (Exception $e) {
                 
                 $slack = new \spamtonprof\slack\Slack();
