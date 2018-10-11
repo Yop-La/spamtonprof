@@ -23,6 +23,8 @@ function ajaxAjoutEleve()
     $retour->error = false;
     $retour->message = "ok";
 
+    serializeTemp($_POST);
+    
     $prenomEleve = $_POST["prenomEleve"];
     $nomEleve = $_POST["nomEleve"];
     $emailEleve = trim($_POST["emailEleve"]);
@@ -40,7 +42,7 @@ function ajaxAjoutEleve()
 
     if ($eleve) {
 
-        $retour->error = false;
+        $retour->error = true;
         $retour->message = "compte_existe_deja";
 
         echo (json_encode($retour));
@@ -193,7 +195,7 @@ function ajaxAfterSubmissionEssai()
 
     if ($proche || $eleve) {
 
-        $retour->error = false;
+        $retour->error = true;
         $retour->message = "compte_existe_deja";
 
         echo (json_encode($retour));
