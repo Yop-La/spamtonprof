@@ -23,6 +23,18 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
+/*
+ * 
+ *  pour vérifier la mise en ligne des annonces après publication en lisant les mails de mise en ligne dans la boite leboncoin
+ *  lancement depuis slack
+ *  lancement dans slack ne fonctionnne plus - à réparer - plus en prod
+ * 
+ */
+
+// plus en prod !!!!!
+
+
+
 /* espace de travail */
 echo("deb");
 $slack = new spamtonprof\slack\Slack();
