@@ -743,11 +743,12 @@ class GetResponse
         return ($rep);
     }
 
-    public function addParentInTrialSequence1(\spamtonprof\stp_api\StpEleve $eleve, \spamtonprof\stp_api\StpProf $prof, \spamtonprof\stp_api\StpFormule $formule, \spamtonprof\stp_api\StpProche $proche)
+    public function addParentInTrialSequence1(\spamtonprof\stp_api\StpEleve $eleve, \spamtonprof\stp_api\StpProf $prof, \spamtonprof\stp_api\StpFormule $formule, \spamtonprof\stp_api\StpProche $proche, $dayOfCycle = 0)
     {
         $params = '{
             "name": "' . $proche->getPrenom() . '",
             "email": "' . $proche->getEmail() . '",
+            "dayOfCycle": ' . $dayOfCycle . ',
             "dayOfCycle": "0",
             "campaign": {
                 "campaignId": "' . $this->stpParentEssaiId1 . '"
