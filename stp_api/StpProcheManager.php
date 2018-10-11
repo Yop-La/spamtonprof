@@ -45,6 +45,15 @@ class StpProcheManager
         return ($proche);
     }
 
+    public function updateEmail(StpProche $proche)
+    {
+        $q = $this->_db->prepare('update stp_proche set email = :email where ref_proche = :ref_proche');
+        $q->bindValue(':email', $proche->getEmail());
+        $q->bindValue(':ref_proche', $proche->getRef_proche());
+        $q->execute();
+        return ($proche);
+    }
+
     public function get($info)
     {
         $data = false;
