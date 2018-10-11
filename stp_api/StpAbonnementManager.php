@@ -121,8 +121,6 @@ class StpAbonnementManager
         }
         return ($nbMessages);
     }
-    
-
 
     /*
      *
@@ -508,7 +506,7 @@ class StpAbonnementManager
         if ($info == "all") {
             $q = $this->_db->prepare('select * from stp_abonnement');
             $q->execute();
-        }else if($info == "no_messages"){
+        } else if ($info == "no_messages") {
             $q = $this->_db->prepare('select * from stp_abonnement where nb_message = 0');
             $q->execute();
         }
@@ -614,14 +612,13 @@ class StpAbonnementManager
     // mise à jour du plan de paiement et de la formule
     function updateFormule($refAbo, int $refFormule, bool $testMode = true)
     {
-        
         $constructor = array(
             "construct" => array(
                 'ref_formule',
                 'ref_plan'
             )
         );
-        
+
         $abo = $this->get(array(
             "ref_abonnement" => $refAbo
         ), $constructor);
@@ -633,25 +630,22 @@ class StpAbonnementManager
             "ref_formule" => $refFormule
         ));
 
-        
         // traitement spécifique aux status
         if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ESSAI) {
             $gr = new \GetResponse();
             $gr->updateTrialList($refAbo);
-        }else if($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ACTIF) {
-            
+        } else if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ACTIF) {
+
             $stripe = new \spamtonprof\stp_api\StripeManager($testMode);
-            $stripe -> updateSubscriptionPlan($abo->getSubs_Id(), $plan);
-            
+            $stripe->updateSubscriptionPlan($abo->getSubs_Id(), $plan);
         }
-            
+
         // mise à jour du plan et de la formule dans la base
         $q = $this->_db->prepare("update stp_abonnement set ref_formule = :ref_formule, ref_plan = :ref_plan where ref_abonnement = :ref_abonnement");
         $q->bindValue(":ref_formule", $refFormule);
         $q->bindValue(":ref_plan", $plan->getRef_plan());
         $q->bindValue(":ref_abonnement", $refAbo);
         $q->execute();
-        
 
         // mise à jour algolia
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
@@ -661,11 +655,87 @@ class StpAbonnementManager
     // pour avoir les conversions de Amina à partir d'un tableau de numéro de téléphone non formaté
     function getAnimaSubscription($nums)
     {
+        $constructor = array(
+            "construct" => array(
+                'ref_parent',
+                'ref_eleve'
+            )
+        );
+
         $abonnements = $this->getAll(array(
             "telephones" => $nums,
             "teleprospection" => "oui",
             "remarques" => "chloe "
-        ));
-        prettyPrint($abonnements);
+        ), $constructor);
+        return ($abonnements);
+    }
+
+    // pour mettre à jour l'email d'un parent
+    function updateEmailParent($email, $refAbo)
+    {
+        $email = "n.gironde@wanadoo.fr";
+        $refAbo = "271";
+
+        // on récupère l'abonnement
+        $constructor = array(
+            "construct" => array(
+                'ref_eleve',
+                'ref_parent',
+                'ref_statut_abonnement',
+                'ref_formule',
+                'ref_prof'
+            )
+        );
+
+        $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
+        $procheMg = new \spamtonprof\stp_api\StpProcheManager();
+
+        $abo = $abonnementMg->get(array(
+            "ref_abonnement" => $refAbo
+        ), $constructor);
+
+        $eleve = $abo->getEleve();
+        $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
+
+        $parent = $abo->getProche();
+        $parent = \spamtonprof\stp_api\StpProche::cast($parent);
+
+        $formule = $abo->getFormule();
+        $prof = $abo->getProf();
+
+        if ($parent->getEmail() == $email) {
+
+            exit(0);
+        }
+
+        // maj getresponse - remove list essai + ajout liste essai si essai
+
+        if ($abo->getFirst_prof_assigned() && $abo->getRef_statut_abonnement() == $abo::ESSAI) {
+
+            $gr = new \GetResponse();
+
+            $end_seq = "";
+            if ($eleve->getSeq_email_parent_essai() == "2") {
+                $end_seq = "_2";
+            }
+            $contact = $gr->getContactInList($parent->getEmail(), "stp_parent_essai" . $end_seq);
+
+            $dayOfCycle = 0;
+            if ($contact) {
+                $dayOfCycle = $contact->dayOfCycle;
+                $gr->deleteContact($contact->contactId);
+            }
+            $parent->setEmail($email);
+            $gr->addParentInTrialSequence1($eleve, $prof, $formule, $parent, $dayOfCycle);
+        }
+
+        // mise à jour de l'email dans la base
+        $parent->setEmail($email);
+
+        $procheMg->updateEmail($parent);
+
+        // update index
+        $algolia = new \spamtonprof\stp_api\AlgoliaManager();
+        $algolia->updateAbonnement($refAbo, $constructor);
     }
 }
