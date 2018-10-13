@@ -1,7 +1,7 @@
 <?php
 namespace spamtonprof\stp_api;
 
-class addsTempo implements \JsonSerializable
+class AddsTempo implements \JsonSerializable
 {
 
     protected $first_publication_date, $zipcode, $city, $id, $ref_compte, $has_phone, $ref_commune;

@@ -380,8 +380,8 @@ class LbcProcessManager
     // --- step 3 : on récupère les potentiels annonces en ligne de ces comptes avec l'api du bon coin
 
     // --- step 4-1 (si il y a des annonces en ligne)
-    //      --- step 4-1-1 : on les ajoute à la table adds_tempo
-    //      --- step 4-1-2 : on met à jour la ref_commune des annonces ajoutés à adds_tempo
+    // --- step 4-1-1 : on les ajoute à la table adds_tempo
+    // --- step 4-1-2 : on met à jour la ref_commune des annonces ajoutés à adds_tempo
     // --- step 5 : on désactive ou on active le compte
     // --- step 6 : on met à jour le nb d'annonce du compte lbc
     // --- step 7 : on met à jour la de contrôle
@@ -457,5 +457,79 @@ class LbcProcessManager
             $lbcAccount->setControle_date($now);
             $lbcAccountMg->updateControleDate($lbcAccount);
         }
+    }
+
+    // pour générer et retourner les annonces avant publication par zenno
+    public function generateAds($refClient, $nbAds, $phone, $ref_compte)
+    {
+
+        // on récupère les titres
+        $hasTypeTitleMg = new \spamtonprof\stp_api\HasTitleTypeManager();
+        $lbcTitleMg = new \spamtonprof\stp_api\LbcTitleManager();
+        $communeMg = new \spamtonprof\stp_api\LbcCommuneManager();
+        $adMg = new \spamtonprof\stp_api\AddsTempoManager();
+
+        $hasTypeTitle = $hasTypeTitleMg->get(array(
+            "ref_client_defaut" => $refClient
+        ));
+        $titles = $lbcTitleMg->getAll(array(
+            "ref_type_titre" => $hasTypeTitle->getRef_type_titre()
+        ));
+
+        // on récupère les textes
+        $hasTypeTexteMg = new \spamtonprof\stp_api\HasTextTypeManager();
+
+        $hasTypeTexte = $hasTypeTexteMg->get(array(
+            "ref_client_defaut" => $refClient
+        ));
+
+        $lbcTexteMg = new \spamtonprof\stp_api\LbcTexteManager();
+        $textes = $lbcTexteMg->getAll(array(
+            "ref_type_texte" => $hasTypeTexte->getRef_type()
+        ));
+
+        // on ajoute le num tel aux textes si demandé
+        if ($phone != 'pas-de-num') {
+            $textes = $lbcTexteMg->addPhoneLine($textes, $phone);
+        }
+
+        // on récupère les communes
+        $communes = $communeMg->getAll(array(
+            "ref_client" => $refClient
+        ));
+
+        // on constitue les annonces ( en verouillant les communes de ces annonces)
+        $nbTitles = count($titles);
+        $nbTextes = count($textes);
+        $nbCommunes = count($communes);
+
+        $ads = [];
+        for ($i = 0; $i < $nbAds; $i ++) {
+
+            // récupération du titre
+            $title = $titles[$i % $nbTitles];
+            $title = $title->getTitre();
+
+            // récupération du texte
+            $texte = $textes[$i % $nbTextes];
+
+            // récupération de la commune
+            $commune = $communes[$i % $nbCommunes];
+            $nomCommune = $commune->getLibelle() . " " . $commune->getCode_postal();
+
+            // verouillage des communes prises dans les annonces
+            $adTempo = new \spamtonprof\stp_api\AddsTempo(array(
+                "ref_compte" => $ref_compte,
+                "ref_commune" => $commune->getRef_commune()
+            ));
+            $adMg->add($adTempo);
+
+            $ad = new \stdClass();
+            $ad->title = $title;
+            $ad->text = $texte;
+            $ad->commune = $nomCommune;
+            $ads[] = $ad;
+        }
+        return($ads);
     }
 }

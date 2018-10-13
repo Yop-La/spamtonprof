@@ -1,9 +1,7 @@
 <?php
 /**
  * 
- *  pour recevoir les hooks de stripe en mode prof
- *  Voilà les hooks reçus :
- *  - invoice.payment_succeeded pour transférer les fonds au prof
+ *  ppour générer un compte lbc avant publication d'annonces par zenno ( en prod )
  *  
  */
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");

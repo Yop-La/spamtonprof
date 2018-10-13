@@ -29,15 +29,14 @@ class LbcCommuneManager
 
         return ($lbcCommune);
     }
-    
-    
+
     // pour chercher dans la base de données code-insee-postaux-geoflar de OpenDataSoft
-    public function getAllFromODS($text){
-        
+    public function getAllFromODS($text)
+    {
         $params = urlencode($text);
         $url = "https://public.opendatasoft.com/api/records/1.0/search/?dataset=code-insee-postaux-geoflar&q=" . $params;
         $curl = curl_init();
-        
+
         curl_setopt_array($curl, array(
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
@@ -51,24 +50,23 @@ class LbcCommuneManager
                 "cache-control: no-cache"
             )
         ));
-        
+
         $response = curl_exec($curl);
         $err = curl_error($curl);
-        
+
         curl_close($curl);
-        
+
         if ($err) {
             echo "cURL Error #:" . $err;
         } else {
             $response = json_decode($response);
             return ($response);
         }
-        
     }
-    
+
     // pour trouver la commune dans une liste de commune ayat le nom de commune le plus proche de $nomCommune
-    //$communes est un records retourné par getAllFromODS
-    //Elle sert à lier un nom de commune du bon coin à une commune de la base open data soft
+    // $communes est un records retourné par getAllFromODS
+    // Elle sert à lier un nom de commune du bon coin à une commune de la base open data soft
     public function findClosest($communes, $nomCommune)
     {
         $nbRecord = count($communes);
@@ -76,7 +74,7 @@ class LbcCommuneManager
         $winner = $record;
         $min = levenshtein($record->fields->libelle_d_acheminement, $nomCommune);
         for ($i = 1; $i < $nbRecord; $i ++) {
-            
+
             $record = $communes[$i];
             $dist = levenshtein($record->fields->libelle_d_acheminement, $nomCommune);
             if ($dist < $min) {
@@ -85,5 +83,40 @@ class LbcCommuneManager
             }
         }
         return ($winner);
+    }
+
+    public function getAll($info)
+    {
+        $q = null;
+        $communes = [];
+        if (is_array($info)) {
+            if (array_key_exists('ref_client', $info)) {
+                $refClient = $info['ref_client'];
+
+                $q = $this->_db->prepare('
+                select * from (
+  select ref_commune,
+		libelle,
+		code_postal,
+		population,
+        row_number() over
+          (partition by libelle ) row_num
+		       from lbc_commune
+                    where ref_commune not in(
+                        select ref_commune from adds_tempo 
+                            where ref_compte in (select ref_compte from compte_lbc where ref_client = :ref_client)
+                    )
+                order by population  desc limit 500) t
+				where row_num = 1 limit 150;');
+                $q->bindValue("ref_client", $refClient);
+                
+            }
+        }
+        $q->execute();
+
+        while ($data = $q->fetch(\PDO::FETCH_ASSOC)) {
+            $communes[] = new \spamtonprof\stp_api\LbcCommune($data);
+        }
+        return ($communes);
     }
 }

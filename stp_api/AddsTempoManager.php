@@ -25,15 +25,16 @@ class AddsTempoManager
         }
     }
 
-    public function add(addsTempo $addsTempo)
+    public function add(AddsTempo $addsTempo)
     {
-        $q = $this->_db->prepare('insert into adds_tempo(first_publication_date, zipcode, city, id, ref_compte, has_phone) values( :first_publication_date,:zipcode,:city,:id,:ref_compte,:has_phone)');
+        $q = $this->_db->prepare('insert into adds_tempo(first_publication_date, zipcode, city, id, ref_compte, has_phone, ref_commune) values( :first_publication_date,:zipcode,:city,:id,:ref_compte,:has_phone, :ref_commune)');
         $q->bindValue(':first_publication_date', $addsTempo->getFirst_publication_date());
         $q->bindValue(':zipcode', $addsTempo->getZipcode());
         $q->bindValue(':city', $addsTempo->getCity());
         $q->bindValue(':id', $addsTempo->getId());
         $q->bindValue(':ref_compte', $addsTempo->getRef_compte());
         $q->bindValue(':has_phone', $addsTempo->getHas_phone(), \PDO::PARAM_BOOL);
+        $q->bindValue(':ref_commune', $addsTempo->getRef_commune());
         $q->execute();
 
         return ($addsTempo);
@@ -114,7 +115,7 @@ class AddsTempoManager
         }
     }
 
-    public function updateRefCommune(\spamtonprof\stp_api\addsTempo $ad)
+    public function updateRefCommune(\spamtonprof\stp_api\AddsTempo $ad)
     {
         $q = $this->_db->prepare('update adds_tempo set ref_commune = :ref_commune where id = :id');
         $q->bindValue(":ref_commune", $ad->getRef_commune());

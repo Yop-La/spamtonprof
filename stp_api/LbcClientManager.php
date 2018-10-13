@@ -5,6 +5,8 @@ class LbcClientManager
 {
 
     private $_db;
+    
+    const CANNELLE = 19, LUCAS = 20, THOMAS = 12, CAMILLA = 17, SEB = 11; 
 
     public function __construct()
     {
