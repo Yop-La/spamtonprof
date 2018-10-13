@@ -37,4 +37,6 @@ $lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
 
 $ads = $lbcProcessMg -> generateAds($refClient, $nbAds, $phone, $refCompte);
 
-prettyPrint($ads);
+$retour = new stdClass();
+$retour->ads = $ads;
+prettyPrint($retour);
