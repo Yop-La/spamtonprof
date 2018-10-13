@@ -71,6 +71,6 @@ $newAccount->setCode_promo($code_promo);
 
 $lbcAccountMg -> updateCodePromo($newAccount);
 
-$lbcAccount->setPrenom_client($client->getPrenom_client());
+$newAccount->setPrenom_client($client->getPrenom_client());
 
 prettyPrint($newAccount);
