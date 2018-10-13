@@ -42,16 +42,19 @@ class StripeManager
         $subscription->cancel();
     }
 
-    public function transfertSubscriptionCharge($event_json)
+    public function transfertSubscriptionCharge($event_json, $subIdMan = false, $chargeIdMan = false)
     {
         $slack = new \spamtonprof\slack\Slack();
 
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
-        $chargeId = $event_json->data->object->charge;
-        $subId;
-        $sub;
-
+        
+        $chargeId = $chargeIdMan;
+        $subId = $subIdMan;
+        if ($event_json) {
+            $chargeId = $event_json->data->object->charge;
+            $subId = $event_json->data->object->subscription;
+        }
+   
         $messages = [];
 
         $messages[] = "---------";
@@ -59,7 +62,7 @@ class StripeManager
         $messages[] = "chargeId : " . $chargeId;
 
         try {
-            $subId = $event_json->data->object->subscription;
+
             $sub = \Stripe\Subscription::retrieve($subId);
 
             if ($sub->metadata["stripe_prof_id"] != "") {
@@ -67,7 +70,7 @@ class StripeManager
                 $profId = $sub->metadata["stripe_prof_id"];
 
                 $charge = \Stripe\Charge::retrieve($chargeId);
-                $charge->transfer_group = $charge->id; // on utilise la charge id comme id de groupage de transactions
+                $charge->transfer_group = $chargeId; // on utilise la charge id comme id de groupage de transactions
                 $charge->save();
 
                 // on transfère 75 % au prof
@@ -75,8 +78,8 @@ class StripeManager
                     "amount" => round(0.75 * $charge->amount),
                     "currency" => "eur",
                     "destination" => $profId,
-                    "transfer_group" => $charge->id,
-                    "source_transaction" => $charge->id
+                    "transfer_group" => $chargeId,
+                    "source_transaction" => $chargeId
                 ));
 
                 $messages[] = "Transfert vers : " . $profId . "réussi";
