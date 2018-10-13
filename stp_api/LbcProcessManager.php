@@ -491,7 +491,7 @@ class LbcProcessManager
         // on ajoute le num tel aux textes si demandé
         if ($phone != 'pas-de-num') {
             $textes = $lbcTexteMg->addPhoneLine($textes, $phone);
-        }
+        }else
 
         // on récupère les communes
         $communes = $communeMg->getAll(array(

@@ -87,8 +87,6 @@ class LbcTexteManager
         return ($textes);
     }
 
-
-
     public function exist($texteType)
     {
         $q = $this->_db->prepare("select count(*) as exist from textes where type = :type_texte ");
@@ -107,22 +105,22 @@ class LbcTexteManager
             return (true);
         }
     }
-    
-    public function addPhoneLine($textes, $phone){
+
+    public function addPhoneLine($textes, $phone)
+    {
         $phoneStringMg = new \spamtonprof\stp_api\PhoneStringManager();
-        $phoneStrings = $phoneStringMg -> getAll();
+        $phoneStrings = $phoneStringMg->getAll();
         $nbPhoneStrings = count($phoneStrings);
-        
+
         $indexAd = 0;
-        foreach ($textes as $texte){
-            
-            $phoneString = $phoneStrings[$indexAd%$nbPhoneStrings];
-            $phoneString = str_replace("[num-tel]",$phone,$phoneString->getPhone_string());
-            
-            
-            $textes[$indexAd] = $phoneString . "\r\n\r\n" . $texte -> getTexte()  ;
-            $indexAd++;
+        foreach ($textes as $texte) {
+
+            $phoneString = $phoneStrings[$indexAd % $nbPhoneStrings];
+            $phoneString = str_replace("[num-tel]", $phone, $phoneString->getPhone_string());
+
+            $texte->setTexte($phoneString . "\r\n\r\n" . $texte->getTexte());
+            $indexAd ++;
         }
-        return($textes);
+        return ($textes);
     }
 }
