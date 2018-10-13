@@ -75,7 +75,7 @@ class LbcAccountManager
             $query = $info["query"];
 
             if ($query == "shortestEmail") {
-                $q = $this->_db->prepare("select * from compte_lbc where ref_client = :ref_client order by length(mail)*random()");
+                $q = $this->_db->prepare("select * from compte_lbc where ref_client = :refClient order by length(mail)*random()");
                 $q->bindValue(":refClient", $refClient);
                 $q->execute();
             }
