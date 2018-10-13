@@ -60,7 +60,7 @@ $newAccount->setMail($newEmail);
 $newAccount->setCode_promo(null);
 $newAccount->setControle_date(null);
 $newAccount->setTelephone($numTel);
-$newAccount->setPassword(wp_generate_password());
+$newAccount->setPassword(wp_generate_password() . rand(12,100));
 
 $newAccount = $lbcAccountMg->add($newAccount);
 
