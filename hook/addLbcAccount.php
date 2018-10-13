@@ -26,6 +26,10 @@ header("Pragma: no-cache");
 $refClient = $_POST["ref_client"];
 $numTel = $_POST["num_tel"];
 
+//étape 1 : on récupère le client pour avoir le nom de domaine
+$clientMg = new \spamtonprof\stp_api\LbcClientManager();
+$client = $clientMg -> get(array("ref_client" => $refClient));
+
 // étape 1 : récupérer un compte à cloner
 $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
 
@@ -41,7 +45,7 @@ $domain = explode("@", $mail)[1];
 $i = 0;
 $exist = true;
 while ($exist) {
-    $newEmail = $radical . $i . "@" . $domain;
+    $newEmail = $radical . $i . "@" . $client->getDomain();
     $exist = $lbcAccountMg->get(array(
         "mail" => $newEmail
     ));
@@ -66,5 +70,7 @@ $code_promo = $hashids->encode($newAccount->getRef_compte());
 $newAccount->setCode_promo($code_promo);
 
 $lbcAccountMg -> updateCodePromo($newAccount);
+
+$lbcAccount->setPrenom_client($client->getPrenom_client());
 
 prettyPrint($newAccount);
