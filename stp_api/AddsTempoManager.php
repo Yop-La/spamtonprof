@@ -89,7 +89,22 @@ class AddsTempoManager
                 $records = $lbcCommuneMg->getAllFromODS($ad->getZipcode());
                 $communes = $records->records;
 
-                $winner = $lbcCommuneMg->findClosest($communes, $ad->getCity());
+                $communes = $lbcCommuneMg->matchByZipCode($communes, $ad->getZipCode());
+
+                if (count($communes) != 1) {
+                    $winner = $lbcCommuneMg->findClosest($communes, $ad->getCity());
+                } else {
+                    $winner = $communes[0];
+                }
+
+                if (! $winner) {
+                    $ad->setRef_commune("pas de match");
+                    $this->updateRefCommune($ad);
+                    break;
+                    $slack->sendMessages("log", array(
+                        "!!!!!!!!! aucun match avec open data soft : " . $param . "  !!!!!!!!!!!"
+                    ));
+                }
 
                 $slack->sendMessages("log", array(
                     "!!!!!!!!! pas de match : " . $param,
@@ -97,7 +112,17 @@ class AddsTempoManager
                 ));
             } else if ($nits > 1) {
 
+                $communes = $lbcCommuneMg->matchByZipCode($communes, $ad->getZipCode());
+
+                if (count($communes) != 1) {
+                    $winner = $lbcCommuneMg->findClosest($communes, $ad->getCity());
+                } else {
+                    $winner = $communes[0];
+                }
+                
                 $winner = $lbcCommuneMg->findClosest($communes, $ad->getCity());
+                
+                
 
                 $slack->sendMessages("log", array(
                     "!!!!!!!!! trop de match : " . $param,

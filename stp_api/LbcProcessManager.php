@@ -390,12 +390,17 @@ class LbcProcessManager
         $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
         $lbcApi = new \spamtonprof\stp_api\LbcApi();
         $adTempoMg = new \spamtonprof\stp_api\AddsTempoManager();
+        $slack = new \spamtonprof\slack\Slack();
 
         // step 1 :récupérer les comptes agés d'au moins 2h.
         $lbcAccounts = $lbcAccountMg->getAccountToScrap($nbCompte);
 
+        
         foreach ($lbcAccounts as $lbcAccount) {
-
+            
+            $msgs = [];
+            $msgs[] = "Contrôle de " . $lbcAccount->getRef_compte();
+            
             $codePromo = $lbcAccount->getCode_promo();
 
             // step 2 : suppression des annonces dans la base
@@ -432,6 +437,9 @@ class LbcProcessManager
                     ));
                     $adTempoMg->add($adTempo);
                     $nbAnnonce ++;
+                    
+                    
+                    
                 }
 
                 // 4-1-2 : on va mettre à jour la ref_commune de adds_tempo
@@ -440,6 +448,7 @@ class LbcProcessManager
                 ));
 
                 $adTempoMg->updateAllRefCommune($adsTemp);
+                
             } else {
                 $disabled = true;
                 $nbAnnonce = 0;
@@ -456,6 +465,10 @@ class LbcProcessManager
             $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
             $lbcAccount->setControle_date($now);
             $lbcAccountMg->updateControleDate($lbcAccount);
+            
+            $msgs[] = $nbAnnonce . "en ligne";
+            $slack ->sendMessages("log", $msgs);
+            
         }
     }
 
@@ -532,4 +545,7 @@ class LbcProcessManager
         }
         return($ads);
     }
+    
+    
+    
 }

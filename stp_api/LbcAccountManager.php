@@ -142,15 +142,16 @@ class LbcAccountManager
         $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
         $q->execute();
     }
-    
+
     public function updateControleDate(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
         $q = $this->_db->prepare("update compte_lbc set controle_date = :controle_date where ref_compte = :ref_compte");
-        $q->bindValue(":controle_date", $lbcAccount->getControle_date()->format(PG_DATETIME_FORMAT));
+        $q->bindValue(":controle_date", $lbcAccount->getControle_date()
+            ->format(PG_DATETIME_FORMAT));
         $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
         $q->execute();
     }
-    
+
     public function updateNbAnnonceOnline(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
         $q = $this->_db->prepare("update compte_lbc set nb_annonces_online = :nb_annonces_online where ref_compte = :ref_compte");
@@ -170,10 +171,10 @@ class LbcAccountManager
         $q->bindValue(":telephone", $lbcAccount->getTelephone());
         $q->bindValue(":date_creation", $now->format(PG_DATETIME_FORMAT));
         $q->execute();
-        
+
         $lbcAccount->setRef_compte($this->_db->lastInsertId());
-        
-        return($lbcAccount);
+
+        return ($lbcAccount);
     }
 
     public function updateRefExpe(\spamtonprof\stp_api\LbcAccount $lbcAccount)
@@ -195,9 +196,9 @@ class LbcAccountManager
     public function getAccountToScrap($nbCompte)
     {
         $accounts = [];
-        
+
         $q = $this->_db->prepare("select * from compte_lbc 
-        where code_promo is not null and now() - interval '2 hour' > date_creation and (disabled = false or disabled = null)
+        where code_promo is not null and now() - interval '2 hour' > date_creation and (disabled = false or disabled is null) and (uncheckable = false or uncheckable is null)
             order by ref_compte desc limit :nb_compte");
         $q->bindValue(":nb_compte", $nbCompte);
         $q->execute();

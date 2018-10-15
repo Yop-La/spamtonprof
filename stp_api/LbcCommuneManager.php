@@ -70,6 +70,11 @@ class LbcCommuneManager
     public function findClosest($communes, $nomCommune)
     {
         $nbRecord = count($communes);
+        
+        if($nbRecord == 0){
+            return(false);
+        }
+        
         $record = $communes[0];
         $winner = $record;
         $min = levenshtein($record->fields->libelle_d_acheminement, $nomCommune);
@@ -83,6 +88,23 @@ class LbcCommuneManager
             }
         }
         return ($winner);
+    }
+    
+    // pour retourner les communes qui ont le même code postal que celui passé en argument
+    public function matchByZipCode($communes, $zipCode)
+    {
+        
+        $matched = [];
+        
+        foreach ($communes as $commune){
+            
+            if($commune->fields->code_postal == $zipCode){
+                $matched[] = $commune;
+            }
+            
+        }
+        
+        return ($matched);
     }
 
     public function getAll($info)

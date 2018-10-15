@@ -24,10 +24,6 @@ header("Pragma: no-cache");
 
 serializeTemp($_POST);
 
-$slack = new \spamtonprof\slack\Slack();
-
-$slack -> sendMessages("log", array("test"));
-
 $nbAds = $_POST["nb_ads"];
 $refClient = $_POST["ref_client"];
 $phone = $_POST["phone"];
