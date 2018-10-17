@@ -25,12 +25,11 @@ class PageManager
         $this->domain = $host_split[0];
 
         $_SESSION["domain"] = $this->domain;
-        
+
         $_SESSION["prod"] = true;
-        if( strpos($_SESSION["domain"], 'localhost') !== false){
+        if (strpos($_SESSION["domain"], 'localhost') !== false) {
             $_SESSION["prod"] = false;
         }
-            
 
         $this->loadSessionVariable();
     }
@@ -71,7 +70,7 @@ class PageManager
                 'ref_compte_wp' => $current_user->ID
             ));
 
-            $proche = $procheMg->get(array(
+            $loggedProche = $procheMg->get(array(
                 'ref_compte_wp' => $current_user->ID
             ));
 
@@ -84,7 +83,9 @@ class PageManager
                 $compte = $compteMg->get(array(
                     'ref_compte_wp' => $current_user->ID
                 ));
-
+                
+                wp_localize_script('functions_js', 'compte', $compte -> toArray());
+                
                 $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
 
                 $abonnements = $abonnementMg->getAll(array(
@@ -109,7 +110,10 @@ class PageManager
                 $abosEssai = [];
                 $abosTermine = [];
 
+                $proche = null;
                 foreach ($abonnements as $abonnement) {
+
+                    $proche = $abonnement->getProche();
 
                     switch ($abonnement->getRef_statut_abonnement()) {
                         case $abonnement::ACTIF:
@@ -127,6 +131,10 @@ class PageManager
                 wp_localize_script('functions_js', 'abosActif', $abosActif);
                 wp_localize_script('functions_js', 'abosEssai', $abosEssai);
                 wp_localize_script('functions_js', 'abosTermine', $abosTermine);
+                serializeTemp($proche);
+                if ($proche) {
+                    wp_localize_script('functions_js', 'proche', $proche->toArray());
+                }
 
                 $eleves = $eleveMg->getAll(array(
                     "ref_compte" => $compte->getRef_compte()
@@ -143,10 +151,9 @@ class PageManager
             }
 
             wp_localize_script('functions_js', 'userType', 'autre');
-            if ($proche) {
-
+            if ($loggedProche) {
                 wp_localize_script('functions_js', 'userType', 'proche');
-                wp_localize_script('functions_js', 'loggedProche', $proche->toArray());
+                wp_localize_script('functions_js', 'loggedProche', $loggedProche->toArray());
             }
 
             if ($eleve) {
@@ -160,19 +167,19 @@ class PageManager
             }
         } else { // si pas loggé (simple visiteur)
 
-//             $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-//             $hour = $now->format('H');
-//             $pageNums = [
-//                 'accueil',
-//                 'tarifs',
-//                 'semaine-decouverte',
-//                 'decouvrir-spamtonprof',
-//                 'temoignages'
-//             ];
+            // $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+            // $hour = $now->format('H');
+            // $pageNums = [
+            // 'accueil',
+            // 'tarifs',
+            // 'semaine-decouverte',
+            // 'decouvrir-spamtonprof',
+            // 'temoignages'
+            // ];
 
-//             if ((11 <= $hour && $hour < 14) || (18 <= $hour && $hour < 20) && in_array($this->pageSlug, $pageNums)) {
-//                 $printNum = "true";
-//             }
+            // if ((11 <= $hour && $hour < 14) || (18 <= $hour && $hour < 20) && in_array($this->pageSlug, $pageNums)) {
+            // $printNum = "true";
+            // }
         }
 
         $numMessage = 'Vous venez de découvrir notre site ? Et si on en discutait au téléphone ? Appelez nous au 04-34-10-25-49.';
@@ -282,7 +289,7 @@ class PageManager
             PageManager::reportingLbc();
         }
         if ($this->pageSlug == 'tes-abonnements') {
-            
+
             PageManager::tesAbonnements();
         }
     }
@@ -333,7 +340,7 @@ class PageManager
 
             'nf-front-end'
         ), time());
-        
+
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
 
         wp_enqueue_style('css_dropdown', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css');
@@ -528,17 +535,17 @@ class PageManager
             'nf-front-end'
         ), time());
     }
-    
+
     public static function tesAbonnements()
     {
         wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
-        
+
         wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/tes-abonnements.css');
-        
+
         wp_enqueue_script('algolia_js', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.js');
-        
+
         wp_enqueue_script('formule_js', plugins_url() . '/spamtonprof/js/tes-abonnements.js', array(
-            
+
             'nf-front-end'
         ), time());
     }

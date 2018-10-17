@@ -9,11 +9,44 @@ add_action('wp_ajax_ajaxStopSubscription', 'ajaxStopSubscription');
 
 add_action('wp_ajax_nopriv_ajaxStopSubscription', 'ajaxStopSubscription');
 
+add_action('wp_ajax_ajaxUpdateCb', 'ajaxUpdateCb');
+
+add_action('wp_ajax_nopriv_ajaxUpdateCb', 'ajaxUpdateCb');
+
+function ajaxUpdateCb()
+{
+    header('Content-type: application/json');
+    
+    serializeTemp($_POST);
+    
+    $retour = new \stdClass();
+    $retour->error = false;
+    
+    
+    $refCompte = $_POST["ref_compte"];
+    $testMode = $_POST["testMode"];
+    $source = $_POST["source"];
+    
+    $stripe = new \spamtonprof\stp_api\StripeManager($testMode);
+    
+    $rep = $stripe -> updateCb($refCompte, $testMode, $source);
+    
+    if(!$rep){
+        $retour->error = true;
+        $retour->message = "Abonnez vous avant d'ajouter une CB";
+    }
+    
+    echo (json_encode($retour));
+    
+    die();
+}
+
+
+
 function ajaxStopSubscription()
 {
     header('Content-type: application/json');
     
-    $slack = new \spamtonprof\slack\Slack();
     
     $retour = new \stdClass();
     
@@ -163,10 +196,20 @@ function ajaxCreateSubscription()
     $compte = $abonnement->getCompte();
     
     
+ 
+    if(!$prof){
+        $retour->error = true;
+        $retour->message = "Attendez d'avoir un prof avant de vous abonner";
+        prettyPrint($retour);
+        exit(0);
+    }
+    
     $compte = \spamtonprof\stp_api\StpCompte::cast($compte);
     $prof = \spamtonprof\stp_api\StpProf::cast($prof);
     $plan = \spamtonprof\stp_api\StpPlan::cast($plan);
     $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
+    
+    
     
     // détermination de l'email client
     $emailClient = "alexandre@spamtonprof.com";

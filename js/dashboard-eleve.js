@@ -143,8 +143,8 @@ jQuery( document ).ready( function( $ ) {
 
 
 		}
-		
-		
+
+
 		/** début formulaire de paiement stripe **/
 
 		var handler2 = StripeCheckout.configure({
@@ -154,23 +154,31 @@ jQuery( document ).ready( function( $ ) {
 			allowRememberMe: false,
 			token: function(token) {
 
-				aboClique = abosEssai[indiceAbo];
 
-				createSubscription(aboClique.ref_abonnement, token.id, testMode);
+
+				updateCb(compte.ref_compte, token.id, testMode);
 
 			}
 		});
-		
+
 		waitForEl(".updatecb", function() {
 
 
-			jQuery('.updatecb').click(function() {
+			jQuery('.updatecb').click(function(e) {
+				var emailCb; 
+				if (typeof proche !== 'undefined') {
+					emailCb = proche.email;
+				}else{
+					emailCb = loggedEleve.email;
+				}
+
 
 				// Open Checkout with further options:
 				handler2.open({
 					name: 'SpamTonProf',
 					description: 'Mise à jour de la carte bancaire',
 					zipCode: false,
+					email: emailCb,
 					panelLabel: "Mettre à jour la CB"
 				});
 				e.preventDefault();
@@ -178,7 +186,7 @@ jQuery( document ).ready( function( $ ) {
 
 			});
 		});
-		
+
 		// Close Checkout on page navigation:
 		window.addEventListener('popstate', function() {
 			handler2.close();
@@ -355,6 +363,42 @@ jQuery( document ).ready( function( $ ) {
 		})
 		.fail(function() {
 			showMessage('Oops : il y a eu un problème avec le paiement. Veuillez réessayer ou contacter l\'équipe. ');
+			ajaxEnCours--;
+			if(ajaxEnCours == 0){
+				jQuery(".hide_loading").removeClass("hide");
+				jQuery("#fountainTextG").addClass("hide");
+			}
+		});
+	}
+
+	function updateCb(refCompte, source, testMode){
+
+		jQuery("#fountainTextG").removeClass("hide");
+		jQuery(".hide_loading").addClass("hide");
+
+		ajaxEnCours++;
+		jQuery.post(
+				ajaxurl,
+				{
+					'action': 'ajaxUpdateCb',
+					'ref_compte' : refCompte,
+					'source': source,
+					'testMode' : testMode
+				}
+		)
+		.done(function(retour) {
+			console.log(retour);
+			if(retour.error){
+				showMessage('Ooops : il y a eu un problème : '.concat(retour.message,'. Veuillez réessayer ou contacter l\'équipe.'));
+				
+			}else{
+				showMessage('Votre carte a été bien mise à jour !');	
+			}
+		})
+		.fail(function() {
+			showMessage('Oops : il y a eu un problème avec la mise à jour. Veuillez réessayer ou contacter l\'équipe. ');
+		})
+		.always(function(){
 			ajaxEnCours--;
 			if(ajaxEnCours == 0){
 				jQuery(".hide_loading").removeClass("hide");

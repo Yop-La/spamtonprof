@@ -47,14 +47,14 @@ class StripeManager
         $slack = new \spamtonprof\slack\Slack();
 
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-        
+
         $chargeId = $chargeIdMan;
         $subId = $subIdMan;
         if ($event_json) {
             $chargeId = $event_json->data->object->charge;
             $subId = $event_json->data->object->subscription;
         }
-   
+
         $messages = [];
 
         $messages[] = "---------";
@@ -478,6 +478,26 @@ class StripeManager
         ));
 
         return ($transfert);
+    }
+
+    /* pour mettre à jour la cb d'un compte stripe */
+    public function updateCb($refCompte, $testMode, $token)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $compteMg = new \spamtonprof\stp_api\StpCompteManager();
+        $compte = $compteMg->get(array(
+            'ref_compte' => $refCompte
+        ));
+
+        if ($compte->getStripe_client()) {
+            $customer = \Stripe\Customer::retrieve($compte->getStripe_client());
+            $customer->source = $token;
+            $customer->save();
+            return (true);
+        } else {
+            return (false);
+        }
     }
 
     // pour créer tous les produits et les plans définis dans la base stp

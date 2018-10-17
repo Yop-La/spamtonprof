@@ -73,6 +73,15 @@ class StpCompte implements \JsonSerializable
         $this->ref_proche = $ref_proche;
     }
 
+    public function toArray()
+    {
+        $retour = [];
+        
+        foreach ($this as $key => $value) {
+            $retour[$key] = $value;
+        }
+        return ($retour);
+    }
  
 
     public function jsonSerialize()
