@@ -999,6 +999,16 @@ class GetResponse
             }
         }
     }
+    
+    public function updateDayOfCycle($contact_id, $dayOfCycle)
+    {
+        $params = '{
+                "dayOfCycle": "' . $dayOfCycle . '"
+            }';
+        
+        $params = json_decode($params);
+        $this->updateContact($contact_id, $params);
+    }
 }
 
 ?>
