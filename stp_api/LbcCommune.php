@@ -4,7 +4,23 @@ namespace spamtonprof\stp_api;
 class LbcCommune implements \JsonSerializable
 {
 
-    protected $code_insee, $nom_commune, $code_postal, $libelle, $nom_reg, $nom_dep, $code_reg, $code_com, $code_dep, $population, $nom_com, $ref_commune;
+    protected $code_insee, $nom_commune, $code_postal, $libelle, $nom_reg, $nom_dep, $code_reg, $code_com, $code_dep, $population, $nom_com, $ref_commune, $lbc;
+
+    /**
+     * @return mixed
+     */
+    public function getLbc()
+    {
+        return $this->lbc;
+    }
+
+    /**
+     * @param mixed $lbc
+     */
+    public function setLbc($lbc)
+    {
+        $this->lbc = $lbc;
+    }
 
     /**
      * @return mixed

@@ -17,7 +17,8 @@ function formatNums($nums)
     return ($nums);
 }
 
-function formatNum($num){
+function formatNum($num)
+{
     $num = str_replace([
         " ",
         ".",
@@ -25,7 +26,7 @@ function formatNum($num){
         "\\",
         "-"
     ], "", $num);
-    return($num);
+    return ($num);
 }
 
 function isNotNull($var)
@@ -432,14 +433,14 @@ function extractFirstMail($string)
 function toSimilarTo(array $elements)
 {
     $nbElem = count($elements);
-    
+
     $retour = "";
-    
+
     for ($i = 0; $i < $nbElem; $i ++) {
         $element = $elements[$i];
 
         if ($i == $nbElem - 1) {
-            $retour = $retour . '%' . $element . '%' ;
+            $retour = $retour . '%' . $element . '%';
         } else {
             $retour = $retour . '%' . $element . '%' . '|';
         }
@@ -488,5 +489,25 @@ function extractAttribute(array $objects, string $attribute)
         $retour[] = $object[$attribute];
     }
     return ($retour);
+}
+
+function readCsv($filePath)
+{
+    $rows = [];
+
+    $row = 1;
+    if (($handle = fopen($filePath, "r")) !== FALSE) {
+        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+            $num = count($data);
+            $row ++;
+            $row = [];
+            for ($c = 0; $c < $num; $c ++) {
+                $row[] = $data[$c];
+            }
+            $rows[] = $row;
+        }
+        fclose($handle);
+        return ($rows);
+    }
 }
 

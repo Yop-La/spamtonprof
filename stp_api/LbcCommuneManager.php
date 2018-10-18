@@ -11,7 +11,7 @@ class LbcCommuneManager
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
 
-    public function add(lbcCommune $lbcCommune)
+    public function add(LbcCommune $lbcCommune)
     {
         $q = $this->_db->prepare('insert into lbc_commune(code_insee, nom_commune, code_postal, libelle, nom_reg, nom_dep, code_reg, code_com, code_dep, population, nom_com) values( :code_insee,:nom_commune,:code_postal,:libelle,:nom_reg,:nom_dep,:code_reg,:code_com,:code_dep,:population,:nom_com)');
         $q->bindValue(':code_insee', $lbcCommune->getCode_insee());
@@ -70,11 +70,11 @@ class LbcCommuneManager
     public function findClosest($communes, $nomCommune)
     {
         $nbRecord = count($communes);
-        
-        if($nbRecord == 0){
-            return(false);
+
+        if ($nbRecord == 0) {
+            return (false);
         }
-        
+
         $record = $communes[0];
         $winner = $record;
         $min = levenshtein($record->fields->libelle_d_acheminement, $nomCommune);
@@ -89,21 +89,19 @@ class LbcCommuneManager
         }
         return ($winner);
     }
-    
+
     // pour retourner les communes qui ont le même code postal que celui passé en argument
     public function matchByZipCode($communes, $zipCode)
     {
-        
         $matched = [];
-        
-        foreach ($communes as $commune){
-            
-            if($commune->fields->code_postal == $zipCode){
+
+        foreach ($communes as $commune) {
+
+            if ($commune->fields->code_postal == $zipCode) {
                 $matched[] = $commune;
             }
-            
         }
-        
+
         return ($matched);
     }
 
@@ -128,10 +126,9 @@ class LbcCommuneManager
                         select ref_commune from adds_tempo 
                             where ref_compte in (select ref_compte from compte_lbc where ref_client = :ref_client)
                     )
-                order by population  desc limit 500) t
-				where row_num = 1 limit 150;');
+                and (lbc is not true or lbc is not null) order by population  desc limit 500) t 
+				where row_num = 1 and (lbc is not true or lbc is not null) limit 150;');
                 $q->bindValue("ref_client", $refClient);
-                
             }
         }
         $q->execute();
@@ -140,5 +137,36 @@ class LbcCommuneManager
             $communes[] = new \spamtonprof\stp_api\LbcCommune($data);
         }
         return ($communes);
+    }
+
+    public function get($info)
+    {
+        $q = null;
+        if (is_array($info)) {
+            if (array_key_exists('libelle', $info) && array_key_exists('code_postal', $info)) {
+                $libelle = $info['libelle'];
+                $codePostal = $info['code_postal'];
+
+                $q = $this->_db->prepare('select * from lbc_commune where libelle like :libelle and
+code_postal like :code_postal');
+                $q->bindValue(":libelle", $libelle);
+                $q->bindValue(":code_postal", $codePostal);
+            }
+        }
+        $q->execute();
+
+        if ($data = $q->fetch(\PDO::FETCH_ASSOC)) {
+            return (new \spamtonprof\stp_api\LbcCommune($data));
+        } else {
+            return (false);
+        }
+    }
+
+    public function updateLbc(\spamtonprof\stp_api\LbcCommune $commune)
+    {
+        $q1 = $this->_db->prepare("update lbc_commune set lbc = :lbc where ref_commune = :ref_commune");
+        $q1->bindValue(":lbc", $commune->getLbc());
+        $q1->bindValue(":ref_commune", $commune->getRef_commune());
+        $q1->execute();
     }
 }
