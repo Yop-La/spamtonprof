@@ -22,9 +22,7 @@ header("Pragma: no-cache");
  * appelé par un template zenno lorsque qu'une annonce n'est pas reconnu par leboncoin
  * le script se charge de mettre la colonne lbc à true ne pas sélectionner lors de prochaines publications
  */
-$commune = 'toulelknefe56v4zvezvvv 1 2121 e';
-echo($commune);
-
+$commune = $_POST["commune"];
 
 $commune = explode(" ", $commune);
 
@@ -41,3 +39,5 @@ $lbcCommune = $lbcCommuneMg->get(array(
 ));
 $lbcCommune->setLbc(true);
 $lbcCommuneMg->updateLbc($lbcCommune);
+
+prettyPrint($commune);
