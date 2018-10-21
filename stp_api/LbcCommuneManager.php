@@ -127,8 +127,8 @@ class LbcCommuneManager
                             where ref_compte in (select ref_compte from compte_lbc where ref_client = :ref_client)
                     )
                 and (lbc is not true or lbc is not null) order by population  desc limit 500) t 
-				where row_num = 1 and (lbc is not true or lbc is not null) limit 150;');
-                $q->bindValue("ref_client", $refClient);
+				where row_num = 1 limit 150;');
+                $q->bindValue(":ref_client", $refClient);
             }
         }
         $q->execute();
