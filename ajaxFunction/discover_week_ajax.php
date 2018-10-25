@@ -24,7 +24,7 @@ function ajaxAjoutEleve()
     $retour->message = "ok";
 
     serializeTemp($_POST);
-    
+
     $prenomEleve = $_POST["prenomEleve"];
     $nomEleve = $_POST["nomEleve"];
     $emailEleve = trim($_POST["emailEleve"]);
@@ -458,6 +458,9 @@ function ajaxAfterSubmissionEssai()
         $abonnement->setTeleprospection($teleprospection);
         $abonnementMg->updateTeleprospection($abonnement);
 
+        $abonnement->setInterruption(false);
+        $abonnementMg->updateInterruption($abonnement);
+
         // étape n° 11 - insérer les remarques d'inscription
 
         $stpRemarqueMg = new \spamtonprof\stp_api\StpRemarqueInscriptionManager();
@@ -618,7 +621,6 @@ function ajaxNewEssaiClient()
     $retour->message = "ok";
 
     $slack = new \spamtonprof\slack\Slack();
-    
 
     $refEleve = $_POST["refEleve"];
     $matieres = $_POST["matieres"];
@@ -748,10 +750,12 @@ function ajaxNewEssaiClient()
 
     $abonnement->setFirst_prof_assigned(false);
     $abonnementMg->updateFirstProfAssigned($abonnement);
-    
+
     $abonnement->setTeleprospection("non");
     $abonnementMg->updateTeleprospection($abonnement);
-    
+
+    $abonnement->setInterruption(false);
+    $abonnementMg->updateInterruption($abonnement);
 
     // étape n° 8 - insérer les remarques d'inscription
 

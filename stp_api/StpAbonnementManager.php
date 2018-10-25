@@ -122,6 +122,57 @@ class StpAbonnementManager
         return ($nbMessages);
     }
 
+    /* pour interrompre un abonnement */
+    function interrupt($debut, $fin, $refAbo, $prorate = false)
+    {
+        $debut = \DateTime::createFromFormat('j/m/Y', $debut);
+        $fin = \DateTime::createFromFormat('j/m/Y', $fin);
+
+        $interru = new \spamtonprof\stp_api\StpInterruption(array(
+            "debut" => $debut->format(PG_DATE_FORMAT),
+            "fin" => $fin->format(PG_DATE_FORMAT),
+            "prorate" => $prorate,
+            "ref_abonnement" => $refAbo
+        ));
+
+        $interruMg = new \spamtonprof\stp_api\StpInterruptionManager();
+        $interruMg->add($interru);
+    }
+
+    public function toAlgoliaSupport($refAbo)
+    {
+        $constructor = array(
+            "construct" => array(
+                'ref_eleve',
+                'ref_formule',
+                'ref_parent',
+                'ref_plan',
+                'remarquesMatieres',
+                'ref_statut_abonnement',
+                'ref_prof'
+            ),
+            "ref_eleve" => array(
+                "construct" => array(
+                    'ref_classe',
+                    'ref_profil'
+                )
+            ),
+            "remarquesMatieres" => array(
+                "construct" => array(
+                    'ref_matiere'
+                )
+            )
+        );
+
+        $stpAbo = $this->get(array(
+            "ref_abonnement" => $refAbo
+        ), $constructor);
+
+        $eleve = $stpAbo->getEleve();
+        $this->prenom = $eleve->getPrenom() . " " . $eleve->getNom();
+        return ($stpAbo);
+    }
+
     /*
      *
      * pour remettre à zéro messages tous les abonnements
@@ -267,6 +318,14 @@ class StpAbonnementManager
     {
         $q = $this->_db->prepare("update stp_abonnement set fin_essai = :fin_essai where ref_abonnement = :ref_abonnement");
         $q->bindValue(":fin_essai", $abonnement->getFin_essai());
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->execute();
+    }
+
+    public function updateInterruption(\spamtonprof\stp_api\StpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set interruption = :interruption where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":interruption", $abonnement->getInterruption(), PDO::PARAM_BOOL);
         $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
         $q->execute();
     }

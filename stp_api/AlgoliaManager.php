@@ -241,6 +241,13 @@ class AlgoliaManager
         $abo = json_decode(json_encode($abo), true);
         $index->saveObject($abo);
     }
+    
+    public function updateSupport($abo)
+    {
+        $index = $this->client->initIndex('support_client');
+        $abo = json_decode(json_encode($abo), true);
+        $index->saveObject($abo);
+    }
 
     /* ------------------ fin index abonnements -------------- */
 

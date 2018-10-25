@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class StpInterruption implements \JsonSerializable
 {
 
-    protected $ref_interruption, $ref_abonnement, $date_debut, $date_fin;
+    protected $ref_interruption, $debut, $fin, $prorate, $ref_abonnement;
 
     public function __construct(array $donnees = array())
     {
@@ -31,6 +31,36 @@ class StpInterruption implements \JsonSerializable
         $this->ref_interruption = $ref_interruption;
     }
 
+    public function getDebut()
+    {
+        return $this->debut;
+    }
+
+    public function setDebut($debut)
+    {
+        $this->debut = $debut;
+    }
+
+    public function getFin()
+    {
+        return $this->fin;
+    }
+
+    public function setFin($fin)
+    {
+        $this->fin = $fin;
+    }
+
+    public function getProrate()
+    {
+        return $this->prorate;
+    }
+
+    public function setProrate($prorate)
+    {
+        $this->prorate = $prorate;
+    }
+
     public function getRef_abonnement()
     {
         return $this->ref_abonnement;
@@ -39,26 +69,6 @@ class StpInterruption implements \JsonSerializable
     public function setRef_abonnement($ref_abonnement)
     {
         $this->ref_abonnement = $ref_abonnement;
-    }
-
-    public function getDate_debut()
-    {
-        return $this->date_debut;
-    }
-
-    public function setDate_debut($date_debut)
-    {
-        $this->date_debut = $date_debut;
-    }
-
-    public function getDate_fin()
-    {
-        return $this->date_fin;
-    }
-
-    public function setDate_fin($date_fin)
-    {
-        $this->date_fin = $date_fin;
     }
 
     public function jsonSerialize()
