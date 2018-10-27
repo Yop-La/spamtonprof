@@ -136,7 +136,7 @@ class StpProfManager
     public function updateUserIdWp(\spamtonprof\stp_api\StpProf $prof)
     {
         $q = null;
-        if (! $_SESSION["prod"]) {
+        if (! LOCAL) {
             $q = $this->_db->prepare('update stp_prof set ref_compte_wp = :ref_compte_wp where ref_prof = :ref_prof');
             $q->bindValue(':ref_compte_wp', $prof->getUser_id_wp());
         } else {

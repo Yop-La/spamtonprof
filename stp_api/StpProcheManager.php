@@ -31,7 +31,7 @@ class StpProcheManager
     public function updateRefCompteWp(StpProche $proche)
     {
         $q = null;
-        if ($_SESSION["prod"]) {
+        if (!LOCAL) {
             $q = $this->_db->prepare('update stp_proche set ref_compte_wp = :ref_compte_wp, local = false where ref_proche = :ref_proche');
             $q->bindValue(':ref_compte_wp', $proche->getRef_compte_wp());
         } else {
@@ -75,7 +75,7 @@ class StpProcheManager
             $refCompteWp = $info["ref_compte_wp"];
 
             $q = null;
-            if (! $_SESSION["prod"]) {
+            if (! LOCAL) {
                 $q = $this->_db->prepare('select * from stp_proche where ref_compte_wp_test = :ref_compte_wp or ref_compte_wp = :ref_compte_wp order by local desc');
                 $q->bindValue(':ref_compte_wp', $refCompteWp);
             } else {

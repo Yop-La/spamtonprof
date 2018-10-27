@@ -26,10 +26,6 @@ class PageManager
 
         $_SESSION["domain"] = $this->domain;
 
-        $_SESSION["prod"] = true;
-        if (strpos($_SESSION["domain"], 'localhost') !== false) {
-            $_SESSION["prod"] = false;
-        }
 
         $this->loadSessionVariable();
     }

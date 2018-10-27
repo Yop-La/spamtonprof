@@ -37,7 +37,7 @@ class StpEleveManager
         $q = null;
 
 
-        if ($_SESSION["prod"]) {
+        if (!LOCAL) {
             $q = $this->_db->prepare('update stp_eleve set ref_compte_wp = :ref_compte_wp, local = false where ref_eleve = :ref_eleve');
             $q->bindValue(':ref_compte_wp', $refCompteWp);
         }else{
@@ -119,7 +119,7 @@ class StpEleveManager
             $refCompteWp = $info["ref_compte_wp"];
 
             $q = null;
-            if (! $_SESSION["prod"]) {
+            if (! LOCAL) {
                 $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp_test = :ref_compte_wp or ref_compte_wp = :ref_compte_wp order by local desc');
                 $q->bindValue(':ref_compte_wp', $refCompteWp);
             } else {
