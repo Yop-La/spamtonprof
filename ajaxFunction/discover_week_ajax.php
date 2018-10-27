@@ -195,7 +195,7 @@ function ajaxAfterSubmissionEssai()
 
     if ($proche || $eleve) {
 
-        $retour->error = true;
+        $retour->error = false;
         $retour->message = "compte_existe_deja";
 
         echo (json_encode($retour));
@@ -352,14 +352,12 @@ function ajaxAfterSubmissionEssai()
 
                     $procheMg->updateRefCompteWp($proche);
 
-                    // connexion au compte parent (si pas déjà connecté au compte élève) pour les prochaines visites
-                    if (! is_user_logged_in()) {
-                        wp_signon(array(
-                            'user_login' => $mailProche,
-                            'user_password' => $passwordProche,
-                            'remember' => true
-                        ));
-                    }
+                    // connexion au compte parent pour les prochaines visites
+                    wp_signon(array(
+                        'user_login' => $mailProche,
+                        'user_password' => $passwordProche,
+                        'remember' => true
+                    ));
                 } else {
 
                     $slack->sendMessages('log', array(

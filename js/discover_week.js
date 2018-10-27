@@ -173,6 +173,7 @@ var mySubmitController = Marionette.Object.extend( {
 						if(error){
 
 							showMessage("Il y a un problème. Contacter l'équipe et donner leur ce message d'erreur : ".concat(message));
+							
 							ajaxEnCours--;
 							if(ajaxEnCours == 0){
 								jQuery("#loadingSpinner").addClass("hide");
@@ -181,7 +182,12 @@ var mySubmitController = Marionette.Object.extend( {
 						}else{
 
 							if(message == "compte_existe_deja"){
-								redirectTo("connexion" ,info = "Vous avez déjà un compte. Connectez vous ! " );
+								ajaxEnCours--;
+								if(ajaxEnCours == 0){
+									jQuery("#loadingSpinner").addClass("hide");
+									jQuery(".hide_loading").removeClass("hide");
+								}
+								showMessage("Vous avez déjà un compte. Connectez vous pour faire une autre inscription ! " );
 							}else{
 								redirectTo("remerciement-eleve" ,"Félicitations. Tu pourras démarrer la semaine de découverte dans 1 jour !" );
 							}
