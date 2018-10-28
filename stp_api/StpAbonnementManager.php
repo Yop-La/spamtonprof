@@ -559,6 +559,12 @@ class StpAbonnementManager
                 $q->bindValue(":teleprospection", $tele);
                 $q->bindValue(":remarques", "%" . $remarques . "%");
                 $q->execute();
+            }else if (array_key_exists("ref_abonnements", $info)) {
+                
+                $refAbos = $info["ref_abonnements"];
+                $refAbos = toPgArray($refAbos, true);
+                $q = $this->_db->prepare('select * from stp_abonnement where ref_abonnement in ' . $refAbos);
+                $q->execute();
             }
         }
 

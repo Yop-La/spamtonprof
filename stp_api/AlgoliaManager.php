@@ -165,6 +165,26 @@ class AlgoliaManager
         $index->partialUpdateObject($abonnement);
     }
 
+    public function updateAbonnements($refAbos, $constructor = false)
+    {
+        $index = $this->client->initIndex('support_client');
+
+        $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
+
+        $abonnements = $abonnementMg->getAll(array(
+            'ref_abonnements' => $refAbos
+        ), $constructor);
+
+        
+        for ($i = 0; $i < count($abonnements); $i ++) {
+            $abonnement = $abonnements[$i];
+            $abonnement = array_filter(json_decode(json_encode($abonnement), true), 'isNotNull');
+            $abonnements[$i] = $abonnement;
+        }
+
+        $index->partialUpdateObjects($abonnements);
+    }
+
     public function updateReportingLbc($info = false)
     {
         $index = $this->client->initIndex('reportingLbc');
@@ -241,7 +261,7 @@ class AlgoliaManager
         $abo = json_decode(json_encode($abo), true);
         $index->saveObject($abo);
     }
-    
+
     public function updateSupport($abo)
     {
         $index = $this->client->initIndex('support_client');
@@ -293,20 +313,22 @@ class AlgoliaManager
         foreach ($index->browse('') as $hit) {
             $hits[] = $hit;
         }
-        
-        return($hits);
+
+        return ($hits);
     }
-    
-    public function resetNbMessage(){
-        
+
+    public function resetNbMessage()
+    {
         $index = $this->client->initIndex("support_client");
         $hits = $this->getAll("support_client");
+
+        $hitIndex = 0;
         foreach ($hits as $hit) {
-            
             $hit["nb_message"] = 0;
-            
+            $hits[$hitIndex] = $hit;
+            $hitIndex ++;
         }
+
         $index->saveObjects($hits);
-        
     }
 }

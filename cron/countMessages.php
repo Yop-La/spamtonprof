@@ -38,6 +38,7 @@ $algolia = new \spamtonprof\stp_api\AlgoliaManager();
 $algolia -> resetNbMessage();
 
 // mettre à jour les messages non nulles dans algolia : 
+$refAbos = [];
 foreach ($nbMessages as $nbMessage) {
     
     $abo = $aboMg->get(array(
@@ -46,9 +47,12 @@ foreach ($nbMessages as $nbMessage) {
     
     $abo->setNb_message($nbMessage["nb_message"]);
     $aboMg->updateNbMessage($abo);
-    
-    $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
-    $algoliaMg->updateAbonnement($abo->getRef_abonnement(), false);
+
+    $refAbos[] = $abo->getRef_abonnement();
     
 }
+
+$algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+$algoliaMg->updateAbonnements($refAbos, false);
+
 
