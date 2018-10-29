@@ -40,6 +40,12 @@ class StpInterruptionManager
                 $q = $this->_db->prepare('select * from stp_interruption where fin = :fin');
                 $q->bindValue(':fin', $fin);
                 $q->execute();
+            } else if (array_key_exists('prolongation', $info)) {
+
+                $prolongation = $info['prolongation'];
+                $q = $this->_db->prepare('select * from stp_interruption where prolongation = :prolongation');
+                $q->bindValue(':prolongation', $prolongation);
+                $q->execute();
             }
         }
 
@@ -51,5 +57,44 @@ class StpInterruptionManager
             $interrups[] = $interrup;
         }
         return ($interrups);
+    }
+
+    public function updateFin(\spamtonprof\stp_api\StpInterruption $interrup)
+    {
+        $q = $this->_db->prepare("update stp_interruption set fin = :fin where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_abonnement", $interrup->getRef_abonnement());
+        $q->bindValue(":fin", $interrup->getFin());
+        $q->execute();
+    }
+
+    public function updateProlongation(\spamtonprof\stp_api\StpInterruption $interrup)
+    {
+        $q = $this->_db->prepare("update stp_interruption set prolongation = :prolongation where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_abonnement", $interrup->getRef_abonnement());
+        $q->bindValue(":prolongation", $interrup->getProlongation());
+        $q->execute();
+    }
+
+    public function get($info)
+    {
+        $q = null;
+        if (is_array($info)) {
+            if (array_key_exists('currentOrNextInterruption', $info)) {
+                $refAbo = $info['currentOrNextInterruption'];
+                $q = $this->_db->prepare('select * from stp_interruption where fin >= current_date and ref_abonnement = :ref_abonnement order by fin ');
+                $q->bindValue(":ref_abonnement", $refAbo);
+            }
+        }
+
+        $q->execute();
+
+        $data = $q->fetch(\PDO::FETCH_ASSOC);
+
+        if ($data) {
+            $interrup = new \spamtonprof\stp_api\StpInterruption($data);
+            return ($interrup);
+        } else {
+            return (false);
+        }
     }
 }

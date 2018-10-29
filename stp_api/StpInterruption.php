@@ -4,7 +4,23 @@ namespace spamtonprof\stp_api;
 class StpInterruption implements \JsonSerializable
 {
 
-    protected $ref_interruption, $debut, $fin, $prorate, $ref_abonnement;
+    protected $ref_interruption, $debut, $fin, $prorate, $ref_abonnement, $prolongation;
+
+    /**
+     * @return mixed
+     */
+    public function getProlongation()
+    {
+        return $this->prolongation;
+    }
+
+    /**
+     * @param mixed $prolongation
+     */
+    public function setProlongation($prolongation)
+    {
+        $this->prolongation = $prolongation;
+    }
 
     public function __construct(array $donnees = array())
     {

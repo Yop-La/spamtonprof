@@ -122,21 +122,46 @@ class StpAbonnementManager
         return ($nbMessages);
     }
 
-    /* pour interrompre un abonnement */
-    function interrupt($debut, $fin, $refAbo, $prorate = false)
+    /*
+     * pour interrompre un abonnement
+     *
+     * date de fin : date de fin de l'essai ( = date de facturation)
+     * la date de debut doit être au minimum celle d'aujourdh'ui si avant 20h ( le cron tourne à 20h )
+     */
+    function interrupt($debut, $fin, $refAbo, $prorate = false, $prolongation = false)
     {
+        $interruMg = new \spamtonprof\stp_api\StpInterruptionManager();
+
         $debut = \DateTime::createFromFormat('j/m/Y', $debut);
         $fin = \DateTime::createFromFormat('j/m/Y', $fin);
 
-        $interru = new \spamtonprof\stp_api\StpInterruption(array(
-            "debut" => $debut->format(PG_DATE_FORMAT),
-            "fin" => $fin->format(PG_DATE_FORMAT),
-            "prorate" => $prorate,
-            "ref_abonnement" => $refAbo
-        ));
+        if (! $prolongation) {
 
-        $interruMg = new \spamtonprof\stp_api\StpInterruptionManager();
-        $interruMg->add($interru);
+            $interru = new \spamtonprof\stp_api\StpInterruption(array(
+                "debut" => $debut->format(PG_DATE_FORMAT),
+                "fin" => $fin->format(PG_DATE_FORMAT),
+                "prorate" => $prorate,
+                "ref_abonnement" => $refAbo
+            ));
+
+            $interruMg->add($interru);
+        } else {
+
+            $interru = $interruMg->get(array(
+                'currentOrNextInterruption' => $refAbo
+            ));
+
+            if ($interru) {
+
+                $interru->setProlongation($debut->format(PG_DATE_FORMAT));
+                $interru->setFin($fin->format(PG_DATE_FORMAT));
+
+                $interruMg->updateFin($interru);
+                $interruMg->updateProlongation($interru);
+            } else {
+                echo ("aucune interruption trouvé. L'interruption originale n'a pa dû être réalisé");
+            }
+        }
     }
 
     public function toAlgoliaSupport($refAbo)
@@ -559,8 +584,8 @@ class StpAbonnementManager
                 $q->bindValue(":teleprospection", $tele);
                 $q->bindValue(":remarques", "%" . $remarques . "%");
                 $q->execute();
-            }else if (array_key_exists("ref_abonnements", $info)) {
-                
+            } else if (array_key_exists("ref_abonnements", $info)) {
+
                 $refAbos = $info["ref_abonnements"];
                 $refAbos = toPgArray($refAbos, true);
                 $q = $this->_db->prepare('select * from stp_abonnement where ref_abonnement in ' . $refAbos);

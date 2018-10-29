@@ -68,6 +68,29 @@ foreach ($interruptions as $interruption){
 }
 
 
+// pour s'occuper des prolongations
+$interruptions = $stpInterruptionMg -> getAll(array('interruption' => $now->format(PG_DATE_FORMAT)));
+
+foreach ($interruptions as $interruption){
+    
+    $refAbo = $interruption -> getRef_abonnement();
+    
+    $abo = $aboMg -> get(array("ref_abonnement" => $refAbo));
+    
+    $stripe -> addTrial($abo->getSubs_Id(),$interruption->getFin(), $prorate);
+    
+    // mise à jour de la table stp_abonnement ( mise à jour boolean "interruption")
+    $abo -> setInterruption(true);
+    $aboMg -> updateInterruption($abo);
+    
+    // mise à jour de de l'index support clietn dans algolia
+    $algoliaMg -> updateAbo($abo);
+    
+    //envoyer les emails à faire ...
+    
+    
+}
+
 
 
 
