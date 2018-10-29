@@ -57,7 +57,7 @@ foreach ($interruptions as $interruption){
     $algoliaMg -> updateSupport($abo);
 
     // ajout d'une période d'essai à stripe
-    $prorate = false;
+    $prorate = $interruption->getProrate();
     
     $stripe -> addTrial($abo->getSubs_Id(),$interruption->getFin(), $prorate);
     
@@ -75,18 +75,22 @@ foreach ($interruptions as $interruption){
     
     $refAbo = $interruption -> getRef_abonnement();
     
-    $abo = $aboMg -> get(array("ref_abonnement" => $refAbo));
-    
-    $stripe -> addTrial($abo->getSubs_Id(),$interruption->getFin(), $prorate);
+    $abo = $aboMg -> toAlgoliaSupport($interruption -> getRef_abonnement());
     
     // mise à jour de la table stp_abonnement ( mise à jour boolean "interruption")
     $abo -> setInterruption(true);
     $aboMg -> updateInterruption($abo);
     
-    // mise à jour de de l'index support clietn dans algolia
-    $algoliaMg -> updateAbo($abo);
+    // mise à jour de de l'index support client dans algolia
+    $algoliaMg -> updateSupport($abo);
     
-    //envoyer les emails à faire ...
+    // ajout d'une période d'essai à stripe
+    $prorate = $interruption->getProrate();
+    
+    $stripe -> addTrial($abo->getSubs_Id(),$interruption->getFin(), $prorate);
+    
+    
+    // envoyer les emails à faire ...
     
     
 }
