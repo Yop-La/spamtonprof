@@ -9,6 +9,7 @@ class StpAbonnement implements \JsonSerializable
     protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage, $objectID, $teleprospection, $compte, $interruption;
 
     /**
+     *
      * @return mixed
      */
     public function getInterruption()
@@ -17,6 +18,7 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $interruption
      */
     public function setInterruption($interruption)
@@ -530,5 +532,24 @@ class StpAbonnement implements \JsonSerializable
     public function setSubs_Id($subs_Id)
     {
         $this->subs_Id = $subs_Id;
+    }
+
+    public function isTrialOver()
+    {
+        $now = new \DateTime(null, new \DateTimeZone('Europe/Paris'));
+
+        $finEssai = $this->getFin_essai();
+
+        if ($finEssai) {
+            return (false);
+        }
+
+        $trialEnd = date_create_from_format(PG_DATE_FORMAT, $finEssai);
+
+        if ($now > $trialEnd) {
+            return (true);
+        } else {
+            return (false);
+        }
     }
 }

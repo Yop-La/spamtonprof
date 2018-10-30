@@ -2,8 +2,8 @@
 use spamtonprof\slack\Slack;
 
 /**
- * pour la boite de seb - adaption possible sur d'autres boites ( voir la "Tracking - Labels gmail api" dans evernote pour mise en place )
- * il ne traque que les emails d'élève ( pas les mails des étudiants et des parents )
+ * 
+ * il ne traque  les emails des élève de des étudiants ( pas des parents )
  *
  * ce script sert :
  * - à stocker dans mail eleve - les messages des élèves
@@ -58,7 +58,7 @@ try {
         'ref_smtp_server' => $smtpServerMg::smtp2Go
     ));
     
-    $smtpServer->sendEmail('Erreur connexion gmail ', 'alexandre@spamtonprof.com', "Impossible de se connecter à la boite : " . $gmailAccount->getEmail() . "Debug message : " . $e->getMessage(), 'alexandre@spamtonprof.com');
+    $smtpServer->sendEmail('Erreur connexion gmail ', 'alexandre@spamtonprof.com', "Vient de ProcessMessageEleve.php - Impossible de se connecter à la boite : " . $gmailAccount->getEmail() . "Debug message : " . $e->getMessage(), 'alexandre@spamtonprof.com');
     
     exit(0);
 }
@@ -162,6 +162,10 @@ foreach ($messages as $message) {
                     $dateReception->format(PG_DATETIME_FORMAT),
                     "Avec " . $prof->getPrenom()
                 ));
+                
+                if($abo->isTrialOver()){
+                    $labelsNameToAdd[] = 'test-over';
+                }
                 
                 $labelsNameToAdd[] = $classe->getClasse();
                 $labelsNameToAdd[] = $statut->getStatut_abonnement();
