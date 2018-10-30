@@ -540,7 +540,7 @@ class StpAbonnement implements \JsonSerializable
 
         $finEssai = $this->getFin_essai();
 
-        if ($finEssai) {
+        if (!$finEssai) {
             return (false);
         }
 
