@@ -163,7 +163,7 @@ foreach ($messages as $message) {
                     "Avec " . $prof->getPrenom()
                 ));
                 
-                if($abo->isTrialOver()){
+                if($abo->isTrialOver() && $abo->getRef_statut_abonnement() == $abo::ESSAI){
                     $labelsNameToAdd[] = 'test-over';
                 }
                 
