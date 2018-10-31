@@ -132,7 +132,7 @@ class SmtpServer implements \JsonSerializable
         // 0 = off (for production use)
         // 1 = client messages
         // 2 = client and server messages
-        $mail->SMTPDebug = 2;
+        $mail->SMTPDebug = 0;
         // Set the hostname of the mail server
         // $mail->Host = $this->host;
         $mail->Host = $host;
