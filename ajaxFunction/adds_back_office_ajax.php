@@ -101,12 +101,14 @@ function ajaxGetTitles()
     
     $accountManager = new \spamtonprof\stp_api\LbcTitleManager();
     
-    $titles = $accountManager->getAll($typeTitle);
+    $slack = new \spamtonprof\slack\Slack();
+    $slack -> sendMessages('log', array('la',$typeTitle));
+    
+    $titles = $accountManager->getAll(array("type_titre" => $typeTitle));
     
 
     echo (json_encode(array(
-        "titles" => $titles,
-        "csvPath" => plugins_url("spamtonprof/tempo/" . $csvName)
+        "titles" => $titles
     )));
     
     die();
@@ -121,11 +123,10 @@ function ajaxGetTextes()
     
     $texteMg = new \spamtonprof\stp_api\LbcTexteManager();
     
-    $textes = $texteMg->getAll($typeTexte);
+    $textes = $texteMg->getAll(array("type_texte" =>$typeTexte));
 
     echo (json_encode(array(
-        "textes" => $textes,
-        "csvPath" => plugins_url("spamtonprof/tempo/" . $csvName)
+        "textes" => $textes
     )));
     
     die();

@@ -45,6 +45,7 @@ class LbcTitleManager
                 $q->bindValue(":type_titre", $titleType);
             }
             if (array_key_exists("ref_type_titre", $info)) {
+;
                 $refType = $info["ref_type_titre"];
                 $q = $this->_db->prepare("select * from titres where ref_type_titre = :ref_type_titre");
                 $q->bindValue(":ref_type_titre", $refType);

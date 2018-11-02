@@ -68,7 +68,6 @@ var mySubmitController = Marionette.Object.extend( {
 						console.log("okay");
 
 						jQuery('#csvTitles').empty();
-						jQuery('#csvTitles').append('<a href="' .concat(titles.csvPath,'">Download as csv</a>'));
 
 						jQuery("#titleTable tr").remove();
 
@@ -119,7 +118,6 @@ var mySubmitController = Marionette.Object.extend( {
 						console.log("okay");
 
 						jQuery('#csvTextes').empty();
-						jQuery('#csvTextes').append('<a href="' .concat(textes.csvPath,'">Download as csv</a>'));
 
 						jQuery("#texteTable tr").remove();
 
@@ -129,8 +127,8 @@ var mySubmitController = Marionette.Object.extend( {
 							var table = document.getElementById("texteTable");
 							var row = table.insertRow(0);
 							var cell1 = row.insertCell(0);
-							cell1.innerHTML = item.texte;
-
+							cell1.innerHTML = item.texte.replace(/(?:\r\n|\r|\n)/g, '<br>');
+							
 						});
 
 					})
