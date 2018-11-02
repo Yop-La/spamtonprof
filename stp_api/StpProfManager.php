@@ -138,11 +138,11 @@ class StpProfManager
         $q = null;
         if (! LOCAL) {
             $q = $this->_db->prepare('update stp_prof set user_id_wp = :user_id_wp where ref_prof = :ref_prof');
-            $q->bindValue(':ref_compte_wp', $prof->getUser_id_wp());
+            $q->bindValue(':user_id_wp', $prof->getUser_id_wp());
         } else {
 
             $q = $this->_db->prepare('update stp_prof set ref_compte_wp_test = :ref_compte_wp_test where ref_prof = :ref_prof');
-            $q->bindValue(':user_id_wp', $prof->getUser_id_wp());
+            $q->bindValue(':ref_compte_wp_test', $prof->getUser_id_wp());
         }
 
         $q->bindValue(':ref_prof', $prof->getRef_prof());
