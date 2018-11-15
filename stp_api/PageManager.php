@@ -26,7 +26,6 @@ class PageManager
 
         $_SESSION["domain"] = $this->domain;
 
-
         $this->loadSessionVariable();
     }
 
@@ -79,9 +78,9 @@ class PageManager
                 $compte = $compteMg->get(array(
                     'ref_compte_wp' => $current_user->ID
                 ));
-                
-                wp_localize_script('functions_js', 'compte', $compte -> toArray());
-                
+
+                wp_localize_script('functions_js', 'compte', $compte->toArray());
+
                 $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
 
                 $abonnements = $abonnementMg->getAll(array(
@@ -96,8 +95,7 @@ class PageManager
                     ),
                     "ref_eleve" => array(
                         "construct" => array(
-                            'ref_classe',
-                            'ref_profil'
+                            'ref_niveau'
                         )
                     )
                 ));
@@ -127,7 +125,7 @@ class PageManager
                 wp_localize_script('functions_js', 'abosActif', $abosActif);
                 wp_localize_script('functions_js', 'abosEssai', $abosEssai);
                 wp_localize_script('functions_js', 'abosTermine', $abosTermine);
-                serializeTemp($proche);
+
                 if ($proche) {
                     wp_localize_script('functions_js', 'proche', $proche->toArray());
                 }
@@ -288,6 +286,10 @@ class PageManager
 
             PageManager::tesAbonnements();
         }
+        if ($this->pageSlug == 'gestion-formule') {
+
+            PageManager::gestionFormule();
+        }
     }
 
     public static function abonnementApresEssaiLoader()
@@ -329,6 +331,17 @@ class PageManager
         ), time());
     }
 
+    public static function gestionFormule()
+
+    {
+        wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
+
+        wp_enqueue_script('gestion_formule_js', plugins_url() . '/spamtonprof/js/gestion-formule.js', array(
+
+            'nf-front-end'
+        ), time());
+    }
+
     public static function discoverWeek()
 
     {
@@ -347,10 +360,16 @@ class PageManager
 
         wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
 
-        $classeMg = new \spamtonprof\stp_api\StpClasseManager();
+        wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
 
-        $classes = $classeMg->getAll("byprofil");
-        wp_localize_script('discover_week', 'classesByProfil', $classes);
+        wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/semaine-decouverte.css');
+
+        // wp_enqueue_script('helper_js', "https://cdn.jsdelivr.net/npm/algoliasearch-helper@2.26.1/dist/algoliasearch.helper.min.js");
+
+        wp_enqueue_script('algolia_js', "https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js");
+
+        wp_enqueue_script('algolia_js_auto', "https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.min.js");
+
     }
 
     public static function passwordReset()

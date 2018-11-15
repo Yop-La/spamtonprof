@@ -1,14 +1,30 @@
 <?php
 namespace spamtonprof\stp_api;
 
-
-
 class StpMatiere implements \JsonSerializable
 {
 
     const MATHS = 1, FRANCAIS = 2, PHYSIQUE = 3;
-    
-    protected $ref_matiere, $matiere;
+
+    protected $ref_matiere, $matiere, $matiere_complet;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getMatiere_complet()
+    {
+        return $this->matiere_complet;
+    }
+
+    /**
+     *
+     * @param mixed $matiere_complet
+     */
+    public function setMatiere_complet($matiere_complet)
+    {
+        $this->matiere_complet = $matiere_complet;
+    }
 
     public function __construct(array $donnees = array())
     {

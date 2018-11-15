@@ -4,9 +4,28 @@ namespace spamtonprof\stp_api;
 class StpProche implements \JsonSerializable
 {
 
-    protected $email, $prenom, $nom, $telephone, $ref_proche, $ref_compte_wp, $statut_proche;
+    protected $email, $prenom, $nom, $telephone, $ref_proche, $ref_compte_wp, $statut_proche, $local;
 
     /**
+     *
+     * @return mixed
+     */
+    public function getLocal()
+    {
+        return $this->local;
+    }
+
+    /**
+     *
+     * @param mixed $local
+     */
+    public function setLocal($local)
+    {
+        $this->local = $local;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getRef_compte_wp()
@@ -15,6 +34,7 @@ class StpProche implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $ref_compte_wp
      */
     public function setRef_compte_wp($ref_compte_wp)
@@ -92,7 +112,9 @@ class StpProche implements \JsonSerializable
         $vars = get_object_vars($this);
         return $vars;
     }
+
     /**
+     *
      * @return mixed
      */
     public function getStatut_proche()
@@ -101,27 +123,26 @@ class StpProche implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $statut_proche
      */
     public function setStatut_proche($statut_proche)
     {
         $this->statut_proche = $statut_proche;
     }
-    
+
     public function toArray()
     {
         $retour = [];
-        
+
         foreach ($this as $key => $value) {
             $retour[$key] = $value;
         }
         return ($retour);
     }
 
-    
-    public static function cast($proche) : \spamtonprof\stp_api\StpProche{
-        
-        return($proche);
-        
+    public static function cast($proche): \spamtonprof\stp_api\StpProche
+    {
+        return ($proche);
     }
 }

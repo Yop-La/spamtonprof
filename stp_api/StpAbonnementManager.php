@@ -31,7 +31,7 @@ class StpAbonnementManager
     }
 
     /*
-     * pour remonter les abonnements sans prof
+     * pour remonter les abonnements sans prof dans le dashboard choisir prof
      */
     public function getAbonnementsSansProf()
     {
@@ -54,8 +54,7 @@ class StpAbonnementManager
                 ),
                 "ref_eleve" => array(
                     "construct" => array(
-                        'ref_classe',
-                        'ref_profil'
+                        'ref_niveau'
                     )
                 )
             ));
@@ -178,8 +177,7 @@ class StpAbonnementManager
             ),
             "ref_eleve" => array(
                 "construct" => array(
-                    'ref_classe',
-                    'ref_profil'
+                    'ref_niveau'
                 )
             ),
             "remarquesMatieres" => array(
@@ -236,8 +234,7 @@ class StpAbonnementManager
                 ),
                 "ref_eleve" => array(
                     "construct" => array(
-                        'ref_classe',
-                        'ref_profil'
+                        'ref_niveau'
                     )
                 )
             ));
@@ -304,6 +301,22 @@ class StpAbonnementManager
         $q = $this->_db->prepare("update stp_abonnement set ref_proche = :ref_proche where ref_abonnement = :ref_abonnement");
         $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
         $q->bindValue(":ref_proche", $abonnement->getRef_proche());
+        $q->execute();
+    }
+
+    public function updateRefFormule(\spamtonprof\stp_api\StpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set ref_formule = :ref_formule where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_formule", $abonnement->getRef_formule());
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->execute();
+    }
+
+    public function updateRefPlan(\spamtonprof\stp_api\StpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set ref_plan = :ref_plan where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_plan", $abonnement->getRef_plan());
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
         $q->execute();
     }
 
@@ -395,7 +408,6 @@ class StpAbonnementManager
                     $constructorRmqs = false;
 
                     if (array_key_exists("remarquesMatieres", $constructor)) {
-
                         $constructorRmqs = $constructor["remarquesMatieres"];
                     }
 
@@ -468,6 +480,14 @@ class StpAbonnementManager
             $q = $this->_db->prepare("select * from stp_abonnement where ref_abonnement =:ref_abonnement");
             $q->bindValue(":ref_abonnement", $refAbonnement);
             $q->execute();
+        } else if (array_key_exists("ref_formule", $info) && array_key_exists("ref_eleve", $info)) {
+
+            $refFormule = $info["ref_formule"];
+            $refEleve = $info["ref_eleve"];
+            $q = $this->_db->prepare("select * from stp_abonnement where ref_formule =:ref_formule and ref_eleve =:ref_eleve");
+            $q->bindValue(":ref_formule", $refFormule);
+            $q->bindValue(":ref_eleve", $refEleve);
+            $q->execute();
         }
 
         $data = $q->fetch(PDO::FETCH_ASSOC);
@@ -500,6 +520,23 @@ class StpAbonnementManager
                 $q = $this->_db->prepare('select * from stp_abonnement where ref_prof = :ref_prof and ref_eleve =:ref_eleve');
                 $q->bindValue(":ref_prof", $refProf);
                 $q->bindValue(":ref_eleve", $refEleve);
+                $q->execute();
+            } else if (array_key_exists("ref_statut_abonnement", $info) && array_key_exists("ref_compte", $info)) {
+
+                $refCompte = $info["ref_compte"];
+                $refStatut = $info["ref_statut_abonnement"];
+                $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte and ref_statut_abonnement = :ref_statut_abonnement');
+                $q->bindValue(":ref_compte", $refCompte);
+                $q->bindValue(":ref_statut_abonnement", $refStatut);
+                $q->execute();
+            } else if (array_key_exists("ref_statut_abonnement", $info) && array_key_exists("ref_eleve", $info)) {
+
+                $refStatut = $info["ref_statut_abonnement"];
+                $refEleve = $info["ref_eleve"];
+
+                $q = $this->_db->prepare('select * from stp_abonnement where ref_eleve = :ref_eleve and ref_statut_abonnement = :ref_statut_abonnement');
+                $q->bindValue(":ref_eleve", $refEleve);
+                $q->bindValue(":ref_statut_abonnement", $refStatut);
                 $q->execute();
             } else if (array_key_exists("ref_eleve", $info)) {
 
@@ -699,6 +736,41 @@ class StpAbonnementManager
         $algoliaMg->updateAbonnement($abo->getRef_abonnement(), $constructor);
     }
 
+    // pour redémarrer un abonnement qui a été arrêté
+    function restart(int $refAbo, $startDate, bool $testMode = true)
+    {
+        $startDate = \DateTime::createFromFormat('j/m/Y', $startDate);
+
+        // mise à jour dans la bdd
+        $constructor = array(
+            "construct" => array(
+                'ref_parent',
+                'ref_plan',
+                'ref_prof',
+                'ref_compte'
+            )
+        );
+        $abo = $this->get(array(
+            'ref_abonnement' => $refAbo
+        ), $constructor);
+
+        $abo->setRef_statut_abonnement($abo::ACTIF);
+        $this->updateRefStatutAbonnement($abo);
+
+        // mise à jour dans stripe
+
+        $planStripeId = $abo->getPlan()->getRef_plan_stripe();
+        $stripeProfId = $abo->getProf()->getStripe_id();
+        if ($testMode) {
+            $planStripeId = $abo->getPlan()->getRef_plan_stripe_test();
+            $stripeProfId = $abo->getProf()->getStripe_id_test();
+        }
+
+        $stripe = new \spamtonprof\stp_api\StripeManager($testMode);
+        $stripe->addConnectSubscription($abo->getProche()
+            ->getEmail(), false, $abo->getRef_compte(), $planStripeId, $stripeProfId, $abo->getRef_abonnement(), $abo->getCompte(), $startDate->getTimestamp());
+    }
+
     // mise à jour du plan de paiement et de la formule
     function updateFormule($refAbo, int $refFormule, bool $testMode = true)
     {
@@ -720,22 +792,21 @@ class StpAbonnementManager
             "ref_formule" => $refFormule
         ));
 
+        // mise à jour du plan et de la formule dans la base
+
+        $abo->setRef_plan($plan->getRef_plan());
+        $this->updateRefPlan($abo);
+        $abo->setRef_formule($refFormule);
+        $this->updateRefFormule($abo);
+
         // traitement spécifique aux status
         if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ESSAI) {
             $gr = new \GetResponse();
             $gr->updateTrialList($refAbo);
         } else if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ACTIF) {
-
             $stripe = new \spamtonprof\stp_api\StripeManager($testMode);
             $stripe->updateSubscriptionPlan($abo->getSubs_Id(), $plan);
         }
-
-        // mise à jour du plan et de la formule dans la base
-        $q = $this->_db->prepare("update stp_abonnement set ref_formule = :ref_formule, ref_plan = :ref_plan where ref_abonnement = :ref_abonnement");
-        $q->bindValue(":ref_formule", $refFormule);
-        $q->bindValue(":ref_plan", $plan->getRef_plan());
-        $q->bindValue(":ref_abonnement", $refAbo);
-        $q->execute();
 
         // mise à jour algolia
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
@@ -763,8 +834,6 @@ class StpAbonnementManager
     // pour mettre à jour l'email d'un parent
     function updateEmailParent($email, $refAbo)
     {
-        $email = "n.gironde@wanadoo.fr";
-        $refAbo = "271";
 
         // on récupère l'abonnement
         $constructor = array(

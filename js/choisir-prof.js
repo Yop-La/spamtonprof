@@ -164,11 +164,10 @@ function fillAttribution(attributionCourante){
 	waitForEl(".row-choix-prof", function() {
 
 
-		jQuery(".row-choix-prof").find("#profil").html(attributionCourante.eleve.profil.profil);
 		jQuery(".row-choix-prof").find("#prenom-nom").html(attributionCourante.eleve.prenom.concat(' ',attributionCourante.eleve.nom));
 		jQuery(".row-choix-prof").find("#date-creation").html(attributionCourante.date_creation);
 		jQuery(".row-choix-prof").find("#matieres").html(attributionCourante.formule.formule);
-		jQuery(".row-choix-prof").find("#classe").html(attributionCourante.eleve.classe.nom_complet);
+		jQuery(".row-choix-prof").find("#classe").html(attributionCourante.eleve.niveau.niveau);
 		jQuery(".row-choix-prof").find("#remarques").html(attributionCourante.remarque_inscription);
 
 		affichageProf = "aucun";

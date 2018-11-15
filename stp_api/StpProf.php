@@ -4,9 +4,28 @@ namespace spamtonprof\stp_api;
 class StpProf implements \JsonSerializable
 {
 
-    protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $user_id_wp, $onboarding_step, $sexe, $stripe_id_test, $ref_gmail_account, $inbox_ready, $processing_date;
+    protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $user_id_wp, $onboarding_step, $sexe, $stripe_id_test, $ref_gmail_account, $inbox_ready, $processing_date, $description, $image_url, $phrase_responsable, $gmailAcc;
 
     /**
+     *
+     * @return mixed
+     */
+    public function getGmailAcc()
+    {
+        return $this->gmailAcc;
+    }
+
+    /**
+     *
+     * @param mixed $gmailAcc
+     */
+    public function setGmailAcc($gmailAcc)
+    {
+        $this->gmailAcc = $gmailAcc;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getProcessing_date()
@@ -15,6 +34,7 @@ class StpProf implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $processing_date
      */
     public function setProcessing_date($processing_date)
@@ -23,6 +43,25 @@ class StpProf implements \JsonSerializable
     }
 
     /**
+     *
+     * @return mixed
+     */
+    public function getPhrase_responsable()
+    {
+        return $this->phrase_responsable;
+    }
+
+    /**
+     *
+     * @param mixed $phrase_responsable
+     */
+    public function setPhrase_responsable($phrase_responsable)
+    {
+        $this->phrase_responsable = $phrase_responsable;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getInbox_ready()
@@ -31,6 +70,43 @@ class StpProf implements \JsonSerializable
     }
 
     /**
+     *
+     * @return mixed
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getImage_url()
+    {
+        return $this->image_url;
+    }
+
+    /**
+     *
+     * @param mixed $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     *
+     * @param mixed $image_url
+     */
+    public function setImage_url($image_url)
+    {
+        $this->image_url = $image_url;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getProcess_inbox()
@@ -39,6 +115,7 @@ class StpProf implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $inbox_ready
      */
     public function setInbox_ready($inbox_ready)
@@ -47,6 +124,7 @@ class StpProf implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $process_inbox
      */
     public function setProcess_inbox($process_inbox)
@@ -55,6 +133,7 @@ class StpProf implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getRef_gmail_account()
@@ -63,6 +142,7 @@ class StpProf implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $ref_gmail_account
      */
     public function setRef_gmail_account($ref_gmail_account)
@@ -286,7 +366,7 @@ class StpProf implements \JsonSerializable
     public function toArray()
     {
         $retour = [];
-        
+
         foreach ($this as $key => $value) {
             $retour[$key] = $value;
         }
@@ -296,7 +376,7 @@ class StpProf implements \JsonSerializable
     public function toSlack($header)
     {
         $retour = [];
-        
+
         $retour[] = $header;
         $retour[] = " ";
         foreach ($this as $key => $value) {
@@ -329,5 +409,4 @@ class StpProf implements \JsonSerializable
     {
         $this->sexe = $sexe;
     }
-
 }

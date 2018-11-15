@@ -105,7 +105,7 @@ class StripeManager
         $this->testMode = $testMode;
     }
 
-    public function addConnectSubscription($emailClient, $source, $refCompte, $planStripeId, $stripeProfId, $refAbonnement, \spamtonprof\stp_api\StpCompte $compte)
+    public function addConnectSubscription($emailClient, $source, $refCompte, $planStripeId, $stripeProfId, $refAbonnement, \spamtonprof\stp_api\StpCompte $compte, $trialEnd = 'now')
     {
         $slack = new \spamtonprof\slack\Slack();
 
@@ -117,8 +117,12 @@ class StripeManager
             if ($compte->getStripe_client()) {
 
                 $customer = \Stripe\Customer::retrieve($compte->getStripe_client());
-                $customer->source = $source;
-                $customer->save();
+
+                if ($source) {
+                    $customer->source = $source;
+                    $customer->save();
+                }
+                
             } else {
 
                 $customer = \Stripe\Customer::create(array(
@@ -145,6 +149,8 @@ class StripeManager
                         "plan" => $planStripeId
                     )
                 ),
+
+                "trial_end" => $trialEnd,
 
                 "metadata" => array(
 
@@ -557,9 +563,8 @@ class StripeManager
 
     public function addTrial($subId, $endDay, $prorate)
     {
-        
         $endDay = \DateTime::createFromFormat(PG_DATE_FORMAT, $endDay);
-        
+
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
 
         \Stripe\Subscription::update($subId, [

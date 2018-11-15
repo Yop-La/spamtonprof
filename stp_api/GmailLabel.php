@@ -5,13 +5,19 @@ class GmailLabel implements \JsonSerializable
 
 {
 
-    protected $ref_label, $nom_label, $color_label;
+    protected $ref_label, $nom_label, $color_label, $action;
 
     public function __construct(array $donnees)
     
     {
         $this->hydrate($donnees);
     }
+    /**     * @return mixed     */    public function getAction()
+    {
+        return $this->action;    }
+    /**     * @param mixed $action     */    public function setAction($action)
+    {
+        $this->action = $action;    }
     public function hydrate(array $donnees)
     
     {

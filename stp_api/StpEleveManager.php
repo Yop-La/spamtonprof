@@ -15,15 +15,16 @@ class StpEleveManager
 
     public function add(StpEleve $StpEleve)
     {
-        $q = $this->_db->prepare('insert into stp_eleve(email, prenom, ref_classe, nom, telephone, same_email, ref_profil,ref_compte) values( :email,:prenom,:ref_classe,:nom,:telephone,  :same_email, :ref_profil, :ref_compte)');
+        $q = $this->_db->prepare('insert into stp_eleve(email, prenom, ref_niveau, nom, telephone, same_email, parent_required,ref_compte, local) values(:email, :prenom, :ref_niveau, :nom, :telephone, :same_email, :parent_required,:ref_compte, :local)');
         $q->bindValue(':email', $StpEleve->getEmail());
         $q->bindValue(':prenom', $StpEleve->getPrenom());
-        $q->bindValue(':ref_classe', $StpEleve->getRef_classe());
+        $q->bindValue(':ref_niveau', $StpEleve->getRef_niveau());
         $q->bindValue(':nom', $StpEleve->getNom());
         $q->bindValue(':telephone', $StpEleve->getTelephone());
         $q->bindValue(':same_email', $StpEleve->getSame_email(), \PDO::PARAM_BOOL);
-        $q->bindValue(':ref_profil', $StpEleve->getRef_profil());
+        $q->bindValue(':parent_required', $StpEleve->getParent_required(), \PDO::PARAM_BOOL);
         $q->bindValue(':ref_compte', $StpEleve->getRef_compte());
+        $q->bindValue(':local', $StpEleve->getLocal(), PDO::PARAM_BOOL);
 
         $q->execute();
         $StpEleve->setRef_eleve($this->_db->lastInsertId());
@@ -36,14 +37,12 @@ class StpEleveManager
 
         $q = null;
 
-
-        if (!LOCAL) {
-            $q = $this->_db->prepare('update stp_eleve set ref_compte_wp = :ref_compte_wp, local = false where ref_eleve = :ref_eleve');
+        if (! LOCAL) {
+            $q = $this->_db->prepare('update stp_eleve set ref_compte_wp = :ref_compte_wp where ref_eleve = :ref_eleve');
             $q->bindValue(':ref_compte_wp', $refCompteWp);
-        }else{
-            $q = $this->_db->prepare('update stp_eleve set ref_compte_wp_test = :ref_compte_wp_test, local = true where ref_eleve = :ref_eleve');
+        } else {
+            $q = $this->_db->prepare('update stp_eleve set ref_compte_wp_test = :ref_compte_wp_test where ref_eleve = :ref_eleve');
             $q->bindValue(':ref_compte_wp_test', $refCompteWp);
-            
         }
 
         $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
@@ -57,6 +56,26 @@ class StpEleveManager
         $q = $this->_db->prepare('update stp_eleve set email = :email, same_email = :same_email where ref_eleve = :ref_eleve');
         $q->bindValue(':email', $eleve->getEmail());
         $q->bindValue(':same_email', $eleve->getSame_email(), PDO::PARAM_BOOL);
+        $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
+        $q->execute();
+
+        return ($eleve);
+    }
+
+    public function updateRefNiveau(StpEleve $eleve)
+    {
+        $q = $this->_db->prepare('update stp_eleve set ref_niveau = :ref_niveau where ref_eleve = :ref_eleve');
+        $q->bindValue(':ref_niveau', $eleve->getRef_niveau());
+        $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
+        $q->execute();
+
+        return ($eleve);
+    }
+
+    public function updateParentRequired(StpEleve $eleve)
+    {
+        $q = $this->_db->prepare('update stp_eleve set parent_required = :parent_required where ref_eleve = :ref_eleve');
+        $q->bindValue(':parent_required', $eleve->getParent_required(), PDO::PARAM_BOOL);
         $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
         $q->execute();
 
@@ -96,6 +115,7 @@ class StpEleveManager
     public function get($info)
     {
         $data = false;
+        $zapDataStep = false;
         if (array_key_exists("email", $info)) {
 
             $email = $info["email"];
@@ -118,16 +138,21 @@ class StpEleveManager
         } else if (array_key_exists("ref_compte_wp", $info)) {
             $refCompteWp = $info["ref_compte_wp"];
 
-            $q = null;
-            if (! LOCAL) {
-                $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp_test = :ref_compte_wp or ref_compte_wp = :ref_compte_wp order by local desc');
+            if (LOCAL) {
+
+                $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp_test = :ref_compte_wp');
                 $q->bindValue(':ref_compte_wp', $refCompteWp);
-            } else {
-                $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp = :ref_compte_wp');
-                $q->bindValue(':ref_compte_wp', $refCompteWp);
+                $q->execute();
+                $data = $q->fetch(\PDO::FETCH_ASSOC);
             }
 
-            $q->execute();
+            if (! $data) {
+                $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp = :ref_compte_wp');
+                $q->bindValue(':ref_compte_wp', $refCompteWp);
+                $q->execute();
+            } else {
+                $zapDataStep = true;
+            }
         } else if (array_key_exists("ref_eleve", $info)) {
 
             $refEleve = $info["ref_eleve"];
@@ -136,9 +161,9 @@ class StpEleveManager
             $q->bindValue(':ref_eleve', $refEleve);
             $q->execute();
         }
-
-        $data = $q->fetch(\PDO::FETCH_ASSOC);
-
+        if (! $zapDataStep) {
+            $data = $q->fetch(\PDO::FETCH_ASSOC);
+        }
         if ($data) {
             return (new \spamtonprof\stp_api\StpEleve($data));
         } else {
@@ -153,8 +178,7 @@ class StpEleveManager
 
     public function construct($constructor)
     {
-        $classeMg = new \spamtonprof\stp_api\StpClasseManager();
-        $profilMg = new \spamtonprof\stp_api\StpProfilManager();
+        $niveauMg = new \spamtonprof\stp_api\StpNiveauManager();
 
         $eleve = $this->cast($constructor["objet"]);
 
@@ -163,19 +187,13 @@ class StpEleveManager
         foreach ($constructOrders as $constructOrder) {
 
             switch ($constructOrder) {
-                case "ref_classe":
-                    $classe = $classeMg->get(array(
-                        'ref_classe' => $eleve->getRef_classe()
+
+                case "ref_niveau":
+                    $niveau = $niveauMg->get(array(
+                        'ref_niveau' => $eleve->getRef_niveau()
                     ));
 
-                    $eleve->setClasse($classe);
-                    break;
-                case "ref_profil":
-                    $profil = $profilMg->get(array(
-                        'ref_profil' => $eleve->getRef_profil()
-                    ));
-
-                    $eleve->setProfil($profil);
+                    $eleve->setNiveau($niveau);
                     break;
             }
         }
@@ -223,6 +241,11 @@ class StpEleveManager
 
             $q = $this->_db->prepare("select * from stp_eleve where regexp_replace(telephone, '[^01234536789]', '','g') SIMILAR TO '" . $nums . "'");
             $q->execute();
+        } else if (in_array("ref_niveau", $info) && in_array("parent_required", $info) && in_array(null, $info)) {
+
+            $q = $this->_db->prepare("select * from stp_eleve where (ref_niveau is null or parent_required is null) and ref_classe is not null and ref_profil is not null limit 100");
+
+            $q->execute();
         }
 
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
@@ -233,5 +256,55 @@ class StpEleveManager
             $eleves[] = $eleve;
         }
         return ($eleves);
+    }
+
+    /*
+     * pour donner un niveau et un parent_required aux élèves inscrits
+     * avant le changement de classe à niveau sur le site (avant ajout moteur de recherche pour essai)
+     */
+    public function setNiveauParentRequired()
+    {
+        $eleves = $this->getAll(array(
+            'ref_niveau',
+            'parent_required',
+            null
+        ));
+
+        $classeMg = new \spamtonprof\stp_api\StpClasseManager();
+        $niveauMg = new \spamtonprof\stp_api\StpNiveauManager();
+
+        $classeNotInNiveau = [
+            "tstistl" => 15,
+            "candidat-libre-bac" => 12,
+            "diplome-universitaire" => 23,
+            "pstistl" => 9,
+            "iut" => 25
+        ];
+
+        foreach ($eleves as $eleve) {
+
+            $classe = $classeMg->get(array(
+                'ref_classe' => $eleve->getRef_classe()
+            ));
+
+            $niveau = $niveauMg->get(array(
+                "sigle" => $classe->getClasse()
+            ));
+
+            if ($eleve->getRef_niveau() == 4) {
+                $eleve->setParent_required(false);
+            } else {
+                $eleve->setParent_required(true);
+            }
+            $this->updateParentRequired($eleve);
+
+            if ($niveau) {
+                $eleve->setRef_niveau($niveau->getRef_niveau());
+            } else {
+
+                $eleve->setRef_niveau($classeNotInNiveau[$classe->getClasse()]);
+            }
+            $this->updateRefNiveau($eleve);
+        }
     }
 }

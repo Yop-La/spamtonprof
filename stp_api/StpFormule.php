@@ -4,9 +4,64 @@ namespace spamtonprof\stp_api;
 class StpFormule implements \JsonSerializable
 {
 
-    protected $formule, $ref_formule, $matieres, $plans, $classes, $ref_product_stripe_test, $ref_product_stripe, $defaultPlan;
+    protected $formule, $ref_formule, $matieres, $plans, $classes, $ref_product_stripe_test, $ref_product_stripe, $defaultPlan, $from_tool, $ref_prof, $prof;
 
     /**
+     *
+     * @return mixed
+     */
+    public function getProf()
+    {
+        return $this->prof;
+    }
+
+    /**
+     *
+     * @param mixed $prof
+     */
+    public function setProf($prof)
+    {
+        $this->prof = $prof;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getRef_prof()
+    {
+        return $this->ref_prof;
+    }
+
+    /**
+     *
+     * @param mixed $ref_prof
+     */
+    public function setRef_prof($ref_prof)
+    {
+        $this->ref_prof = $ref_prof;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getFrom_tool()
+    {
+        return $this->from_tool;
+    }
+
+    /**
+     *
+     * @param mixed $from_tool
+     */
+    public function setFrom_tool($from_tool)
+    {
+        $this->from_tool = $from_tool;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getDefaultPlan()
@@ -15,6 +70,7 @@ class StpFormule implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $defaultPlan
      */
     public function setDefaultPlan($defaultPlan)
@@ -23,14 +79,19 @@ class StpFormule implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getClasses()
     {
+        if (gettype($this->classes) == "string") {
+            $this->classes = pgArrayToArray($this->classes);
+        }
         return $this->classes;
     }
 
     /**
+     *
      * @param mixed $classes
      */
     public function setClasses($classes)
@@ -39,20 +100,20 @@ class StpFormule implements \JsonSerializable
     }
 
     public function __construct(array $donnees = array())
-    
+
     {
         $this->hydrate($donnees);
     }
 
     public function hydrate(array $donnees)
-    
+
     {
         foreach ($donnees as $key => $value) {
-            
+
             $method = 'set' . ucfirst($key);
-            
+
             if (method_exists($this, $method)) {
-                
+
                 $this->$method($value);
             }
         }
@@ -73,14 +134,13 @@ class StpFormule implements \JsonSerializable
      */
     public function setFormule($formule)
     {
-        
         $this->formule = $formule;
     }
 
     public function jsonSerialize()
     {
         $vars = get_object_vars($this);
-        
+
         return $vars;
     }
 
@@ -114,14 +174,7 @@ class StpFormule implements \JsonSerializable
     public function getMatieres()
     {
         if (gettype($this->matieres) == "string") {
-            $matieres = str_replace(array(
-                '{',
-                '}'
-            ), array(
-                ''
-            ), $this->matieres);
-            $matieres = explode(",", $matieres);
-            $this->matieres = $matieres;
+            $this->matieres = pgArrayToArray($this->matieres);
         }
         return $this->matieres;
     }
@@ -166,7 +219,9 @@ class StpFormule implements \JsonSerializable
     {
         $this->plans = $plans;
     }
+
     /**
+     *
      * @return mixed
      */
     public function getRef_product_stripe_test()
@@ -175,6 +230,7 @@ class StpFormule implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getRef_product_stripe()
@@ -183,6 +239,7 @@ class StpFormule implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $ref_product_stripe_test
      */
     public function setRef_product_stripe_test($ref_product_stripe_test)
@@ -191,14 +248,12 @@ class StpFormule implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $ref_product_stripe
      */
     public function setRef_product_stripe($ref_product_stripe)
     {
         $this->ref_product_stripe = $ref_product_stripe;
     }
-
-    
-    
 }
 

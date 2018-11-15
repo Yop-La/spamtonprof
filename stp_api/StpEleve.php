@@ -4,8 +4,116 @@ namespace spamtonprof\stp_api;
 class StpEleve implements \JsonSerializable
 {
 
-    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil, $ref_compte, $seq_email_parent_essai, $hasToSendToEleve, $hasToSendToParent ;
-    
+    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil, $ref_compte, $seq_email_parent_essai, $hasToSendToEleve, $hasToSendToParent, $ref_niveau, $parent_required, $niveau, $local;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getLocal()
+    {
+        return $this->local;
+    }
+
+    /**
+     *
+     * @param mixed $local
+     */
+    public function setLocal($local)
+    {
+        $this->local = $local;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getNiveau()
+    {
+        return $this->niveau;
+    }
+
+    /**
+     *
+     * @param mixed $niveau
+     */
+    public function setNiveau($niveau)
+    {
+        $this->niveau = $niveau;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getParent_required()
+    {
+        return $this->parent_required;
+    }
+
+    /**
+     *
+     * @param mixed $parent_required
+     */
+    public function setParent_required($parent_required)
+    {
+        $this->parent_required = $parent_required;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getRef_niveau()
+    {
+        return $this->ref_niveau;
+    }
+
+    /**
+     *
+     * @param mixed $ref_niveau
+     */
+    public function setRef_niveau($ref_niveau)
+    {
+        $this->ref_niveau = $ref_niveau;
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    public function getHasToSendToEleve()
+    {
+        return $this->hasToSendToEleve;
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    public function getHasToSendToParent()
+    {
+        return $this->hasToSendToParent;
+    }
+
+    /**
+     *
+     * @param boolean $hasToSendToEleve
+     */
+    public function setHasToSendToEleve($hasToSendToEleve)
+    {
+        $this->hasToSendToEleve = $hasToSendToEleve;
+    }
+
+    /**
+     *
+     * @param boolean $hasToSendToParent
+     */
+    public function setHasToSendToParent($hasToSendToParent)
+    {
+        $this->hasToSendToParent = $hasToSendToParent;
+    }
+
     public function __construct(array $donnees = array())
     {
         $this->hydrate($donnees);
@@ -20,52 +128,49 @@ class StpEleve implements \JsonSerializable
             }
         }
     }
-    
-    public function hasToSendToEleve(){
-        
-        if(is_null($this->getRef_profil()) || is_null($this->getSame_email())){
-            return(null);
+
+    public function hasToSendToEleve()
+    {
+        if (is_null($this->getParent_required()) || is_null($this->getSame_email())) {
+            return (null);
         }
         $this->setHasToSend();
-        return($this->hasToSendToEleve);
-        
+        return ($this->hasToSendToEleve);
     }
-    
-    public function hasToSendToParent(){
-        
-        if(is_null($this->getRef_profil()) || is_null($this->getSame_email())){
-            return(null);
+
+    public function hasToSendToParent()
+    {
+        if (is_null($this->getParent_required()) || is_null($this->getSame_email())) {
+            return (null);
         }
         $this->setHasToSend();
-        return($this->hasToSendToParent);
-        
+        return ($this->hasToSendToParent);
     }
-    
-    public function setHasToSend(){
-        
-        if ($this->getRef_profil() == \spamtonprof\stp_api\StpProfil::ETUDIANT) {
-            
+
+    public function setHasToSend()
+    {
+        if (! $this->getParent_required()) {
+
             $this->hasToSendToEleve = true;
             $this->hasToSendToParent = false;
         } else {
-            
+
             if ($this->getSame_email()) {
-                
+
                 $this->hasToSendToEleve = false;
                 $this->hasToSendToParent = true;
             } else {
-                
+
                 $this->hasToSendToEleve = true;
                 $this->hasToSendToParent = true;
             }
         }
-        
     }
-    
+
     public function toArray()
     {
         $retour = [];
-        
+
         foreach ($this as $key => $value) {
             $retour[$key] = $value;
         }
@@ -192,41 +297,8 @@ class StpEleve implements \JsonSerializable
         $this->ref_profil = $ref_profil;
     }
 
-    /**
-     *
-     * @return mixed
-     */
-    public function getClasse()
-    {
-        return $this->classe;
-    }
 
-    /**
-     *
-     * @return mixed
-     */
-    public function getProfil()
-    {
-        return $this->profil;
-    }
-
-    /**
-     *
-     * @param mixed $classe
-     */
-    public function setClasse($classe)
-    {
-        $this->classe = $classe;
-    }
-
-    /**
-     *
-     * @param mixed $profil
-     */
-    public function setProfil($profil)
-    {
-        $this->profil = $profil;
-    }
+    
 
     public static function cast(\spamtonprof\stp_api\StpEleve $eleve)
     {
@@ -250,7 +322,9 @@ class StpEleve implements \JsonSerializable
     {
         $this->ref_compte = $ref_compte;
     }
+
     /**
+     *
      * @return mixed
      */
     public function getSeq_email_parent_essai()
@@ -259,13 +333,11 @@ class StpEleve implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $seq_email_parent_essai
      */
     public function setSeq_email_parent_essai($seq_email_parent_essai)
     {
         $this->seq_email_parent_essai = $seq_email_parent_essai;
     }
-
-    
-    
 }

@@ -86,7 +86,7 @@ class StpProfManager
         }
     }
 
-    public function getAll($info = null)
+    public function getAll($info = null, $constructor = false)
     {
         $profs = [];
         $q = null;
@@ -112,9 +112,38 @@ class StpProfManager
 
         while ($data = $q->fetch(\PDO::FETCH_ASSOC)) {
 
-            $profs[] = new \spamtonprof\stp_api\StpProf($data);
+            $prof = new \spamtonprof\stp_api\StpProf($data);
+            ;
+
+            if ($constructor) {
+                $constructor["objet"] = $prof;
+                $this->construct($constructor);
+            }
+
+            $profs[] = $prof;
         }
         return ($profs);
+    }
+
+    public function construct($constructor)
+    {
+        $gmailAccMg = new \spamtonprof\stp_api\StpGmailAccountManager();
+
+        $prof = $this->cast($constructor["objet"]);
+
+        $constructOrders = $constructor["construct"];
+
+        foreach ($constructOrders as $constructOrder) {
+
+            switch ($constructOrder) {
+
+                case "ref_gmail_account":
+                    $gmailAcc = $gmailAccMg->get($prof->getRef_gmail_account());
+
+                    $prof->setGmailAcc($gmailAcc);
+                    break;
+            }
+        }
     }
 
     public function getNextInboxToProcess()
@@ -298,5 +327,40 @@ class StpProfManager
     public function cast(\spamtonprof\stp_api\StpProf $object)
     {
         return ($object);
+    }
+
+    public function addNewGmailLabels()
+    {
+        // pour ajouter au gmail des profs les labels avec l'action add (après ajout de nouveau niveau par exemple)
+        $gmail = new \spamtonprof\gmailManager\GmailManager('seb.spamtonprof@gmail.com');
+
+        $profMg = new \spamtonprof\stp_api\StpProfManager();
+
+        $constructor = array(
+            "construct" => array(
+                'ref_gmail_account'
+            )
+        );
+
+        $profs = $profMg->getAll(array(
+            "inbox_ready" => true
+        ), $constructor);
+
+        $labelMg = new \spamtonprof\stp_api\GmailLabelManager();
+        $labels = $labelMg->getAll(array(
+            'action' => 'add'
+        ));
+
+        foreach ($profs as $prof) {
+
+            $gmail = new \spamtonprof\gmailManager\GmailManager($prof->getGmailAcc()->getEmail());
+
+            foreach ($labels as $label) {
+
+                $gmail->createLabel($label->getNom_label(), $label->getColor_label());
+                $label->setAction(null);
+                $labelMg->updateAction($label);
+            }
+        }
     }
 }

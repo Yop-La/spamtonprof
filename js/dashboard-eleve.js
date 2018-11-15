@@ -10,8 +10,6 @@ jQuery( document ).ready( function( $ ) {
 
 
 
-
-
 	waitForEl(".row-essai", function() {
 
 		// pour charger et remplir les lignes d'essai 
@@ -82,7 +80,7 @@ jQuery( document ).ready( function( $ ) {
 			montant = aboClique.plan.tarif;
 
 			emailCheckout = "alexandre@spamtonprof.com";
-			if(aboClique.eleve.ref_profil == 4){
+			if(!aboClique.eleve.parent_required){
 				emailCheckout = aboClique.eleve.email;
 			}else{
 				emailCheckout = aboClique.proche.email;
@@ -322,7 +320,7 @@ jQuery( document ).ready( function( $ ) {
 			}
 		})
 		.fail(function() {
-			showMessage('Oops : il y a eu un problème avec le paiement. Veuillez réessayer ou contacter l\'équipe. ');
+			showMessage('Oops : il y a eu un problème avec la demande d\'arrêt. Veuillez réessayer ou contacter l\'équipe. ');
 			ajaxEnCours--;
 			if(ajaxEnCours == 0){
 				jQuery(".hide_loading").removeClass("hide");
@@ -390,7 +388,7 @@ jQuery( document ).ready( function( $ ) {
 			console.log(retour);
 			if(retour.error){
 				showMessage('Ooops : il y a eu un problème : '.concat(retour.message,'. Veuillez réessayer ou contacter l\'équipe.'));
-				
+
 			}else{
 				showMessage('Votre carte a été bien mise à jour !');	
 			}

@@ -4,9 +4,10 @@ namespace spamtonprof\stp_api;
 class StpRemarqueInscription implements \JsonSerializable
 {
 
-    protected $ref_abonnement, $chapitre, $difficulte, $note, $ref_matiere, $ref_remarque, $matiere;
+    protected $ref_abonnement, $chapitre, $difficulte, $note, $ref_matiere, $ref_remarque, $matiere, $remarque;
 
     /**
+     *
      * @return mixed
      */
     public function getMatiere()
@@ -15,6 +16,25 @@ class StpRemarqueInscription implements \JsonSerializable
     }
 
     /**
+     *
+     * @return mixed
+     */
+    public function getRemarque()
+    {
+        return $this->remarque;
+    }
+
+    /**
+     *
+     * @param mixed $remarque
+     */
+    public function setRemarque($remarque)
+    {
+        $this->remarque = $remarque;
+    }
+
+    /**
+     *
      * @param mixed $matiere
      */
     public function setMatiere($matiere)
@@ -102,6 +122,4 @@ class StpRemarqueInscription implements \JsonSerializable
         $vars = get_object_vars($this);
         return $vars;
     }
-    
-    
 }

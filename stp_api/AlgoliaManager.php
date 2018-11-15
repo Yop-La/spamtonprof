@@ -90,6 +90,36 @@ class AlgoliaManager
         $index->addObjects($formules);
     }
 
+    public function resetMatiereIndex()
+    {
+        $index = $this->client->initIndex('matiere');
+
+        $index->clearIndex();
+
+        $matiereMg = new \spamtonprof\stp_api\StpMatiereManager();
+
+        $matieres = $matiereMg->getAll(array(
+            'all'
+        ));
+
+        $index->addObjects($matieres);
+    }
+
+    public function resetNiveauIndex()
+    {
+        $index = $this->client->initIndex('niveau');
+
+        $index->clearIndex();
+
+        $niveauMg = new \spamtonprof\stp_api\StpNiveauManager();
+
+        $niveaux = $niveauMg->getAll(array(
+            'all'
+        ));
+
+        $index->addObjects($niveaux);
+    }
+
     public function resetReportingLbc()
     {
         $index = $this->client->initIndex('reportingLbc');
@@ -132,8 +162,7 @@ class AlgoliaManager
             ),
             "ref_eleve" => array(
                 "construct" => array(
-                    'ref_classe',
-                    'ref_profil'
+                    'ref_niveau',
                 )
             ),
             "remarquesMatieres" => array(
@@ -146,8 +175,11 @@ class AlgoliaManager
         $abonnement = $abonnementMg->get(array(
             'ref_abonnement' => $refAbo
         ), $constructor);
+        
+        
 
         $index->addObject($abonnement);
+        
     }
 
     public function updateAbonnement($refAbo, $constructor = false)
@@ -175,7 +207,6 @@ class AlgoliaManager
             'ref_abonnements' => $refAbos
         ), $constructor);
 
-        
         for ($i = 0; $i < count($abonnements); $i ++) {
             $abonnement = $abonnements[$i];
             $abonnement = array_filter(json_decode(json_encode($abonnement), true), 'isNotNull');

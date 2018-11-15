@@ -23,58 +23,51 @@ class StpCompteManager
 
         return ($StpCompte);
     }
-    
-    public function delete($refCompte){
-        
+
+    public function delete($refCompte)
+    {
         $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte; ');
         $q->bindValue(':ref_compte', $refCompte);
         $q->execute();
-        
-        $refAbos= [];
+
+        $refAbos = [];
         $refEleves = [];
         $refProches = [];
-        
+
         while ($data = $q->fetch(\PDO::FETCH_ASSOC)) {
-            
+
             $refAbos[] = $data["ref_abonnement"];
             $refEleves[] = $data["ref_eleve"];
             $refProches[] = $data["ref_proche"];
         }
-        
-        
+
         $refAbosQr = implode(',', array_fill(0, count($refAbos), '?'));
         $refElevesQr = implode(',', array_fill(0, count($refEleves), '?'));
         $refProchesQr = implode(',', array_fill(0, count($refProches), '?'));
-        
-        
-        
-        
-        $q = $this->_db->prepare('delete from stp_message_eleve where ref_abonnement in (' . $refAbosQr .');');
+
+        $q = $this->_db->prepare('delete from stp_message_eleve where ref_abonnement in (' . $refAbosQr . ');');
         $q->execute($refAbos);
-        
-        $q = $this->_db->prepare('delete from stp_log_abonnement where ref_abonnement in (' . $refAbosQr .');');
+
+        $q = $this->_db->prepare('delete from stp_log_abonnement where ref_abonnement in (' . $refAbosQr . ');');
         $q->execute($refAbos);
-        
-        $q = $this->_db->prepare('delete from stp_remarque_inscription where ref_abonnement in (' . $refAbosQr .');' );
+
+        $q = $this->_db->prepare('delete from stp_remarque_inscription where ref_abonnement in (' . $refAbosQr . ');');
         $q->execute($refAbos);
-        
-        $q = $this->_db->prepare('delete from stp_abonnement where ref_abonnement in (' . $refAbosQr .');' );
+
+        $q = $this->_db->prepare('delete from stp_abonnement where ref_abonnement in (' . $refAbosQr . ');');
         $q->execute($refAbos);
-        
-        
-        $q = $this->_db->prepare('delete from stp_eleve where ref_eleve in (' . $refElevesQr .')' );
+
+        $q = $this->_db->prepare('delete from stp_eleve where ref_eleve in (' . $refElevesQr . ')');
         $q->execute($refEleves);
-        
+
         $q = $this->_db->prepare('delete from stp_compte where ref_compte = :ref_compte; ');
         $q->bindValue(':ref_compte', $refCompte);
         $q->execute();
-        
-        $q = $this->_db->prepare('delete from stp_proche where ref_proche in (' . $refProchesQr .')' );
+
+        $q = $this->_db->prepare('delete from stp_proche where ref_proche in (' . $refProchesQr . ')');
         $q->execute($refProches);
-        
-        
+
         print_r($this->_db->errorInfo());
-        
     }
 
     /*
@@ -121,24 +114,40 @@ class StpCompteManager
             $eleve = $eleveMg->get(array(
                 "ref_compte_wp" => $refCompteWp
             ));
-
+            $compte1 = false;
             if ($eleve) {
-                $compte = $this->get(array(
+                $compte1 = $this->get(array(
                     "ref_compte" => $eleve->getRef_compte()
                 ));
-                return ($compte);
             }
 
+            $compte2 = false;
             $proche = $procheMg->get(array(
                 "ref_compte_wp" => $refCompteWp
             ));
-
             if ($proche) {
-                $compte = $this->get(array(
+                $compte2 = $this->get(array(
                     "ref_proche" => $proche->getRef_proche()
                 ));
-                return ($compte);
             }
+
+            if (LOCAL) {
+                if ($compte1 && $compte2) {
+                    if ($eleve->getLocal() && ! $proche->getLocal()) {
+                        return ($compte1);
+                    } else if (! $eleve->getLocal() && $proche->getLocal()) {
+                        return ($compte2);
+                    }
+                }
+            }
+
+            if ($compte1) {
+                return ($compte1);
+            }
+            if ($compte2) {
+                return ($compte2);
+            }
+
             return (false);
         }
 

@@ -2,8 +2,7 @@
 use spamtonprof\slack\Slack;
 
 /**
- * 
- * il ne traque  les emails des élève de des étudiants ( pas des parents )
+ * il ne traque les emails des élève de des étudiants ( pas des parents )
  *
  * ce script sert :
  * - à stocker dans mail eleve - les messages des élèves
@@ -48,18 +47,18 @@ $gmailAccountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
 $gmailAccount = $gmailAccountMg->get($prof->getRef_gmail_account());
 
 try {
-    
+
     $gmailManager = new spamtonprof\gmailManager\GmailManager($gmailAccount->getEmail());
 } catch (\Exception $e) {
-    
+
     $smtpServerMg = new \spamtonprof\stp_api\SmtpServerManager();
-    
+
     $smtpServer = $smtpServerMg->get(array(
         'ref_smtp_server' => $smtpServerMg::smtp2Go
     ));
-    
+
     $smtpServer->sendEmail('Erreur connexion gmail ', 'alexandre@spamtonprof.com', "Vient de ProcessMessageEleve.php - Impossible de se connecter à la boite : " . $gmailAccount->getEmail() . "Debug message : " . $e->getMessage(), 'alexandre@spamtonprof.com');
-    
+
     exit(0);
 }
 
@@ -86,27 +85,27 @@ $gmailAccount->setLast_history_id($lastHistoryId);
 $gmailAccountMg->updateHistoryId($gmailAccount);
 
 foreach ($messages as $message) {
-    
+
     $gmailId = $message->id;
-    
+
     $from = extractFirstMail($gmailManager->getHeader($message, "From"));
     $snippet = $message->snippet;
     $subject = $gmailManager->getHeader($message, "Subject");
     $date = $gmailManager->getHeader($message, "Date");
     // $body = $gmailManager->getBody($message, "html");
-    
+
     $dateReception = new \DateTime($date);
     $dateReception->setTimezone(new \DateTimeZone("Europe/Paris"));
-    
+
     $eleve = false;
     $eleve = $eleveMg->get(array(
         "email" => $from
     ));
-    
+
     echo ("mail : " . $from . " -- date reception : " . $dateReception->format(PG_DATETIME_FORMAT) . " -- message id : " . $gmailId . "<br><br>");
-    
+
     if ($eleve) {
-        
+
         $constructor = array(
             "construct" => array(
                 'ref_eleve',
@@ -114,18 +113,18 @@ foreach ($messages as $message) {
             ),
             "ref_eleve" => array(
                 "construct" => array(
-                    'ref_classe'
+                    'ref_niveau'
                 )
             )
         );
-        
+
         $abos = $aboMg->getAll(array(
             "ref_eleve" => $eleve->getRef_eleve(),
             "ref_prof" => $prof->getRef_prof()
         ), $constructor);
-        
+
         $nbAbos = count($abos);
-        
+
         $labelsNameToAdd = [];
         switch ($nbAbos) {
             case 0:
@@ -135,9 +134,9 @@ foreach ($messages as $message) {
                 $labelsNameToAdd[] = 'error_double_formule';
                 break;
             case 1:
-                
+
                 $abo = $abos[0];
-                
+
                 // sauvegarder le message
                 $MessEleveMg->add(new \spamtonprof\stp_api\StpMessageEleve(array(
                     'ref_abonnement' => $abo->getRef_abonnement(),
@@ -145,49 +144,50 @@ foreach ($messages as $message) {
                     'ref_gmail' => $gmailId,
                     'mail_expe' => $from
                 )));
-                
+
                 // attribuer les libellées
-                
+
                 $eleve = $abo->getEleve();
                 $statut = $abo->getStatut();
-                
-                $classe = \spamtonprof\stp_api\StpClasse::cast($eleve->getClasse());
+
+                $niveau = \spamtonprof\stp_api\StpNiveauManager::cast($eleve->getNiveau());
                 $statut = \spamtonprof\stp_api\StpStatutAbonnement::cast($statut);
-                
+
                 $slack->sendMessages("message_eleve", array(
                     " ---- ",
                     "Nouveau message de : " . $eleve->getPrenom(),
-                    $classe->getNom_complet(),
+                    $niveau->getNiveau(),
                     $gmailId,
                     $dateReception->format(PG_DATETIME_FORMAT),
                     "Avec " . $prof->getPrenom()
                 ));
-                
-                if($abo->isTrialOver() && $abo->getRef_statut_abonnement() == $abo::ESSAI){
+
+                if ($abo->isTrialOver() && $abo->getRef_statut_abonnement() == $abo::ESSAI) {
                     $labelsNameToAdd[] = 'test-over';
                 }
-                
-                $labelsNameToAdd[] = $classe->getClasse();
+
+                $labelsNameToAdd[] = $niveau->getSigle();
                 $labelsNameToAdd[] = $statut->getStatut_abonnement();
-                
-                
+
                 // mettre à jour la date de dernier contact
                 $abo->setDernier_contact($dateReception->format(PG_DATETIME_FORMAT));
                 $aboMg->updateDernierContact($abo);
-                
-                //mise à jour de l'index
+
+                // mise à jour de l'index
                 $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
                 $algoliaMg->updateAbonnement($abo->getRef_abonnement(), false);
-                
+
                 break;
             default:
-                $slack -> sendMessages("log", array("Nb d'abonnements incohérent au moment du tracking des élèves. Voir ProcessMessageEleve.php"));
+                $slack->sendMessages("log", array(
+                    "Nb d'abonnements incohérent au moment du tracking des élèves. Voir ProcessMessageEleve.php"
+                ));
                 exit(0);
         }
-        
+
         // attribuer les libellés s
         $labelsToAdd = $gmailManager->getCustomLabelsToAdd($labelsNameToAdd);
-        
+
         $gmailManager->modifyMessage($gmailId, $labelsToAdd, array());
     }
 }

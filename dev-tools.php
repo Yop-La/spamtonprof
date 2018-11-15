@@ -1,5 +1,26 @@
 <?php
 
+
+function generateRandomString($length = 4) {
+    $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
+}
+
+function objectToObject($instance, $className) {
+    return unserialize(sprintf(
+        'O:%d:"%s"%s',
+        strlen($className),
+        $className,
+        strstr(strstr(serialize($instance), '"'), ':')
+        ));
+}
+
+
 function formatNums($nums)
 {
     for ($i = 0; $i < count($nums); $i ++)
@@ -590,20 +611,20 @@ function addLabelToAllProf($labelName, $hexColor)
     $first = null;
     $mailProf = null;
     $slack = new \spamtonprof\slack\Slack();
-    
+
     $lock = false;
-    
+
     do {
-        
+
         $profMg = new \spamtonprof\stp_api\StpProfManager();
-        
+
         $prof = $profMg->getNextInboxToProcess();
-        
+
         $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-        
+
         $prof->setProcessing_date($now->format(PG_DATETIME_FORMAT));
         $profMg->updateProcessingDate($prof);
-        
+
         if (! $lock) {
             $lock = true;
             $first = $prof->getEmail_stp();
@@ -622,10 +643,25 @@ function addLabelToAllProf($labelName, $hexColor)
         }
         $gmailAccountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
         $gmailAccount = $gmailAccountMg->get($prof->getRef_gmail_account());
-        
+
         $gmail = new spamtonprof\gmailManager\GmailManager($gmailAccount->getEmail());
-        
+
         $gmail->createLabel($labelName, $hexColor);
     } while ($first != $mailProf);
 }
 
+function pgArrayToArray($pgArray)
+{
+    $pgArray = str_replace([
+        '{',
+        '}'
+    ], "", $pgArray);
+    return (explode(",", $pgArray));
+}
+
+function arrayToPgArray($array)
+{
+    $str = implode(',', $array);
+    $str = '{' . $str . '}';
+    return ($str);
+}

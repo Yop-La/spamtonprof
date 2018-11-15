@@ -101,9 +101,6 @@ function ajaxGetTitles()
     
     $accountManager = new \spamtonprof\stp_api\LbcTitleManager();
     
-    $slack = new \spamtonprof\slack\Slack();
-    $slack -> sendMessages('log', array('la',$typeTitle));
-    
     $titles = $accountManager->getAll(array("type_titre" => $typeTitle));
     
 

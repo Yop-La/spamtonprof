@@ -1,476 +1,1136 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" style="line-height: inherit;"><head style="line-height: inherit;">
-    <!--[if gte mso 9]><xml>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:v="urn:schemas-microsoft-com:vml"
+	xmlns:o="urn:schemas-microsoft-com:office:office"
+	style="line-height: inherit;">
+<head style="line-height: inherit;">
+<!--[if gte mso 9]><xml>
      <o:OfficeDocumentSettings>
       <o:AllowPNG/>
       <o:PixelsPerInch>96</o:PixelsPerInch>
      </o:OfficeDocumentSettings>
     </xml><![endif]-->
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" style="line-height: inherit;">
-    <meta name="viewport" content="width=device-width" style="line-height: inherit;">
-    <!--[if !mso]><!--><meta http-equiv="X-UA-Compatible" content="IE=edge" style="line-height: inherit;"><!--<![endif]-->
-    <title style="line-height: inherit;"></title>
-    
-    
-    <style type="text/css" id="media-query" style="line-height: inherit;">
-      body {
-  margin: 0;
-  padding: 0; }
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"
+	style="line-height: inherit;">
+<meta name="viewport" content="width=device-width"
+	style="line-height: inherit;">
+<!--[if !mso]><!-->
+<meta http-equiv="X-UA-Compatible" content="IE=edge"
+	style="line-height: inherit;">
+<!--<![endif]-->
+<title style="line-height: inherit;"></title>
+
+
+<style type="text/css" id="media-query" style="line-height: inherit;">
+body {
+	margin: 0;
+	padding: 0;
+}
 
 table, tr, td {
-  vertical-align: top;
-  border-collapse: collapse; }
+	vertical-align: top;
+	border-collapse: collapse;
+}
 
 .ie-browser table, .mso-container table {
-  table-layout: fixed; }
+	table-layout: fixed;
+}
 
 * {
-  line-height: inherit; }
+	line-height: inherit;
+}
 
 a[x-apple-data-detectors=true] {
-  color: inherit !important;
-  text-decoration: none !important; }
+	color: inherit !important;
+	text-decoration: none !important;
+}
 
 [owa] .img-container div, [owa] .img-container button {
-  display: block !important; }
+	display: block !important;
+}
 
 [owa] .fullwidth button {
-  width: 100% !important; }
+	width: 100% !important;
+}
 
 [owa] .block-grid .col {
-  display: table-cell;
-  float: none !important;
-  vertical-align: top; }
+	display: table-cell;
+	float: none !important;
+	vertical-align: top;
+}
 
-.ie-browser .num12, .ie-browser .block-grid, [owa] .num12, [owa] .block-grid {
-  width: 500px !important; }
+.ie-browser .num12, .ie-browser .block-grid, [owa] .num12, [owa] .block-grid
+	{
+	width: 500px !important;
+}
 
-.ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div {
-  line-height: 100%; }
+.ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font,
+	.ExternalClass td, .ExternalClass div {
+	line-height: 100%;
+}
 
 .ie-browser .mixed-two-up .num4, [owa] .mixed-two-up .num4 {
-  width: 164px !important; }
+	width: 164px !important;
+}
 
 .ie-browser .mixed-two-up .num8, [owa] .mixed-two-up .num8 {
-  width: 328px !important; }
+	width: 328px !important;
+}
 
 .ie-browser .block-grid.two-up .col, [owa] .block-grid.two-up .col {
-  width: 250px !important; }
+	width: 250px !important;
+}
 
 .ie-browser .block-grid.three-up .col, [owa] .block-grid.three-up .col {
-  width: 166px !important; }
+	width: 166px !important;
+}
 
 .ie-browser .block-grid.four-up .col, [owa] .block-grid.four-up .col {
-  width: 125px !important; }
+	width: 125px !important;
+}
 
 .ie-browser .block-grid.five-up .col, [owa] .block-grid.five-up .col {
-  width: 100px !important; }
+	width: 100px !important;
+}
 
 .ie-browser .block-grid.six-up .col, [owa] .block-grid.six-up .col {
-  width: 83px !important; }
+	width: 83px !important;
+}
 
 .ie-browser .block-grid.seven-up .col, [owa] .block-grid.seven-up .col {
-  width: 71px !important; }
+	width: 71px !important;
+}
 
 .ie-browser .block-grid.eight-up .col, [owa] .block-grid.eight-up .col {
-  width: 62px !important; }
+	width: 62px !important;
+}
 
 .ie-browser .block-grid.nine-up .col, [owa] .block-grid.nine-up .col {
-  width: 55px !important; }
+	width: 55px !important;
+}
 
 .ie-browser .block-grid.ten-up .col, [owa] .block-grid.ten-up .col {
-  width: 50px !important; }
+	width: 50px !important;
+}
 
-.ie-browser .block-grid.eleven-up .col, [owa] .block-grid.eleven-up .col {
-  width: 45px !important; }
+.ie-browser .block-grid.eleven-up .col, [owa] .block-grid.eleven-up .col
+	{
+	width: 45px !important;
+}
 
-.ie-browser .block-grid.twelve-up .col, [owa] .block-grid.twelve-up .col {
-  width: 41px !important; }
+.ie-browser .block-grid.twelve-up .col, [owa] .block-grid.twelve-up .col
+	{
+	width: 41px !important;
+}
 
 @media only screen and (min-width: 520px) {
-  .block-grid {
-    width: 500px !important; }
-  .block-grid .col {
-    vertical-align: top; }
-    .block-grid .col.num12 {
-      width: 500px !important; }
-  .block-grid.mixed-two-up .col.num4 {
-    width: 164px !important; }
-  .block-grid.mixed-two-up .col.num8 {
-    width: 328px !important; }
-  .block-grid.two-up .col {
-    width: 250px !important; }
-  .block-grid.three-up .col {
-    width: 166px !important; }
-  .block-grid.four-up .col {
-    width: 125px !important; }
-  .block-grid.five-up .col {
-    width: 100px !important; }
-  .block-grid.six-up .col {
-    width: 83px !important; }
-  .block-grid.seven-up .col {
-    width: 71px !important; }
-  .block-grid.eight-up .col {
-    width: 62px !important; }
-  .block-grid.nine-up .col {
-    width: 55px !important; }
-  .block-grid.ten-up .col {
-    width: 50px !important; }
-  .block-grid.eleven-up .col {
-    width: 45px !important; }
-  .block-grid.twelve-up .col {
-    width: 41px !important; } }
+	.block-grid {
+		width: 500px !important;
+	}
+	.block-grid .col {
+		vertical-align: top;
+	}
+	.block-grid .col.num12 {
+		width: 500px !important;
+	}
+	.block-grid.mixed-two-up .col.num4 {
+		width: 164px !important;
+	}
+	.block-grid.mixed-two-up .col.num8 {
+		width: 328px !important;
+	}
+	.block-grid.two-up .col {
+		width: 250px !important;
+	}
+	.block-grid.three-up .col {
+		width: 166px !important;
+	}
+	.block-grid.four-up .col {
+		width: 125px !important;
+	}
+	.block-grid.five-up .col {
+		width: 100px !important;
+	}
+	.block-grid.six-up .col {
+		width: 83px !important;
+	}
+	.block-grid.seven-up .col {
+		width: 71px !important;
+	}
+	.block-grid.eight-up .col {
+		width: 62px !important;
+	}
+	.block-grid.nine-up .col {
+		width: 55px !important;
+	}
+	.block-grid.ten-up .col {
+		width: 50px !important;
+	}
+	.block-grid.eleven-up .col {
+		width: 45px !important;
+	}
+	.block-grid.twelve-up .col {
+		width: 41px !important;
+	}
+}
 
-@media (max-width: 520px) {
-  .block-grid, .col {
-    min-width: 320px !important;
-    max-width: 100% !important;
-    display: block !important; }
-  .block-grid {
-    width: calc(100% - 40px) !important; }
-  .col {
-    width: 100% !important; }
-    .col > div {
-      margin: 0 auto; }
-  img.fullwidth, img.fullwidthOnMobile {
-    max-width: 100% !important; }
-  .no-stack .col {
-    min-width: 0 !important;
-    display: table-cell !important; }
-  .no-stack.two-up .col {
-    width: 50% !important; }
-  .no-stack.mixed-two-up .col.num4 {
-    width: 33% !important; }
-  .no-stack.mixed-two-up .col.num8 {
-    width: 66% !important; }
-  .no-stack.three-up .col.num4 {
-    width: 33% !important; }
-  .no-stack.four-up .col.num3 {
-    width: 25% !important; }
-  .mobile_hide {
-    min-height: 0px;
-    max-height: 0px;
-    max-width: 0px;
-    display: none;
-    overflow: hidden;
-    font-size: 0px; } }
+@media ( max-width : 520px) {
+	.block-grid, .col {
+		min-width: 320px !important;
+		max-width: 100% !important;
+		display: block !important;
+	}
+	.block-grid {
+		width: calc(100% - 40px) !important;
+	}
+	.col {
+		width: 100% !important;
+	}
+	.col>div {
+		margin: 0 auto;
+	}
+	img.fullwidth, img.fullwidthOnMobile {
+		max-width: 100% !important;
+	}
+	.no-stack .col {
+		min-width: 0 !important;
+		display: table-cell !important;
+	}
+	.no-stack.two-up .col {
+		width: 50% !important;
+	}
+	.no-stack.mixed-two-up .col.num4 {
+		width: 33% !important;
+	}
+	.no-stack.mixed-two-up .col.num8 {
+		width: 66% !important;
+	}
+	.no-stack.three-up .col.num4 {
+		width: 33% !important;
+	}
+	.no-stack.four-up .col.num3 {
+		width: 25% !important;
+	}
+	.mobile_hide {
+		min-height: 0px;
+		max-height: 0px;
+		max-width: 0px;
+		display: none;
+		overflow: hidden;
+		font-size: 0px;
+	}
+}
 
-    .hide{
-      display: none;
-    }
-
-    </style>
+.hide {
+	display: none;
+}
+</style>
 </head>
-<body class="clean-body" style="margin: 0;padding: 0;-webkit-text-size-adjust: 100%;background-color: #FFFFFF;line-height: inherit;">
-  <style type="text/css" id="media-query-bodytag" style="line-height: inherit;">
-    @media (max-width: 520px) {
-      .block-grid {
-        min-width: 320px!important;
-        max-width: 100%!important;
-        width: 100%!important;
-        display: block!important;
-      }
+<body class="clean-body"
+	style="margin: 0; padding: 0; -webkit-text-size-adjust: 100%; background-color: #FFFFFF; line-height: inherit;">
+	<style type="text/css" id="media-query-bodytag"
+		style="line-height: inherit;">
+@media ( max-width : 520px) {
+	.block-grid {
+		min-width: 320px !important;
+		max-width: 100% !important;
+		width: 100% !important;
+		display: block !important;
+	}
+	.col {
+		min-width: 320px !important;
+		max-width: 100% !important;
+		width: 100% !important;
+		display: block !important;
+	}
+	.col>div {
+		margin: 0 auto;
+	}
+	img.fullwidth {
+		max-width: 100% !important;
+	}
+	img.fullwidthOnMobile {
+		max-width: 100% !important;
+	}
+	.no-stack .col {
+		min-width: 0 !important;
+		display: table-cell !important;
+	}
+	.no-stack.two-up .col {
+		width: 50% !important;
+	}
+	.no-stack.mixed-two-up .col.num4 {
+		width: 33% !important;
+	}
+	.no-stack.mixed-two-up .col.num8 {
+		width: 66% !important;
+	}
+	.no-stack.three-up .col.num4 {
+		width: 33% !important;
+	}
+	.no-stack.four-up .col.num3 {
+		width: 25% !important;
+	}
+	.mobile_hide {
+		min-height: 0px !important;
+		max-height: 0px !important;
+		max-width: 0px !important;
+		display: none !important;
+		overflow: hidden !important;
+		font-size: 0px !important;
+	}
+}
+</style>
+	<!--[if IE]><div class="ie-browser"><![endif]-->
+	<!--[if mso]><div class="mso-container"><![endif]-->
+	<table class="nl-container"
+		style="border-collapse: collapse; table-layout: fixed; border-spacing: 0; mso-table-lspace: 0pt; mso-table-rspace: 0pt; vertical-align: top; min-width: 320px; margin: 0 auto; background-color: #FFFFFF; width: 100%; line-height: inherit;"
+		cellpadding="0" cellspacing="0">
+		<tbody style="line-height: inherit;">
+			<tr
+				style="vertical-align: top; line-height: inherit; border-collapse: collapse;">
+				<td
+					style="word-break: break-word; border-collapse: collapse !important; vertical-align: top; line-height: inherit;">
+					<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="background-color: #FFFFFF;"><![endif]-->
 
-      .col {
-        min-width: 320px!important;
-        max-width: 100%!important;
-        width: 100%!important;
-        display: block!important;
-      }
+					<div style="background-color: transparent; line-height: inherit;">
+						<div
+							style="margin: 0 auto; min-width: 320px; max-width: 500px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent; line-height: inherit;"
+							class="block-grid ">
+							<div
+								style="border-collapse: collapse; display: table; width: 100%; background-color: transparent; line-height: inherit;">
+								<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="background-color:transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width: 500px;"><tr class="layout-full-width" style="background-color:transparent;"><![endif]-->
 
-        .col > div {
-          margin: 0 auto;
-        }
-
-      img.fullwidth {
-        max-width: 100%!important;
-      }
-      img.fullwidthOnMobile {
-        max-width: 100%!important;
-      }
-      .no-stack .col {
-        min-width: 0!important;
-        display: table-cell!important;
-      }
-      .no-stack.two-up .col {
-        width: 50%!important;
-      }
-      .no-stack.mixed-two-up .col.num4 {
-        width: 33%!important;
-      }
-      .no-stack.mixed-two-up .col.num8 {
-        width: 66%!important;
-      }
-      .no-stack.three-up .col.num4 {
-        width: 33%!important;
-      }
-      .no-stack.four-up .col.num3 {
-        width: 25%!important;
-      }
-      .mobile_hide {
-        min-height: 0px!important;
-        max-height: 0px!important;
-        max-width: 0px!important;
-        display: none!important;
-        overflow: hidden!important;
-        font-size: 0px!important;
-      }
-    }
-  </style>
-  <!--[if IE]><div class="ie-browser"><![endif]-->
-  <!--[if mso]><div class="mso-container"><![endif]-->
-  <table class="nl-container" style="border-collapse: collapse;table-layout: fixed;border-spacing: 0;mso-table-lspace: 0pt;mso-table-rspace: 0pt;vertical-align: top;min-width: 320px;margin: 0 auto;background-color: #FFFFFF;width: 100%;line-height: inherit;" cellpadding="0" cellspacing="0">
-  <tbody style="line-height: inherit;">
-  <tr style="vertical-align: top;line-height: inherit;border-collapse: collapse;">
-    <td style="word-break: break-word;border-collapse: collapse !important;vertical-align: top;line-height: inherit;">
-    <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="background-color: #FFFFFF;"><![endif]-->
-
-    <div style="background-color: transparent;line-height: inherit;">
-      <div style="margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;line-height: inherit;" class="block-grid ">
-        <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;line-height: inherit;">
-          <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="background-color:transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width: 500px;"><tr class="layout-full-width" style="background-color:transparent;"><![endif]-->
-
-              <!--[if (mso)|(IE)]><td align="center" width="500" style=" width:500px; padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><![endif]-->
-            <div class="col num12" style="min-width: 320px;max-width: 500px;display: table-cell;vertical-align: top;line-height: inherit;">
-              <div style="background-color: transparent;width: 100% !important;line-height: inherit;">
-              <!--[if (!mso)&(!IE)]><!--><div style="border-top: 0px solid transparent;border-left: 0px solid transparent;border-bottom: 0px solid transparent;border-right: 0px solid transparent;padding-top: 5px;padding-bottom: 5px;padding-right: 0px;padding-left: 0px;line-height: inherit;"><!--<![endif]-->
-
-                  
-                    <div class="" style="line-height: inherit;">
-  <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;"><![endif]-->
-  <div style="color:#555555;line-height:120%;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">  
-    <div style="font-size:12px;line-height:14px;color:#555555;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align:left;"><p style="margin: 0;font-size: 12px;line-height: 14px"><span style="font-size: 22px; line-height: 26px;"><strong style="line-height: inherit;">Première partie : l'élève</strong></span><br style="line-height: inherit;"></p></div> 
-  </div>
-  <!--[if mso]></td></tr></table><![endif]-->
-</div>
-                  
-              <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
-              </div>
-            </div>
-          <!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-        </div>
-      </div>
-    </div>    <div style="background-color: transparent;line-height: inherit;">
-      <div style="margin: 0 auto;min-width: 320px;max-width: 500px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;line-height: inherit;" class="block-grid ">
-        <div style="border-collapse: collapse;display: table;width: 100%;background-color: transparent;line-height: inherit;">
-          <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="background-color:transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width: 500px;"><tr class="layout-full-width" style="background-color:transparent;"><![endif]-->
-
-              <!--[if (mso)|(IE)]><td align="center" width="500" style=" width:500px; padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><![endif]-->
-            <div class="col num12" style="min-width: 320px;max-width: 500px;display: table-cell;vertical-align: top;line-height: inherit;">
-              <div style="background-color: transparent;width: 100% !important;line-height: inherit;">
-              <!--[if (!mso)&(!IE)]><!--><div style="border-top: 0px solid transparent;border-left: 0px solid transparent;border-bottom: 0px solid transparent;border-right: 0px solid transparent;padding-top: 5px;padding-bottom: 5px;padding-right: 0px;padding-left: 0px;line-height: inherit;"><!--<![endif]-->
-
-                  
-                    <div class="" style="font-size: 16px;font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align: center;line-height: inherit;"><style style="line-height: inherit;">
-.tg  {border-collapse:collapse;border-spacing:0;border-color:#aabcfe;margin:0px auto;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#669;background-color:#e8edff;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#039;background-color:#b9c9fe;}
-.tg .tg-us36{border-color:inherit;vertical-align:top}
-.tg .tg-ov9q{background-color:#D2E4FC;border-color:inherit;vertical-align:top}
-@media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style>
-<div class="tg-wrap" style="line-height: inherit;overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;"><table class="tg" style="undefined: ;table-layout: fixed;width: 404px;line-height: inherit;vertical-align: top;border-collapse: collapse;border-spacing: 0;border-color: #aabcfe;margin: 0px auto;">
-<colgroup style="line-height: inherit;">
-<col style="width: 202.2px;line-height: inherit;">
-</col><col style="width: 202px;line-height: inherit;">
-</col></colgroup>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">Prénom élève</td>
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">prenom_eleve<br style="line-height: inherit;"></td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">Nom élève<br style="line-height: inherit;"></td>
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">nom_eleve<br style="line-height: inherit;"></td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">Email élève<br style="line-height: inherit;"></td>
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">email_eleve</td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">Téléphone élève<br style="line-height: inherit;"></td>
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">telephone_eleve</td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">Matières<br style="line-height: inherit;"></td>
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">matieres_eleve</td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">Classe<br style="line-height: inherit;"></td>
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">classe_eleve</td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">Profil<br style="line-height: inherit;"></td>
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">profil_eleve</td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">Remarques<br style="line-height: inherit;"></td>
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">remarques_eleve</td>
-  </tr>
-</table></div></div>
-
-                  
-                  
-                    <div class="" style="line-height: inherit;">
-  <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;"><![endif]-->
-  <div style="color:#555555;line-height:120%;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">  
-    <div style="font-size:12px;line-height:14px;color:#555555;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align:left;"><p style="margin: 0;font-size: 12px;line-height: 14px"><span style="font-size: 22px; line-height: 26px;"><strong style="line-height: inherit;">Deuxième partie : les matières</strong></span><br style="line-height: inherit;"></p></div>  
-  </div>
-  <!--[if mso]></td></tr></table><![endif]-->
-</div>
-                  
-                  
-                    <div class="" style="font-size: 16px;font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align: center;line-height: inherit;"><div class="maths" style="line-height: inherit;display: none;">
-<style style="line-height: inherit;">
-.tg  {border-collapse:collapse;border-spacing:0;border-color:#aabcfe;margin:0px auto;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#669;background-color:#e8edff;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#039;background-color:#b9c9fe;}
-.tg .tg-us36{border-color:inherit;vertical-align:top}
-.tg .tg-ov9q{background-color:#D2E4FC;border-color:inherit;vertical-align:top}
-@media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style>
-<div class="tg-wrap" style="line-height: inherit;overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;"><table class="tg" style="undefined: ;table-layout: fixed;width: 404px;line-height: inherit;vertical-align: top;border-collapse: collapse;border-spacing: 0;border-color: #aabcfe;margin: 0px auto;">
-<colgroup style="line-height: inherit;">
-<col style="width: 202.2px;line-height: inherit;">
-</col><col style="width: 202px;line-height: inherit;">
-</col></colgroup>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">Difficultés maths</td>
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">diff_maths<br style="line-height: inherit;"></td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">Note Maths<br style="line-height: inherit;"></td>
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">note_maths<br style="line-height: inherit;"></td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">Chapitres maths<br style="line-height: inherit;"></td>
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">chapitres_maths</td>
-  </tr>
-</table></div>
-</div></div>
-
-                  
-                  
-                    <div class="" style="font-size: 16px;font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align: center;line-height: inherit;"><div class="physique" style="line-height: inherit;display: none;">
-<style style="line-height: inherit;">
-.tg  {border-collapse:collapse;border-spacing:0;border-color:#aabcfe;margin:0px auto;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#669;background-color:#e8edff;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#039;background-color:#b9c9fe;}
-.tg .tg-us36{border-color:inherit;vertical-align:top}
-.tg .tg-ov9q{background-color:#D2E4FC;border-color:inherit;vertical-align:top}
-@media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style>
-<div class="tg-wrap" style="line-height: inherit;overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;"><table class="tg" style="undefined: ;table-layout: fixed;width: 404px;line-height: inherit;vertical-align: top;border-collapse: collapse;border-spacing: 0;border-color: #aabcfe;margin: 0px auto;">
-<colgroup style="line-height: inherit;">
-<col style="width: 202.2px;line-height: inherit;">
-</col><col style="width: 202px;line-height: inherit;">
-</col></colgroup>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">Difficultés physique</td>
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">diff_physique<br style="line-height: inherit;"></td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">Note physique<br style="line-height: inherit;"></td>
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">note_physique<br style="line-height: inherit;"></td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">Chapitres physique<br style="line-height: inherit;"></td>
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">chapitres_physique</td>
-  </tr>
-</table></div>
-</div></div>
-
-                  
-                  
-                    <div class="" style="font-size: 16px;font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align: center;line-height: inherit;"><div class="francais" style="line-height: inherit;display: none;">
-<style style="line-height: inherit;">
-.tg  {border-collapse:collapse;border-spacing:0;border-color:#aabcfe;margin:0px auto;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#669;background-color:#e8edff;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#039;background-color:#b9c9fe;}
-.tg .tg-us36{border-color:inherit;vertical-align:top}
-.tg .tg-ov9q{background-color:#D2E4FC;border-color:inherit;vertical-align:top}
-@media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style>
-<div class="tg-wrap" style="line-height: inherit;overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;"><table class="tg" style="undefined: ;table-layout: fixed;width: 404px;line-height: inherit;vertical-align: top;border-collapse: collapse;border-spacing: 0;border-color: #aabcfe;margin: 0px auto;">
-<colgroup style="line-height: inherit;">
-<col style="width: 202.2px;line-height: inherit;">
-</col><col style="width: 202px;line-height: inherit;">
-</col></colgroup>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">Difficultés français</td>
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">diff_francais<br style="line-height: inherit;"></td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">Note français<br style="line-height: inherit;"></td>
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">note_francais<br style="line-height: inherit;"></td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">Chapitres français<br style="line-height: inherit;"></td>
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">chapitres_francais</td>
-  </tr>
-</table></div>
-</div></div>
-
-                  
-                  
-              <div class="parent" style="line-height: inherit;"> 
-
-                  
-                  
-                    <div class="parent" style="line-height: inherit;">
-  <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;"><![endif]-->
-  <div style="color:#555555;line-height:120%;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">  
-    <div style="font-size:12px;line-height:14px;color:#555555;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align:left;"><p style="margin: 0;font-size: 12px;line-height: 14px"><span style="font-size: 22px; line-height: 26px;"><strong style="line-height: inherit;">Troisième partie : le parent</strong></span><br style="line-height: inherit;"></p></div>  
-  </div>
-  <!--[if mso]></td></tr></table><![endif]-->
-</div>
-                  
-                  
-                    <div class="" style="font-size: 16px;font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align: center;line-height: inherit;"><style style="line-height: inherit;">
-.tg  {border-collapse:collapse;border-spacing:0;border-color:#aabcfe;margin:0px auto;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#669;background-color:#e8edff;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#039;background-color:#b9c9fe;}
-.tg .tg-us36{border-color:inherit;vertical-align:top}
-.tg .tg-ov9q{background-color:#D2E4FC;border-color:inherit;vertical-align:top}
-@media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style>
-<div class="tg-wrap" style="line-height: inherit;overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;"><table class="tg" style="undefined: ;table-layout: fixed;width: 404px;line-height: inherit;vertical-align: top;border-collapse: collapse;border-spacing: 0;border-color: #aabcfe;margin: 0px auto;">
-<colgroup style="line-height: inherit;">
-<col style="width: 202.2px;line-height: inherit;">
-</col><col style="width: 202px;line-height: inherit;">
-</col></colgroup>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">Prénom parent</td>
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">prenom_parent<br style="line-height: inherit;"></td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">Nom parent<br style="line-height: inherit;"></td>
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">nom_parent<br style="line-height: inherit;"></td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">Email parent<br style="line-height: inherit;"></td>
-    <td class="tg-us36" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #e8edff;">email_parent</td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">Téléphone parent<br style="line-height: inherit;"></td>
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">telephone_parent</td>
-  </tr>
-  <tr style="line-height: inherit;vertical-align: top;border-collapse: collapse;">
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">Statut parent<br style="line-height: inherit;"></td>
-    <td class="tg-ov9q" style="line-height: inherit;vertical-align: top;border-collapse: collapse;font-family: Arial, sans-serif;font-size: 14px;padding: 10px 5px;border-style: solid;border-width: 1px;overflow: hidden;word-break: normal;border-color: inherit;color: #669;background-color: #D2E4FC;">statut_parent</td>
-  </tr>
-</table></div></div>
-
-                  </div>
-                  
-                    <div class="" style="font-size: 16px;font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;text-align: center;line-height: inherit;"> </div>
-
-                  
-              <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
-              </div>
-            </div>
-          <!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-        </div>
-      </div>
-    </div>   <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-    </td>
-  </tr>
-  </tbody>
-  </table>
-  <!--[if (mso)|(IE)]></div><![endif]-->
+								<!--[if (mso)|(IE)]><td align="center" width="500" style=" width:500px; padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><![endif]-->
+								<div class="col num12"
+									style="min-width: 320px; max-width: 500px; display: table-cell; vertical-align: top; line-height: inherit;">
+									<div
+										style="background-color: transparent; width: 100% !important; line-height: inherit;">
+										<!--[if (!mso)&(!IE)]><!-->
+										<div
+											style="border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent; padding-top: 5px; padding-bottom: 5px; padding-right: 0px; padding-left: 0px; line-height: inherit;">
+											<!--<![endif]-->
 
 
-</body></html>
+											<div class="" style="line-height: inherit;">
+												<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;"><![endif]-->
+												<div
+													style="color: #555555; line-height: 120%; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">
+													<div
+														style="font-size: 12px; line-height: 14px; color: #555555; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-align: left;">
+														<p style="margin: 0; font-size: 12px; line-height: 14px">
+															<span style="font-size: 22px; line-height: 26px;"><strong
+																style="line-height: inherit;">Première partie :
+																	l'élève</strong></span><br style="line-height: inherit;">
+														</p>
+													</div>
+												</div>
+												<!--[if mso]></td></tr></table><![endif]-->
+											</div>
+
+											<!--[if (!mso)&(!IE)]><!-->
+										</div>
+										<!--<![endif]-->
+									</div>
+								</div>
+								<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+							</div>
+						</div>
+					</div>
+					<div style="background-color: transparent; line-height: inherit;">
+						<div
+							style="margin: 0 auto; min-width: 320px; max-width: 500px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent; line-height: inherit;"
+							class="block-grid ">
+							<div
+								style="border-collapse: collapse; display: table; width: 100%; background-color: transparent; line-height: inherit;">
+								<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="background-color:transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width: 500px;"><tr class="layout-full-width" style="background-color:transparent;"><![endif]-->
+
+								<!--[if (mso)|(IE)]><td align="center" width="500" style=" width:500px; padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><![endif]-->
+								<div class="col num12"
+									style="min-width: 320px; max-width: 500px; display: table-cell; vertical-align: top; line-height: inherit;">
+									<div
+										style="background-color: transparent; width: 100% !important; line-height: inherit;">
+										<!--[if (!mso)&(!IE)]><!-->
+										<div
+											style="border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent; padding-top: 5px; padding-bottom: 5px; padding-right: 0px; padding-left: 0px; line-height: inherit;">
+											<!--<![endif]-->
+
+
+											<div class=""
+												style="font-size: 16px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-align: center; line-height: inherit;">
+												<style style="line-height: inherit;">
+.tg {
+	border-collapse: collapse;
+	border-spacing: 0;
+	border-color: #aabcfe;
+	margin: 0px auto;
+}
+
+.tg td {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	padding: 10px 5px;
+	border-style: solid;
+	border-width: 1px;
+	overflow: hidden;
+	word-break: normal;
+	border-color: #aabcfe;
+	color: #669;
+	background-color: #e8edff;
+}
+
+.tg th {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	font-weight: normal;
+	padding: 10px 5px;
+	border-style: solid;
+	border-width: 1px;
+	overflow: hidden;
+	word-break: normal;
+	border-color: #aabcfe;
+	color: #039;
+	background-color: #b9c9fe;
+}
+
+.tg .tg-us36 {
+	border-color: inherit;
+	vertical-align: top
+}
+
+.tg .tg-ov9q {
+	background-color: #D2E4FC;
+	border-color: inherit;
+	vertical-align: top
+}
+
+@media screen and (max-width: 767px) {
+	.tg {
+		width: auto !important;
+	}
+	.tg col {
+		width: auto !important;
+	}
+	.tg-wrap {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		margin: auto 0px;
+	}
+}
+</style>
+												<div class="tg-wrap"
+													style="line-height: inherit; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: auto 0px;">
+													<table class="tg"
+														style="undefined:; table-layout: fixed; width: 404px; line-height: inherit; vertical-align: top; border-collapse: collapse; border-spacing: 0; border-color: #aabcfe; margin: 0px auto;">
+														<colgroup style="line-height: inherit;">
+															<col style="width: 202.2px; line-height: inherit;">
+															</col>
+															<col style="width: 202px; line-height: inherit;">
+															</col>
+														</colgroup>
+														<tr
+															style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+															<td class="tg-us36"
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">Prénom
+																élève</td>
+															<td class="tg-us36"
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">prenom_eleve<br
+																style="line-height: inherit;"></td>
+														</tr>
+														<tr
+															style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+															<td class="tg-ov9q"
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">Nom
+																élève<br style="line-height: inherit;">
+															</td>
+															<td class="tg-ov9q"
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">nom_eleve<br
+																style="line-height: inherit;"></td>
+														</tr>
+														<tr
+															style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+															<td class="tg-us36"
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">Email
+																élève<br style="line-height: inherit;">
+															</td>
+															<td class="tg-us36"
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">email_eleve</td>
+														</tr>
+														<tr
+															style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+															<td class="tg-ov9q"
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">Téléphone
+																élève<br style="line-height: inherit;">
+															</td>
+															<td class="tg-ov9q"
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">telephone_eleve</td>
+														</tr>
+														<tr
+															style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+															<td class="tg-ov9q"
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">Matières<br
+																style="line-height: inherit;"></td>
+															<td class="tg-ov9q"
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">matieres_eleve</td>
+														</tr>
+														<tr
+															style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+															<td class="tg-ov9q"
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">Niveau<br
+																style="line-height: inherit;"></td>
+															<td class="tg-ov9q"
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">niveau_eleve</td>
+														</tr>
+														<tr
+															style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+															<td class="tg-ov9q"
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">Remarques<br
+																style="line-height: inherit;"></td>
+															<td class="tg-ov9q"
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">remarques_eleve</td>
+														</tr>
+													</table>
+												</div>
+											</div>
+
+
+
+											<div class="" style="line-height: inherit;">
+												<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;"><![endif]-->
+												<div
+													style="color: #555555; line-height: 120%; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">
+													<div
+														style="font-size: 12px; line-height: 14px; color: #555555; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-align: left;">
+														<p style="margin: 0; font-size: 12px; line-height: 14px">
+															<span style="font-size: 22px; line-height: 26px;"><strong
+																style="line-height: inherit;">Deuxième partie :
+																	les matières</strong></span><br style="line-height: inherit;">
+														</p>
+													</div>
+												</div>
+												<!--[if mso]></td></tr></table><![endif]-->
+											</div>
+
+
+											<div class=""
+												style="font-size: 16px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-align: center; line-height: inherit;">
+												<div class="matiere1"
+													style="line-height: inherit; display: none;">
+													<style style="line-height: inherit;">
+.tg {
+	border-collapse: collapse;
+	border-spacing: 0;
+	border-color: #aabcfe;
+	margin: 0px auto;
+}
+
+.tg td {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	padding: 10px 5px;
+	border-style: solid;
+	border-width: 1px;
+	overflow: hidden;
+	word-break: normal;
+	border-color: #aabcfe;
+	color: #669;
+	background-color: #e8edff;
+}
+
+.tg th {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	font-weight: normal;
+	padding: 10px 5px;
+	border-style: solid;
+	border-width: 1px;
+	overflow: hidden;
+	word-break: normal;
+	border-color: #aabcfe;
+	color: #039;
+	background-color: #b9c9fe;
+}
+
+.tg .tg-us36 {
+	border-color: inherit;
+	vertical-align: top
+}
+
+.tg .tg-ov9q {
+	background-color: #D2E4FC;
+	border-color: inherit;
+	vertical-align: top
+}
+
+@media screen and (max-width: 767px) {
+	.tg {
+		width: auto !important;
+	}
+	.tg col {
+		width: auto !important;
+	}
+	.tg-wrap {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		margin: auto 0px;
+	}
+}
+</style>
+													<div class="tg-wrap"
+														style="line-height: inherit; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: auto 0px;">
+														<table class="tg"
+															style="undefined:; table-layout: fixed; width: 404px; line-height: inherit; vertical-align: top; border-collapse: collapse; border-spacing: 0; border-color: #aabcfe; margin: 0px auto;">
+															<colgroup style="line-height: inherit;">
+																<col style="width: 202.2px; line-height: inherit;">
+																</col>
+																<col style="width: 202px; line-height: inherit;">
+																</col>
+															</colgroup>
+															<tr
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+																<td class="tg-us36"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">Remarques
+																	matiere1</td>
+																<td class="tg-us36"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">remarque_matiere1<br
+																	style="line-height: inherit;"></td>
+															</tr>
+														</table>
+													</div>
+												</div>
+											</div>
+
+
+
+											<div class=""
+												style="font-size: 16px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-align: center; line-height: inherit;">
+												<div class="matiere2"
+													style="line-height: inherit; display: none;">
+													<style style="line-height: inherit;">
+.tg {
+	border-collapse: collapse;
+	border-spacing: 0;
+	border-color: #aabcfe;
+	margin: 0px auto;
+}
+
+.tg td {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	padding: 10px 5px;
+	border-style: solid;
+	border-width: 1px;
+	overflow: hidden;
+	word-break: normal;
+	border-color: #aabcfe;
+	color: #669;
+	background-color: #e8edff;
+}
+
+.tg th {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	font-weight: normal;
+	padding: 10px 5px;
+	border-style: solid;
+	border-width: 1px;
+	overflow: hidden;
+	word-break: normal;
+	border-color: #aabcfe;
+	color: #039;
+	background-color: #b9c9fe;
+}
+
+.tg .tg-us36 {
+	border-color: inherit;
+	vertical-align: top
+}
+
+.tg .tg-ov9q {
+	background-color: #D2E4FC;
+	border-color: inherit;
+	vertical-align: top
+}
+
+@media screen and (max-width: 767px) {
+	.tg {
+		width: auto !important;
+	}
+	.tg col {
+		width: auto !important;
+	}
+	.tg-wrap {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		margin: auto 0px;
+	}
+}
+</style>
+													<div class="tg-wrap"
+														style="line-height: inherit; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: auto 0px;">
+														<table class="tg"
+															style="undefined:; table-layout: fixed; width: 404px; line-height: inherit; vertical-align: top; border-collapse: collapse; border-spacing: 0; border-color: #aabcfe; margin: 0px auto;">
+															<colgroup style="line-height: inherit;">
+																<col style="width: 202.2px; line-height: inherit;">
+																</col>
+																<col style="width: 202px; line-height: inherit;">
+																</col>
+															</colgroup>
+															<tr
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+																<td class="tg-us36"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">Remarques
+																	matiere2</td>
+																<td class="tg-us36"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">remarque_matiere2<br
+																	style="line-height: inherit;"></td>
+															</tr>
+														</table>
+													</div>
+												</div>
+											</div>
+
+
+
+											<div class=""
+												style="font-size: 16px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-align: center; line-height: inherit;">
+												<div class="matiere3"
+													style="line-height: inherit; display: none;">
+													<style style="line-height: inherit;">
+.tg {
+	border-collapse: collapse;
+	border-spacing: 0;
+	border-color: #aabcfe;
+	margin: 0px auto;
+}
+
+.tg td {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	padding: 10px 5px;
+	border-style: solid;
+	border-width: 1px;
+	overflow: hidden;
+	word-break: normal;
+	border-color: #aabcfe;
+	color: #669;
+	background-color: #e8edff;
+}
+
+.tg th {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	font-weight: normal;
+	padding: 10px 5px;
+	border-style: solid;
+	border-width: 1px;
+	overflow: hidden;
+	word-break: normal;
+	border-color: #aabcfe;
+	color: #039;
+	background-color: #b9c9fe;
+}
+
+.tg .tg-us36 {
+	border-color: inherit;
+	vertical-align: top
+}
+
+.tg .tg-ov9q {
+	background-color: #D2E4FC;
+	border-color: inherit;
+	vertical-align: top
+}
+
+@media screen and (max-width: 767px) {
+	.tg {
+		width: auto !important;
+	}
+	.tg col {
+		width: auto !important;
+	}
+	.tg-wrap {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		margin: auto 0px;
+	}
+}
+</style>
+													<div class="tg-wrap"
+														style="line-height: inherit; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: auto 0px;">
+														<table class="tg"
+															style="undefined:; table-layout: fixed; width: 404px; line-height: inherit; vertical-align: top; border-collapse: collapse; border-spacing: 0; border-color: #aabcfe; margin: 0px auto;">
+															<colgroup style="line-height: inherit;">
+																<col style="width: 202.2px; line-height: inherit;">
+																</col>
+																<col style="width: 202px; line-height: inherit;">
+																</col>
+															</colgroup>
+															<tr
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+																<td class="tg-us36"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">Remarques
+																	matiere3</td>
+																<td class="tg-us36"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">remarque_matiere3<br
+																	style="line-height: inherit;"></td>
+															</tr>
+														</table>
+													</div>
+												</div>
+											</div>
+
+
+
+											<div class=""
+												style="font-size: 16px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-align: center; line-height: inherit;">
+												<div class="matiere4"
+													style="line-height: inherit; display: none;">
+													<style style="line-height: inherit;">
+.tg {
+	border-collapse: collapse;
+	border-spacing: 0;
+	border-color: #aabcfe;
+	margin: 0px auto;
+}
+
+.tg td {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	padding: 10px 5px;
+	border-style: solid;
+	border-width: 1px;
+	overflow: hidden;
+	word-break: normal;
+	border-color: #aabcfe;
+	color: #669;
+	background-color: #e8edff;
+}
+
+.tg th {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	font-weight: normal;
+	padding: 10px 5px;
+	border-style: solid;
+	border-width: 1px;
+	overflow: hidden;
+	word-break: normal;
+	border-color: #aabcfe;
+	color: #039;
+	background-color: #b9c9fe;
+}
+
+.tg .tg-us36 {
+	border-color: inherit;
+	vertical-align: top
+}
+
+.tg .tg-ov9q {
+	background-color: #D2E4FC;
+	border-color: inherit;
+	vertical-align: top
+}
+
+@media screen and (max-width: 767px) {
+	.tg {
+		width: auto !important;
+	}
+	.tg col {
+		width: auto !important;
+	}
+	.tg-wrap {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		margin: auto 0px;
+	}
+}
+</style>
+													<div class="tg-wrap"
+														style="line-height: inherit; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: auto 0px;">
+														<table class="tg"
+															style="undefined:; table-layout: fixed; width: 404px; line-height: inherit; vertical-align: top; border-collapse: collapse; border-spacing: 0; border-color: #aabcfe; margin: 0px auto;">
+															<colgroup style="line-height: inherit;">
+																<col style="width: 202.2px; line-height: inherit;">
+																</col>
+																<col style="width: 202px; line-height: inherit;">
+																</col>
+															</colgroup>
+															<tr
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+																<td class="tg-us36"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">Remarques
+																	matiere4</td>
+																<td class="tg-us36"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">remarque_matiere4<br
+																	style="line-height: inherit;"></td>
+															</tr>
+														</table>
+													</div>
+												</div>
+											</div>
+
+
+
+
+											<div class=""
+												style="font-size: 16px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-align: center; line-height: inherit;">
+												<div class="matiere5"
+													style="line-height: inherit; display: none;">
+													<style style="line-height: inherit;">
+.tg {
+	border-collapse: collapse;
+	border-spacing: 0;
+	border-color: #aabcfe;
+	margin: 0px auto;
+}
+
+.tg td {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	padding: 10px 5px;
+	border-style: solid;
+	border-width: 1px;
+	overflow: hidden;
+	word-break: normal;
+	border-color: #aabcfe;
+	color: #669;
+	background-color: #e8edff;
+}
+
+.tg th {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	font-weight: normal;
+	padding: 10px 5px;
+	border-style: solid;
+	border-width: 1px;
+	overflow: hidden;
+	word-break: normal;
+	border-color: #aabcfe;
+	color: #039;
+	background-color: #b9c9fe;
+}
+
+.tg .tg-us36 {
+	border-color: inherit;
+	vertical-align: top
+}
+
+.tg .tg-ov9q {
+	background-color: #D2E4FC;
+	border-color: inherit;
+	vertical-align: top
+}
+
+@media screen and (max-width: 767px) {
+	.tg {
+		width: auto !important;
+	}
+	.tg col {
+		width: auto !important;
+	}
+	.tg-wrap {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		margin: auto 0px;
+	}
+}
+</style>
+													<div class="tg-wrap"
+														style="line-height: inherit; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: auto 0px;">
+														<table class="tg"
+															style="undefined:; table-layout: fixed; width: 404px; line-height: inherit; vertical-align: top; border-collapse: collapse; border-spacing: 0; border-color: #aabcfe; margin: 0px auto;">
+															<colgroup style="line-height: inherit;">
+																<col style="width: 202.2px; line-height: inherit;">
+																</col>
+																<col style="width: 202px; line-height: inherit;">
+																</col>
+															</colgroup>
+															<tr
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+																<td class="tg-us36"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">Remarques
+																	matiere5</td>
+																<td class="tg-us36"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">remarque_matiere5<br
+																	style="line-height: inherit;"></td>
+															</tr>
+														</table>
+													</div>
+												</div>
+											</div>
+
+
+
+
+
+
+											<div class="parent" style="line-height: inherit;">
+
+
+
+												<div class="parent" style="line-height: inherit;">
+													<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;"><![endif]-->
+													<div
+														style="color: #555555; line-height: 120%; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">
+														<div
+															style="font-size: 12px; line-height: 14px; color: #555555; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-align: left;">
+															<p style="margin: 0; font-size: 12px; line-height: 14px">
+																<span style="font-size: 22px; line-height: 26px;"><strong
+																	style="line-height: inherit;">Troisième partie
+																		: le parent</strong></span><br style="line-height: inherit;">
+															</p>
+														</div>
+													</div>
+													<!--[if mso]></td></tr></table><![endif]-->
+												</div>
+
+
+												<div class=""
+													style="font-size: 16px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-align: center; line-height: inherit;">
+													<style style="line-height: inherit;">
+.tg {
+	border-collapse: collapse;
+	border-spacing: 0;
+	border-color: #aabcfe;
+	margin: 0px auto;
+}
+
+.tg td {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	padding: 10px 5px;
+	border-style: solid;
+	border-width: 1px;
+	overflow: hidden;
+	word-break: normal;
+	border-color: #aabcfe;
+	color: #669;
+	background-color: #e8edff;
+}
+
+.tg th {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	font-weight: normal;
+	padding: 10px 5px;
+	border-style: solid;
+	border-width: 1px;
+	overflow: hidden;
+	word-break: normal;
+	border-color: #aabcfe;
+	color: #039;
+	background-color: #b9c9fe;
+}
+
+.tg .tg-us36 {
+	border-color: inherit;
+	vertical-align: top
+}
+
+.tg .tg-ov9q {
+	background-color: #D2E4FC;
+	border-color: inherit;
+	vertical-align: top
+}
+
+@media screen and (max-width: 767px) {
+	.tg {
+		width: auto !important;
+	}
+	.tg col {
+		width: auto !important;
+	}
+	.tg-wrap {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		margin: auto 0px;
+	}
+}
+</style>
+													<div class="tg-wrap"
+														style="line-height: inherit; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: auto 0px;">
+														<table class="tg"
+															style="undefined:; table-layout: fixed; width: 404px; line-height: inherit; vertical-align: top; border-collapse: collapse; border-spacing: 0; border-color: #aabcfe; margin: 0px auto;">
+															<colgroup style="line-height: inherit;">
+																<col style="width: 202.2px; line-height: inherit;">
+																</col>
+																<col style="width: 202px; line-height: inherit;">
+																</col>
+															</colgroup>
+															<tr
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+																<td class="tg-us36"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">Prénom
+																	parent</td>
+																<td class="tg-us36"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">prenom_parent<br
+																	style="line-height: inherit;"></td>
+															</tr>
+															<tr
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+																<td class="tg-ov9q"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">Nom
+																	parent<br style="line-height: inherit;">
+																</td>
+																<td class="tg-ov9q"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">nom_parent<br
+																	style="line-height: inherit;"></td>
+															</tr>
+															<tr
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+																<td class="tg-us36"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">Email
+																	parent<br style="line-height: inherit;">
+																</td>
+																<td class="tg-us36"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #e8edff;">email_parent</td>
+															</tr>
+															<tr
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+																<td class="tg-ov9q"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">Téléphone
+																	parent<br style="line-height: inherit;">
+																</td>
+																<td class="tg-ov9q"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">telephone_parent</td>
+															</tr>
+															<tr
+																style="line-height: inherit; vertical-align: top; border-collapse: collapse;">
+																<td class="tg-ov9q"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">Statut
+																	parent<br style="line-height: inherit;">
+																</td>
+																<td class="tg-ov9q"
+																	style="line-height: inherit; vertical-align: top; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 5px; border-style: solid; border-width: 1px; overflow: hidden; word-break: normal; border-color: inherit; color: #669; background-color: #D2E4FC;">statut_parent</td>
+															</tr>
+														</table>
+													</div>
+												</div>
+
+											</div>
+
+											<div class=""
+												style="font-size: 16px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-align: center; line-height: inherit;">
+											</div>
+
+
+											<!--[if (!mso)&(!IE)]><!-->
+										</div>
+										<!--<![endif]-->
+									</div>
+								</div>
+								<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+							</div>
+						</div>
+					</div> <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<!--[if (mso)|(IE)]></div><![endif]-->
+
+
+</body>
+</html>
