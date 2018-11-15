@@ -20,7 +20,10 @@ var matiereBoxTemplate;
 
 var formules = null;
 var formuleChoisie = null; // formule choisie après clic sur s'inscrire
-var popEssaiId = 19758;
+var popEssaiId = 20795;
+if(domain == 'localhost'){
+	popEssaiId = 19758;
+}
 
 var niveau = null;
 var matiere = null;
