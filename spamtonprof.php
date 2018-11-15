@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.6.5.9
+ * Version: 1.1.6.6.0
  *
  *
  * Author: yopla
@@ -154,7 +154,7 @@ function handleScriptAndTestModeOnPage()
 {
     global $post;
     $pageSlug = $post->post_name;
-   
+    $PageManager = new \spamtonprof\stp_api\PageManager($pageSlug);
 }
 
 add_filter('ninja_forms_render_options', 'my_pre_population_callback', 10, 2);
