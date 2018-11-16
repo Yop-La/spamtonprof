@@ -369,7 +369,6 @@ class PageManager
         wp_enqueue_script('algolia_js', "https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js");
 
         wp_enqueue_script('algolia_js_auto', "https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.min.js");
-
     }
 
     public static function passwordReset()
@@ -520,6 +519,19 @@ class PageManager
 
             'nf-front-end'
         ), time());
+
+        
+        wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/tarifs.css');
+        
+        
+
+        wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
+
+        wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/semaine-decouverte.css');
+
+        wp_enqueue_script('algolia_js', "https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js");
+
+        wp_enqueue_script('algolia_js_auto', "https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.min.js");
     }
 
     public static function formule()
