@@ -12,19 +12,37 @@ console.log('hello');
 ajaxEnCours = 0;
 
 //form ajout formule
-idAdFormulaForm = "76";
-idNomFormule= "1046";
-idTarif= "1050";
+var idAdFormulaForm = "76";
+var idNomFormule= "1046";
+var idTarif= "1047";
 
 
 //edit formula form 
-idEditFormulaForm = '77';
-idSelectFormula = '1054';
+var idEditFormulaForm = '77';
+var idSelectFormula = '1049';
 
-idNomFormule2 = '1057';
+var idNomFormule2 = '1050';
 
-idSelectMatiere = '1058';
-idSelectNiveau = '1059';
+var idSelectMatiere = '1051';
+var idSelectNiveau = '1052';
+
+if(domain == 'localhost'){
+
+	//form ajout formule
+	idNomFormule= "1046";
+	idTarif= "1050";
+
+
+	//edit formula form 
+	idSelectFormula = '1054';
+
+	idNomFormule2 = '1057';
+
+	idSelectMatiere = '1058';
+	idSelectNiveau = '1059';
+
+
+}
 
 var reset = true;
 var refFormule; // la ref formule en cours d'édition
