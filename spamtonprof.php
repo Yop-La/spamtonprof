@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.6.6.2
+ * Version: 1.1.6.6.3
  *
  *
  * Author: yopla
@@ -161,8 +161,6 @@ add_filter('ninja_forms_render_options', 'my_pre_population_callback', 10, 2);
 
 function my_pre_population_callback($options, $settings)
 {
-
-
 
     // target "choisir prof" field in choisir_prof
     if ($settings['key'] == 'choisir_le_prof_1533217231976') {

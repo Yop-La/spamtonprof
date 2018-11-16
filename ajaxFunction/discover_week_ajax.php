@@ -194,7 +194,7 @@ function inscriptionEssai()
 
                 die();
             }
-            if ($eleve1) {
+            if ($proche1) {
 
                 $retour->error = true;
                 $retour->message = "parent_pas_eleve";
