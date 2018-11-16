@@ -20,8 +20,6 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-use Sunra\PhpSimple\HtmlDomParser;
-
 $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
 $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
 $compteMg = new \spamtonprof\stp_api\StpCompteManager();
@@ -108,11 +106,7 @@ foreach ($abonnements as $abonnement) {
 
     // envoyer le mail recap au prof choisi
 
-    $emailRecap = file_get_contents(dirname(dirname(__FILE__)) . "/emails/mail_recap_prof.html");
-
-    $html = HtmlDomParser::str_get_html($emailRecap);
-
-    $emailRecap = $html;
+    $emailRecap = file_get_contents(dirname(__FILE__) . "/wp-content/plugins/spamtonprof/emails/mail_recap_prof.html");
 
     // ajout des infos élèves aux mails récap
     $emailRecap = str_replace(array(
@@ -150,12 +144,10 @@ foreach ($abonnements as $abonnement) {
     foreach ($remarques as $remarque) {
 
         $matiereIndex = 'matiere' . $i;
-        $elems = $html->find('.' . $matiereIndex);
-        $elems[0]->{'style'} = "line-height: inherit;";
 
         $emailRecap = str_replace(array(
-            $matiereIndex,
-            "remarque_" . $matiereIndex
+            '[' . $matiereIndex . ']',
+            '[' . "remarque_" . $matiereIndex . ']'
         ), array(
             $remarque->getMatiere()->getMatiere_complet(),
             $remarque->getRemarque()
@@ -164,10 +156,7 @@ foreach ($abonnements as $abonnement) {
     }
 
     // ajout des infos parents aux mails récap
-    if (!$eleve->getParent_required()) {
-        $elems = $html->find('.parent');
-        $elems[0]->outertext = '';
-    } else {
+    if ($eleve->getParent_required()) {
         $emailRecap = str_replace(array(
             "prenom_parent",
             "nom_parent",
@@ -182,6 +171,35 @@ foreach ($abonnements as $abonnement) {
             $proche->getStatut_proche()
         ), $emailRecap);
     }
+
+    // cacher et relever les bloc matieres et parent
+    $dom = new DOMDocument();
+    $dom->loadHTML($emailRecap);
+
+    $xpath = new DOMXPath($dom);
+
+    // bloc matieres
+    for ($i = 1; $i <= count($remarques); $i ++) {
+
+        $nodes = $xpath->query("/html/body/table/tbody/tr/td/div[2]/div/div/div/div/div/div[" . (2 + $i) . "]/div");
+
+        foreach ($nodes as $node) {
+
+            $node->setAttribute('style', 'line-height: inherit');
+        }
+    }
+
+    // bloc parent
+    if (! $eleve->getParent_required()) {
+        $nodes = $xpath->query("/html/body/table/tbody/tr/td/div[2]/div/div/div/div/div/div[8]");
+
+        foreach ($nodes as $node) {
+            echo ('dedans');
+
+            $node->setAttribute('style', 'line-height: inherit; display: none !important;');
+        }
+    }
+    $emailRecap = $dom->saveHTML();
 
     // envoi du mail au prof et à moi
 
