@@ -6,7 +6,7 @@ use PDO;
 class StpEleveManager
 {
 
-    private $_db, $profilMg, $classeMg;
+    private $_db;
 
     public function __construct()
     {
@@ -241,12 +241,7 @@ class StpEleveManager
 
             $q = $this->_db->prepare("select * from stp_eleve where regexp_replace(telephone, '[^01234536789]', '','g') SIMILAR TO '" . $nums . "'");
             $q->execute();
-        } else if (in_array("ref_niveau", $info) && in_array("parent_required", $info) && in_array(null, $info)) {
-
-            $q = $this->_db->prepare("select * from stp_eleve where (ref_niveau is null or parent_required is null) and ref_classe is not null and ref_profil is not null limit 100");
-
-            $q->execute();
-        }
+        } 
 
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
             $eleve = new \spamtonprof\stp_api\StpEleve($data);
@@ -258,53 +253,5 @@ class StpEleveManager
         return ($eleves);
     }
 
-    /*
-     * pour donner un niveau et un parent_required aux élèves inscrits
-     * avant le changement de classe à niveau sur le site (avant ajout moteur de recherche pour essai)
-     */
-    public function setNiveauParentRequired()
-    {
-        $eleves = $this->getAll(array(
-            'ref_niveau',
-            'parent_required',
-            null
-        ));
-
-        $classeMg = new \spamtonprof\stp_api\StpClasseManager();
-        $niveauMg = new \spamtonprof\stp_api\StpNiveauManager();
-
-        $classeNotInNiveau = [
-            "tstistl" => 15,
-            "candidat-libre-bac" => 12,
-            "diplome-universitaire" => 23,
-            "pstistl" => 9,
-            "iut" => 25
-        ];
-
-        foreach ($eleves as $eleve) {
-
-            $classe = $classeMg->get(array(
-                'ref_classe' => $eleve->getRef_classe()
-            ));
-
-            $niveau = $niveauMg->get(array(
-                "sigle" => $classe->getClasse()
-            ));
-
-            if ($eleve->getRef_niveau() == 4) {
-                $eleve->setParent_required(false);
-            } else {
-                $eleve->setParent_required(true);
-            }
-            $this->updateParentRequired($eleve);
-
-            if ($niveau) {
-                $eleve->setRef_niveau($niveau->getRef_niveau());
-            } else {
-
-                $eleve->setRef_niveau($classeNotInNiveau[$classe->getClasse()]);
-            }
-            $this->updateRefNiveau($eleve);
-        }
-    }
+ 
 }
