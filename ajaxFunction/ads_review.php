@@ -45,7 +45,8 @@ function ajaxAdsReview()
     $lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
     $lbcAcctMg = new \spamtonprof\stp_api\LbcAccountManager();
 
-    $ads = $lbcProcessMg->generateAds($refClient, 50, $phone);
+    $ads = $lbcProcessMg->generateAds($refClient, 50, $phone, 815, false);
+    //815 est un compte pris au hasard pour tester la récupération du code promo
     $lbcAccts = $lbcAcctMg->getAll(array(
         'ref_client' => $refClient
     ));

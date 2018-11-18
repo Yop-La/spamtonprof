@@ -467,7 +467,7 @@ class LbcProcessManager
     }
 
     // pour générer et retourner les annonces avant publication par zenno
-    public function generateAds($refClient, $nbAds, $phone, $ref_compte = false)
+    public function generateAds($refClient, $nbAds, $phone, $ref_compte, $lock = true)
     {
 
         // on récupère le client
@@ -481,6 +481,7 @@ class LbcProcessManager
         $lbcTitleMg = new \spamtonprof\stp_api\LbcTitleManager();
         $communeMg = new \spamtonprof\stp_api\LbcCommuneManager();
         $adMg = new \spamtonprof\stp_api\AddsTempoManager();
+        $lbcAcctMG = new \spamtonprof\stp_api\LbcAccountManager();
 
         $hasTypeTitle = $hasTypeTitleMg->get(array(
             "ref_client_defaut" => $refClient
@@ -548,7 +549,7 @@ class LbcProcessManager
             $commune = $communes[$i % $nbCommunes];
             $nomCommune = $commune->getLibelle() . " " . $commune->getCode_postal();
 
-            if ($ref_compte) {
+            if ($lock) {
                 // verouillage des communes prises dans les annonces
                 $adTempo = new \spamtonprof\stp_api\AddsTempo(array(
                     "ref_compte" => $ref_compte,
@@ -556,6 +557,12 @@ class LbcProcessManager
                 ));
                 $adMg->add($adTempo);
             }
+
+            // récupération du code promo pour ajouter un code promo
+            $lbcAcct = $lbcAcctMG->get(array(
+                'ref_compte' => $ref_compte
+            ));
+            $texte->setTexte($texte->getTexte() . PHP_EOL . PHP_EOL . $lbcAcct->getCode_promo());
 
             $ad = new \stdClass();
             $ad->title = $title;
