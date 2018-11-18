@@ -106,7 +106,7 @@ foreach ($abonnements as $abonnement) {
 
     // envoyer le mail recap au prof choisi
 
-    $emailRecap = file_get_contents(dirname(__FILE__) . "/wp-content/plugins/spamtonprof/emails/mail_recap_prof.html");
+    $emailRecap = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/mail_recap_prof.html");
 
     // ajout des infos élèves aux mails récap
     $emailRecap = str_replace(array(
