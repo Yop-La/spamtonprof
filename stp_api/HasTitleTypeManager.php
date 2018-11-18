@@ -13,7 +13,7 @@ class HasTitleTypeManager
 
     public function add(HasTitleType $hasTitleType)
     {
-        $q = $this->_db->prepare('insert into has_title_type(ref_client, ref_type_titre) values( :ref_client,:ref_type_titre)');
+        $q = $this->_db->prepare('insert into has_title_type(ref_client, ref_type_titre, defaut) values( :ref_client,:ref_type_titre, true)');
         $q->bindValue(':ref_client', $hasTitleType->getRef_client());
         $q->bindValue(':ref_type_titre', $hasTitleType->getRef_type_titre());
         $q->execute();
@@ -37,6 +37,22 @@ class HasTitleTypeManager
         $data = $q->fetch(\PDO::FETCH_ASSOC);
         if ($data) {
             return new \spamtonprof\stp_api\HasTitleType($data);
+        } else {
+            return (false);
         }
+    }
+
+    public function deleteAll($info)
+    {
+        $q = null;
+        if (is_array($info)) {
+            if (array_key_exists("ref_client", $info)) {
+                $refClient = $info["ref_client"];
+
+                $q = $this->_db->prepare("delete from has_title_type where ref_client = :ref_client;");
+                $q->bindValue(":ref_client", $refClient);
+            }
+        }
+        $q->execute();
     }
 }

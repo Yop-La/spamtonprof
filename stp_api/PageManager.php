@@ -290,6 +290,11 @@ class PageManager
 
             PageManager::gestionFormule();
         }
+
+        if ($this->pageSlug == 'ad-review') {
+
+            PageManager::adReview();
+        }
     }
 
     public static function abonnementApresEssaiLoader()
@@ -520,10 +525,7 @@ class PageManager
             'nf-front-end'
         ), time());
 
-        
         wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/tarifs.css');
-        
-        
 
         wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
 
@@ -575,6 +577,18 @@ class PageManager
 
             'nf-front-end'
         ), time());
+    }
+
+    public static function adReview()
+
+    {
+        wp_enqueue_script('tarifs', plugins_url() . '/spamtonprof/js/ad-review.js', array(
+
+        'nf-front-end'
+        ), time());
+
+        wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/ad-review.css');
+        wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
     }
 }
 

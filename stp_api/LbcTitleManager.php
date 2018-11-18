@@ -33,6 +33,22 @@ class LbcTitleManager
         return ($titleTypes);
     }
 
+    
+    /* utiliser après insertion des titres dans la table titres pour raccoder titres à type_titre
+     */
+    public function getDistinctTypeWithoutRefType()
+    {
+        $types = [];
+        $q = $this->_db->prepare("select distinct(type_titre) as type from titres where ref_type_titre is null;");
+        $q->execute();
+        
+        while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
+            
+            $types[] = $data['type'];
+        }
+        return ($types);
+    }
+    
     public function getAll($info)
     {
         $titles = [];

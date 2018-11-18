@@ -446,6 +446,8 @@ jQuery( document ).ready( function( jQuery ) {
 
 								prenom = formule.prof.prenom;
 
+								console.log(formule.prof);
+								
 								// création du bloc prof + attribution id
 								idBloc = 'formule-'.concat(formule.ref_formule);
 								var blocProf = jQuery(matiereBoxTemplate).clone();

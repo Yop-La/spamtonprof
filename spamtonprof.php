@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.6.6.6
+ * Version: 1.1.6.6.7
  *
  *
  * Author: yopla
@@ -80,6 +80,8 @@ require_once (dirname(__FILE__) . '/ajaxFunction/ajax_bo.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/gestion_formule_ajax.php');
 
+require_once (dirname(__FILE__) . '/ajaxFunction/ads_review.php');
+
 add_action('template_redirect', 'handleRedirections');
 
 function handleRedirections()
@@ -138,11 +140,14 @@ function handleRedirections()
     }
 }
 
-add_action( 'wp_enqueue_scripts', 'theme_enqueue_styles', PHP_INT_MAX);
+add_action('wp_enqueue_scripts', 'theme_enqueue_styles', PHP_INT_MAX);
 
-function theme_enqueue_styles() {
-    wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css' );
-    wp_enqueue_style( 'child-style', get_stylesheet_directory_uri() . '/styles/child-style.css', array( 'parent-style' ) );
+function theme_enqueue_styles()
+{
+    wp_enqueue_style('parent-style', get_template_directory_uri() . '/style.css');
+    wp_enqueue_style('child-style', get_stylesheet_directory_uri() . '/styles/child-style.css', array(
+        'parent-style'
+    ));
 }
 
 add_action('init', 'stp_session_start', 1);
@@ -275,6 +280,70 @@ function my_pre_population_callback($options, $settings)
         }
     }
 
+    // target "choix client leboncoin" du formulaire "Sélectionner client leboncoin"
+    if ($settings['key'] == 'choisir_un_client_leboncoin_1542472364642' || $settings['key'] == 'choisir_client_1542481215387') {
+
+        if (is_user_logged_in()) {
+
+            $clientMg = new \spamtonprof\stp_api\LbcClientManager();
+
+            $clients = $clientMg->getAll(array(
+                'all'
+            ));
+
+            foreach ($clients as $client) {
+
+                $options[] = array(
+                    'label' => $client->getPrenom_client() . ' ' . $client->getNom_client() . ' ref : '.$client->getRef_client(),
+                    'value' => $client->getRef_client()
+                );
+            }
+        }
+    }
+
+    // target "choix type titre" du formulaire "conf client leboncoin"
+    if ($settings['key'] == 'type_titre_1542480076396') {
+
+        if (is_user_logged_in()) {
+
+            $typeTitleMg = new \spamtonprof\stp_api\TypeTitreManager();
+
+            $typeTitles = $typeTitleMg->getAll(array(
+                'all'
+            ));
+
+            foreach ($typeTitles as $typeTitle) {
+
+                $options[] = array(
+                    'label' => $typeTitle->getType(),
+                    'value' => $typeTitle->getRef_type()
+                );
+            }
+        }
+    }
+
+    // target "choix type texte" du formulaire "conf client leboncoin"
+    if ($settings['key'] == 'type_texte_1542480094564') {
+        
+        if (is_user_logged_in()) {
+            
+            $typeTexteMg = new \spamtonprof\stp_api\TypeTexteManager();
+            
+            $typeTextes = $typeTexteMg->getAll(array(
+                'all'
+            ));
+            
+            foreach ($typeTextes as $typeTexte) {
+                
+                $options[] = array(
+                    'label' => $typeTexte->getType(),
+                    'value' => $typeTexte->getRef_type()    
+                );
+            }
+        }
+    }
+    
+    
     return $options;
 }
 

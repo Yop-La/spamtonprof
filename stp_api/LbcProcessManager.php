@@ -395,12 +395,11 @@ class LbcProcessManager
         // step 1 :récupérer les comptes agés d'au moins 2h.
         $lbcAccounts = $lbcAccountMg->getAccountToScrap($nbCompte);
 
-        
         foreach ($lbcAccounts as $lbcAccount) {
-            
+
             $msgs = [];
             $msgs[] = "Contrôle de " . $lbcAccount->getRef_compte();
-            
+
             $codePromo = $lbcAccount->getCode_promo();
 
             // step 2 : suppression des annonces dans la base
@@ -437,9 +436,6 @@ class LbcProcessManager
                     ));
                     $adTempoMg->add($adTempo);
                     $nbAnnonce ++;
-                    
-                    
-                    
                 }
 
                 // 4-1-2 : on va mettre à jour la ref_commune de adds_tempo
@@ -448,7 +444,6 @@ class LbcProcessManager
                 ));
 
                 $adTempoMg->updateAllRefCommune($adsTemp);
-                
             } else {
                 $disabled = true;
                 $nbAnnonce = 0;
@@ -465,16 +460,21 @@ class LbcProcessManager
             $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
             $lbcAccount->setControle_date($now);
             $lbcAccountMg->updateControleDate($lbcAccount);
-            
+
             $msgs[] = $nbAnnonce . "en ligne";
-            $slack ->sendMessages("log", $msgs);
-            
+            $slack->sendMessages("log", $msgs);
         }
     }
 
     // pour générer et retourner les annonces avant publication par zenno
-    public function generateAds($refClient, $nbAds, $phone, $ref_compte)
+    public function generateAds($refClient, $nbAds, $phone, $ref_compte = false)
     {
+
+        // on récupère le client
+        $clientMg = new \spamtonprof\stp_api\LbcClientManager();
+        $client = $clientMg->get(array(
+            'ref_client' => $refClient
+        ));
 
         // on récupère les titres
         $hasTypeTitleMg = new \spamtonprof\stp_api\HasTitleTypeManager();
@@ -516,6 +516,14 @@ class LbcProcessManager
         $nbTextes = count($textes);
         $nbCommunes = count($communes);
 
+        // récupération des images
+        $images = scandir(ABSPATH . 'wp-content/uploads/lbc_images/' . $client->getImg_folder());
+
+        unset($images[0]);
+        unset($images[1]);
+
+        $nbImages = count($images);
+
         $ads = [];
         for ($i = 0; $i < $nbAds; $i ++) {
 
@@ -526,26 +534,108 @@ class LbcProcessManager
             // récupération du texte
             $texte = $textes[$i % $nbTextes];
 
+            serializeTemp($texte);
+
+            $texte->setTexte(str_replace(array(
+                'Alexandre',
+                'alexandre'
+            ), $client->getPrenom_client(), $texte->getTexte()));
+
+            // récupération de l'image
+            $image = 'https://spamtonprof.com/wp-content/uploads/lbc_images/' . $client->getImg_folder() . '/' . $images[($i % $nbImages) + 2];
+
             // récupération de la commune
             $commune = $communes[$i % $nbCommunes];
             $nomCommune = $commune->getLibelle() . " " . $commune->getCode_postal();
 
-            // verouillage des communes prises dans les annonces
-            $adTempo = new \spamtonprof\stp_api\AddsTempo(array(
-                "ref_compte" => $ref_compte,
-                "ref_commune" => $commune->getRef_commune()
-            ));
-            $adMg->add($adTempo);
+            if ($ref_compte) {
+                // verouillage des communes prises dans les annonces
+                $adTempo = new \spamtonprof\stp_api\AddsTempo(array(
+                    "ref_compte" => $ref_compte,
+                    "ref_commune" => $commune->getRef_commune()
+                ));
+                $adMg->add($adTempo);
+            }
 
             $ad = new \stdClass();
             $ad->title = $title;
             $ad->text = $texte;
+            $ad->image = $image;
+            $ad->commune = $nomCommune;
             $ad->commune = $nomCommune;
             $ads[] = $ad;
         }
-        return($ads);
+        return ($ads);
     }
-    
-    
-    
+
+    // pour retouner la configuration d'un client leboncoin (le type de texte par defaut et le type de titre par défaut d'un client)
+    public function getDefaultConf($refClient)
+    {
+
+        // on récupère le type titre
+        $hasTypeTitleMg = new \spamtonprof\stp_api\HasTitleTypeManager();
+        $typeTitreMg = new \spamtonprof\stp_api\TypeTitreManager();
+
+        $hasTypeTitle = $hasTypeTitleMg->get(array(
+            "ref_client_defaut" => $refClient
+        ));
+
+        $typeTitre = false;
+        $messageTypeTitre = 'pas de ref type titre par defaut pour ce client (voir has_title_type)';
+        if ($hasTypeTitle) {
+
+            $typeTitre = $typeTitreMg->get(array(
+                'ref_type' => $hasTypeTitle->getRef_type_titre()
+            ));
+            if (! $typeTitre) {
+                $messageTypeTitre = 'pas type titre définie type_titre pour ce client (à ajouter)';
+            }
+        }
+
+        // on récupère le type texte
+        $hasTypeTexteMg = new \spamtonprof\stp_api\HasTextTypeManager();
+
+        $typeTexteMg = new \spamtonprof\stp_api\TypeTexteManager();
+
+        $hasTypeTexte = $hasTypeTexteMg->get(array(
+            "ref_client_defaut" => $refClient
+        ));
+
+        $typeTexte = false;
+        $messageTypeTexte = 'pas de ref type texte par defaut pour ce client (voir has_texte_type)';
+        if ($hasTypeTexte) {
+
+            $typeTexte = $typeTexteMg->get(array(
+                'ref_type' => $hasTypeTexte->getRef_type()
+            ));
+            if (! $typeTexte) {
+                $messageTypeTexte = 'pas type texte définie type_texte pour ce client (à ajouter)';
+            }
+        }
+
+        // on récupère le client
+        $clientMg = new \spamtonprof\stp_api\LbcClientManager();
+
+        $client = $clientMg->get(array(
+            'ref_client' => $refClient
+        ));
+
+        if ($typeTexte) {
+            $messageTypeTexte = 'tout est ok pour le texte';
+        }
+
+        if ($typeTitre) {
+            $messageTypeTitre = 'tout est ok pour le titre';
+        }
+
+        $conf = new \stdClass();
+        $conf->typeTexte = $typeTexte;
+        $conf->typeTitre = $typeTitre;
+        $conf->messagetypeTexte = $messageTypeTexte;
+        $conf->messagetypeTitre = $messageTypeTitre;
+
+        $conf->client = $client;
+
+        return ($conf);
+    }
 }

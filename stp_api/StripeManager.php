@@ -122,7 +122,6 @@ class StripeManager
                     $customer->source = $source;
                     $customer->save();
                 }
-                
             } else {
 
                 $customer = \Stripe\Customer::create(array(
@@ -506,7 +505,7 @@ class StripeManager
         }
     }
 
-    // pour créer tous les produits et les plans définis dans la base stp
+    // pour créer tous les produits et les plans définis dans la base stp qui ne sont pas dans stripe
     public function createProductsAndPlans()
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
@@ -520,12 +519,14 @@ class StripeManager
             )
         );
 
-        $formules = $formuleMg->getAll($constructor);
+        $formules = $formuleMg->getAll(array(
+            'getFormuleNotInStripe' => $this->testMode
+        ), $constructor);
 
         foreach ($formules as $formule) {
 
             $strProduct = \Stripe\Product::create(array(
-                "name" => "New " . $formule->getFormule(),
+                "name" => "From Tool : " . $formule->getFormule(),
                 "type" => "service"
             ));
 

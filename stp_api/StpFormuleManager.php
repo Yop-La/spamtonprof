@@ -40,6 +40,14 @@ class StpFormuleManager
                 $fromTool = $info['from_tool'];
                 $q = $this->_db->prepare("select * from stp_formule where from_tool = :from_tool order by ref_formule");
                 $q->bindValue(':from_tool', $fromTool, PDO::PARAM_BOOL);
+            } else if (array_key_exists('getFormuleNotInStripe', $info)) {
+                $testMode = $info['getFormuleNotInStripe'];
+    
+                if (! $testMode) {
+                    $q = $this->_db->prepare("select * from stp_formule where from_tool is true and ref_product_stripe is null");
+                } else {
+                    $q = $this->_db->prepare("select * from stp_formule where from_tool is true and ref_product_stripe_test is null");
+                }
             } else if (array_key_exists('matieres', $info) && array_key_exists('from_tool', $info) && array_key_exists('ref_formule', $info)) {
 
                 $matieres = $info['matieres'];

@@ -185,6 +185,23 @@ class LbcAccountManager
         $q->execute();
     }
 
+    public function updateAll($info)
+    {
+        $q = null;
+
+        if (is_array($info)) {
+
+            if (array_key_exists("dumpRefClient", $info)) {
+                $dumpRefClient = $info["dumpRefClient"];
+
+                $q = $this->_db->prepare("update compte_lbc set ref_client = 1 where ref_client = :ref_client ");
+                $q->bindValue(':ref_client', $dumpRefClient);
+            }
+        }
+
+        $q->execute();
+    }
+
     public function updateCodePromo(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
         $q = $this->_db->prepare("update compte_lbc set code_promo = :code_promo where ref_compte = :ref_compte");

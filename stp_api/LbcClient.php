@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class LbcClient implements \JsonSerializable
 {
 
-    protected $ref_client, $nom_client, $prenom_client, $domain;
+    protected $ref_client, $nom_client, $prenom_client, $domain, $img_folder;
 
     public function __construct(array $donnees = array())
     {
@@ -19,6 +19,24 @@ class LbcClient implements \JsonSerializable
                 $this->$method($value);
             }
         }
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getImg_folder()
+    {
+        return $this->img_folder;
+    }
+
+    /**
+     *
+     * @param mixed $img_folder
+     */
+    public function setImg_folder($img_folder)
+    {
+        $this->img_folder = $img_folder;
     }
 
     public function getRef_client()
@@ -66,6 +84,4 @@ class LbcClient implements \JsonSerializable
         $vars = get_object_vars($this);
         return $vars;
     }
-
-
 }

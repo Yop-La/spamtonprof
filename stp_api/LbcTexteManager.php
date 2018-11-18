@@ -61,20 +61,60 @@ class LbcTexteManager
         }
     }
 
+    public function updateAll($info)
+    {
+        if (array_key_exists("type", $info) && array_key_exists("ref_type_texte", $info)) {
+
+            $type = $info["type"];
+            $refTypeTexte = $info["ref_type_texte"];
+
+            $q = $this->_db->prepare("update textes set ref_type_texte = :ref_type_texte where type =:type");
+
+            $q->bindValue(":type", $type);
+            $q->bindValue(":ref_type_texte", $refTypeTexte);
+        }
+
+        $q->execute();
+    }
+
+    /*
+     * utiliser après génération automatique des textes pour raccoder textesà type_texte
+     */
+    public function getDistinctTypeWithoutRefType()
+    {
+        $types = [];
+        $q = $this->_db->prepare("select distinct (type) as type from textes where ref_type_texte is null;");
+        $q->execute();
+
+        while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
+
+            $types[] = $data['type'];
+        }
+        return ($types);
+    }
+
     public function getAll($info)
     {
         $textes = [];
         $q = null;
         if (is_array($info)) {
-            if (array_key_exists("type_texte", $info)) {
+            if (array_key_exists("type_texte", $info) && ! array_key_exists("limit", $info)) {
                 $texteType = $info["type_texte"];
                 $q = $this->_db->prepare("select * from textes where type = :type_texte order by ref_texte desc");
                 $q->bindValue(":type_texte", $texteType);
             }
-            if (array_key_exists("ref_type_texte", $info)) {
+            if (array_key_exists("ref_type_texte", $info) && ! array_key_exists("limit", $info)) {
                 $refTexteType = $info["ref_type_texte"];
                 $q = $this->_db->prepare("select * from textes where ref_type_texte = :ref_type_texte order by ref_texte desc");
                 $q->bindValue(":ref_type_texte", $refTexteType);
+            }
+
+            if (array_key_exists("ref_type_texte", $info) && array_key_exists("limit", $info)) {
+                $refTexteType = $info["ref_type_texte"];
+                $limit = $info["limit"];
+                $q = $this->_db->prepare("select * from textes where ref_type_texte = :ref_type_texte limit :limit");
+                $q->bindValue(":ref_type_texte", $refTexteType);
+                $q->bindValue(":limit", $limit);
             }
         }
         $q->execute();
