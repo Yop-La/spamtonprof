@@ -106,6 +106,13 @@ class LbcAccountManager
                 $q = $this->_db->prepare("select prenom_client, nom_client, ref_compte, code_promo, controle_date, nb_annonces_online
                 from compte_lbc, client where compte_lbc.ref_client = client.ref_client and compte_lbc.ref_compte in " . $in);
                 $q->execute($refComptes);
+            } else if (array_key_exists("ref_client", $info)) {
+
+                $refClient = $info["ref_client"];
+
+                $q = $this->_db->prepare("select * from compte_lbc where ref_client = :ref_client");
+                $q->bindValue(":ref_client", $refClient);
+                $q->execute();
             }
         } else {
 

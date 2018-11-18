@@ -43,12 +43,22 @@ function ajaxAdsReview()
     }
 
     $lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
+    $lbcAcctMg = new \spamtonprof\stp_api\LbcAccountManager();
 
     $ads = $lbcProcessMg->generateAds($refClient, 50, $phone);
+    $lbcAccts = $lbcAcctMg->getAll(array(
+        'ref_client' => $refClient
+    ));
+
+    $emails = [];
+    foreach ($lbcAccts as $lbcAcct) {
+        $emails[] = $lbcAcct->getMail();
+    }
 
     $retour->phone = $phone;
     $retour->refClient = $refClient;
     $retour->ads = $ads;
+    $retour->emails = $emails;
 
     echo (json_encode($retour));
 

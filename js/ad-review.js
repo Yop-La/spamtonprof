@@ -123,11 +123,12 @@ var mySubmitController = Marionette.Object.extend( {
 
 						console.log(retour);
 
-						
-						
+
+
 						error = retour.error;
 						message = retour.message;
 						ads = retour.ads;
+						emails = retour.emails;
 
 						if(error){
 
@@ -143,6 +144,9 @@ var mySubmitController = Marionette.Object.extend( {
 
 						}
 
+
+						jQuery('#csvEmails').empty();
+						jQuery("#emailTable tr").remove();
 
 						jQuery('#csvTitles1').empty();
 						jQuery("#titleTable1 tr").remove();
@@ -179,8 +183,8 @@ var mySubmitController = Marionette.Object.extend( {
 							var cell1 = row.insertCell(0);
 							cell1.innerHTML = 'n° '.concat(i, ' : ',ad.commune);
 
-							
-							
+
+
 							if(i<=5){
 								jQuery('#ad_img_'.concat(i)).attr('src',ad.image);
 							}else{
@@ -188,13 +192,22 @@ var mySubmitController = Marionette.Object.extend( {
 								var row = table.insertRow(0);
 								var cell1 = row.insertCell(0);
 								cell1.innerHTML = 'n° '.concat(i, ' : ',ad.image);
-								
+
 							}
 							i++;
 						});
 
+						var i = 1;
+						emails.forEach(function(email){
 
 
+							var table = document.getElementById("emailTable");
+							var row = table.insertRow(0);
+							var cell1 = row.insertCell(0);
+							cell1.innerHTML = 'n° '.concat(i, ' : ',email);
+							i++;
+
+						});
 
 
 
