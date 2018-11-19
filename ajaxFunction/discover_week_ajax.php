@@ -50,6 +50,7 @@ function inscriptionEssai()
     $telephone_responsable = $fields->telephone_responsable;
     $remarques = $fields->remarques;
     $code_promo = $fields->code_promo;
+    $source_traffic = $fields->source_traffic;
     $parent_required = boolval($fields->parent_required);
 
     $matiere = json_decode(stripslashes($fields->matiere));
@@ -503,7 +504,8 @@ function inscriptionEssai()
             "Prénom parent : " . $proche->getPrenom(),
             " Nom parent : " . $proche->getNom(),
             "Téléphone parent :" . $proche->getTelephone(),
-            "Remarque :" . $abonnement->getRemarque_inscription()
+            "Remarque :" . $abonnement->getRemarque_inscription(),
+            "Source traffic : " . $source_traffic
         );
     } else {
         $messages = array(
@@ -515,7 +517,8 @@ function inscriptionEssai()
             "Niveau : " . $niveau->getNiveau(),
             "Téléphone :" . $eleve->getTelephone(),
             "Formule : " . $formule->getFormule(),
-            "Remarque :" . $abonnement->getRemarque_inscription()
+            "Remarque :" . $abonnement->getRemarque_inscription(),
+            "Source traffic : " . $source_traffic
         );
     }
     $messages[] = " ---------- ";

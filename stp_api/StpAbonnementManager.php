@@ -511,8 +511,13 @@ class StpAbonnementManager
         $q = null;
 
         if (is_array($info)) {
+            if (array_key_exists("ref_abonnement_lower_with_prof", $info)) {
 
-            if (array_key_exists("ref_eleve", $info) && array_key_exists("ref_prof", $info)) {
+                $refAbonnement = $info["ref_abonnement_lower_with_prof"];
+                $q = $this->_db->prepare('select * from stp_abonnement where ref_abonnement >= :ref_abonnement and first_prof_assigned is true');
+                $q->bindValue(":ref_abonnement", $refAbonnement);
+                $q->execute();
+            } else if (array_key_exists("ref_eleve", $info) && array_key_exists("ref_prof", $info)) {
 
                 $refEleve = $info["ref_eleve"];
                 $refProf = $info["ref_prof"];

@@ -26,6 +26,7 @@ $compteMg = new \spamtonprof\stp_api\StpCompteManager();
 $statutEssai = new \spamtonprof\stp_api\StpStatutEssai();
 $getresponse = new \GetResponse();
 
+
 $abonnements = $abonnementMg->getHasNotFirstProfAssignement();
 
 $reponse = [];
@@ -107,7 +108,7 @@ foreach ($abonnements as $abonnement) {
     // envoyer le mail recap au prof choisi
 
     $emailRecap = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/mail_recap_prof.html");
-
+    
     // ajout des infos élèves aux mails récap
     $emailRecap = str_replace(array(
         "prenom_eleve",
