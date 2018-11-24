@@ -26,23 +26,7 @@ var idNomFormule2 = '1050';
 var idSelectMatiere = '1051';
 var idSelectNiveau = '1052';
 
-if(domain == 'localhost'){
 
-	//form ajout formule
-	idNomFormule= "1046";
-	idTarif= "1050";
-
-
-	//edit formula form 
-	idSelectFormula = '1054';
-
-	idNomFormule2 = '1057';
-
-	idSelectMatiere = '1058';
-	idSelectNiveau = '1059';
-
-
-}
 
 var reset = true;
 var refFormule; // la ref formule en cours d'édition

@@ -6,9 +6,6 @@
 
 var ajaxEnCours = 0;
 var idChoixClient = 1133;
-if(domain == 'localhost'){
-	idChoixClient = 1133;
-}
 
 var idAdReview = '81';
 
