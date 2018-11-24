@@ -4,7 +4,25 @@ namespace spamtonprof\stp_api;
 class StpEleve implements \JsonSerializable
 {
 
-    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil, $ref_compte, $seq_email_parent_essai, $hasToSendToEleve, $hasToSendToParent, $ref_niveau, $parent_required, $niveau, $local;
+    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil, $ref_compte, $seq_email_parent_essai, $hasToSendToEleve, $hasToSendToParent, $ref_niveau, $parent_required, $niveau, $local, $gr_id;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getGr_id()
+    {
+        return $this->gr_id;
+    }
+
+    /**
+     *
+     * @param mixed $gr_id
+     */
+    public function setGr_id($gr_id)
+    {
+        $this->gr_id = $gr_id;
+    }
 
     /**
      *
@@ -296,9 +314,6 @@ class StpEleve implements \JsonSerializable
     {
         $this->ref_profil = $ref_profil;
     }
-
-
-    
 
     public static function cast(\spamtonprof\stp_api\StpEleve $eleve)
     {

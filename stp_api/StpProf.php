@@ -4,7 +4,25 @@ namespace spamtonprof\stp_api;
 class StpProf implements \JsonSerializable
 {
 
-    protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $user_id_wp, $onboarding_step, $sexe, $stripe_id_test, $ref_gmail_account, $inbox_ready, $processing_date, $description, $image_url, $phrase_responsable, $gmailAcc;
+    protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $user_id_wp, $onboarding_step, $sexe, $stripe_id_test, $ref_gmail_account, $inbox_ready, $processing_date, $description, $image_url, $phrase_responsable, $gmailAcc, $gr_id;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getGr_id()
+    {
+        return $this->gr_id;
+    }
+
+    /**
+     *
+     * @param mixed $gr_id
+     */
+    public function setGr_id($gr_id)
+    {
+        $this->gr_id = $gr_id;
+    }
 
     /**
      *
