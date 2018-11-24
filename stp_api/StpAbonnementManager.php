@@ -741,10 +741,13 @@ class StpAbonnementManager
         $algoliaMg->updateAbonnement($abo->getRef_abonnement(), $constructor);
     }
 
-    // pour redémarrer un abonnement qui a été arrêté
+    // pour redémarrer un abonnement qui a été arrêté (startDate vaut now ou une date)
     function restart(int $refAbo, $startDate, bool $testMode = true)
     {
-        $startDate = \DateTime::createFromFormat('j/m/Y', $startDate);
+        if ($startDate != 'now') {
+            $startDate = \DateTime::createFromFormat('j/m/Y', $startDate);
+            $startDate = $startDate->getTimestamp();
+        }
 
         // mise à jour dans la bdd
         $constructor = array(
@@ -773,7 +776,7 @@ class StpAbonnementManager
 
         $stripe = new \spamtonprof\stp_api\StripeManager($testMode);
         $stripe->addConnectSubscription($abo->getProche()
-            ->getEmail(), false, $abo->getRef_compte(), $planStripeId, $stripeProfId, $abo->getRef_abonnement(), $abo->getCompte(), $startDate->getTimestamp());
+            ->getEmail(), false, $abo->getRef_compte(), $planStripeId, $stripeProfId, $abo->getRef_abonnement(), $abo->getCompte(), $startDate);
     }
 
     // mise à jour du plan de paiement et de la formule
