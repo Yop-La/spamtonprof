@@ -6,11 +6,29 @@ use Monolog\Handler\NullHandler;
 class StpStatutAbonnement implements \JsonSerializable
 {
 
-    protected $ref_statut_abonnement, $statut_abonnement;
+    protected $ref_statut_abonnement, $statut_abonnement, $gr_id;
 
     public function __construct(array $donnees = array())
     {
         $this->hydrate($donnees);
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getGr_id()
+    {
+        return $this->gr_id;
+    }
+
+    /**
+     *
+     * @param mixed $gr_id
+     */
+    public function setGr_id($gr_id)
+    {
+        $this->gr_id = $gr_id;
     }
 
     public function hydrate(array $donnees)
@@ -22,7 +40,7 @@ class StpStatutAbonnement implements \JsonSerializable
             }
         }
     }
-    
+
     public static function cast(\spamtonprof\stp_api\StpStatutAbonnement $statut)
     {
         return ($statut);

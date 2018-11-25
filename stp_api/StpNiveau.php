@@ -4,7 +4,23 @@ namespace spamtonprof\stp_api;
 class StpNiveau implements \JsonSerializable
 {
 
-    protected $ref_niveau, $niveau, $sigle, $keyword, $parent_required;
+    protected $ref_niveau, $niveau, $sigle, $keyword, $parent_required, $gr_id;
+
+    /**
+     * @return mixed
+     */
+    public function getGr_id()
+    {
+        return $this->gr_id;
+    }
+
+    /**
+     * @param mixed $gr_id
+     */
+    public function setGr_id($gr_id)
+    {
+        $this->gr_id = $gr_id;
+    }
 
     /**
      * @return mixed

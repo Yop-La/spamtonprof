@@ -4,7 +4,79 @@ namespace spamtonprof\stp_api;
 class StpEleve implements \JsonSerializable
 {
 
-    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil, $ref_compte, $seq_email_parent_essai, $hasToSendToEleve, $hasToSendToParent, $ref_niveau, $parent_required, $niveau, $local, $gr_id;
+    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil, $ref_compte, $seq_email_parent_essai, $hasToSendToEleve, $hasToSendToParent, $ref_niveau, $parent_required, $niveau, $local, $gr_id, $formules, $abos;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getFormules()
+    {
+        return $this->formules;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getClasse()
+    {
+        return $this->classe;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getProfil()
+    {
+        return $this->profil;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getAbos()
+    {
+        return $this->abos;
+    }
+
+    /**
+     *
+     * @param mixed $classe
+     */
+    public function setClasse($classe)
+    {
+        $this->classe = $classe;
+    }
+
+    /**
+     *
+     * @param mixed $profil
+     */
+    public function setProfil($profil)
+    {
+        $this->profil = $profil;
+    }
+
+    /**
+     *
+     * @param mixed $abos
+     */
+    public function setAbos($abos)
+    {
+        $this->abos = $abos;
+    }
+
+    /**
+     *
+     * @param mixed $formules
+     */
+    public function setFormules($formules)
+    {
+        $this->formules = $formules;
+    }
 
     /**
      *

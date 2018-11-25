@@ -329,6 +329,14 @@ class StpProfManager
         return ($object);
     }
 
+    public function updateGrId(\spamtonprof\stp_api\StpProf $prof)
+    {
+        $q = $this->_db->prepare("update stp_prof set gr_id = :gr_id where ref_prof = :ref_prof");
+        $q->bindValue(":ref_prof", $prof->getRef_prof());
+        $q->bindValue(":gr_id", $prof->getGr_id());
+        $q->execute();
+    }
+
     public function addNewGmailLabels()
     {
         // pour ajouter au gmail des profs les labels avec l'action add (après ajout de nouveau niveau par exemple)
@@ -363,4 +371,54 @@ class StpProfManager
             }
         }
     }
+    
+    
+    // pour ajouter les nouveaux profs aux tags de getresponse et à mettre jour la ref dans stp_matiere
+    function resetGrTags()
+    {
+        $gr = new \GetResponse();
+        
+        $profs = $this->getAll();
+        
+        foreach ($profs as $prof) {
+            
+            $params = new \stdClass();
+            
+            $profSigle = $prof->getPrenom() . '_' . $prof->getRef_prof();
+            
+            $profSigle = strtolower($profSigle);
+            $profSigle = unaccent($profSigle);
+            
+            $profSigle = str_replace("-", "_", $profSigle);
+            
+            $params->name = $profSigle;
+            
+            $tag = $gr->createTag($params);
+        }
+        
+        $tags = $gr->getTags();
+        
+        foreach ($tags as $tag) {
+            
+            $tagId = $tag->tagId;
+            
+            $tagName = $tag->name;
+            
+            $tagNameParts = explode("_", $tagName);
+            
+            $refProf = $tagNameParts[count($tagNameParts) - 1];
+            
+            $prof = $this->get(array(
+                'ref_prof' => $refProf
+            ));
+            
+            if ($prof) {
+                
+                $prof->setGr_id($tagId);
+                $this->updateGrId($prof);
+            }
+        }
+    }
+    
+    
 }

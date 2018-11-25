@@ -419,9 +419,16 @@ class StpAbonnementManager
                     break;
 
                 case "ref_formule":
+
+                    $constructorForumule = false;
+                    if (array_key_exists("ref_formule", $constructor)) {
+
+                        $constructorForumule = $constructor["ref_formule"];
+                    }
+
                     $formule = $formuleMg->get(array(
                         'ref_formule' => $abonnement->getRef_formule()
-                    ));
+                    ), $constructorForumule);
 
                     $abonnement->setFormule($formule);
                     break;

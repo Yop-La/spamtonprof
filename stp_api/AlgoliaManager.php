@@ -57,8 +57,7 @@ class AlgoliaManager
             ),
             "ref_eleve" => array(
                 "construct" => array(
-                    'ref_classe',
-                    'ref_profil'
+                    'ref_niveau'
                 )
             ),
             "remarquesMatieres" => array(

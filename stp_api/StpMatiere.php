@@ -6,7 +6,25 @@ class StpMatiere implements \JsonSerializable
 
     const MATHS = 1, FRANCAIS = 2, PHYSIQUE = 3;
 
-    protected $ref_matiere, $matiere, $matiere_complet;
+    protected $ref_matiere, $matiere, $matiere_complet, $gr_id;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getGr_id()
+    {
+        return $this->gr_id;
+    }
+
+    /**
+     *
+     * @param mixed $gr_id
+     */
+    public function setGr_id($gr_id)
+    {
+        $this->gr_id = $gr_id;
+    }
 
     /**
      *

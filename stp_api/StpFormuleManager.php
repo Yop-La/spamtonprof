@@ -42,7 +42,7 @@ class StpFormuleManager
                 $q->bindValue(':from_tool', $fromTool, PDO::PARAM_BOOL);
             } else if (array_key_exists('getFormuleNotInStripe', $info)) {
                 $testMode = $info['getFormuleNotInStripe'];
-    
+
                 if (! $testMode) {
                     $q = $this->_db->prepare("select * from stp_formule where from_tool is true and ref_product_stripe is null");
                 } else {
@@ -77,6 +77,12 @@ class StpFormuleManager
                 $q = $this->_db->prepare('SELECT * FROM stp_formule where :matiere like any (matieres) and :classe like any (classes) and from_tool is true order by array_upper(matieres,1)');
                 $q->bindValue(':matiere', $matiere);
                 $q->bindValue(':classe', $classe);
+            } else if (array_key_exists('ref_eleve', $info)) {
+
+                $refEleve = $info['ref_eleve'];
+
+                $q = $this->_db->prepare('SELECT * FROM stp_formule where ref_formule in (select ref_formule from stp_abonnement where ref_eleve = :ref_eleve)');
+                $q->bindValue(':ref_eleve', $refEleve);
             }
         } else {
             $q = $this->_db->prepare("select * from stp_formule");
@@ -188,6 +194,7 @@ class StpFormuleManager
                     $formule->setProf($prof);
                     break;
                 case 'matieres':
+
                     $matieres = $formule->getMatieres();
                     for ($i = 0; $i < count($matieres); $i ++) {
                         $matiere = $matieres[$i];

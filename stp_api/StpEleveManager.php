@@ -179,6 +179,8 @@ class StpEleveManager
     public function construct($constructor)
     {
         $niveauMg = new \spamtonprof\stp_api\StpNiveauManager();
+        $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
+        $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
 
         $eleve = $this->cast($constructor["objet"]);
 
@@ -194,6 +196,36 @@ class StpEleveManager
                     ));
 
                     $eleve->setNiveau($niveau);
+                    break;
+                case "formules":
+
+                    $constructorFormules = false;
+                    if (array_key_exists("formules", $constructor)) {
+
+                        $constructorFormules = $constructor["formules"];
+                    }
+
+                    $formules = $formuleMg->getAll(array(
+                        'ref_eleve' => $eleve->getRef_eleve()
+                    ), $constructorFormules);
+
+                    $eleve->setFormules($formules);
+
+                    break;
+                case "abonnements":
+
+                    $constructorAbos = false;
+                    if (array_key_exists("abonnements", $constructor)) {
+
+                        $constructorAbos = $constructor["abonnements"];
+                    }
+
+                    $abos = $aboMg->getAll(array(
+                        'ref_eleve' => $eleve->getRef_eleve()
+                    ), $constructorAbos);
+
+                    $eleve->setAbos($abos);
+
                     break;
             }
         }
@@ -216,7 +248,7 @@ class StpEleveManager
         }
     }
 
-    public function getAll($info, $eleveAsArray = false)
+    public function getAll($info, $eleveAsArray = false, $constructor = false)
     {
         $eleves = [];
         $q = null;
@@ -241,17 +273,33 @@ class StpEleveManager
 
             $q = $this->_db->prepare("select * from stp_eleve where regexp_replace(telephone, '[^01234536789]', '','g') SIMILAR TO '" . $nums . "'");
             $q->execute();
-        } 
+        } else if (in_array('eleve_to_ad_in_gr', $info)) {
+
+            $q = $this->_db->prepare("select * from stp_eleve where ref_eleve in (
+                select ref_eleve from stp_abonnement 
+                    where ref_prof is not null and ((ref_statut_abonnement = 2 and extract(day from now() - date_creation) <= 10) 
+                        or ref_statut_abonnement = 1)) and same_email is false and gr_id is null limit 25");
+            $q->execute();
+        }
 
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
             $eleve = new \spamtonprof\stp_api\StpEleve($data);
             if ($eleveAsArray) {
                 $eleve = $eleve->toArray();
+            } else if ($constructor) {
+                $constructor["objet"] = $eleve;
+                $this->construct($constructor);
             }
             $eleves[] = $eleve;
         }
         return ($eleves);
     }
 
- 
+    public function updateGrId(\spamtonprof\stp_api\StpEleve $eleve)
+    {
+        $q = $this->_db->prepare("update stp_eleve set gr_id = :gr_id where ref_eleve = :ref_eleve");
+        $q->bindValue(":ref_eleve", $eleve->getRef_eleve());
+        $q->bindValue(":gr_id", $eleve->getGr_id());
+        $q->execute();
+    }
 }

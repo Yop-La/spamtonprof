@@ -44,7 +44,7 @@ class StpNiveauManager
             $q->bindValue(':ref_niveau', $ref_niveau);
         } else if (array_key_exists('sigle', $info)) {
             $sigle = $info['sigle'];
-            
+
             $q = $this->_db->prepare('select * from stp_niveau where sigle = :sigle');
             $q->bindValue(':sigle', $sigle);
         }
@@ -59,8 +59,60 @@ class StpNiveauManager
         }
     }
 
+    // pour ajouter les nouveaux niveaux aux tags de getresponse et à mettre jour la ref dans stp_niveau
+    function resetGrTags()
+    {
+        $gr = new \GetResponse();
+
+        $niveaux = $this->getAll(array(
+            'all'
+        ));
+
+        foreach ($niveaux as $niveau) {
+
+            $params = new \stdClass();
+
+            $niveauSigle = $niveau->getSigle();
+
+            $niveauSigle = str_replace("-", "_", $niveauSigle);
+
+            $params->name = $niveauSigle;
+
+            $tag = $gr->createTag($params);
+        }
+
+        $tags = $gr->getTags();
+
+        foreach ($tags as $tag) {
+
+            $tagId = $tag->tagId;
+
+            $tagName = $tag->name;
+
+            $tagName = str_replace("_", "-", $tagName);
+
+            $niveau = $this->get(array(
+                'sigle' => $tagName
+            ));
+
+            if ($niveau) {
+
+                $niveau->setGr_id($tagId);
+                $this->updateGrId($niveau);
+            }
+        }
+    }
+
     public static function cast(\spamtonprof\stp_api\StpNiveau $object)
     {
         return ($object);
+    }
+
+    public function updateGrId(\spamtonprof\stp_api\StpNiveau $niveau)
+    {
+        $q = $this->_db->prepare("update stp_niveau set gr_id = :gr_id where ref_niveau = :ref_niveau");
+        $q->bindValue(":ref_niveau", $niveau->getRef_niveau());
+        $q->bindValue(":gr_id", $niveau->getGr_id());
+        $q->execute();
     }
 }

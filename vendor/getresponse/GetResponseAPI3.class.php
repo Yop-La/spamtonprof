@@ -279,6 +279,9 @@ class GetResponse
         return $this->call('contacts/' . $id . '/custom-fields', 'POST', $params);
     }
 
+
+    
+    
     /**
      * retrieve segment
      *
@@ -388,6 +391,18 @@ class GetResponse
     {
         return $this->call('tags', 'POST', $params);
     }
+    
+    /**
+     * drop single tag by ID
+     *
+     * @param string $contact_id
+     *            - obtained by API
+     * @return mixed
+     */
+    public function deleteTag($tag_id)
+    {
+        return $this->call('tags/' . $tag_id, 'DELETE');
+    }
 
     /**
      * get all tags
@@ -399,6 +414,8 @@ class GetResponse
         return $this->call('tags');
     }
 
+
+    
     /**
      * adding tag to contact
      *

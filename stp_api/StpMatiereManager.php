@@ -22,8 +22,7 @@ class StpMatiereManager
 
         return ($StpMatiere);
     }
-    
-    
+
     public static function cast(\spamtonprof\stp_api\StpMatiere $object)
     {
         return ($object);
@@ -47,11 +46,11 @@ class StpMatiereManager
             $q = $this->_db->prepare('select * from stp_matiere where ref_matiere = :ref_matiere');
             $q->bindValue(':ref_matiere', $refMatiere);
         }
-        
+
         if (array_key_exists('matiere_complet', $info)) {
-            
+
             $matiereComplet = $info['matiere_complet'];
-            
+
             $q = $this->_db->prepare('select * from stp_matiere where lower(matiere_complet) like lower(:matiere_complet)');
             $q->bindValue(':matiere_complet', $matiereComplet);
         }
@@ -81,5 +80,53 @@ class StpMatiereManager
             $matieres[] = new \spamtonprof\stp_api\StpMatiere($data);
         }
         return ($matieres);
+    }
+
+    public function updateGrId(\spamtonprof\stp_api\StpMatiere $matiere)
+    {
+        $q = $this->_db->prepare("update stp_matiere set gr_id = :gr_id where ref_matiere = :ref_matiere");
+        $q->bindValue(":ref_matiere", $matiere->getRef_matiere());
+        $q->bindValue(":gr_id", $matiere->getGr_id());
+        $q->execute();
+    }
+
+    // pour ajouter les nouveaux matières aux tags de getresponse et à mettre jour la ref dans stp_matiere
+    function resetGrTags()
+    {
+        $gr = new \GetResponse();
+
+        $matieres = $this->getAll(array(
+            'all'
+        ));
+
+        foreach ($matieres as $matiere) {
+
+            $params = new \stdClass();
+
+            $matiereSigle = $matiere->getMatiere();
+
+            $params->name = $matiereSigle;
+
+            $tag = $gr->createTag($params);
+        }
+
+        $tags = $gr->getTags();
+
+        foreach ($tags as $tag) {
+
+            $tagId = $tag->tagId;
+
+            $tagName = $tag->name;
+
+            $matiere = $this->get(array(
+                'matiere' => $tagName
+            ));
+
+            if ($matiere) {
+
+                $matiere->setGr_id($tagId);
+                $this->updateGrId($matiere);
+            }
+        }
     }
 }
