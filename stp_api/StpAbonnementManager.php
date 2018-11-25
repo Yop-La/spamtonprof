@@ -710,7 +710,7 @@ class StpAbonnementManager
         $algoliaMg->updateAbonnement($abo->getRef_abonnement(), $constructor);
     }
 
-    // champs de $fields : prenom, nom
+    // champs de $fields : prenom, nom, ref_niveau
     function updateEleve($refAbo, array $fields)
     {
         $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
@@ -718,6 +718,11 @@ class StpAbonnementManager
         $constructor = array(
             "construct" => array(
                 'ref_eleve'
+            ),
+            "ref_eleve" => array(
+                "construct" => array(
+                    'ref_niveau'
+                )
             )
         );
 
@@ -736,6 +741,11 @@ class StpAbonnementManager
         if (array_key_exists("nom", $fields)) {
             $eleve->setNom($fields["nom"]);
             $eleveMg->updateNom($eleve);
+        }
+
+        if (array_key_exists("ref_niveau", $fields)) {
+            $eleve->setRef_niveau($fields["ref_niveau"]);
+            $eleveMg->updateRefNiveau($eleve);
         }
 
         if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ESSAI) {
