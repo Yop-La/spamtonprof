@@ -29,9 +29,10 @@ jQuery( document ).ready( function( $ ) {
 			rowEssai.insertAfter(".row-essai-template");
 			rowEssai.removeClass("row-essai-template");
 
-
+			console.log("abo")
+			console.log(abo)
 			rowEssai.find(".prenom-eleve").html(abo.eleve.prenom);
-			rowEssai.find(".nom-formule").html(abo.formule.formule);
+			rowEssai.find(".nom-formule").html(abo.formule.formule.split("|")[0]. concat(" - ",abo.eleve.niveau.niveau));
 
 			if(abo.debut_essai != null){
 
