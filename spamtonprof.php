@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.6.7.2
+ * Version: 1.1.6.7.3
  *
  *
  * Author: yopla
@@ -294,7 +294,7 @@ function my_pre_population_callback($options, $settings)
             foreach ($clients as $client) {
 
                 $options[] = array(
-                    'label' => $client->getPrenom_client() . ' ' . $client->getNom_client() . ' ref : '.$client->getRef_client(),
+                    'label' => $client->getPrenom_client() . ' ' . $client->getNom_client() . ' ref : ' . $client->getRef_client(),
                     'value' => $client->getRef_client()
                 );
             }
@@ -324,26 +324,25 @@ function my_pre_population_callback($options, $settings)
 
     // target "choix type texte" du formulaire "conf client leboncoin"
     if ($settings['key'] == 'type_texte_1542480094564') {
-        
+
         if (is_user_logged_in()) {
-            
+
             $typeTexteMg = new \spamtonprof\stp_api\TypeTexteManager();
-            
+
             $typeTextes = $typeTexteMg->getAll(array(
                 'all'
             ));
-            
+
             foreach ($typeTextes as $typeTexte) {
-                
+
                 $options[] = array(
                     'label' => $typeTexte->getType(),
-                    'value' => $typeTexte->getRef_type()    
+                    'value' => $typeTexte->getRef_type()
                 );
             }
         }
     }
-    
-    
+
     return $options;
 }
 
