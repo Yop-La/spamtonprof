@@ -31,6 +31,12 @@ class TypeTitreManager
             $q = $this->_db->prepare("select * from type_titre where ref_type =:ref_type");
             $q->bindValue(":ref_type", $refType);
             $q->execute();
+        }else if (array_key_exists("type", $info)) {
+            
+            $type = $info["type"];
+            $q = $this->_db->prepare("select * from type_titre where type =:type");
+            $q->bindValue(":type", $type);
+            $q->execute();
         }
 
         $data = $q->fetch(\PDO::FETCH_ASSOC);

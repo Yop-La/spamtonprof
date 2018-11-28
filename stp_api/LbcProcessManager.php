@@ -539,7 +539,9 @@ class LbcProcessManager
 
             $texte->setTexte(str_replace(array(
                 'Alexandre',
-                'alexandre'
+                'alexandre',
+                'Anahyse',
+                'anahyse',
             ), $client->getPrenom_client(), $texte->getTexte()));
 
             // récupération de l'image
@@ -644,5 +646,41 @@ class LbcProcessManager
         $conf->client = $client;
 
         return ($conf);
+    }
+
+    // pour ajouter les titres lors de l'arrivé d'un nouveau prof par exemple
+    // ajouter type titre à la table type_titre
+    // ajouter les titres à la table titres
+    function addLbcTitle($fileName = 'titles.csv', $type)
+    {
+        $csv_path = ABSPATH . $fileName;
+
+        // ajout du type titre si il existe pas
+        $typeTitreMg = new \spamtonprof\stp_api\TypeTitreManager();
+
+        $typeTitre = $typeTitreMg->get(array(
+            "type" => $type
+        ));
+
+        if (! $typeTitre) {
+
+            $typeTitre = $typeTitreMg->add(new \spamtonprof\stp_api\TypeTitre(array(
+                'type' => $type
+            )));
+        }
+
+        // ajout des titres
+        $titleMg = new \spamtonprof\stp_api\LbcTitleManager();
+
+        $rows = readCsv($csv_path);
+
+        foreach ($rows as $row) {
+
+            $titleMg->add(new \spamtonprof\stp_api\LbcTitle(array(
+                "titre" => $row[0],
+                "type_titre" => $typeTitre->getType(),
+                "ref_type_titre" => $typeTitre->getRef_type()
+            )));
+        }
     }
 }

@@ -49,6 +49,18 @@ class LbcTitleManager
         return ($types);
     }
     
+    public function add(LbcTitle $titre)
+    {
+        $q = $this->_db->prepare('insert into titres(titre, type_titre, ref_type_titre) values(:titre, :type_titre, :ref_type_titre)');
+        $q->bindValue(':titre', $titre->getTitre());
+        $q->bindValue(':type_titre', $titre->getType_titre());
+        $q->bindValue(':ref_type_titre', $titre->getRef_type_titre());
+        $q->execute();
+        $titre->setRef_titre($this->_db->lastInsertId());
+        
+        return ($titre);
+    }
+    
     public function getAll($info)
     {
         $titles = [];
