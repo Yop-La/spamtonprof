@@ -683,4 +683,30 @@ class LbcProcessManager
             )));
         }
     }
+    
+    
+    function addLbcEmails($ref_client,$fileName = 'emails.csv'){
+        
+        $csv_path = ABSPATH . $fileName;
+        
+        // ajout des titres
+        $actMg = new \spamtonprof\stp_api\LbcAccountManager();
+        
+        $rows = readCsv($csv_path);
+        
+        foreach ($rows as $row) {
+            
+            $newAccount = new \spamtonprof\stp_api\LbcAccount();
+            
+            
+            $newAccount->setRef_client($ref_client);
+            $newAccount->setMail($row[0]);
+            
+            
+            $newAccount = $actMg->add($newAccount);
+            
+            
+        }
+        
+    }
 }
