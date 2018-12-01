@@ -112,7 +112,7 @@ class StpEleveManager
         return ($eleve);
     }
 
-    public function get($info)
+    public function get($info, $constructor = false)
     {
         $data = false;
         $zapDataStep = false;
@@ -160,12 +160,27 @@ class StpEleveManager
             $q = $this->_db->prepare('select * from stp_eleve where ref_eleve = :ref_eleve');
             $q->bindValue(':ref_eleve', $refEleve);
             $q->execute();
+        } else if (array_key_exists("gr_id", $info)) {
+
+            $grId = $info["gr_id"];
+
+            $q = $this->_db->prepare('select * from stp_eleve where gr_id = :gr_id');
+            $q->bindValue(':gr_id', $grId);
+            $q->execute();
         }
         if (! $zapDataStep) {
             $data = $q->fetch(\PDO::FETCH_ASSOC);
         }
         if ($data) {
-            return (new \spamtonprof\stp_api\StpEleve($data));
+
+            $eleve = new \spamtonprof\stp_api\StpEleve($data);
+
+            if ($constructor) {
+                $constructor["objet"] = $eleve;
+                $this->construct($constructor);
+            }
+
+            return ($eleve);
         } else {
             return (false);
         }
@@ -301,5 +316,129 @@ class StpEleveManager
         $q->bindValue(":ref_eleve", $eleve->getRef_eleve());
         $q->bindValue(":gr_id", $eleve->getGr_id());
         $q->execute();
+    }
+
+    function toStpEleveGr(StpEleve $eleve, $update = false)
+    {
+        $slack = new \spamtonprof\slack\Slack();
+
+        $niveau = $eleve->getNiveau()->getGr_id();
+        $matieres = [];
+        $statuts = [];
+        $profs = [];
+
+        $parentRequired = $eleve->getParent_required();
+        $prenomProche = 'undefined';
+
+        $abos = $eleve->getAbos();
+
+        foreach ($abos as $abo) {
+
+            $formule = $abo->getFormule();
+            $matieresObj = $formule->getMatieres();
+            $statut = $abo->getStatut()->getGr_id();
+
+            $prof = $abo->getProf();
+            $profGrId = $prof->getGr_id();
+
+            foreach ($matieresObj as $matiere) {
+
+                $matieres[] = $matiere->getGr_id();
+            }
+
+            if ($parentRequired) {
+                $proche = $abo->getProche();
+                if ($proche) {
+                    $prenomProche = $abo->getProche()->getPrenom();
+                } else {
+                    $slack->sendMessages('log', array(
+                        'cet eleve a parent required = true mais impossible de récup proche. ref_eleve :' . $eleve->getRef_eleve()
+                    ));
+                    continue;
+                }
+            }
+
+            $statuts[] = $statut;
+            $profs[] = $profGrId;
+        }
+
+        if ($update) {
+
+            $params = '{
+                "name": "' . $eleve->getPrenom() . '"
+            }';
+        } else {
+
+            $params = '{
+                "name": "' . $eleve->getPrenom() . '",
+                "email": "' . $eleve->getEmail() . '",
+                "campaign": {
+                    "campaignId": "' . GrCampaignMg::STP_ELEVE . '"
+                }
+            }';
+        }
+
+        $params = json_decode($params);
+
+        // ajout des tags et des champs
+        $tags = [];
+        $customFieldValues = [];
+
+        foreach ($statuts as $statut) {
+            $tag = new \stdClass();
+            $tag->tagId = $statut;
+            $tags[] = $tag;
+        }
+
+        foreach ($matieres as $matiere) {
+            $tag = new \stdClass();
+            $tag->tagId = $matiere;
+            $tags[] = $tag;
+        }
+
+        foreach ($profs as $prof) {
+            $tag = new \stdClass();
+            $tag->tagId = $prof;
+            $tags[] = $tag;
+        }
+
+        $tagNiveau = new \stdClass();
+        $tagNiveau->tagId = $niveau;
+        $tags[] = $tagNiveau;
+
+        if ($parentRequired) {
+            $tag->tagId = GrTagMg::PARENT_REQUIRED;
+            $customFieldValue = new \stdClass();
+
+            $customFieldValue->customFieldId = GrCustomFieldMg::PRENOM_PROCHE_ID;
+            $customFieldValue->value = array(
+                $prenomProche
+            );
+
+            $customFieldValues[] = $customFieldValue;
+        }
+
+        // ref eleve
+        $customFieldValue = new \stdClass();
+
+        $customFieldValue->customFieldId = GrCustomFieldMg::REF_ELEVE_ID;
+        $customFieldValue->value = array(
+            $eleve->getRef_eleve()
+        );
+        $customFieldValues[] = $customFieldValue;
+
+        // jour de mise à jour
+        $currentDayNumber = (date('z')) + 1;
+        $customFieldValue = new \stdClass();
+        $customFieldValue->customFieldId = GrCustomFieldMg::UPDATE_DAY_NUMBER;
+        $customFieldValue->value = array(
+            $currentDayNumber
+        );
+        $customFieldValues[] = $customFieldValue;
+
+        $params->tags = $tags;
+        $params->customFieldValues = $customFieldValues;
+
+        return ($params);
     }
 }
