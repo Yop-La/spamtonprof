@@ -678,7 +678,7 @@ class StpAbonnementManager
         }
     }
 
-    function updateProf($refAbo, $mailProfStp)
+    function updateProf($refAbo, $mailProfStp, $testMode = true)
     {
         $profMg = new \spamtonprof\stp_api\StpProfManager();
 
@@ -696,9 +696,16 @@ class StpAbonnementManager
 
             $gr = new \GetResponse();
             $gr->updateTrialList($refAbo);
-        }
-        // mise à jour algolia
+        } else if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ACTIF) {
 
+            $subId = $abo->getSubs_Id();
+
+            $stripe = new \spamtonprof\stp_api\StripeManager($testMode);
+
+            $stripe->updateStripeProfId($subId, $prof->getStripe_id());
+        }
+
+        // mise à jour algolia
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
 
         $constructor = array(
@@ -792,8 +799,11 @@ class StpAbonnementManager
         }
 
         $stripe = new \spamtonprof\stp_api\StripeManager($testMode);
-        $stripe->addConnectSubscription($abo->getProche()
+        $ret = $stripe->addConnectSubscription($abo->getProche()
             ->getEmail(), false, $abo->getRef_compte(), $planStripeId, $stripeProfId, $abo->getRef_abonnement(), $abo->getCompte(), $startDate);
+
+        $abo->setSubs_Id($ret["subId"]);
+        $this->updateSubsId($abo);
     }
 
     // mise à jour du plan de paiement et de la formule
