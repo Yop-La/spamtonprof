@@ -42,6 +42,17 @@ class StripeManager
         $subscription->cancel();
     }
 
+    public function updateStripeProfId(string $subId, string $stripeProdId)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $sub = \Stripe\Subscription::retrieve($subId);
+
+        $sub->metadata["stripe_prof_id"] = $stripeProdId;
+
+        $sub->save();
+    }
+
     public function transfertSubscriptionCharge($event_json, $subIdMan = false, $chargeIdMan = false)
     {
         $slack = new \spamtonprof\slack\Slack();
