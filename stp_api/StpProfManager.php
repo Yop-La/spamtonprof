@@ -340,7 +340,7 @@ class StpProfManager
     public function addNewGmailLabels()
     {
         // pour ajouter au gmail des profs les labels avec l'action add (après ajout de nouveau niveau par exemple)
-        $gmail = new \spamtonprof\gmailManager\GmailManager('seb.spamtonprof@gmail.com');
+        $gmail = new \spamtonprof\googleMg\GoogleManager('seb.spamtonprof@gmail.com');
 
         $profMg = new \spamtonprof\stp_api\StpProfManager();
 
@@ -361,7 +361,7 @@ class StpProfManager
 
         foreach ($profs as $prof) {
 
-            $gmail = new \spamtonprof\gmailManager\GmailManager($prof->getGmailAcc()->getEmail());
+            $gmail = new \spamtonprof\googleMg\GoogleManager($prof->getGmailAcc()->getEmail());
 
             foreach ($labels as $label) {
 

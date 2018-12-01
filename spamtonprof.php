@@ -42,7 +42,7 @@ require_once (dirname(__FILE__) . '/inc/autoloader_stripe.php'); // autoloader d
 
 require_once (dirname(__FILE__) . '/inc/autoloader_getresponse.php'); // autoloader les custom classes de getresponse
 
-require_once (dirname(__FILE__) . '/inc/autoloader_gmail.php'); // autoloader les custom classes de getresponse
+require_once (dirname(__FILE__) . '/inc/autoloader_google.php'); // autoloader les custom classes de google
 
 require_once (dirname(__FILE__) . '/inc/autoloader_cnl.php'); // autoloader les custom classes de cnl
 

@@ -1,21 +1,10 @@
 <?php
 
 /*
- * 
+ *
  * pour faire un contrôle des publications en ligne avec les mails envoyés par leboncon
- * 
- * */
-use spamtonprof\stp_api\AccountManager;
-use spamtonprof\stp_api\EleveManager;
-use spamtonprof\stp_api\ClasseManager;
-use spamtonprof\stp_api\GmailLabelManager;
-use spamtonprof\stp_api\GmailLabel;
-use spamtonprof\stp_api\NbEmailManager;
-use spamtonprof\stp_api\GetResponseManager;
-use spamtonprof\getresponse_api\CampaignManager;
-use spamtonprof\stp_api\LbcProcessManager;
-use Hashids\Hashids;
-
+ *
+ */
 require_once (dirname(__FILE__) . '/wp-config.php');
 $wp->init();
 $wp->parse_request();
@@ -107,7 +96,7 @@ prettyPrint($ads);
 
 exit(0);
 
-$gmail = new \spamtonprof\gmailManager\GmailManager("mailsfromlbc@gmail.com");
+$gmail = new \spamtonprof\googleMg\GoogleManager("mailsfromlbc@gmail.com");
 
 $messages = $gmail->listMessages("subject:ligne after:2018/10/12 from:no.reply@leboncoin.fr");
 

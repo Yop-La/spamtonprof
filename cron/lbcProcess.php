@@ -1,6 +1,5 @@
 <?php
 use spamtonprof\slack\Slack;
-use spamtonprof\gmailManager\GmailManager;
 
 /**
  * pour la boite mailsfromlbc@gmail.com - adaption possible sur d'autres boites

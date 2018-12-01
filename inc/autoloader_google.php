@@ -6,7 +6,7 @@
  * @package spamtonprof\inc
  */
  
-spl_autoload_register( 'gmail_autoload' );
+spl_autoload_register( 'google_autoload' );
  
 /**
  * Dynamically loads the class attempting to be instantiated elsewhere in the
@@ -23,9 +23,9 @@ spl_autoload_register( 'gmail_autoload' );
 
 
 
-function gmail_autoload( $class_name ) {
+function google_autoload( $class_name ) {
     // If the specified $class_name does not include our namespace, duck out.
-    if ( false === strpos( $class_name, 'spamtonprof\gmailManager' ) ) {
+    if ( false === strpos( $class_name, 'spamtonprof\googleMg' ) ) {
         return;
     }
     

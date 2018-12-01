@@ -10,7 +10,7 @@ class LbcProcessManager
     {
         $this->slack = new \spamtonprof\slack\Slack();
 
-        $this->gmailManager = new \spamtonprof\gmailManager\GmailManager("mailsfromlbc@gmail.com");
+        $this->gmailManager = new \spamtonprof\googleMg\GoogleManager("mailsfromlbc@gmail.com");
         $this->prospectLbcMg = new \spamtonprof\stp_api\ProspectLbcManager();
         $this->messProspectMg = new \spamtonprof\stp_api\MessageProspectLbcManager();
         $this->lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
