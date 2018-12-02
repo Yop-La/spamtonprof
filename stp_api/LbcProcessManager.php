@@ -133,7 +133,7 @@ class LbcProcessManager
                     $this->msgs[] = strip_tags($body);
 
                     if (count($this->msgs) != 0) {
-//                         $this->slack->sendMessages($this->slack::LogLbc, $this->msgs);
+                        $this->slack->sendMessages($this->slack::LogLbc, $this->msgs);
                         $this->msgs = [];
                     }
 

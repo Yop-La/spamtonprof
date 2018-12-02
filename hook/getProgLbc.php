@@ -49,4 +49,8 @@ $slack->sendMessages('log-lbc', array(
     implode(" - ", $rows[$index])
 ));
 
-prettyPrint($rows[$index]);
+$ret = new \stdClass();
+$ret->prog = $rows[$index];
+
+prettyPrint($ret);
+
