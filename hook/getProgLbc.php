@@ -45,7 +45,8 @@ if ($index >= $nbRows) {
 }
 
 $slack->sendMessages('log', array(
-    "LBC : publication de la ligne du sheet n° : " . ($index + 1) . " sur " . $nbRows
+    "LBC : publication de la ligne du sheet n° : " . ($index + 1) . " sur " . $nbRows,
+    implode(" - ", $rows[$index])
 ));
 
 prettyPrint($rows[$index]);
