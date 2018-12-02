@@ -28,7 +28,7 @@ header("Pragma: no-cache");
 
 $slack = new \spamtonprof\slack\Slack();
 
-$index = $_POST["index"];
+$index = $_GET["index"];
 
 $ggMg = new \spamtonprof\googleMg\GoogleManager('soutien.par.mail@gmail.com');
 
