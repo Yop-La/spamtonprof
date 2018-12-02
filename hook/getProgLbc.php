@@ -39,12 +39,12 @@ $nbRows = count($rows);
 if ($index >= $nbRows) {
     prettyPrint('false');
 
-    $slack->sendMessages('log', array(
+    $slack->sendMessages('log-lbc', array(
         "Fin de publication : le sheet a été parcouru en entier"
     ));
 }
 
-$slack->sendMessages('log', array(
+$slack->sendMessages('log-lbc', array(
     "LBC : publication de la ligne du sheet n° : " . ($index + 1) . " sur " . $nbRows,
     implode(" - ", $rows[$index])
 ));
