@@ -1,13 +1,13 @@
 <?php
 namespace spamtonprof\googleMg;
 
+use PHPMailer\PHPMailer\PHPMailer;
 use Exception;
 use Google_Client;
 use Google_Service_Gmail;
 use Google_Service_Gmail_Message;
+use Google_Service_Sheets;
 use spamtonprof\stp_api\GmailLabelManager;
-use spamtonprof;
-use PHPMailer\PHPMailer\PHPMailer;
 
 class GoogleManager
 {
@@ -38,7 +38,11 @@ class GoogleManager
 
         $client = new Google_Client();
         $client->setApplicationName('Gmail API PHP Quickstart');
-        $client->setScopes(Google_Service_Gmail::GMAIL_MODIFY);
+
+        $client->setScopes(array(
+            Google_Service_Sheets::SPREADSHEETS,
+            Google_Service_Gmail::GMAIL_MODIFY
+        ));
 
         $authConfig = json_decode($key->getKey(), true);
 
@@ -52,12 +56,13 @@ class GoogleManager
         }
 
         if ($account->getCredential() != "" && ! is_null($account->getCredential())) {
+
             $accessToken = json_decode($account->getCredential(), true);
         } else {
             // Request authorization from the user.
             $authUrl = $client->createAuthUrl();
 
-            $authCode = "4/QwD3C591Xb4urr1v4bwTH6LFkLqFSJ5D9NzrE303Jo3YPCo-trSIEi4"; // à remplir par ce qui sera donné par $authUrl
+            $authCode = "4/pwD1w63PZDiUPFSTPab2j-uV12vWLYhiPn8s46fP3h1PA3BjM0PcOvU"; // à remplir par ce qui sera donné par $authUrl
 
             if ($authCode == "") {
                 echo ("la2");
@@ -69,6 +74,13 @@ class GoogleManager
 
             echo (json_encode($accessToken));
 
+            echo ('<br><br><br>');
+
+            echo ($account->getRef_gmail_account());
+
+            echo ('<br><br><br>');
+
+            // $account->setCredential(json_encode($accessToken));
             $account->setCredential(json_encode($accessToken));
             $accountMg->updateCredential($account);
         }
@@ -522,6 +534,42 @@ class GoogleManager
             }
         }
         return ($values);
+    }
+
+    function readSheet($sheetId = '1dUtoN7GsgfPtWJcoanlwYn1o83i9ABaxZeefz6aOfts', $sheetName = 'prog')
+    {
+        $service = new \Google_Service_Sheets($this->client);
+
+        $response = $service->spreadsheets_values->get($sheetId, $sheetName);
+        $values = $response->getValues();
+
+        if (empty($values)) {
+            print "No data found.\n";
+        } else {
+            return ($values);
+        }
+    }
+
+    function test()
+    {
+        $service = new \Google_Service_Sheets($this->client);
+
+        // Prints the names and majors of students in a sample spreadsheet:
+        // https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+        $spreadsheetId = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms';
+        $range = 'Class Data';
+        $response = $service->spreadsheets_values->get($spreadsheetId, $range);
+        $values = $response->getValues();
+
+        if (empty($values)) {
+            print "No data found.\n";
+        } else {
+            print "Name, Major:\n";
+            foreach ($values as $row) {
+                // Print columns A and E, which correspond to indices 0 and 4.
+                printf("%s, %s\n", $row[0], $row[4]);
+            }
+        }
     }
 }
 

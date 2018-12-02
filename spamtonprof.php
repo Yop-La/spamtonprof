@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.6.7.6
+ * Version: 1.1.6.7.7
  *
  *
  * Author: yopla
@@ -58,7 +58,6 @@ require_once (dirname(__FILE__) . '/dev-tools.php');
 
 /* require tous les fichiers contenant des fonctions ajax */
 
-require_once (dirname(__FILE__) . '/ajaxFunction/page-paiement-ajax.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/page-inscription-essai_eleve-ajax.php');
 

@@ -57,7 +57,7 @@ class StpGmailAccountManager
     public function updateCredential(StpGmailAccount $StpGmailAccount)
     
     {
-        $q = $this->_db->prepare('UPDATE stp_gmail_account credential=:credential
+        $q = $this->_db->prepare('UPDATE stp_gmail_account set credential=:credential
             WHERE ref_gmail_account = :ref_gmail_account');
         
         $q->bindValue(':credential', $StpGmailAccount->getCredential());

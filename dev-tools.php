@@ -1118,7 +1118,7 @@ function addLabelToAllProf($labelName, $hexColor)
         $gmailAccountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
         $gmailAccount = $gmailAccountMg->get($prof->getRef_gmail_account());
 
-        $gmail = new spamtonprof\gmailManager\GmailManager($gmailAccount->getEmail());
+        $gmail = new spamtonprof\googleMg\GoogleManager($gmailAccount->getEmail());
 
         $gmail->createLabel($labelName, $hexColor);
     } while ($first != $mailProf);

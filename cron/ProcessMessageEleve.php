@@ -48,7 +48,7 @@ $gmailAccount = $gmailAccountMg->get($prof->getRef_gmail_account());
 
 try {
 
-    $gmailManager = new spamtonprof\gmailManager\GoogleManager($gmailAccount->getEmail());
+    $gmailManager = new spamtonprof\googleMg\GoogleManager($gmailAccount->getEmail());
 } catch (\Exception $e) {
 
     $smtpServerMg = new \spamtonprof\stp_api\SmtpServerManager();
