@@ -247,7 +247,7 @@ function inscriptionEssai()
         ));
 
         $proche = $procheMg->get(array(
-            'ref_compte_wp' => $compte->getRef_proche()
+            'ref_proche' => $compte->getRef_proche()
         ));
 
         if (! $proche) {
