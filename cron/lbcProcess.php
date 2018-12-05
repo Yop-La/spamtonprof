@@ -32,23 +32,23 @@ $lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
 
 $lbcReaderint = unserializeTemp("/tempo/lbcReaderInt");
 
-if (! $lbcReaderint) {  
-    $lbcReaderInt = - 1;
+if (! $lbcReaderint) {
+    $lbcReaderInt = 0;
     serializeTemp($lbcReaderInt, "/tempo/lbcReaderInt");
 }
 
-if ($lbcReaderint == - 1) {
-    $lbcReaderInt = 1;
-} elseif ($lbcReaderint == 1) {
-    $lbcReaderInt = - 1;
-}
-
-serializeTemp($lbcReaderInt, "/tempo/lbcReaderInt");
-
-if ($lbcReaderint == - 1) {
+if ($lbcReaderint == 0) {
     echo ("process 1 : lecture des emails de mailsfromlbc@gmail.com" . "<br>");
     $lbcProcessMg->readNewLeadMessages();
 } elseif ($lbcReaderint == 1) {
     echo ("process 2 : redirection des emails vers lebureaudesprofs + envoi des emails aux prospects depuis mailsfromlbc@gmail.com" . "<br>");
     $lbcProcessMg->processNewMessages();
+} elseif ($lbcReaderint == 2) {
+    echo ("process 3 : réponse automatique aux premiers messages des prospects" . "<br>");
+    $lbcProcessMg->sendAutomaticAnswer();
 }
+
+$lbcReaderInt = $lbcReaderInt + 1;
+$lbcReaderInt = $lbcReaderInt % 3;
+
+serializeTemp($lbcReaderInt, "/tempo/lbcReaderInt");

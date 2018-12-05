@@ -53,6 +53,7 @@ class GoogleManager
 
         if (! $account) {
             echo ("ajouté : " . $gmailAdress . " à la table prof <br><br><br>");
+            exit(0);
         }
 
         if ($account->getCredential() != "" && ! is_null($account->getCredential())) {
@@ -62,7 +63,7 @@ class GoogleManager
             // Request authorization from the user.
             $authUrl = $client->createAuthUrl();
 
-            $authCode = "4/pwD1w63PZDiUPFSTPab2j-uV12vWLYhiPn8s46fP3h1PA3BjM0PcOvU"; // à remplir par ce qui sera donné par $authUrl
+            $authCode = "4/qgAUI0_GtpAZ5GlWXMYCDcd2pZ2-HgLiU5EeQKCIcWV-kJrf97LNfBI"; // à remplir par ce qui sera donné par $authUrl
 
             if ($authCode == "") {
                 echo ("la2");
@@ -476,9 +477,14 @@ class GoogleManager
      *            Message to send.
      * @return Google_Service_Gmail_Message sent Message.
      */
-    function sendMessage($body, $subject, $to, $replyTo, $from, $fromName)
+    function sendMessage($body, $subject, $to, $replyTo, $from, $fromName, $threadId = false)
     {
         $gMessage = $this->createMessage($body, $subject, $to, $replyTo, $from, $fromName);
+
+        if ($threadId) {
+            $gMessage->threadId = $threadId;
+        }
+
         try {
             $gMessage = $this->service->users_messages->send($this->userId, $gMessage);
             print 'Message with ID: ' . $gMessage->getId() . ' sent.<br>';

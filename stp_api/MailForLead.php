@@ -6,42 +6,42 @@ use Exception;
 /**
  *
  * @author alexg
- *         
+ *        
  */
 class MailForLead implements \JsonSerializable
 {
 
-    protected $ref_mail_for_lead,
-    $body,
-    $subject;
+    protected $ref_mail_for_lead, $body;
 
     public function __construct(array $donnees = array())
 
-{
-    $this->hydrate($donnees);
-}
+    {
+        $this->hydrate($donnees);
+    }
 
     public function hydrate(array $donnees)
-    
+
     {
         foreach ($donnees as $key => $value) {
-            
+
             $method = 'set' . ucfirst($key);
-            
+
             if (method_exists($this, $method)) {
-                
+
                 $this->$method($value);
             }
         }
     }
-   
-      public function jsonSerialize()
+
+    public function jsonSerialize()
     {
         $vars = get_object_vars($this);
-        
+
         return $vars;
     }
+
     /**
+     *
      * @return mixed
      */
     public function getRef_mail_for_lead()
@@ -50,6 +50,7 @@ class MailForLead implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getBody()
@@ -58,14 +59,7 @@ class MailForLead implements \JsonSerializable
     }
 
     /**
-     * @return mixed
-     */
-    public function getSubject()
-    {
-        return $this->subject;
-    }
-
-    /**
+     *
      * @param mixed $ref_mail_for_lead
      */
     public function setRef_mail_for_lead($ref_mail_for_lead)
@@ -74,24 +68,12 @@ class MailForLead implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $body
      */
     public function setBody($body)
     {
         $this->body = $body;
     }
-
-    /**
-     * @param mixed $subject
-     */
-    public function setSubject($subject)
-    {
-        $this->subject = $subject;
-    }
-
-    
-    
-
-  
 }
 

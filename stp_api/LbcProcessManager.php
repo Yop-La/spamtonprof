@@ -695,6 +695,8 @@ class LbcProcessManager
 
         foreach ($rows as $row) {
 
+            echo ($row[0] . '<br>');
+
             $newAccount = new \spamtonprof\stp_api\LbcAccount();
 
             $newAccount->setRef_client($ref_client);
@@ -702,5 +704,137 @@ class LbcProcessManager
 
             $newAccount = $actMg->add($newAccount);
         }
+    }
+    
+    // pour répondre automatiquement aux premiers messages des prospects
+    function sendAutomaticAnswer(){
+        
+        
+        $gmailMg = new \spamtonprof\googleMg\GoogleManager('le.bureau.des.profs@gmail.com');
+
+
+        $clientMg = new \spamtonprof\stp_api\LbcClientManager();
+        $mailForLeadMg = new \spamtonprof\stp_api\MailForLeadManager();
+        
+        
+        $gmailAccount = $this->gmailAccountMg->get("le.bureau.des.profs@gmail.com");
+        
+        $lastHistoryId = $gmailAccount->getLast_history_id();
+        
+        $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+        
+        $now->sub(new \DateInterval("PT2H"));
+        
+        
+        $now = $now->format('Y/m/d');
+        
+        $retour = $gmailMg->getNewMessages($lastHistoryId);
+        
+        $messages = $retour["messages"];
+        
+        $lastHistoryId = $retour["lastHistoryId"];
+        
+        $gmailAccount->setLast_history_id($lastHistoryId);
+        $this->gmailAccountMg->updateHistoryId($gmailAccount);
+        
+        echo ("------ nb messages : " . count($messages) . " ----- <br><br><br>");
+        
+        foreach ($messages as $message) {
+            
+            // on regarde le titre du message si il commence par |--|ref_|--| c'est bon
+            $subject = $gmailMg->getHeader($message, "Subject");
+            $threadId = $message->threadId;
+            $gmailId = $message->id;
+            
+            echo ($subject . ' -- ' . $threadId . '<br>');
+            $matches = [];
+            preg_match('/^\|--\|(\d*)\|--\|/', $subject, $matches);
+            
+            if (count($matches) != 2) {
+                
+                continue;
+            }
+            
+            // on extrait la ref_message
+            $refMessage = $matches[1];
+            
+            // on récupère le message dans la table message_prospect_lbc
+            $messProspectMg = new \spamtonprof\stp_api\MessageProspectLbcManager();
+            $msg = $messProspectMg->get(array(
+                "ref_message" => $refMessage
+            ));
+            
+            // on ne répond pas aux messages si il a déjà eu une réponse
+            if ($msg->getAnswered()) {
+                
+                // on attribue un libellé 'first_contact_done'
+                $labelId = $gmailMg->getLabelsIds(array(
+                    "first_contact_done"
+                ));
+                
+                $gmailMg->modifyMessage($gmailId, $labelId, array());
+                
+                echo (utf8_encode('déja répondu <br>'));
+                continue;
+            }
+            
+            // à partir du message, on récupère ref_prospect_lbc
+            $refProspect = $msg->getRef_prospect_lbc();
+            
+            // on fait une recherche de messages avec ref_prospect_lbc
+            $msgs = $messProspectMg->getAll(array(
+                'ref_prospect_lbc' => $refProspect,
+                'answered' => true
+            ));
+            
+            // si il n'y a pas de messages avec ref_prospect_lbc déjà répondu alors on répond
+            echo ("nb msg : " . count($msgs) . '<br>');
+            if (count($msgs) > 0) {
+                
+                // on attribue un libellé 'first_contact_done'
+                $labelId = $gmailMg->getLabelsIds(array(
+                    "first_contact_done"
+                ));
+                
+                $gmailMg->modifyMessage($gmailId, $labelId, array());
+                
+                continue;
+            }
+            
+            // on récupère ref_compte_lbc à partir du message
+            $refCompte = $msg->getRef_compte_lbc();
+            
+            // on récupère le compte lbc à partir de la ref_compte_lbc
+            $act = $this->lbcAccountMg->get(array(
+                'ref_compte' => $refCompte
+            ));
+            
+            // puis on récupère le client, puis le message à envoyer
+            $refClient = $act->getRef_client();
+            
+            $client = $clientMg->get(array(
+                'ref_client' => $refClient
+            ));
+            
+            $refMailForLead = $client->getRef_mail_for_lead();
+            
+            $mailForLead = $mailForLeadMg->get(array(
+                'ref_mail_for_lead' => $refMailForLead
+            ));
+            
+            $body = str_replace('[prof_name]', $client->getPrenom_client(), $mailForLead->getBody());
+            
+            // on envoie le message
+            $gmailMg->sendMessage($body, 'Re: ' . $subject, 'mailsfromlbc@gmail.com', 'mailsfromlbc@gmail.com', 'le.bureau.des.profs@gmail.com', 'Cannelle Gaucher', $threadId);
+            
+            // on attribue un libellé 'answer'
+            $labelId = $gmailMg->getLabelsIds(array(
+                "bot_has_made_first_contact"
+            ));
+            
+            $gmailMg->modifyMessage($gmailId, $labelId, array());
+        }
+        
+        
     }
 }
