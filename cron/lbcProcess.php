@@ -30,7 +30,7 @@ header("Pragma: no-cache");
 
 $lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
 
-$lbcReaderint = unserializeTemp("/tempo/lbcReaderInt");
+$lbcReaderInt = unserializeTemp("/tempo/lbcReaderInt");
 
 if (! $lbcReaderint) {
     $lbcReaderInt = 0;
