@@ -241,8 +241,13 @@ function inscriptionEssai()
 
         // étape n°1 : on récupère le proche
         $current_user = wp_get_current_user();
-        $proche = $procheMg->get(array(
+
+        $compte = $compteMg->get(array(
             'ref_compte_wp' => $current_user->ID
+        ));
+
+        $proche = $procheMg->get(array(
+            'ref_compte_wp' => $compte->getRef_proche()
         ));
 
         if (! $proche) {
