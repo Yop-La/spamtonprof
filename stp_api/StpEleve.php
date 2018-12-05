@@ -174,6 +174,7 @@ class StpEleve implements \JsonSerializable
      */
     public function getHasToSendToEleve()
     {
+        $this->hasToSendToEleve();
         return $this->hasToSendToEleve;
     }
 
@@ -183,6 +184,7 @@ class StpEleve implements \JsonSerializable
      */
     public function getHasToSendToParent()
     {
+        $this->hasToSendToParent();
         return $this->hasToSendToParent;
     }
 
