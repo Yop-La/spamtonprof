@@ -37,7 +37,7 @@ class StpAbonnementManager
     {
         $abonnements = [];
 
-        $q = $this->_db->prepare("select * from stp_abonnement where ref_prof is null and ref_statut_abonnement not in (4) order by date_creation ");
+        $q = $this->_db->prepare("select * from stp_abonnement where ref_prof is null and ref_statut_abonnement not in (4,3) order by date_creation ");
 
         $q->execute();
 
@@ -495,6 +495,12 @@ class StpAbonnementManager
             $q->bindValue(":ref_formule", $refFormule);
             $q->bindValue(":ref_eleve", $refEleve);
             $q->execute();
+        } else if (array_key_exists("subs_id", $info)) {
+
+            $subId = $info["subs_id"];
+            $q = $this->_db->prepare("select * from stp_abonnement where subs_id =:subs_id");
+            $q->bindValue(":subs_id", $subId);
+            $q->execute();
         }
 
         $data = $q->fetch(PDO::FETCH_ASSOC);
@@ -804,6 +810,34 @@ class StpAbonnementManager
 
         $abo->setSubs_Id($ret["subId"]);
         $this->updateSubsId($abo);
+    }
+    
+    // stop essai
+    function stopEssai($refAbo)
+    {
+        $logAboMg = new \spamtonprof\stp_api\StpLogAbonnementManager();
+        
+        $abo = $this->get(array(
+            'ref_abonnement' => $refAbo
+        ));
+        
+        $abo->setRef_statut_abonnement($abo::TERMINE);
+        
+        $logAboMg->add(new \spamtonprof\stp_api\StpLogAbonnement(array(
+            "ref_abonnement" => $abo->getRef_abonnement(),
+            "ref_statut_abo" => $abo->getRef_statut_abonnement()
+        )));
+        $this->updateRefStatutAbonnement($abo);
+        
+        $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+        
+        $constructor = array(
+            "construct" => array(
+                'ref_statut_abonnement'
+            )
+        );
+        
+        $algoliaMg->updateAbonnement($refAbo, $constructor);
     }
 
     // mise à jour du plan de paiement et de la formule
