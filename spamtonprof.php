@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.6.9.0
+ * Version: 1.1.6.9.1
  *
  *
  * Author: yopla
@@ -52,12 +52,13 @@ require_once (dirname(__FILE__) . '/vendor/autoload.php'); // autoload strip, pa
 
 require_once (dirname(__FILE__) . '/vendor/getresponse/GetResponseAPI3.class.php');
 
+require_once (dirname(__FILE__) . '/vendor/mxforward/mx_forward.php');
+
 require_once (dirname(__FILE__) . '/slack/Slack.php'); // pour communiquer avec slack
 
 require_once (dirname(__FILE__) . '/dev-tools.php');
 
 /* require tous les fichiers contenant des fonctions ajax */
-
 
 require_once (dirname(__FILE__) . '/ajaxFunction/page-inscription-essai_eleve-ajax.php');
 

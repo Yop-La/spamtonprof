@@ -26,8 +26,9 @@
 class Google_Service_Pubsub_Resource_ProjectsTopics extends Google_Service_Resource
 {
   /**
-   * Creates the given topic with the given name. See the  resource name rules.
-   * (topics.create)
+   * Creates the given topic with the given name. See the
+   *
+   * resource name rules. (topics.create)
    *
    * @param string $name The name of the topic. It must have the format
    * `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
@@ -96,14 +97,14 @@ class Google_Service_Pubsub_Resource_ProjectsTopics extends Google_Service_Resou
   /**
    * Lists matching topics. (topics.listProjectsTopics)
    *
-   * @param string $project The name of the cloud project that topics belong to.
-   * Format is `projects/{project}`.
+   * @param string $project The name of the project in which to list topics.
+   * Format is `projects/{project-id}`.
    * @param array $optParams Optional parameters.
    *
+   * @opt_param int pageSize Maximum number of topics to return.
    * @opt_param string pageToken The value returned by the last
    * `ListTopicsResponse`; indicates that this is a continuation of a prior
    * `ListTopics` call, and that the system should return the next page of data.
-   * @opt_param int pageSize Maximum number of topics to return.
    * @return Google_Service_Pubsub_ListTopicsResponse
    */
   public function listProjectsTopics($project, $optParams = array())
@@ -134,8 +135,7 @@ class Google_Service_Pubsub_Resource_ProjectsTopics extends Google_Service_Resou
   }
   /**
    * Adds one or more messages to the topic. Returns `NOT_FOUND` if the topic does
-   * not exist. The message payload must not be empty; it must contain  either a
-   * non-empty data field, or at least one attribute. (topics.publish)
+   * not exist. (topics.publish)
    *
    * @param string $topic The messages in the request will be published on this
    * topic. Format is `projects/{project}/topics/{topic}`.

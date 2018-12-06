@@ -19,11 +19,11 @@
  * Service definition for IAMCredentials (v1).
  *
  * <p>
- * IAM Service Account Credentials API</p>
+ * Creates short-lived, limited-privilege credentials for IAM service accounts.</p>
  *
  * <p>
  * For more information about this service, see the API
- * <a href="https://developers.google.com/identity/protocols/OAuth2ServiceAccount" target="_blank">Documentation</a>
+ * <a href="https://cloud.google.com/iam/docs/creating-short-lived-service-account-credentials" target="_blank">Documentation</a>
  * </p>
  *
  * @author Google, Inc.
@@ -67,6 +67,16 @@ class Google_Service_IAMCredentials extends Google_Service
               ),
             ),'generateIdToken' => array(
               'path' => 'v1/{+name}:generateIdToken',
+              'httpMethod' => 'POST',
+              'parameters' => array(
+                'name' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'generateIdentityBindingAccessToken' => array(
+              'path' => 'v1/{+name}:generateIdentityBindingAccessToken',
               'httpMethod' => 'POST',
               'parameters' => array(
                 'name' => array(

@@ -1,5 +1,63 @@
 # Changelog
 
+## 6.24.0 - 2018-11-28
+* [#564](https://github.com/stripe/stripe-php/pull/564) Add event name constants for subscription schedule aborted/expiring
+
+## 6.23.0 - 2018-11-27
+* [#542](https://github.com/stripe/stripe-php/pull/542) Add support for `ValueList` and `ValueListItem` for Radar 
+
+## 6.22.1 - 2018-11-20
+* [#561](https://github.com/stripe/stripe-php/pull/561) Add cast and some docs to telemetry introduced in 6.22.0/#549
+
+## 6.22.0 - 2018-11-15
+* [#549](https://github.com/stripe/stripe-php/pull/549) Add support for client telemetry
+
+## 6.21.1 - 2018-11-12
+* [#548](https://github.com/stripe/stripe-php/pull/548) Don't mutate `Exception` class properties from `OAuthBase` error
+
+## 6.21.0 - 2018-11-08
+* [#537](https://github.com/stripe/stripe-php/pull/537) Add new API endpoints for the `Invoice` resource.
+
+## 6.20.1 - 2018-11-07
+* [#546](https://github.com/stripe/stripe-php/pull/546) Drop files from the Composer package that aren't needed in the release
+
+## 6.20.0 - 2018-10-30
+* [#536](https://github.com/stripe/stripe-php/pull/536) Add support for the `Person` resource
+* [#541](https://github.com/stripe/stripe-php/pull/541) Add support for the `WebhookEndpoint` resource
+
+## 6.19.5 - 2018-10-17
+* [#539](https://github.com/stripe/stripe-php/pull/539) Fix methods on `\Stripe\PaymentIntent` to properly pass arguments to the API.
+
+## 6.19.4 - 2018-10-11
+* [#534](https://github.com/stripe/stripe-php/pull/534) Fix PSR-4 autoloading for `\Stripe\FileUpload` class alias
+
+## 6.19.3 - 2018-10-09
+* [#530](https://github.com/stripe/stripe-php/pull/530) Add constants for `flow` (`FLOW_*`), `status` (`STATUS_*`) and `usage` (`USAGE_*`) on `\Stripe\Source`
+
+## 6.19.2 - 2018-10-08
+* [#531](https://github.com/stripe/stripe-php/pull/531) Store HTTP response headers in case-insensitive array
+
+## 6.19.1 - 2018-09-25
+* [#526](https://github.com/stripe/stripe-php/pull/526) Ignore null values in request parameters
+
+## 6.19.0 - 2018-09-24
+* [#523](https://github.com/stripe/stripe-php/pull/523) Add support for Stripe Terminal
+
+## 6.18.0 - 2018-09-24
+* [#520](https://github.com/stripe/stripe-php/pull/520) Rename `\Stripe\FileUpload` to `\Stripe\File`
+
+## 6.17.2 - 2018-09-18
+* [#522](https://github.com/stripe/stripe-php/pull/522) Fix warning when adding a new additional owner to an existing array
+
+## 6.17.1 - 2018-09-14
+* [#517](https://github.com/stripe/stripe-php/pull/517) Integer-index encode all sequential arrays
+
+## 6.17.0 - 2018-09-05
+* [#514](https://github.com/stripe/stripe-php/pull/514) Add support for reporting resources
+
+## 6.16.0 - 2018-08-23
+* [#509](https://github.com/stripe/stripe-php/pull/509) Add support for usage record summaries
+
 ## 6.15.0 - 2018-08-03
 * [#504](https://github.com/stripe/stripe-php/pull/504) Add cancel support for topups
 

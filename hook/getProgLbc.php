@@ -44,9 +44,17 @@ if ($index >= $nbRows) {
     ));
 }
 
+$clientMg = new \spamtonprof\stp_api\LbcClientManager();
+
+$client = $clientMg->get(array(
+    'ref_client' => $rows[$index][0]
+));
+
 $slack->sendMessages('log-lbc', array(
+    "   --------------   ",
     "LBC : publication de la ligne du sheet n° : " . ($index + 1) . " sur " . $nbRows,
-    implode(" - ", $rows[$index])
+    implode(" - ", $rows[$index]),
+    'nom de domaine : ' . $client->getDomain()
 ));
 
 $ret = new \stdClass();

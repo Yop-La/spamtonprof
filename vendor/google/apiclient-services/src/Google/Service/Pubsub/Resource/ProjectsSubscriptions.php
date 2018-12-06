@@ -47,9 +47,11 @@ class Google_Service_Pubsub_Resource_ProjectsSubscriptions extends Google_Servic
     return $this->call('acknowledge', array($params), "Google_Service_Pubsub_PubsubEmpty");
   }
   /**
-   * Creates a subscription to a given topic. See the  resource name rules. If the
-   * subscription already exists, returns `ALREADY_EXISTS`. If the corresponding
-   * topic doesn't exist, returns `NOT_FOUND`.
+   * Creates a subscription to a given topic. See the
+   *
+   * resource name rules. If the subscription already exists, returns
+   * `ALREADY_EXISTS`. If the corresponding topic doesn't exist, returns
+   * `NOT_FOUND`.
    *
    * If the name is not provided in the request, the server will assign a random
    * name for this subscription on the same project as the topic, conforming to
@@ -125,8 +127,8 @@ class Google_Service_Pubsub_Resource_ProjectsSubscriptions extends Google_Servic
   /**
    * Lists matching subscriptions. (subscriptions.listProjectsSubscriptions)
    *
-   * @param string $project The name of the cloud project that subscriptions
-   * belong to. Format is `projects/{project}`.
+   * @param string $project The name of the project in which to list
+   * subscriptions. Format is `projects/{project-id}`.
    * @param array $optParams Optional parameters.
    *
    * @opt_param string pageToken The value returned by the last
@@ -222,7 +224,11 @@ class Google_Service_Pubsub_Resource_ProjectsSubscriptions extends Google_Servic
   }
   /**
    * Seeks an existing subscription to a point in time or to a given snapshot,
-   * whichever is provided in the request. ALPHA: This feature is part of an alpha
+   * whichever is provided in the request. Snapshots are used in Seek operations,
+   * which allow you to manage message acknowledgments in bulk. That is, you can
+   * set the acknowledgment state of messages in an existing subscription to the
+   * state captured by a snapshot. Note that both the subscription and the
+   * snapshot must be on the same topic. BETA: This feature is part of a beta
    * release. This API might be changed in backward-incompatible ways and is not
    * recommended for production use. It is not subject to any SLA or deprecation
    * policy. (subscriptions.seek)

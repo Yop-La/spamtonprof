@@ -63,7 +63,11 @@ class Google_Service_Iam extends Google_Service
         'iamPolicies',
         array(
           'methods' => array(
-            'queryAuditableServices' => array(
+            'lintPolicy' => array(
+              'path' => 'v1/iamPolicies:lintPolicy',
+              'httpMethod' => 'POST',
+              'parameters' => array(),
+            ),'queryAuditableServices' => array(
               'path' => 'v1/iamPolicies:queryAuditableServices',
               'httpMethod' => 'POST',
               'parameters' => array(),
@@ -120,6 +124,10 @@ class Google_Service_Iam extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
+                'view' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
                 'showDeleted' => array(
                   'location' => 'query',
                   'type' => 'boolean',
@@ -131,10 +139,6 @@ class Google_Service_Iam extends Google_Service
                 'pageSize' => array(
                   'location' => 'query',
                   'type' => 'integer',
-                ),
-                'view' => array(
-                  'location' => 'query',
-                  'type' => 'string',
                 ),
               ),
             ),'patch' => array(
@@ -228,6 +232,10 @@ class Google_Service_Iam extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
+                'showDeleted' => array(
+                  'location' => 'query',
+                  'type' => 'boolean',
+                ),
                 'pageToken' => array(
                   'location' => 'query',
                   'type' => 'string',
@@ -239,10 +247,6 @@ class Google_Service_Iam extends Google_Service
                 'view' => array(
                   'location' => 'query',
                   'type' => 'string',
-                ),
-                'showDeleted' => array(
-                  'location' => 'query',
-                  'type' => 'boolean',
                 ),
               ),
             ),'patch' => array(
@@ -328,13 +332,13 @@ class Google_Service_Iam extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageSize' => array(
-                  'location' => 'query',
-                  'type' => 'integer',
-                ),
                 'pageToken' => array(
                   'location' => 'query',
                   'type' => 'string',
+                ),
+                'pageSize' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
                 ),
               ),
             ),'setIamPolicy' => array(
@@ -470,10 +474,6 @@ class Google_Service_Iam extends Google_Service
               'path' => 'v1/roles',
               'httpMethod' => 'GET',
               'parameters' => array(
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'pageSize' => array(
                   'location' => 'query',
                   'type' => 'integer',
@@ -489,6 +489,10 @@ class Google_Service_Iam extends Google_Service
                 'showDeleted' => array(
                   'location' => 'query',
                   'type' => 'boolean',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),'queryGrantableRoles' => array(

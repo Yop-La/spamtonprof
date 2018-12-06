@@ -116,6 +116,24 @@ class StripeManager
         $this->testMode = $testMode;
     }
 
+    public function listActiveSubs(int $limit, $starting_after = false)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $params = [
+            'limit' => $limit,
+            'status' => 'active'
+        ];
+
+        if ($starting_after) {
+            $params['starting_after'] = $starting_after;
+        }
+
+        $subs = \Stripe\Subscription::all($params);
+
+        return ($subs);
+    }
+
     public function addConnectSubscription($emailClient, $source, $refCompte, $planStripeId, $stripeProfId, $refAbonnement, \spamtonprof\stp_api\StpCompte $compte, $trialEnd = 'now')
     {
         $slack = new \spamtonprof\slack\Slack();
@@ -487,7 +505,7 @@ class StripeManager
         ));
 
         $transfert = \Stripe\Transfer::create(array(
-            "amount" => $amount * 100,
+            "amount" => round($amount * 100),
             "currency" => "eur",
             "destination" => $prof->getStripe_id(),
             "description" => $description

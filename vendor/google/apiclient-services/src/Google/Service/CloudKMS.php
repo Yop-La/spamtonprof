@@ -19,8 +19,8 @@
  * Service definition for CloudKMS (v1).
  *
  * <p>
- * Manages encryption for your cloud services the same way you do on-premises.
- * You can generate, use, rotate, and destroy AES256 encryption keys.</p>
+ * Manages keys and performs cryptographic operations in a central cloud
+ * service, for direct use by other cloud resources and applications.</p>
  *
  * <p>
  * For more information about this service, see the API
@@ -254,6 +254,10 @@ class Google_Service_CloudKMS extends Google_Service
                   'location' => 'query',
                   'type' => 'integer',
                 ),
+                'versionView' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
               ),
             ),'patch' => array(
               'path' => 'v1/{+name}',
@@ -309,7 +313,27 @@ class Google_Service_CloudKMS extends Google_Service
         'cryptoKeyVersions',
         array(
           'methods' => array(
-            'create' => array(
+            'asymmetricDecrypt' => array(
+              'path' => 'v1/{+name}:asymmetricDecrypt',
+              'httpMethod' => 'POST',
+              'parameters' => array(
+                'name' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'asymmetricSign' => array(
+              'path' => 'v1/{+name}:asymmetricSign',
+              'httpMethod' => 'POST',
+              'parameters' => array(
+                'name' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'create' => array(
               'path' => 'v1/{+parent}/cryptoKeyVersions',
               'httpMethod' => 'POST',
               'parameters' => array(
@@ -339,6 +363,16 @@ class Google_Service_CloudKMS extends Google_Service
                   'required' => true,
                 ),
               ),
+            ),'getPublicKey' => array(
+              'path' => 'v1/{+name}/publicKey',
+              'httpMethod' => 'GET',
+              'parameters' => array(
+                'name' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
             ),'list' => array(
               'path' => 'v1/{+parent}/cryptoKeyVersions',
               'httpMethod' => 'GET',
@@ -348,11 +382,15 @@ class Google_Service_CloudKMS extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
                 'pageSize' => array(
                   'location' => 'query',
                   'type' => 'integer',
                 ),
-                'pageToken' => array(
+                'view' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),

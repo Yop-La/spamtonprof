@@ -21,6 +21,8 @@ class Google_Service_Container_Cluster extends Google_Collection
   protected $addonsConfigType = 'Google_Service_Container_AddonsConfig';
   protected $addonsConfigDataType = '';
   public $clusterIpv4Cidr;
+  protected $conditionsType = 'Google_Service_Container_StatusCondition';
+  protected $conditionsDataType = 'array';
   public $createTime;
   public $currentMasterVersion;
   public $currentNodeCount;
@@ -49,6 +51,8 @@ class Google_Service_Container_Cluster extends Google_Collection
   public $monitoringService;
   public $name;
   public $network;
+  protected $networkConfigType = 'Google_Service_Container_NetworkConfig';
+  protected $networkConfigDataType = '';
   protected $networkPolicyType = 'Google_Service_Container_NetworkPolicy';
   protected $networkPolicyDataType = '';
   protected $nodeConfigType = 'Google_Service_Container_NodeConfig';
@@ -56,6 +60,8 @@ class Google_Service_Container_Cluster extends Google_Collection
   public $nodeIpv4CidrSize;
   protected $nodePoolsType = 'Google_Service_Container_NodePool';
   protected $nodePoolsDataType = 'array';
+  protected $privateClusterConfigType = 'Google_Service_Container_PrivateClusterConfig';
+  protected $privateClusterConfigDataType = '';
   public $resourceLabels;
   public $selfLink;
   public $servicesIpv4Cidr;
@@ -85,6 +91,20 @@ class Google_Service_Container_Cluster extends Google_Collection
   public function getClusterIpv4Cidr()
   {
     return $this->clusterIpv4Cidr;
+  }
+  /**
+   * @param Google_Service_Container_StatusCondition
+   */
+  public function setConditions($conditions)
+  {
+    $this->conditions = $conditions;
+  }
+  /**
+   * @return Google_Service_Container_StatusCondition
+   */
+  public function getConditions()
+  {
+    return $this->conditions;
   }
   public function setCreateTime($createTime)
   {
@@ -301,6 +321,20 @@ class Google_Service_Container_Cluster extends Google_Collection
     return $this->network;
   }
   /**
+   * @param Google_Service_Container_NetworkConfig
+   */
+  public function setNetworkConfig(Google_Service_Container_NetworkConfig $networkConfig)
+  {
+    $this->networkConfig = $networkConfig;
+  }
+  /**
+   * @return Google_Service_Container_NetworkConfig
+   */
+  public function getNetworkConfig()
+  {
+    return $this->networkConfig;
+  }
+  /**
    * @param Google_Service_Container_NetworkPolicy
    */
   public function setNetworkPolicy(Google_Service_Container_NetworkPolicy $networkPolicy)
@@ -349,6 +383,20 @@ class Google_Service_Container_Cluster extends Google_Collection
   public function getNodePools()
   {
     return $this->nodePools;
+  }
+  /**
+   * @param Google_Service_Container_PrivateClusterConfig
+   */
+  public function setPrivateClusterConfig(Google_Service_Container_PrivateClusterConfig $privateClusterConfig)
+  {
+    $this->privateClusterConfig = $privateClusterConfig;
+  }
+  /**
+   * @return Google_Service_Container_PrivateClusterConfig
+   */
+  public function getPrivateClusterConfig()
+  {
+    return $this->privateClusterConfig;
   }
   public function setResourceLabels($resourceLabels)
   {

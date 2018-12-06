@@ -68,6 +68,8 @@ class Google_Service_AndroidManagement_Policy extends Google_Collection
   public $openNetworkConfiguration;
   public $outgoingBeamDisabled;
   public $outgoingCallsDisabled;
+  protected $passwordPoliciesType = 'Google_Service_AndroidManagement_PasswordRequirements';
+  protected $passwordPoliciesDataType = 'array';
   protected $passwordRequirementsType = 'Google_Service_AndroidManagement_PasswordRequirements';
   protected $passwordRequirementsDataType = '';
   protected $permissionGrantsType = 'Google_Service_AndroidManagement_PermissionGrant';
@@ -76,6 +78,7 @@ class Google_Service_AndroidManagement_Policy extends Google_Collection
   protected $permittedInputMethodsDataType = '';
   protected $persistentPreferredActivitiesType = 'Google_Service_AndroidManagement_PersistentPreferredActivity';
   protected $persistentPreferredActivitiesDataType = 'array';
+  public $playStoreMode;
   public $privateKeySelectionEnabled;
   protected $recommendedGlobalProxyType = 'Google_Service_AndroidManagement_ProxyInfo';
   protected $recommendedGlobalProxyDataType = '';
@@ -496,6 +499,20 @@ class Google_Service_AndroidManagement_Policy extends Google_Collection
   /**
    * @param Google_Service_AndroidManagement_PasswordRequirements
    */
+  public function setPasswordPolicies($passwordPolicies)
+  {
+    $this->passwordPolicies = $passwordPolicies;
+  }
+  /**
+   * @return Google_Service_AndroidManagement_PasswordRequirements
+   */
+  public function getPasswordPolicies()
+  {
+    return $this->passwordPolicies;
+  }
+  /**
+   * @param Google_Service_AndroidManagement_PasswordRequirements
+   */
   public function setPasswordRequirements(Google_Service_AndroidManagement_PasswordRequirements $passwordRequirements)
   {
     $this->passwordRequirements = $passwordRequirements;
@@ -548,6 +565,14 @@ class Google_Service_AndroidManagement_Policy extends Google_Collection
   public function getPersistentPreferredActivities()
   {
     return $this->persistentPreferredActivities;
+  }
+  public function setPlayStoreMode($playStoreMode)
+  {
+    $this->playStoreMode = $playStoreMode;
+  }
+  public function getPlayStoreMode()
+  {
+    return $this->playStoreMode;
   }
   public function setPrivateKeySelectionEnabled($privateKeySelectionEnabled)
   {

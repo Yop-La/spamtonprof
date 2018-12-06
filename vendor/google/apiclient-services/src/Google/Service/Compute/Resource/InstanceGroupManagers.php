@@ -26,14 +26,14 @@
 class Google_Service_Compute_Resource_InstanceGroupManagers extends Google_Service_Resource
 {
   /**
-   * Schedules a group action to remove the specified instances from the managed
-   * instance group. Abandoning an instance does not delete the instance, but it
-   * does remove the instance from any target pools that are applied by the
-   * managed instance group. This method reduces the targetSize of the managed
-   * instance group by the number of instances that you abandon. This operation is
-   * marked as DONE when the action is scheduled even if the instances have not
-   * yet been removed from the group. You must separately verify the status of the
-   * abandoning action with the listmanagedinstances method.
+   * Flags the specified instances to be removed from the managed instance group.
+   * Abandoning an instance does not delete the instance, but it does remove the
+   * instance from any target pools that are applied by the managed instance
+   * group. This method reduces the targetSize of the managed instance group by
+   * the number of instances that you abandon. This operation is marked as DONE
+   * when the action is scheduled even if the instances have not yet been removed
+   * from the group. You must separately verify the status of the abandoning
+   * action with the listmanagedinstances method.
    *
    * If the group is part of a backend service that has enabled connection
    * draining, it can take up to 60 seconds after the connection draining duration
@@ -156,13 +156,13 @@ class Google_Service_Compute_Resource_InstanceGroupManagers extends Google_Servi
     return $this->call('delete', array($params), "Google_Service_Compute_Operation");
   }
   /**
-   * Schedules a group action to delete the specified instances in the managed
-   * instance group. The instances are also removed from any target pools of which
-   * they were a member. This method reduces the targetSize of the managed
-   * instance group by the number of instances that you delete. This operation is
-   * marked as DONE when the action is scheduled even if the instances are still
-   * being deleted. You must separately verify the status of the deleting action
-   * with the listmanagedinstances method.
+   * Flags the specified instances in the managed instance group for immediate
+   * deletion. The instances are also removed from any target pools of which they
+   * were a member. This method reduces the targetSize of the managed instance
+   * group by the number of instances that you delete. This operation is marked as
+   * DONE when the action is scheduled even if the instances are still being
+   * deleted. You must separately verify the status of the deleting action with
+   * the listmanagedinstances method.
    *
    * If the group is part of a backend service that has enabled connection
    * draining, it can take up to 60 seconds after the connection draining duration
@@ -218,11 +218,11 @@ class Google_Service_Compute_Resource_InstanceGroupManagers extends Google_Servi
   }
   /**
    * Creates a managed instance group using the information that you specify in
-   * the request. After the group is created, it schedules an action to create
-   * instances in the group using the specified instance template. This operation
-   * is marked as DONE when the group is created even if the instances in the
-   * group have not yet been created. You must separately verify the status of the
-   * individual instances with the listmanagedinstances method.
+   * the request. After the group is created, instances in the group are created
+   * using the specified instance template. This operation is marked as DONE when
+   * the group is created even if the instances in the group have not yet been
+   * created. You must separately verify the status of the individual instances
+   * with the listmanagedinstances method.
    *
    * A managed instance group can have up to 1000 VM instances per group. Please
    * contact Cloud Support if you need an increase in this limit.
@@ -323,10 +323,44 @@ class Google_Service_Compute_Resource_InstanceGroupManagers extends Google_Servi
    * @param string $instanceGroupManager The name of the managed instance group.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string filter
-   * @opt_param string maxResults
-   * @opt_param string order_by
-   * @opt_param string pageToken
+   * @opt_param string filter A filter expression that filters resources listed in
+   * the response. The expression must specify the field name, a comparison
+   * operator, and the value that you want to use for filtering. The value must be
+   * a string, a number, or a boolean. The comparison operator must be either =,
+   * !=, >, or <.
+   *
+   * For example, if you are filtering Compute Engine instances, you can exclude
+   * instances named example-instance by specifying name != example-instance.
+   *
+   * You can also filter nested fields. For example, you could specify
+   * scheduling.automaticRestart = false to include instances only if they are not
+   * scheduled for automatic restarts. You can use filtering on nested fields to
+   * filter based on resource labels.
+   *
+   * To filter on multiple expressions, provide each separate expression within
+   * parentheses. For example, (scheduling.automaticRestart = true) (cpuPlatform =
+   * "Intel Skylake"). By default, each expression is an AND expression. However,
+   * you can include AND and OR expressions explicitly. For example, (cpuPlatform
+   * = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND
+   * (scheduling.automaticRestart = true).
+   * @opt_param string maxResults The maximum number of results per page that
+   * should be returned. If the number of available results is larger than
+   * maxResults, Compute Engine returns a nextPageToken that can be used to get
+   * the next page of results in subsequent list requests. Acceptable values are 0
+   * to 500, inclusive. (Default: 500)
+   * @opt_param string order_by Sorts list results by a certain order. By default,
+   * results are returned in alphanumerical order based on the resource name.
+   *
+   * You can also sort results in descending order based on the creation timestamp
+   * using orderBy="creationTimestamp desc". This sorts results based on the
+   * creationTimestamp field in reverse chronological order (newest result first).
+   * Use this to sort resources like operations so that the newest operation is
+   * returned first.
+   *
+   * Currently, only sorting by name or creationTimestamp desc is supported.
+   * @opt_param string pageToken Specifies a page token to use. Set pageToken to
+   * the nextPageToken returned by a previous list request to get the next page of
+   * results.
    * @return Google_Service_Compute_InstanceGroupManagersListManagedInstancesResponse
    */
   public function listManagedInstances($project, $zone, $instanceGroupManager, $optParams = array())
@@ -336,12 +370,12 @@ class Google_Service_Compute_Resource_InstanceGroupManagers extends Google_Servi
     return $this->call('listManagedInstances', array($params), "Google_Service_Compute_InstanceGroupManagersListManagedInstancesResponse");
   }
   /**
-   * Schedules a group action to recreate the specified instances in the managed
-   * instance group. The instances are deleted and recreated using the current
-   * instance template for the managed instance group. This operation is marked as
-   * DONE when the action is scheduled even if the instances have not yet been
-   * recreated. You must separately verify the status of the recreating action
-   * with the listmanagedinstances method.
+   * Flags the specified instances in the managed instance group to be immediately
+   * recreated. The instances are deleted and recreated using the current instance
+   * template for the managed instance group. This operation is marked as DONE
+   * when the flag is set even if the instances have not yet been recreated. You
+   * must separately verify the status of the recreating action with the
+   * listmanagedinstances method.
    *
    * If the group is part of a backend service that has enabled connection
    * draining, it can take up to 60 seconds after the connection draining duration
@@ -384,6 +418,16 @@ class Google_Service_Compute_Resource_InstanceGroupManagers extends Google_Servi
    * when the resize actions are scheduled even if the group has not yet added or
    * deleted any instances. You must separately verify the status of the creating
    * or deleting actions with the listmanagedinstances method.
+   *
+   * When resizing down, the instance group arbitrarily chooses the order in which
+   * VMs are deleted. The group takes into account some VM attributes when making
+   * the selection including:
+   *
+   * + The status of the VM instance. + The health of the VM instance. + The
+   * instance template version the VM is based on. + For regional managed instance
+   * groups, the location of the VM instance.
+   *
+   * This list is subject to change.
    *
    * If the group is part of a backend service that has enabled connection
    * draining, it can take up to 60 seconds after the connection draining duration
