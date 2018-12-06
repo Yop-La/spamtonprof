@@ -107,12 +107,12 @@ class GoogleManager
      *            can be used to indicate the authenticated user.
      * @return array Array of Messages.
      */
-    public function listMessages($searchOperator)
+    public function listMessages($searchOperator, $nbPage = 1)
     {
         $pageToken = NULL;
         $messages = array();
         $opt_param = array(
-            "q" => $searchOperator,
+            "q" => utf8_encode($searchOperator),
             "maxResults" => 10
         );
 
@@ -126,8 +126,13 @@ class GoogleManager
                 $messagesResponse = $this->service->users_messages->listUsersMessages($this->userId, $opt_param);
                 if ($messagesResponse->getMessages()) {
                     $messages = array_merge($messages, $messagesResponse->getMessages());
-
                     $pageToken = $messagesResponse->getNextPageToken();
+
+                    $indexPage = $indexPage + 1;
+                    
+                    if ($indexPage == $nbPage) {
+                        return ($messages);
+                    }
                 }
             } catch (\Exception $e) {
                 print 'An error occurred: ' . $e->getMessage();
