@@ -30,9 +30,14 @@ header("Pragma: no-cache");
 $gmail = new \spamtonprof\googleMg\GoogleManager('mailsfromlbc@gmail.com');
 $slack = new \spamtonprof\slack\Slack();
 
-$email = $_POST['email'];
-$timeBreak = $_POST['timeBreak'];
-$nbTry = $_POST['nbTry'];
+// $email = $_POST['email'];
+// $timeBreak = $_POST['timeBreak'];
+// $nbTry = $_POST['nbTry'];
+
+
+$email = 'tom00@maths1.thomas-cours.fr';
+$timeBreak = 1;
+$nbTry = 2;
 
 $ret = new \stdClass();
 
@@ -56,7 +61,7 @@ do {
         $pattern = '#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#';
         preg_match_all($pattern, $body, $matches);
 
-        $confirmationUrl = $matches[0];
+        $confirmationUrl = $matches[0][0];
 
         $ret->url = $confirmationUrl;
         prettyPrint($ret);
@@ -67,6 +72,10 @@ do {
     ));
     sleep($timeBreak);
 } while ($nbTry != $indexTry);
+
+$slack->sendMessages('log-lbc', array(
+    'Impossible de récupérer l\'email de confirmation pour l\'email : ' . $email . '. Fin de publication.'
+));
 
 $ret->url = "no_confirmation_email_found";
 prettyPrint($ret);
