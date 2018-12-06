@@ -30,14 +30,12 @@ header("Pragma: no-cache");
 $gmail = new \spamtonprof\googleMg\GoogleManager('mailsfromlbc@gmail.com');
 $slack = new \spamtonprof\slack\Slack();
 
-// $email = $_POST['email'];
-// $timeBreak = $_POST['timeBreak'];
-// $nbTry = $_POST['nbTry'];
+$email = $_POST['email'];
+$timeBreak = $_POST['timeBreak'];
+$nbTry = $_POST['nbTry'];
 
 
-$email = 'tom00@maths1.thomas-cours.fr';
-$timeBreak = 1;
-$nbTry = 2;
+
 
 $ret = new \stdClass();
 
