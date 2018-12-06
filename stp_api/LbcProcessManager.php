@@ -133,7 +133,7 @@ class LbcProcessManager
                     $this->msgs[] = strip_tags($body);
 
                     if (count($this->msgs) != 0) {
-                        $this->slack->sendMessages($this->slack::LogLbc, $this->msgs);
+//                         $this->slack->sendMessages($this->slack::LogLbc, $this->msgs);
                         $this->msgs = [];
                     }
 
@@ -321,7 +321,7 @@ class LbcProcessManager
                 $msgs[] = "Réponse : ";
                 $msgs[] = $subject;
                 $msgs[] = strip_tags($body);
-                $this->slack->sendMessages($this->slack::LogLbc, $msgs);
+//                 $this->slack->sendMessages($this->slack::LogLbc, $msgs);
 
                 $labelId = $this->gmailManager->getLabelsIds(array(
                     "Repondu"
@@ -462,7 +462,7 @@ class LbcProcessManager
             $lbcAccountMg->updateControleDate($lbcAccount);
 
             $msgs[] = $nbAnnonce . "en ligne";
-            $slack->sendMessages("log", $msgs);
+            $slack->sendMessages("log-lbc", $msgs);
         }
     }
 
