@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.6.9.6
+ * Version: 1.1.6.9.7
  *
  *
  * Author: yopla
@@ -338,6 +338,28 @@ function my_pre_population_callback($options, $settings)
                 $options[] = array(
                     'label' => $typeTexte->getType(),
                     'value' => $typeTexte->getRef_type()
+                );
+            }
+        }
+    }
+
+    // target "choix domain" du formulaire "conf client leboncoin"
+    if ($settings['key'] == 'listselect_1544217682738' || $settings['key'] == 'listselect_1544218848651') {
+
+        if (is_user_logged_in()) {
+
+            $domainMg = new \spamtonprof\stp_api\StpDomainManager();
+
+            $domains = $domainMg->getAll(array(
+                'in_black_list' => false,
+                'mx_ok' => true
+            ));
+
+            foreach ($domains as $domain) {
+
+                $options[] = array(
+                    'label' => $domain->getName(),
+                    'value' => $domain->getName()
                 );
             }
         }

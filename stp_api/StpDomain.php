@@ -4,11 +4,26 @@ namespace spamtonprof\stp_api;
 class StpDomain implements \JsonSerializable
 {
 
-    protected $name, $ref_domain, $mail_provider, $mx_ok, $in_black_list;
+    protected $name, $ref_domain, $mail_provider, $mx_ok, $in_black_list, $root, $subdomain;
 
     public function __construct(array $donnees = array())
     {
         $this->hydrate($donnees);
+
+        if (! is_null($this->name)) {
+            $domain_part = explode('.', $this->name);
+            $nbPart = count($domain_part);
+
+            $this->root = implode('.', array(
+                $domain_part[$nbPart - 2],
+                $domain_part[$nbPart - 1]
+            ));
+
+            unset($domain_part[$nbPart - 2]);
+            unset($domain_part[$nbPart - 1]);
+
+            $this->subdomain = implode('.', $domain_part);
+        }
     }
 
     public function hydrate(array $donnees)
@@ -19,6 +34,42 @@ class StpDomain implements \JsonSerializable
                 $this->$method($value);
             }
         }
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getRoot()
+    {
+        return $this->root;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getSubdomain()
+    {
+        return $this->subdomain;
+    }
+
+    /**
+     *
+     * @param mixed $root
+     */
+    public function setRoot($root)
+    {
+        $this->root = $root;
+    }
+
+    /**
+     *
+     * @param mixed $subdomain
+     */
+    public function setSubdomain($subdomain)
+    {
+        $this->subdomain = $subdomain;
     }
 
     public function getName()
