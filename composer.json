@@ -9,6 +9,9 @@
 		"ifsnop/mysqldump-php" : "2.*",
 		"sunra/php-simple-html-dom-parser" : "1.5.2",
 		"algolia/algoliasearch-client-php" : "^1.27",
-		"ovh/ovh": "^2.0"
+		"ovh/ovh": "^2.0",
+		"mailgun/mailgun-php": "^2.6",
+		"php-http/curl-client": "^1.7",
+		"guzzlehttp/psr7": "^1.5"
 	}
 }

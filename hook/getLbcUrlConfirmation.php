@@ -34,9 +34,6 @@ $email = $_POST['email'];
 $timeBreak = $_POST['timeBreak'];
 $nbTry = $_POST['nbTry'];
 
-
-
-
 $ret = new \stdClass();
 
 $indexTry = 0;
@@ -56,7 +53,7 @@ do {
 
         $matches = array();
 
-        $pattern = '#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#';
+        $pattern = '#\bhttps?://.*leboncoin.fr.*#';
         preg_match_all($pattern, $body, $matches);
 
         $confirmationUrl = $matches[0][0];
