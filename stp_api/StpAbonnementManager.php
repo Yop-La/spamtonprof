@@ -810,6 +810,17 @@ class StpAbonnementManager
 
         $abo->setSubs_Id($ret["subId"]);
         $this->updateSubsId($abo);
+        
+        //mise à jout du statut d'abonnement dans algolia
+        $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+        
+        $constructor = array(
+            "construct" => array(
+                'ref_statut_abonnement'
+            )
+        );
+        
+        $algoliaMg->updateAbonnement($refAbo, $constructor);
     }
     
     // stop essai
