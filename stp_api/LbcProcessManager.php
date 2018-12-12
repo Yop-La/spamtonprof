@@ -54,7 +54,7 @@ class LbcProcessManager
         $now = $now->format('Y/m/d');
 
         $retour = $this->gmailManager->getNewMessages($lastHistoryId);
-        
+
         $messages = $retour["messages"];
 
         $lastHistoryId = $retour["lastHistoryId"];
@@ -83,8 +83,6 @@ class LbcProcessManager
             $dateReception = new \DateTime($date);
             $dateReception->setTimezone(new \DateTimeZone("Europe/Paris"));
 
-
-            
             $messageType = 0;
 
             // if à faire en premier car le premier if est inclus dans le deuxième if
@@ -166,8 +164,6 @@ class LbcProcessManager
                     $messageType = $this->messageTypeMg::DEBUT_MESSAGERIE_LEBONCOIN;
                 }
 
-                
-                
                 // Extraction de l'adresse mail du champ to
                 $matches = [];
                 $pattern = "/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i";
@@ -193,7 +189,6 @@ class LbcProcessManager
                     echo ($body . "<br>");
                     echo ("lbcProfil : " . $lbcProfil . " -- leadEmail : " . $leadEmail . " -- messageId : " . $messageId . " -- dateReception : " . $dateReception->format(PG_DATETIME_FORMAT) . "  --  type : " . $messageType . "<br>" . "<br>");
 
-                    
                     // on ajoute à table lead messages
 
                     $this->addNewLeadMessage($lbcProfil, $leadEmail, $dateReception, $gmailId, $subject, $messageType);
@@ -232,7 +227,7 @@ class LbcProcessManager
                     }
                 }
             } elseif (strpos($from, 'le.bureau.des.profs@gmail.com') !== false) {
-    
+
                 if (strpos($subject, "|--|") !== false) {
 
                     preg_match('/\|--\|(\d*)\|--\|/', $subject, $matches);
