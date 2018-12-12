@@ -129,7 +129,7 @@ class GoogleManager
                     $pageToken = $messagesResponse->getNextPageToken();
 
                     $indexPage = $indexPage + 1;
-                    
+
                     if ($indexPage == $nbPage) {
                         return ($messages);
                     }
@@ -580,6 +580,27 @@ class GoogleManager
                 // Print columns A and E, which correspond to indices 0 and 4.
                 printf("%s, %s\n", $row[0], $row[4]);
             }
+        }
+    }
+
+    public function forwardMessage($gmailId, $to, $replyTo)
+    {
+        $gMessage = $this->getMessage($gmailId, [
+            "format" => "full"
+        ]);
+
+        $subject = $this->getHeader($gMessage, "Subject");
+        $body = $this->getBody($gMessage);
+        $this->sendMessage($body, $subject, $to, $replyTo, "mailsfromlbc@gmail.com", "lbcBot");
+    }
+
+    public function forwardMessages($query, $nbPage = 1, $to, $replyTo)
+    {
+        $msgs = $this->listMessages($query, $nbPage);
+
+        foreach ($msgs as $msg) {
+
+            $this->forwardMessage($msg->id, $to, $replyTo);
         }
     }
 }
