@@ -328,6 +328,14 @@ class StpAbonnementManager
         $q->execute();
     }
 
+    public function updateRefCoupon(\spamtonprof\stp_api\StpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set ref_coupon = :ref_coupon where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->bindValue(":ref_coupon", $abonnement->getRef_coupon());
+        $q->execute();
+    }
+
     public function updateFirstProfAssigned(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set first_prof_assigned = :first_prof_assigned where ref_abonnement = :ref_abonnement");
@@ -462,8 +470,14 @@ class StpAbonnementManager
                     $statutAbo = $statutAboMg->get(array(
                         'ref_statut_abonnement' => $abonnement->getRef_statut_abonnement()
                     ));
-
-                    $abonnement->setStatut($statutAbo);
+                case "ref_coupon":
+                    $couponMg = new \spamtonprof\stp_api\StpCouponManager();
+                    if (! is_null($abonnement->getRef_coupon())) {
+                        $coupon = $couponMg->get(array(
+                            'ref_coupon' => $abonnement->getRef_coupon()
+                        ));
+                        $abonnement->setCoupon($coupon);
+                    }
                     break;
                 case "ref_compte":
                     $compteMg = new \spamtonprof\stp_api\StpCompteManager();
@@ -567,6 +581,14 @@ class StpAbonnementManager
                 $refProche = $info["ref_proche"];
                 $q = $this->_db->prepare('select * from stp_abonnement where ref_proche = :ref_proche');
                 $q->bindValue(":ref_proche", $refProche);
+                $q->execute();
+            } else if (array_key_exists("ref_coupon", $info) && array_key_exists("ref_compte", $info)) {
+
+                $refCoupon = $info["ref_coupon"];
+                $refCompte = $info["ref_compte"];
+                $q = $this->_db->prepare('select * from stp_abonnement where ref_coupon = :ref_coupon and ref_compte = :ref_compte');
+                $q->bindValue(":ref_coupon", $refCoupon);
+                $q->bindValue(":ref_compte", $refCompte);
                 $q->execute();
             } else if (array_key_exists("ref_compte", $info)) {
 
@@ -810,44 +832,44 @@ class StpAbonnementManager
 
         $abo->setSubs_Id($ret["subId"]);
         $this->updateSubsId($abo);
-        
-        //mise à jout du statut d'abonnement dans algolia
+
+        // mise à jout du statut d'abonnement dans algolia
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
-        
+
         $constructor = array(
             "construct" => array(
                 'ref_statut_abonnement'
             )
         );
-        
+
         $algoliaMg->updateAbonnement($refAbo, $constructor);
     }
-    
+
     // stop essai
     function stopEssai($refAbo)
     {
         $logAboMg = new \spamtonprof\stp_api\StpLogAbonnementManager();
-        
+
         $abo = $this->get(array(
             'ref_abonnement' => $refAbo
         ));
-        
+
         $abo->setRef_statut_abonnement($abo::TERMINE);
-        
+
         $logAboMg->add(new \spamtonprof\stp_api\StpLogAbonnement(array(
             "ref_abonnement" => $abo->getRef_abonnement(),
             "ref_statut_abo" => $abo->getRef_statut_abonnement()
         )));
         $this->updateRefStatutAbonnement($abo);
-        
+
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
-        
+
         $constructor = array(
             "construct" => array(
                 'ref_statut_abonnement'
             )
         );
-        
+
         $algoliaMg->updateAbonnement($refAbo, $constructor);
     }
 

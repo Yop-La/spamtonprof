@@ -11,9 +11,9 @@ use PayPal\Api\Currency;
 
 /*
  *
- * Cette classe sert à gérér ( CRUD ) les plans de paiement stripe
+ * Cette classe sert Ã  gÃ©rÃ©r ( CRUD ) les plans de paiement stripe
  *
- * Elle sert aussi à créer des abonnements, des clients, des paiements, etc
+ * Elle sert aussi Ã  crÃ©er des abonnements, des clients, des paiements, etc
  *
  *
  *
@@ -55,21 +55,26 @@ class StripeManager
 
     public function transfertSubscriptionCharge($event_json, $subIdMan = false, $chargeIdMan = false)
     {
+        serializeTemp($event_json);
         $slack = new \spamtonprof\slack\Slack();
 
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $discount = false;
 
         $chargeId = $chargeIdMan;
         $subId = $subIdMan;
         if ($event_json) {
             $chargeId = $event_json->data->object->charge;
             $subId = $event_json->data->object->subscription;
+            $discount = $event_json->data->object->discount;
         }
 
         $messages = [];
 
         $messages[] = "---------";
-        $messages[] = "Nouveau paiement réussi";
+        $messages[] = "Event id : " . $event_json->id;
+        $messages[] = "Nouveau paiement rÃ©ussi";
         $messages[] = "chargeId : " . $chargeId;
 
         try {
@@ -81,26 +86,55 @@ class StripeManager
                 $profId = $sub->metadata["stripe_prof_id"];
 
                 $charge = \Stripe\Charge::retrieve($chargeId);
+
+                $commission = 25;
+
+                if ($discount) { // on change la commission
+
+                    $percent_off = $discount->coupon->percent_off;
+
+                    if ($percent_off >= 100) {
+                        $slack->sendMessages('log', array(
+                            "Event id : " . $event_json->id,
+                            "Nouveau paiement rÃ©ussi",
+                            "chargeId : " . $chargeId,
+                            'Promo de 100% : pas de transfert'
+                        ));
+                        exit(0);
+                    }
+
+                    if ($percent_off >= $commission) {
+                        $commission = 0;
+                    } else {
+
+                        $commission = 100 * (1 - ((1 - $commission / 100) / (1 - $percent_off / 100)));
+                    }
+                }
+
+                $part_prof = 1 - $commission / 100;
+
                 $charge->transfer_group = $chargeId; // on utilise la charge id comme id de groupage de transactions
                 $charge->save();
 
-                // on transfère 75 % au prof
-                $transfer = \Stripe\Transfer::create(array(
-                    "amount" => round(0.75 * $charge->amount),
+                // on transfÃ¨re 75 % au prof
+                \Stripe\Transfer::create(array(
+                    "amount" => round($part_prof * $charge->amount),
                     "currency" => "eur",
                     "destination" => $profId,
                     "transfer_group" => $chargeId,
                     "source_transaction" => $chargeId
                 ));
 
-                $messages[] = "Transfert vers : " . $profId . "réussi";
+                $messages[] = "Transfert vers : " . $profId . " de " . round($part_prof * $charge->amount / 100) . "â‚¬ (".($part_prof*100)."%) rÃ©ussi";
             } else {
-                $messages[] = "Un abonnement vient d'être facturé sans compte prof associé";
+                $messages[] = "Un abonnement vient d'Ãªtre facturÃ© sans compte prof associÃ©";
             }
         } catch (\Exception $e) {
+
             $messages[] = $e->getMessage();
             return;
         } finally {
+            $messages[] = $event_json;
             $slack->sendMessages("stripe", $messages);
         }
     }
@@ -134,7 +168,7 @@ class StripeManager
         return ($subs);
     }
 
-    public function addConnectSubscription($emailClient, $source, $refCompte, $planStripeId, $stripeProfId, $refAbonnement, \spamtonprof\stp_api\StpCompte $compte, $trialEnd = 'now')
+    public function addConnectSubscription($emailClient, $source, $refCompte, $planStripeId, $stripeProfId, $refAbonnement, \spamtonprof\stp_api\StpCompte $compte, $trialEnd = 'now', \spamtonprof\stp_api\StpCoupon $coupon = null)
     {
         $slack = new \spamtonprof\slack\Slack();
 
@@ -166,7 +200,7 @@ class StripeManager
                 ));
             }
 
-            $subscription = \Stripe\Subscription::create(array(
+            $subParams = array(
 
                 "customer" => $customer->id,
 
@@ -186,11 +220,21 @@ class StripeManager
                     "ref_abonnement" => $refAbonnement,
                     "stripe_prof_id" => $stripeProfId
                 )
-            ));
+            );
+
+            if ($coupon) {
+                if ($this->testMode) {
+                    $subParams['coupon'] = $coupon->getRef_stripe_test();
+                } else {
+                    $subParams['coupon'] = $coupon->getRef_stripe();
+                }
+            }
+
+            $subscription = \Stripe\Subscription::create($subParams);
 
             $slack->sendMessages("abonnement", array(
 
-                "Nouvel abonnement, bien joué la team !!",
+                "Nouvel abonnement, bien jouÃ© la team !!",
 
                 "ref compte : " . $refCompte,
 
@@ -204,21 +248,22 @@ class StripeManager
                 "cusId" => $customer->id
             ));
         } catch (Exception $e) {
-            return (false);
 
             $slack->sendMessages("abonnement", array(
 
-                "Oops un paiement pour abonnement vient d'échouer",
+                "Oops un paiement pour abonnement vient d'Ã©chouer",
 
                 "ref compte : " . $refCompte,
 
                 "email client : " . $emailClient,
 
-                "Faut voir ça avec le client",
+                "Faut voir Ã§a avec le client",
 
                 "Erreur : " . $e->getMessage()
             ));
         }
+
+        return (false);
     }
 
     public function updateSubscriptionPlan($subId, \spamtonprof\stp_api\StpPlan $plan)
@@ -228,7 +273,7 @@ class StripeManager
             $planId = $plan->getRef_plan_stripe_test();
         }
 
-        // mise à jour de l'abonnement stripe
+        // mise Ã  jour de l'abonnement stripe
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $sub = \Stripe\Subscription::retrieve($subId);
 
@@ -305,7 +350,7 @@ class StripeManager
         ;
 
         /**
-         * *********** à éxecuter pour mise en prod stripe - sert à ajouter les produits à stripe et enregistrer les reds dans la bdd ***************************
+         * *********** Ã  Ã©xecuter pour mise en prod stripe - sert Ã  ajouter les produits Ã  stripe et enregistrer les reds dans la bdd ***************************
          */
 
         $formuleManager = new FormuleManager();
@@ -335,10 +380,10 @@ class StripeManager
         }
 
         /**
-         * *********** fin à éxecuter pour mise en prod stripe - sert à ajouter les produits à stripe et enregistrer les reds dans la bdd ***************************
+         * *********** fin Ã  Ã©xecuter pour mise en prod stripe - sert Ã  ajouter les produits Ã  stripe et enregistrer les reds dans la bdd ***************************
          */
 
-        // /************* deb : à éxecuter pour mise en prod stripe - sert à ajouter les plan de paiements à stripe et enregistrer les refs dans la bdd ****************************/
+        // /************* deb : Ã  Ã©xecuter pour mise en prod stripe - sert Ã  ajouter les plan de paiements Ã  stripe et enregistrer les refs dans la bdd ****************************/
 
         $planPaiementManager = new PlanPaiementManager();
 
@@ -390,7 +435,7 @@ class StripeManager
     public function createCustomAccount($tokenId, $pays)
     {
 
-        // faire la création du compte stripe
+        // faire la crÃ©ation du compte stripe
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
 
         try {
@@ -415,7 +460,7 @@ class StripeManager
     public function updateCustomAccount($tokenId, $accoundId)
     {
 
-        // faire la création du compte stripe
+        // faire la crÃ©ation du compte stripe
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
 
         try {
@@ -434,7 +479,7 @@ class StripeManager
     public function addExternalAccount($tokenId, $accoundId)
     {
 
-        // faire la création du compte stripe
+        // faire la crÃ©ation du compte stripe
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
 
         try {
@@ -514,7 +559,7 @@ class StripeManager
         return ($transfert);
     }
 
-    /* pour mettre à jour la cb d'un compte stripe */
+    /* pour mettre Ã  jour la cb d'un compte stripe */
     public function updateCb($refCompte, $testMode, $token)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
@@ -534,7 +579,7 @@ class StripeManager
         }
     }
 
-    // pour créer tous les produits et les plans définis dans la base stp qui ne sont pas dans stripe
+    // pour crÃ©er tous les produits et les plans dÃ©finis dans la base stp qui ne sont pas dans stripe
     public function createProductsAndPlans()
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
@@ -567,7 +612,7 @@ class StripeManager
                 $formuleMg->updateRefProductStripe($formule);
             }
 
-            // créer la formule dans stripe
+            // crÃ©er la formule dans stripe
             $plans = $formule->getPlans();
             foreach ($plans as $plan) {
 

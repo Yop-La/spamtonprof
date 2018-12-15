@@ -91,7 +91,8 @@ class PageManager
                         'ref_formule',
                         'ref_prof',
                         'ref_parent',
-                        'ref_plan'
+                        'ref_plan',
+                        "ref_coupon"
                     ),
                     "ref_eleve" => array(
                         "construct" => array(
@@ -483,6 +484,8 @@ class PageManager
         wp_enqueue_script('stripe_checkout_js', 'https://checkout.stripe.com/checkout.js');
 
         wp_enqueue_script('stripe_main_js', 'https://js.stripe.com/v3/');
+
+        wp_enqueue_style('ds_eleve_css', get_stylesheet_directory_uri() . '/css/pages/dashboard-eleve.css');
     }
 
     public static function backOffice()
@@ -584,7 +587,7 @@ class PageManager
     {
         wp_enqueue_script('tarifs', plugins_url() . '/spamtonprof/js/ad-review.js', array(
 
-        'nf-front-end'
+            'nf-front-end'
         ), time());
 
         wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/ad-review.css');

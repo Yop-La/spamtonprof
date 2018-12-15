@@ -1139,3 +1139,34 @@ function arrayToPgArray($array)
     $str = '{' . $str . '}';
     return ($str);
 }
+
+
+// pour terminer rapidement le processus d'inscription d'un compte de test
+function finishTrialInscription($refAbo, $refProf = 59){
+    
+    $now = new \DateTime(null, new \DateTimeZone('Europe/Paris'));
+    
+    $abonnement = new \spamtonprof\stp_api\StpAbonnement(array(
+        "ref_abonnement" => $refAbo,
+        "ref_prof" => $refProf,
+        "date_attribution_prof" => $now,
+        'first_prof_assigned' => true
+    ));
+    
+    $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
+    
+    $abonnementMg->updateRefProf($abonnement);
+    
+    $abonnementMg->updateDateAttributionProf($abonnement);
+    
+    $abonnementMg->updateFirstProfAssigned($abonnement);
+    
+    
+    $abonnement->setDebut_essai($now->format(PG_DATE_FORMAT));
+    $end = $now->add(new DateInterval('P7D'));
+    $abonnement->setFin_essai($end->format(PG_DATE_FORMAT));
+    
+    $abonnementMg->updateDebutEssai($abonnement);
+    $abonnementMg->updateFinEssai($abonnement);
+    
+}

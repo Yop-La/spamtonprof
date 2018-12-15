@@ -9,6 +9,10 @@ add_action('wp_ajax_inscriptionEssai', 'inscriptionEssai');
 
 add_action('wp_ajax_nopriv_inscriptionEssai', 'inscriptionEssai');
 
+add_action('wp_ajax_ajaxIsValidCoupon', 'ajaxIsValidCoupon');
+
+add_action('wp_ajax_nopriv_ajaxIsValidCoupon', 'ajaxIsValidCoupon');
+
 function inscriptionEssai()
 {
 
@@ -406,7 +410,26 @@ function inscriptionEssai()
         }
     }
 
-    // étape n° 6 - insérer l'abonnement
+    // étape n°6 : code promo
+    $couponMg = new \spamtonprof\stp_api\StpCouponManager();
+    $coupon = $couponMg->get(array(
+        'name' => $code_promo
+    ));
+
+    if (! $prospect && $coupon) {
+
+        $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
+        $abos = $aboMg->getAll(array(
+            'ref_coupon' => $coupon->getRef_coupon(),
+            'ref_compte' => $compte->getRef_compte()
+        ));
+
+        if (count($abos) >= $coupon->getClient_limit()) {
+            $coupon = false;
+        }
+    }
+
+    // étape n° 7 - insérer l'abonnement
 
     $abonnement = new \spamtonprof\stp_api\StpAbonnement(array(
         "ref_eleve" => $eleve->getRef_eleve(),
@@ -440,7 +463,12 @@ function inscriptionEssai()
     $abonnement->setInterruption(false);
     $abonnementMg->updateInterruption($abonnement);
 
-    // étape n° 7 - insérer les remarques d'inscription
+    if ($coupon) {
+        $abonnement->setRef_coupon($coupon->getRef_coupon());
+        $abonnementMg->updateRefCoupon($abonnement);
+    }
+
+    // étape n° 8 - insérer les remarques d'inscription
 
     $stpRemarqueMg = new \spamtonprof\stp_api\StpRemarqueInscriptionManager();
 
@@ -491,7 +519,7 @@ function inscriptionEssai()
         }
     }
 
-    // étape n°8 - envoi d'un message dans slack pour dire qu'il y a une attribution de prof en attente
+    // étape n°9 - envoi d'un message dans slack pour dire qu'il y a une attribution de prof en attente
     $messages;
     if ($proche) {
 
@@ -532,7 +560,7 @@ function inscriptionEssai()
 
     $slack->sendMessages("inscription-essai", $messages);
 
-    // étape n°9 - envoi d'un mail de bienvenue et de mise en attente au parent et à l'élève
+    // étape n°10 - envoi d'un mail de bienvenue et de mise en attente au parent et à l'élève
 
     $profResponsable = $formule->getProf()->getPhrase_responsable();
 
@@ -559,7 +587,7 @@ function inscriptionEssai()
 
     echo (json_encode($retour));
 
-    // étape n°10 : mettre à jour l'index
+    // étape n°11 : mettre à jour l'index
     $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
     $algoliaMg->addAbonnement($abonnement->getRef_abonnement());
 
@@ -634,4 +662,75 @@ function ajaxGetFormules()
     die();
 }
 
+/*
+ * pour vérifier que le coupon saisi est valide c'est à dire
+ *
+ * si il existe et si le client/prospect a le droit de l'utiliser
+ * si prospect -> oui, il a le droit de l'utiliser
+ * si client -> ça dépend
+ *
+ */
+function ajaxIsValidCoupon()
+{
+    header('Content-type: application/json');
 
+    $retour = new \stdClass();
+    $retour->error = false;
+    $retour->message = 'ok';
+    $retour->couponValid = false;
+    $retour->statut = 'ok';
+
+    $slack = new \spamtonprof\slack\Slack();
+
+    $slack->sendMessages('log', $_POST);
+
+    serializeTemp($_POST);
+
+    $coupon = $_POST['coupon'];
+
+    $couponMg = new \spamtonprof\stp_api\StpCouponManager();
+    $coupon = $couponMg->get(array(
+        'name' => $coupon
+    ));
+
+    if (! $coupon) {
+        $retour->message = 'Code promo invalide';
+        echo (json_encode($retour));
+        die();
+    }
+
+    // si c'est un prospect ok
+    $current_user = wp_get_current_user();
+    if (0 == $current_user->ID) {
+        $retour->message = $coupon->getDescription();
+        $retour->couponValid = true;
+        echo (json_encode($retour));
+        die();
+    }
+
+    // cas du client connecté
+    $compteMg = new \spamtonprof\stp_api\StpCompteManager();
+
+    $compte = $compteMg->get(array(
+        'ref_compte_wp' => $current_user->ID
+    ));
+
+    $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
+    $abos = $aboMg->getAll(array(
+        'ref_coupon' => $coupon->getRef_coupon(),
+        'ref_compte' => $compte->getRef_compte()
+    ));
+
+    
+    if (count($abos) >= $coupon->getClient_limit()) {
+        $retour->statut = 'over';
+        $retour->message = utf8_encode('Code promo déjà utilisé');
+        echo (json_encode($retour));
+        die();
+    }
+
+    $retour->message = $coupon->getDescription();
+    $retour->couponValid = true;
+    echo (json_encode($retour));
+    die();
+}

@@ -6,6 +6,8 @@ aboClique = null;
 popupArret = "18626";
 
 
+
+
 jQuery( document ).ready( function( $ ) {
 
 
@@ -23,7 +25,20 @@ jQuery( document ).ready( function( $ ) {
 
 		for(var i = 0; i< nbAbosEssai ; i++){
 
+
+			/*
+			 * 
+			 * 
+			 * total
+			 * coupon_details
+			 * coupon_row
+			 * 
+			 */
+
 			abo = abosEssai[i];
+
+
+
 
 			rowEssai = jQuery(".row-essai-template").clone();
 			rowEssai.insertAfter(".row-essai-template");
@@ -33,6 +48,26 @@ jQuery( document ).ready( function( $ ) {
 			console.log(abo)
 			rowEssai.find(".prenom-eleve").html(abo.eleve.prenom);
 			rowEssai.find(".nom-formule").html(abo.formule.formule.split("|")[0]. concat(" - ",abo.eleve.niveau.niveau));
+
+			montantAbo = abo.plan.tarif;
+			montant = montantAbo
+
+			if(abo.coupon){
+
+				coupon = abo.coupon
+				jQuery(rowEssai).find("#coupon_name").text(coupon.name);
+				jQuery(rowEssai).find("#coupon_description").text(coupon.description);
+
+				montant = montant * (1-coupon.pct_off/100)
+
+
+			}else{
+				jQuery(rowEssai).find("#coupon_row").addClass('hide');
+
+			}
+			jQuery(rowEssai).find("#total").text(montant);
+			jQuery(rowEssai).find("#montant").text(montantAbo);
+
 
 			if(abo.debut_essai != null){
 
@@ -78,7 +113,20 @@ jQuery( document ).ready( function( $ ) {
 			indiceAbo = jQuery(this).parents(".row-essai").find(".ref-abo").val();
 			aboClique = abosEssai[indiceAbo];
 
-			montant = aboClique.plan.tarif;
+			console.log("aboClique")
+			console.log(aboClique)
+
+			montantAbo = aboClique.plan.tarif;
+			montant = montantAbo
+
+
+			if(aboClique.coupon){
+
+				coupon = aboClique.coupon
+				montant = montant * (1-coupon.pct_off/100)
+			}
+
+			description = 'Abonnement de '.concat(montantAbo,' € par semaine')
 
 			emailCheckout = "alexandre@spamtonprof.com";
 			if(!aboClique.eleve.parent_required){
@@ -90,11 +138,13 @@ jQuery( document ).ready( function( $ ) {
 			// Open Checkout with further options:
 			handler.open({
 				name: 'SpamTonProf',
-				description: 'Abonnement de '.concat(montant,' € par semaine'),
+				description: description,
 				zipCode: false,
 				amount: montant*100,
 				email : emailCheckout,
-				currency: 'EUR'
+				currency: 'EUR',
+				locale: 'auto',
+				'panel-label': "Payer {{amount}}"
 			});
 			e.preventDefault();
 		});
@@ -360,7 +410,7 @@ jQuery( document ).ready( function( $ ) {
 				redirectTo('dashboard-eleve','Félicitations : le paiement est passé. L\'inscription est bien validé.');
 			}
 		})
-		.fail(function() {
+		.fail(function(retour) {
 			showMessage('Oops : il y a eu un problème avec le paiement. Veuillez réessayer ou contacter l\'équipe. ');
 			ajaxEnCours--;
 			if(ajaxEnCours == 0){

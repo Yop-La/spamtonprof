@@ -96,8 +96,7 @@ var mySubmitController = Marionette.Object.extend( {
 
 									redirectTo("semaine-decouverte" ,"Oops : vous avez déjà un compte. Connectez vous pour faire une autre inscription ! " );
 								}else if(message == "essai_deja_fait"){
-
-									redirectTo("semaine-decouverte" ,"Oops : cous avez déjà fait un essai pour cette matière ! Venez en parler avec nous." );
+									redirectTo("semaine-decouverte" ,"Oops : vous avez déjà fait un essai pour cette matière ! Venez en parler avec nous." );
 								}else if(message == "deja_2_essai"){
 
 									redirectTo("semaine-decouverte" ,"Oops : il y a déjà 2 essais en cours ! Revenez quand au moins un essai sera fini" );
@@ -154,6 +153,12 @@ var myCustomFieldController = Marionette.Object.extend( {
 		this.listenTo( nfRadio.channel( 'textarea' ), 'render:view', this.renderViewTextArea );
 		this.listenTo( nfRadio.channel( 'textbox' ), 'render:view', this.renderViewTextBox );
 		this.listenTo( nfRadio.channel( 'html' ), 'render:view', this.renderViewHtml );
+
+
+		// on the Field's model value change...
+		var fieldsChannel = Backbone.Radio.channel( 'fields' );
+		this.listenTo( fieldsChannel, 'change:modelValue', this.validate );
+
 	},
 
 	renderViewTextArea: function( view ) {
@@ -236,6 +241,71 @@ var myCustomFieldController = Marionette.Object.extend( {
 		h5 = h5.replace('matiere'.concat(index),nomMatiere);
 		jQuery(el).find('h5').text(h5);
 
+
+	},validate: function( model ) {
+
+
+		// If validation passes...
+		var modelID       = model.get( 'id' );
+		var value = model.get( 'value' );
+
+		if(modelID != '1094'){
+			return;
+		}
+
+		//faire appel ajax pour
+		// 1- vérifier que le code promo
+		// 2- vérifier le droit d'utilisation du code promo
+
+		var errorID       = 'custom-field-error';
+		var fieldsChannel = Backbone.Radio.channel( 'fields' );
+
+		console.log('value');
+		console.log(value);
+
+		if( value ) {
+
+			// soumission ajax du code promo pour savoir si il est valide ou nons
+			ajaxEnCours++;
+
+			jQuery('.html_code_promo_cont .nf-field-element').html('<img src="http://localhost/spamtonprof/wp-content/uploads/2018/12/Spinner-1s-68px.gif" alt="Smiley face" width="50" height="50">')
+
+			jQuery.post(
+					ajaxurl,
+					{
+						'action' : 'ajaxIsValidCoupon',
+						'coupon' : value,
+					})
+					.done(function(retour){ 
+
+						console.log(retour);
+
+						error = retour.error;
+						message = retour.message;
+						statut = retour.statut;
+						couponValid = retour.couponValid;
+
+						if(statut == 'over'){
+							Backbone.Radio.channel( 'fields' ).request( 'add:error', model.get( 'id' ), 'custom-field-error', message );
+						}else{
+							Backbone.Radio.channel( 'fields' ).request( 'remove:error', model.get( 'id' ), 'custom-field-error' );
+						}
+
+
+						jQuery('.html_code_promo_cont .nf-field-element').html('<br>'.concat(message,'<br>'))
+
+					})
+					.fail(function(err){
+						jQuery('.html_code_promo_cont .nf-field-element').html('<br>Erreur. Contactez l\'équipe<br>')
+					})
+					.always(function() {
+						ajaxEnCours--;
+					});
+
+		}else{
+			Backbone.Radio.channel( 'fields' ).request( 'remove:error', model.get( 'id' ), 'custom-field-error' );
+			jQuery('.html_code_promo_cont .nf-field-element').text('')
+		}
 
 	}
 
@@ -445,7 +515,7 @@ jQuery( document ).ready( function( jQuery ) {
 								prenom = formule.prof.prenom;
 
 								console.log(formule.prof);
-								
+
 								// création du bloc prof + attribution id
 								idBloc = 'formule-'.concat(formule.ref_formule);
 								var blocProf = jQuery(matiereBoxTemplate).clone();
