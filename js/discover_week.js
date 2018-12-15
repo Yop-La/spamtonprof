@@ -28,7 +28,10 @@ var matiere = null;
 
 var idFormEssai = 80;
 
-
+var codePromoId = 1163;
+if(domain != 'spamtonprof'){
+	codePromoId = 1094;
+}
 
 var mySubmitController = Marionette.Object.extend( {
 
@@ -249,7 +252,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 		var modelID       = model.get( 'id' );
 		var value = model.get( 'value' );
 
-		if(modelID != '1094'){
+		if(modelID != codePromoId){
 			return;
 		}
 
