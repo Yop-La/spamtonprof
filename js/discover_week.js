@@ -271,7 +271,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 			// soumission ajax du code promo pour savoir si il est valide ou nons
 			ajaxEnCours++;
 
-			jQuery('.html_code_promo_cont .nf-field-element').html('<img src="http://localhost/spamtonprof/wp-content/uploads/2018/12/Spinner-1s-68px.gif" alt="Smiley face" width="50" height="50">')
+			jQuery('.html_code_promo_cont .nf-field-element').html('<img src="https://spamtonprof.com/wp-content/uploads/2018/12/Spinner-1s-68px.gif" alt="Smiley face" width="50" height="50">')
 
 			jQuery.post(
 					ajaxurl,
