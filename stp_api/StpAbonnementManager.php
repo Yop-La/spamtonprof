@@ -127,7 +127,7 @@ class StpAbonnementManager
      * date de fin : date de fin de l'essai ( = date de facturation)
      * la date de debut doit être au minimum celle d'aujourdh'ui si avant 20h ( le cron tourne à 20h )
      */
-    function interrupt($debut, $fin, $refAbo, $prorate = false, $prolongation = false)
+    function interrupt($debut, $fin, $refAbo, $prorate = true, $prolongation = false)
     {
         $interruMg = new \spamtonprof\stp_api\StpInterruptionManager();
 
@@ -441,11 +441,20 @@ class StpAbonnementManager
                     $abonnement->setFormule($formule);
                     break;
                 case "ref_prof":
-                    $prof = $profMg->get(array(
-                        'ref_prof' => $abonnement->getRef_prof()
-                    ));
+                    if (! is_null($abonnement->getRef_prof())) {
+                        $prof = $profMg->get(array(
+                            'ref_prof' => $abonnement->getRef_prof()
+                        ));
 
-                    $abonnement->setProf($prof);
+                        if (array_key_exists("ref_prof", $constructor)) {
+
+                            $constructorProf = $constructor["ref_prof"];
+                            $constructorProf["objet"] = $prof;
+
+                            $profMg->construct($constructorProf);
+                        }
+                        $abonnement->setProf($prof);
+                    }
                     break;
                 case "ref_parent":
                     if (! is_null($abonnement->getRef_proche())) {
@@ -470,6 +479,7 @@ class StpAbonnementManager
                     $statutAbo = $statutAboMg->get(array(
                         'ref_statut_abonnement' => $abonnement->getRef_statut_abonnement()
                     ));
+                    $abonnement->setStatut($statutAbo);
                 case "ref_coupon":
                     $couponMg = new \spamtonprof\stp_api\StpCouponManager();
                     if (! is_null($abonnement->getRef_coupon())) {
@@ -595,6 +605,15 @@ class StpAbonnementManager
                 $refCompte = $info["ref_compte"];
                 $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte');
                 $q->bindValue(":ref_compte", $refCompte);
+                $q->execute();
+            } else if (in_array("abo_vivant", $info) && array_key_exists('offset', $info)) {
+
+                $offset = $info['offset'];
+
+                $q = $this->_db->prepare('select * from stp_abonnement 
+                    where ref_statut_abonnement = 1 or (ref_statut_abonnement = 2 and extract(day from NOW() - date_creation)<=10)
+                       order by ref_prof desc limit 20 offset :offset');
+                $q->bindValue(':offset', $offset);
                 $q->execute();
             } else if (array_key_exists("ref_prof", $info)) {
 
