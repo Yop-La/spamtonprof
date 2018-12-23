@@ -211,7 +211,7 @@ jQuery( document ).ready( function( jQuery ) {
 							
 							formules.forEach(function(formule){
 
-								var formulaSelector  = formulaSelectors[1];
+								var formulaSelector  = formulaSelectors[formulaSelectors.length-1];
 
 								if(i > 2){
 									
