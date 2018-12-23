@@ -178,34 +178,49 @@ jQuery( document ).ready( function( jQuery ) {
 
 							// pour afficher le nombre de résultats et aller dessus
 
+							var formulaSelectors = []
+
+							nbAdditionnalLine = Math.floor(nbFormule/3)
+
 							jQuery(".nb_formule").text(nbFormule.toString().concat(' formule(s)'));
 
+							nbFormuleFirstLine = nbFormule;
 
-							var formulaSelector = '#formula_';
+							if(nbAdditionnalLine  == 1){
 
-							switch (nbFormule) {
-							case 1:
-								jQuery("#formula_1").removeClass('hide');
-								formulaSelector = '#formula_' . concat(1);
-								break;
-							case 2:
-								jQuery("#formula_2").removeClass('hide');
-								formulaSelector = '#formula_' . concat(2);
-								break;
-							default:
-								jQuery("#formula_3").removeClass('hide');
-							formulaSelector = '#formula_' . concat(3);
-							break;
+								nbFormuleFirstLine = 3;
+
+								nbFormuleSecondLine = nbFormule % 3
+
+								var formulaSelector = '#formula_';
+								formulaSelector = '#formula_' . concat(nbFormuleSecondLine);
+								formulaSelectors.push(formulaSelector)
+								jQuery(formulaSelector).removeClass('hide');
 							}
 
+							var formulaSelector = '#formula_';
+							formulaSelector = '#formula_' . concat(nbFormuleFirstLine);
+							jQuery(formulaSelector).removeClass('hide');
+							formulaSelectors.push(formulaSelector)
 
+							console.log(formulaSelectors)
 
 							var i = 0;
 
 							//remplissge colonne par colonne de la table des matières
+							
 							formules.forEach(function(formule){
 
-								var formulaClass = '.matiere'.concat(i+1); 
+								var formulaSelector  = formulaSelectors[1];
+
+								if(i > 2){
+									
+									formulaSelector  = formulaSelectors[0];
+								}
+
+								j = i % 3;
+								
+								var formulaClass = '.matiere'.concat(j+1); 
 
 								matieres = formule.formule.split('|');
 								matieres = matieres[0];
@@ -215,16 +230,15 @@ jQuery( document ).ready( function( jQuery ) {
 								jQuery(formulaClass).text(matieres);
 
 								//écriture du nom de la formule
-								jQuery(formulaSelector.concat(' .pricing-column h3:eq( ',i,' )')).html('<div>'.concat('Formule ',niveau.niveau,'<br></div><div>',matieres,'</div>'));
+								jQuery(formulaSelector.concat(' .pricing-column h3:eq( ',j,' )')).html('<div>'.concat('Formule ',niveau.niveau,'<br></div><div>',matieres,'</div>'));
 
 								//écriture du prix
-								jQuery(formulaSelector.concat(' .pricing-column .pricing-column-content h4:eq( ',i,' )')).html(''.concat(formule.defaultPlan.tarif, ' €'));
+								jQuery(formulaSelector.concat(' .pricing-column .pricing-column-content h4:eq( ',j,' )')).html(''.concat(formule.defaultPlan.tarif, ' €'));
 
 								//écriture de l'interval
-								jQuery(formulaSelector.concat(' .pricing-column .interval:eq( ',i,' )')).html('Par semaine avec '.concat(formule.matieres.length,' matière(s) incluses'));
+								jQuery(formulaSelector.concat(' .pricing-column .interval:eq( ',j,' )')).html('Par semaine avec '.concat(formule.matieres.length,' matière(s) incluses'));
 
-								console.log(formule.defaultPlan.tarif)
-
+						
 
 
 
