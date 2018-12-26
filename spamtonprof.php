@@ -179,7 +179,9 @@ function my_pre_population_callback($options, $settings)
 
         $StpProfMg = new \spamtonprof\stp_api\StpProfManager();
 
-        $profs = $StpProfMg->getAll();
+        $profs = $StpProfMg->getAll(array(
+            "inbox_ready" => true
+        ));
 
         foreach ($profs as $prof) {
 
