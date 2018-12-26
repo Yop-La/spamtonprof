@@ -96,7 +96,7 @@ foreach ($messages as $message) {
 
     $timeStamp = $message->internalDate / 1000;
     $dateReception = new DateTime();
-    $dateReception -> setTimestamp('@' . $timeStamp);
+    $dateReception -> setTimestamp($timeStamp);
     
     $dateReception->setTimezone(new \DateTimeZone('Europe/Paris'));
     
