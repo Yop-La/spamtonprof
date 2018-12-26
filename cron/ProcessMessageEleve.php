@@ -95,14 +95,17 @@ foreach ($messages as $message) {
     // $body = $gmailManager->getBody($message, "html");
 
     $timeStamp = $message->internalDate / 1000;
-    $dateReception = new DateTime('@' . $timeStamp, new \DateTimeZone('Europe/Paris'));
-
+    $dateReception = new DateTime();
+    $dateReception -> setTimestamp('@' . $timeStamp);
+    
+    $dateReception->setTimezone(new \DateTimeZone('Europe/Paris'));
+    
     $eleve = false;
     $eleve = $eleveMg->get(array(
         "email" => $from
     ));
 
-    echo ("mail : " . $from . " -- date reception : " . $dateReception->format(PG_DATETIME_FORMAT) . " -- message id : " . $gmailId . "<br><br>");
+    echo ("mail : " . $from . " -- new date reception : " . $dateReception->format(PG_DATETIME_FORMAT) . " -- message id : " . $gmailId . "<br><br>");
 
     if ($eleve) {
 

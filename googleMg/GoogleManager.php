@@ -107,13 +107,13 @@ class GoogleManager
      *            can be used to indicate the authenticated user.
      * @return array Array of Messages.
      */
-    public function listMessages($searchOperator, $nbPage = 1)
+    public function listMessages($searchOperator, $nbPage = 1, $maxResults = 10)
     {
         $pageToken = NULL;
         $messages = array();
         $opt_param = array(
             "q" => utf8_encode($searchOperator),
-            "maxResults" => 10
+            "maxResults" => $maxResults
         );
 
         $indexPage = 0;
