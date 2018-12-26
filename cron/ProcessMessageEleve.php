@@ -94,8 +94,8 @@ foreach ($messages as $message) {
     $date = $gmailManager->getHeader($message, "Date");
     // $body = $gmailManager->getBody($message, "html");
 
-    $dateReception = new \DateTime($date);
-    $dateReception->setTimezone(new \DateTimeZone("Europe/Paris"));
+    $timeStamp = $message->internalDate / 1000;
+    $dateReception = new DateTime('@' . $timeStamp, new \DateTimeZone('Europe/Paris'));
 
     $eleve = false;
     $eleve = $eleveMg->get(array(
