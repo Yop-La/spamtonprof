@@ -1,0 +1,15 @@
+Bonjour [[name]],
+
+Cela fait maintenant 15 jours ou plus que ta semaine d’essai s'est terminée.
+
+Voilà pourquoi, nous venons tout juste de désactiver ton SpamTonProf.
+
+Si tu souhaites reprendre le soutien avec [[prof_name]] ou un autre prof, fais nous signe. Nous pourrons alors réactiver ton compte.
+
+Nous sommes heureux d'avoir pu te compter parmi nos élèves.
+
+On te souhaite beaucoup de réussite,
+
+Peut-être à bientôt !
+
+L’équipe Spamtonprof

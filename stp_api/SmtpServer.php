@@ -114,7 +114,7 @@ class SmtpServer implements \JsonSerializable
         return $vars;
     }
 
-    public function sendEmail($subject, $to, $body, $from, $fromName = "", $html = false, $ccs = false)
+    public function sendEmail($subject, $to, $body, $from, $fromName = "", $html = false, $ccs = false, $reply_to = false)
     {
         $host = $this->host;
         $port = $this->port;
@@ -148,7 +148,13 @@ class SmtpServer implements \JsonSerializable
         // Password to use for SMTP authentication
         $mail->Password = $password;
         // Set who the message is to be sent from
-        $mail->addReplyTo($from);
+
+        if ($reply_to) {
+            $mail->addReplyTo($reply_to);
+        } else {
+            $mail->addReplyTo($from);
+        }
+
         $mail->setFrom($from, $fromName);
 
         // Set who the message is to be sent to
@@ -168,7 +174,7 @@ class SmtpServer implements \JsonSerializable
                 )
             );
         }
-        
+
         if ($ccs) {
 
             foreach ($ccs as $cc) {

@@ -6,9 +6,10 @@ class StpAbonnement implements \JsonSerializable
 
     const ACTIF = 1, ESSAI = 2, TERMINE = 3, DESACTIVE = 4;
 
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage, $objectID, $teleprospection, $compte, $interruption, $ref_coupon, $coupon;
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage, $objectID, $teleprospection, $compte, $interruption, $ref_coupon, $coupon, $relance_date;
 
     /**
+     *
      * @return mixed
      */
     public function getRef_coupon()
@@ -17,6 +18,25 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
+     * @return mixed
+     */
+    public function getRelance_date()
+    {
+        return $this->relance_date;
+    }
+
+    /**
+     *
+     * @param mixed $relance_date
+     */
+    public function setRelance_date($relance_date)
+    {
+        $this->relance_date = $relance_date;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getCoupon()
@@ -25,6 +45,7 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $coupon
      */
     public function setCoupon($coupon)
@@ -33,6 +54,7 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $ref_coupon
      */
     public function setRef_coupon($ref_coupon)
@@ -572,7 +594,7 @@ class StpAbonnement implements \JsonSerializable
 
         $finEssai = $this->getFin_essai();
 
-        if (!$finEssai) {
+        if (! $finEssai) {
             return (false);
         }
 

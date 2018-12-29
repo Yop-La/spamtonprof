@@ -42,32 +42,47 @@ class AlgoliaManager
         $index = $this->client->initIndex('support_client');
 
         $index->clearIndex();
+        $slack = new \spamtonprof\slack\Slack();
 
         $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
+        $offset = 0;
 
-        $abonnements = $abonnementMg->getAll("all", array(
-            "construct" => array(
-                'ref_eleve',
-                'ref_formule',
-                'ref_parent',
-                'ref_plan',
-                'remarquesMatieres',
-                'ref_statut_abonnement',
-                'ref_prof'
-            ),
-            "ref_eleve" => array(
-                "construct" => array(
-                    'ref_niveau'
-                )
-            ),
-            "remarquesMatieres" => array(
-                "construct" => array(
-                    'ref_matiere'
-                )
-            )
-        ));
+        do {
 
-        $index->addObjects($abonnements);
+            $abonnements = $abonnementMg->getAll(array(
+                'all',
+                'offset' => $offset,
+                'limit' => 10
+            ), array(
+                "construct" => array(
+                    'ref_eleve',
+                    'ref_formule',
+                    'ref_parent',
+                    'ref_plan',
+                    'remarquesMatieres',
+                    'ref_statut_abonnement',
+                    'ref_prof'
+                ),
+                "ref_eleve" => array(
+                    "construct" => array(
+                        'ref_niveau'
+                    )
+                ),
+                "remarquesMatieres" => array(
+                    "construct" => array(
+                        'ref_matiere'
+                    )
+                )
+            ));
+
+            $offset = $offset + 10;
+
+            $slack->sendMessages('log', array(
+                'reset support client en cours. Offset : ' . $offset
+            ));
+
+            $index->addObjects($abonnements);
+        } while (count($abonnements) != 0);
     }
 
     public function resetFormuleIndex()
@@ -161,7 +176,7 @@ class AlgoliaManager
             ),
             "ref_eleve" => array(
                 "construct" => array(
-                    'ref_niveau',
+                    'ref_niveau'
                 )
             ),
             "remarquesMatieres" => array(
@@ -174,11 +189,8 @@ class AlgoliaManager
         $abonnement = $abonnementMg->get(array(
             'ref_abonnement' => $refAbo
         ), $constructor);
-        
-        
 
         $index->addObject($abonnement);
-        
     }
 
     public function updateAbonnement($refAbo, $constructor = false)

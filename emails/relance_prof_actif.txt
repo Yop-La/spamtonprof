@@ -1,0 +1,15 @@
+Bonjour [[name]],
+
+[[eleve_name]] vient tout juste de résilier son abonnement à la formule " [[formule]] " qu'il avait avec toi.
+
+Je t'invite à lui proposer de laisser un témoignage (si tu le sens bien) en lui demandant.
+
+Voilà le lien pour laisser un témoignage : https://spamtonprof.com/temoigner/
+
+Et voilà les adresses mails : 
+- adresse élève : [[adresse_eleve]]
+- adresse parent : [[adresse_parent]]
+
+À bientôt,
+
+Alexandre le directeur

@@ -304,6 +304,14 @@ class StpAbonnementManager
         $q->execute();
     }
 
+    public function updateRelanceDate(\spamtonprof\stp_api\StpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set relance_date = :relance_date where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->bindValue(":relance_date", $abonnement->getRelance_date());
+        $q->execute();
+    }
+
     public function updateRefFormule(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set ref_formule = :ref_formule where ref_abonnement = :ref_abonnement");
@@ -563,7 +571,7 @@ class StpAbonnementManager
                 $q->bindValue(":ref_prof", $refProf);
                 $q->bindValue(":ref_eleve", $refEleve);
                 $q->execute();
-            } else if (array_key_exists("ref_statut_abonnement", $info) && array_key_exists("ref_compte", $info)) {
+            } else if (array_key_exists("ref_statut_abonnement", $info) != false && array_key_exists("ref_compte", $info)) {
 
                 $refCompte = $info["ref_compte"];
                 $refStatut = $info["ref_statut_abonnement"];
@@ -606,14 +614,19 @@ class StpAbonnementManager
                 $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte');
                 $q->bindValue(":ref_compte", $refCompte);
                 $q->execute();
-            } else if (in_array("abo_vivant", $info) && array_key_exists('offset', $info)) {
+            } else if (array_search("abo_vivant", $info, true) !== false && array_key_exists('offset', $info) && array_key_exists('ref_prof', $info) && array_key_exists('limit', $info)) {
 
                 $offset = $info['offset'];
+                $ref_prof = $info['ref_prof'];
+                $limit = $info['limit'];
 
                 $q = $this->_db->prepare('select * from stp_abonnement 
-                    where ref_statut_abonnement = 1 or (ref_statut_abonnement = 2 and extract(day from NOW() - date_creation)<=10)
-                       order by ref_prof desc limit 20 offset :offset');
+                    where (ref_statut_abonnement = 1 or (ref_statut_abonnement = 2 and extract(day from NOW() - date_creation)<=10))
+                        and ref_prof = :ref_prof   
+                    limit :limit offset :offset');
                 $q->bindValue(':offset', $offset);
+                $q->bindValue(':limit', $limit);
+                $q->bindValue(':ref_prof', $ref_prof);
                 $q->execute();
             } else if (array_key_exists("ref_prof", $info)) {
 
@@ -686,13 +699,77 @@ class StpAbonnementManager
                 $refAbos = toPgArray($refAbos, true);
                 $q = $this->_db->prepare('select * from stp_abonnement where ref_abonnement in ' . $refAbos);
                 $q->execute();
+            } else if (array_key_exists("limit", $info) && array_search("all", $info, true) !== false && array_key_exists("offset", $info)) {
+
+                $offset = $info["offset"];
+                $limit = $info["limit"];
+
+                $q = $this->_db->prepare('select * from stp_abonnement limit :limit offset :offset');
+                $q->bindValue(':offset', $offset);
+                $q->bindValue(':limit', $limit);
+                $q->execute();
+            } else if (array_key_exists("ref_statut_abonnement", $info) && array_search("nb_inactif_day", $info, true) !== false) {
+
+                $ref_statut_abonnement = $info["ref_statut_abonnement"];
+                $nb_inactif_day = $info["nb_inactif_day"];
+
+                $q = $this->_db->prepare('select extract(day from now() - dernier_contact)  from stp_abonnement 
+	               where extract(day from now() - dernier_contact) > :nb_inactif_day and ref_statut_abonnement = :ref_statut_abonnement');
+                $q->bindValue(':ref_statut_abonnement', $ref_statut_abonnement);
+                $q->bindValue(':nb_inactif_day', $nb_inactif_day);
+                $q->execute();
+            } else if (array_key_exists("ref_statut_abonnement", $info) && array_search("nb_inactif_day", $info, true) !== false && array_key_exists("age", $info)) {
+
+                $ref_statut_abonnement = $info["ref_statut_abonnement"];
+                $nb_inactif_day = $info["nb_inactif_day"];
+                $age = $info["age"];
+
+                $q = $this->_db->prepare('select extract(day from now() - dernier_contact)  from stp_abonnement
+	               where extract(day from now() - dernier_contact) < :nb_inactif_day 
+                    and ref_statut_abonnement = :ref_statut_abonnement
+                    and extract(day from now() - date_creation) < :age');
+                $q->bindValue(':ref_statut_abonnement', $ref_statut_abonnement);
+                $q->bindValue(':nb_inactif_day', $nb_inactif_day);
+                $q->execute();
+            } else if (array_key_exists("ref_statut_abonnement", $info) && array_key_exists("nb_inactif_day", $info) && array_key_exists("limit", $info) && array_key_exists("days_since_relance", $info)) {
+
+                $ref_statut_abonnement = $info["ref_statut_abonnement"];
+                $days_since_relance = $info["days_since_relance"];
+                $limit = $info["limit"];
+                $nb_inactif_day = $info["nb_inactif_day"];
+
+                $q = $this->_db->prepare("select *  from stp_abonnement
+	               where (extract(day from now() - dernier_contact) > :nb_inactif_day or dernier_contact is null) and ref_statut_abonnement = :ref_statut_abonnement
+                        and (relance_date is null or now() > relance_date + interval '" . $days_since_relance . " days')
+                        limit :limit");
+                $q->bindValue(':ref_statut_abonnement', $ref_statut_abonnement);
+                $q->bindValue(':nb_inactif_day', $nb_inactif_day);
+                $q->bindValue(':limit', $limit);
+                $q->execute();
+            } else if (array_key_exists("ref_interruption", $info)) {
+
+                $ref_interruption = $info["ref_interruption"];
+
+                $q = $this->_db->prepare('select * from stp_abonnement
+                    where ref_abonnement in (
+                        select ref_abonnement from stp_interruption where ref_interruption > :ref_interruption
+                    )');
+                $q->bindValue(':ref_interruption', $ref_interruption);
+                $q->execute();
+            } else if (array_search("get_trial_account_to_desactivate", $info, true) !== false && array_key_exists("limit", $info)) { // compte en essai dont l'essai est terminé et sans message depuis 5 jours
+
+                $limit = $info["limit"];
+
+                $q = $this->_db->prepare("select *  from stp_abonnement
+	               where fin_essai is not null and now() > fin_essai + interval '15' day
+				   	and ref_statut_abonnement = 2  
+                        limit :limit");
+                $q->bindValue(":limit", $limit);
+                $q->execute();
             }
         }
 
-        if ($info == "all") {
-            $q = $this->_db->prepare('select * from stp_abonnement');
-            $q->execute();
-        } else if ($info == "no_messages") {
+        if ($info == "no_messages") {
             $q = $this->_db->prepare('select * from stp_abonnement where nb_message = 0');
             $q->execute();
         }
