@@ -5,7 +5,7 @@ jQuery( document ).ready( function( $ ) {
 	if (typeof loggedProf !== 'undefined') {
 		filter = 'ref_prof = '.concat(loggedProf.ref_prof,' AND (ref_statut_abonnement = 1 OR ref_statut_abonnement = 2  OR ref_statut_abonnement = 3 ) ');
 	}else{
-		filter = "ref_statut_abonnement = 1 OR ref_statut_abonnement = 2";	
+		filter = "ref_statut_abonnement = 1 OR ref_statut_abonnement = 2   OR ref_statut_abonnement = 3 ";	
 	}
 
 	var search = instantsearch({
@@ -19,6 +19,26 @@ jQuery( document ).ready( function( $ ) {
 			filters: filter
 		}
 	});
+
+	waitForEl('#refinement-list1', function() {
+
+
+
+
+		search.addWidget(
+				instantsearch.widgets.refinementList({
+					container: '#refinement-list1',
+					attributeName: "statut.statut_abonnement",
+					autoHideContainer: false,
+					templates: {
+						header: "Statut abonnement"
+					}
+				})
+		);
+
+
+	});
+
 
 	waitForEl('#search-input', function() {
 
@@ -139,6 +159,6 @@ jQuery( document ).ready( function( $ ) {
 
 
 	});
-	
-	
+
+
 });

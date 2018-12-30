@@ -24,8 +24,48 @@ jQuery( document ).ready( function( $ ) {
 					container: '#search-input'
 				})
 		);
+	});
+
+	waitForEl('#refinement-list1', function() {
+
+
+
+
+		search.addWidget(
+				instantsearch.widgets.refinementList({
+					container: '#refinement-list1',
+					attributeName: "statut.statut_abonnement",
+					autoHideContainer: false,
+					templates: {
+						header: "Statut abonnement"
+					}
+				})
+		);
+
 
 	});
+
+	waitForEl('#refinement-list2', function() {
+
+
+
+
+		search.addWidget(
+				instantsearch.widgets.refinementList({
+					container: '#refinement-list2',
+					attributeName: "prof.email_stp",
+					autoHideContainer: false,
+					templates: {
+						header: "Prof"
+					}
+				})
+		);
+
+
+	});
+
+
+
 
 	waitForEl('#hits', function() {
 
