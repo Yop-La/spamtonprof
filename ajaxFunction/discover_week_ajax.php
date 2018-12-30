@@ -538,7 +538,8 @@ function inscriptionEssai()
             " Nom parent : " . $proche->getNom(),
             "Téléphone parent :" . $proche->getTelephone(),
             "Remarque :" . $abonnement->getRemarque_inscription(),
-            "Source traffic : " . $source_traffic
+            "Source traffic : " . $source_traffic,
+            "Coupon : " . $code_promo
         );
     } else {
         $messages = array(
@@ -551,7 +552,8 @@ function inscriptionEssai()
             "Téléphone :" . $eleve->getTelephone(),
             "Formule : " . $formule->getFormule(),
             "Remarque :" . $abonnement->getRemarque_inscription(),
-            "Source traffic : " . $source_traffic
+            "Source traffic : " . $source_traffic,
+            "Coupon : " . $code_promo
         );
     }
     $messages[] = " ---------- ";
