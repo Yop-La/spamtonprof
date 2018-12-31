@@ -1,0 +1,28 @@
+Hello [[name]],
+
+Un de tes élève risque de ne pas s'abonner à la fin de l'essai. Il a l'air assez inactif. Essaye de le relancer par sms ou email.
+
+Voici le gars ou la fille en question :
+- [[eleve_name]]
+
+Il a commencé avec toi le [[date_attribution_prof]].
+
+Il t'a envoyé [[nb_messages]] ces 7 derniers jours.
+
+Son dernier message date de : [[date_dernier_message]]
+
+Tu peux directement le relancer en répondant à cet email.
+
+Sinon, voici l'adresse email de ses parents : [[email_parent]] et son prénom [[name_parent]]
+
+[[phrase_fin_essai]]
+
+Attention : si il ne s'abonne pas, il sera automatiquement désinscrit le [[date_desabonnement]].
+
+Voilà, j'espère que tu arriveras à lui donner envie d'échanger avec toi :)
+
+ps : sans nouvelle de l'élève, la prochaine relance arrivera dans 3 jours.
+
+pps: si jamais SpamTonBot a l'air de délirer, remonte nous le bug !
+
+Ton SpamTonBot

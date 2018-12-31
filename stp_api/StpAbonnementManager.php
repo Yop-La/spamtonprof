@@ -766,6 +766,22 @@ class StpAbonnementManager
                         limit :limit");
                 $q->bindValue(":limit", $limit);
                 $q->execute();
+            } else if (array_search("trial_abo_to_relance", $info, true) !== false && array_key_exists("limit", $info)) {
+
+                $limit = $info["limit"];
+
+                $q = $this->_db->prepare("
+                select * from stp_abonnement where ref_statut_abonnement = 2 
+                    and date_attribution_prof + interval '2 days' <= now()
+                    and (dernier_contact is null or (dernier_contact + interval '2 days' <= now()))
+                    and nb_message <= 2
+                    and (relance_date is null  or (relance_date + interval '3 days' <= now()))
+                order by date_attribution_prof desc
+                limit :limit");
+
+                $q->bindValue(":limit", $limit);
+
+                $q->execute();
             }
         }
 
