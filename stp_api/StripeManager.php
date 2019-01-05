@@ -125,7 +125,7 @@ class StripeManager
                     "source_transaction" => $chargeId
                 ));
 
-                $messages[] = "Transfert vers : " . $profId . " de " . round($part_prof * $charge->amount / 100) . "€ (".($part_prof*100)."%) réussi";
+                $messages[] = "Transfert vers : " . $profId . " de " . round($part_prof * $charge->amount / 100) . "€ (" . ($part_prof * 100) . "%) réussi";
             } else {
                 $messages[] = "Un abonnement vient d'être facturé sans compte prof associé";
             }
@@ -148,6 +148,24 @@ class StripeManager
         }
 
         $this->testMode = $testMode;
+    }
+
+    public function echoEvent($id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $ret = \Stripe\Event::retrieve($id);
+
+        prettyPrint($ret);
+    }
+    
+    public function getObjectId($id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        
+        $ret = \Stripe\Event::retrieve($id);
+        
+        return($ret->data->object->id);
     }
 
     public function listActiveSubs(int $limit, $starting_after = false)
