@@ -21,14 +21,15 @@ header("Pragma: no-cache");
 
 // voir "Spécification hook - creation compte lbc depuis zenno" dans evernote - en prod - date création : 08/10/2018
 
-
 // récupération des entrées
 $refClient = $_POST["ref_client"];
 $numTel = $_POST["num_tel"];
 
-//étape 1 : on récupère le client pour avoir le nom de domaine
+// étape 1 : on récupère le client pour avoir le nom de domaine
 $clientMg = new \spamtonprof\stp_api\LbcClientManager();
-$client = $clientMg -> get(array("ref_client" => $refClient));
+$client = $clientMg->get(array(
+    "ref_client" => $refClient
+));
 
 // étape 1 : récupérer un compte à cloner
 $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
@@ -42,7 +43,19 @@ $lbcAccount = $lbcAccountMg->get(array(
 $mail = trim($lbcAccount->getMail());
 $radical = explode("@", $mail)[0];
 $domain = explode("@", $mail)[1];
-$i = 0;
+
+$matches = null;
+$pattern = '/\d+$/';
+preg_match($pattern, $radical, $matches);
+
+$number = - 1;
+
+if ($matches) {
+    $radical = preg_replace($pattern, '', $radical);
+    $number = $matches[0];
+}
+
+$i = $number + 1;
 $exist = true;
 while ($exist) {
     $newEmail = $radical . $i . "@" . $client->getDomain();
@@ -60,16 +73,16 @@ $newAccount->setMail($newEmail);
 $newAccount->setCode_promo(null);
 $newAccount->setControle_date(null);
 $newAccount->setTelephone($numTel);
-$newAccount->setPassword(wp_generate_password() . rand(12,100));
+$newAccount->setPassword(wp_generate_password() . rand(12, 100));
 
 $newAccount = $lbcAccountMg->add($newAccount);
 
-//étape 4 : génération du compte promo
+// étape 4 : génération du compte promo
 $hashids = new \Hashids\Hashids("stpsalt", 5); // génération du code promo
 $code_promo = $hashids->encode($newAccount->getRef_compte());
 $newAccount->setCode_promo($code_promo);
 
-$lbcAccountMg -> updateCodePromo($newAccount);
+$lbcAccountMg->updateCodePromo($newAccount);
 
 $newAccount->setPrenom_client($client->getPrenom_client());
 
