@@ -18,7 +18,7 @@ class LbcApi implements \JsonSerializable
         $this->slack = new \spamtonprof\slack\Slack();
     }
 
-    function getAdds($text)
+    function getAdds($text, $offset=0)
     {
         $curl = curl_init();
 
@@ -30,7 +30,7 @@ class LbcApi implements \JsonSerializable
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "{\"limit\":100,\"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"36\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $text . "\"},\"ranges\":{}}}",
+            CURLOPT_POSTFIELDS => "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"36\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $text . "\"},\"ranges\":{}}}",
             CURLOPT_HTTPHEADER => array(
                 "Postman-Token: c417730d-59a2-4781-86e1-2edba9de02ee",
                 "api_key: ba0c2dad52b3ec",
@@ -104,7 +104,6 @@ class LbcApi implements \JsonSerializable
             $res = $match[1];
 
             preg_match_all("/(?:97|98|99) -->(.*?)<!--/", $res[0], $match);
-            
 
             if ($match[1][0] == "") {
 

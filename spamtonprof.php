@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.7.1.3
+ * Version: 1.1.7.1.4
  *
  *
  * Author: yopla
@@ -81,6 +81,8 @@ require_once (dirname(__FILE__) . '/ajaxFunction/ajax_bo.php');
 require_once (dirname(__FILE__) . '/ajaxFunction/gestion_formule_ajax.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/ads_review.php');
+
+require_once (dirname(__FILE__) . '/ajaxFunction/edit_lbc_text.php');
 
 add_action('template_redirect', 'handleRedirections');
 
@@ -325,7 +327,7 @@ function my_pre_population_callback($options, $settings)
     }
 
     // target "choix type texte" du formulaire "conf client leboncoin"
-    if ($settings['key'] == 'type_texte_1542480094564') {
+    if ($settings['key'] == 'type_texte_1542480094564' || $settings['key'] == 'text_category_1546779674338') {
 
         if (is_user_logged_in()) {
 

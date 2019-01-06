@@ -35,11 +35,13 @@ class LbcTexteManager
 
     public function add(\spamtonprof\stp_api\LbcTexte $texte)
     {
-        $q = $this->_db->prepare("insert into textes(texte, type) values(:texte, :type)");
+        $q = $this->_db->prepare("insert into textes(texte, type,ref_type_texte) values(:texte, :type,:ref_type_texte)");
 
         $q->bindValue(":texte", $texte->getTexte());
 
         $q->bindValue(":type", $texte->getType());
+
+        $q->bindValue(":ref_type_texte", $texte->getRef_type_texte());
 
         $q->execute();
 
@@ -74,6 +76,15 @@ class LbcTexteManager
             $q->bindValue(":ref_type_texte", $refTypeTexte);
         }
 
+        $q->execute();
+    }
+
+    public function updateTexte(\spamtonprof\stp_api\LbcTexte $texte)
+    {
+        $q = $this->_db->prepare("update textes set texte = :texte where ref_texte =:ref_texte");
+
+        $q->bindValue(":ref_texte", $texte->getRef_texte());
+        $q->bindValue(":texte", $texte->getTexte());
         $q->execute();
     }
 
