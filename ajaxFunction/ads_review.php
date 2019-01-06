@@ -140,6 +140,14 @@ function ajaxUpdateCfgClient()
 
         die();
     }
+    
+    
+    $hasTypeTexteMg->deleteAll(array(
+        'ref_client' => $choisir_client
+    ));
+    $hasTypeTitleMg->deleteAll(array(
+        'ref_client' => $choisir_client
+    ));
 
     $hasTypeTitle = new \spamtonprof\stp_api\HasTitleType(array(
         "ref_client" => $choisir_client,
