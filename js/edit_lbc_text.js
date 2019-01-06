@@ -123,7 +123,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 			jQuery("#indexCourant").html('');
 			jQuery("#indexFin").html('');
 
-			jQuery(".text_lbc").text('');
+			jQuery(".text_lbc").val('');
 			jQuery(".text_lbc").change();
 
 			jQuery(".ref_text").val('');
@@ -245,7 +245,7 @@ jQuery( document ).ready( function( jQuery ) {
 function updateIndice(){
 	texteCourant =  textes[indiceCourant];
 
-	jQuery(".text_lbc").text(texteCourant.texte);
+	jQuery(".text_lbc").val(texteCourant.texte);
 	jQuery(".text_lbc").change();
 	jQuery(".ref_text").val(texteCourant.ref_texte);
 	jQuery(".ref_text").change();
