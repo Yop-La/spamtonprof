@@ -29,9 +29,15 @@ $refClient = $_POST["ref_client"];
 $phone = $_POST["phone"];
 $refCompte = $_POST["ref_compte"];
 
+$code_promo =false;
+if(array_key_exists("code_promo", $_POST)){
+    $code_promo = $_POST["code_promo"];
+}
+
+
 $lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
 
-$ads = $lbcProcessMg -> generateAds($refClient, $nbAds, $phone, $refCompte);
+$ads = $lbcProcessMg -> generateAds($refClient, $nbAds, $phone, $refCompte, $code_promo);
 
 $retour = new stdClass();
 $retour->ads = $ads;

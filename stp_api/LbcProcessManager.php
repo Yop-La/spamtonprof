@@ -544,7 +544,7 @@ class LbcProcessManager
     }
 
     // pour générer et retourner les annonces avant publication par zenno
-    public function generateAds($refClient, $nbAds, $phone, $ref_compte, $lock = true)
+    public function generateAds($refClient, $nbAds, $phone, $ref_compte, $code_promo = true, $lock = true)
     {
 
         // on récupère le client
@@ -641,7 +641,23 @@ class LbcProcessManager
             $lbcAcct = $lbcAcctMG->get(array(
                 'ref_compte' => $ref_compte
             ));
-            $texte->setTexte($texte->getTexte() . PHP_EOL . PHP_EOL . $lbcAcct->getCode_promo());
+
+            if ($code_promo) {
+                $texte->setTexte($texte->getTexte() . PHP_EOL . PHP_EOL . $lbcAcct->getCode_promo());
+            } else {
+
+                $symbols = [
+                    '-',
+                    '_',
+                    '/',
+                    '=',
+                    '.',
+                    '*'
+                ];
+                $symbol = $symbols[rand(0, count($symbols) - 1)];
+                $symbols_line = str_repeat($symbol, rand(10, 50));
+                $texte->setTexte($symbols_line . PHP_EOL . PHP_EOL . $texte->getTexte() . PHP_EOL . PHP_EOL . $symbols_line);
+            }
 
             $ad = new \stdClass();
             $ad->title = $title;
