@@ -301,6 +301,11 @@ class PageManager
 
             PageManager::editLbcText();
         }
+
+        if ($this->pageSlug == 'espace-presse') {
+
+            PageManager::espacePresse();
+        }
     }
 
     public static function abonnementApresEssaiLoader()
@@ -604,11 +609,17 @@ class PageManager
     {
         wp_enqueue_script('tarifs', plugins_url() . '/spamtonprof/js/edit_lbc_text.js', array(
 
-        'nf-front-end'
+            'nf-front-end'
         ), time());
 
         // wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/ad-review.css');
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
+    }
+
+    public static function espacePresse()
+
+    {
+        wp_enqueue_style('css_espace-presse', get_home_url() . '/wp-content/themes/salient-child/css/pages/espace-presse.css');
     }
 }
 
