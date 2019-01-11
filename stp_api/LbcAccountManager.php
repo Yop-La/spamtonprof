@@ -217,6 +217,14 @@ class LbcAccountManager
         $q->execute();
     }
 
+    public function updateCookie(\spamtonprof\stp_api\LbcAccount $lbcAccount)
+    {
+        $q = $this->_db->prepare("update compte_lbc set cookie = :cookie where ref_compte = :ref_compte");
+        $q->bindValue(":cookie", $lbcAccount->getCookie());
+        $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
+        $q->execute();
+    }
+
     public function getAccountToScrap($nbCompte)
     {
         $accounts = [];

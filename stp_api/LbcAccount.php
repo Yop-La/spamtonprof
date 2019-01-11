@@ -11,17 +11,34 @@ use Exception;
 class LbcAccount implements \JsonSerializable
 {
 
-    protected $ref_compte, $mail, $password, $nb_annonces_online, $date_derniere_activite, $disabled, $date_of_disabling, $ref_client, $ref_expe, $expe, $code_promo, $prenom_client, $nom_client, $controle_date, $objectID, $date_creation, $telephone;
+    protected $ref_compte, $mail, $password, $nb_annonces_online, $date_derniere_activite, $disabled, $date_of_disabling, $ref_client, $ref_expe, $expe, $code_promo, $prenom_client, $nom_client, $controle_date, $objectID, $date_creation, $telephone, $cookie;
 
     public function __construct(array $donnees = array())
 
     {
         $this->hydrate($donnees);
     }
-    
-    
 
     /**
+     *
+     * @return mixed
+     */
+    public function getCookie()
+    {
+        return $this->cookie;
+    }
+
+    /**
+     *
+     * @param mixed $cookie
+     */
+    public function setCookie($cookie)
+    {
+        $this->cookie = $cookie;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getTelephone()
@@ -30,6 +47,7 @@ class LbcAccount implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $telephone
      */
     public function setTelephone($telephone)
