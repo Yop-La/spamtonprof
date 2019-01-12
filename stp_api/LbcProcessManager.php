@@ -478,6 +478,8 @@ class LbcProcessManager
             $msgs[] = "Contrôle de " . $lbcAccount->getRef_compte();
 
             $codePromo = $lbcAccount->getCode_promo();
+            $user_id = $lbcAccount->getUser_id();
+            
 
             // step 2 : suppression des annonces dans la base
             $adTempoMg->deleteAll(array(
@@ -485,7 +487,16 @@ class LbcProcessManager
             ));
 
             // step 3 : récupération des annonces via api leboncoin
-            $ads = $lbcApi->getAdds($codePromo);
+            
+            $ads = false;
+            
+            if($user_id){
+                $ads = $lbcApi->getAdds(array('user_id' => $user_id));
+            }else{
+                $ads = $lbcApi->getAdds(array("code_promo" => $codePromo));
+            }
+            
+            
 
             // step 4-1 : si il y a des annonces en ligne sur leboncoin
             $disabled = false;

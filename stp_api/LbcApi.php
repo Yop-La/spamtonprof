@@ -50,28 +50,63 @@ class LbcApi implements \JsonSerializable
         }
     }
 
-    function getAdds($text, $offset = 0)
+    function getAdds($info, $offset = 0)
     {
+        $response = false;
+        $err = false;
         $curl = curl_init();
+        
+        if (array_key_exists('code_promo', $info)) {
 
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.leboncoin.fr/finder/search",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"36\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $text . "\"},\"ranges\":{}}}",
-            CURLOPT_HTTPHEADER => array(
-                "Postman-Token: c417730d-59a2-4781-86e1-2edba9de02ee",
-                "api_key: ba0c2dad52b3ec",
-                "cache-control: no-cache"
-            )
-        ));
+            $code_promo = $info['code_promo'];
 
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => "https://api.leboncoin.fr/finder/search",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_POSTFIELDS => "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"36\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $code_promo . "\"},\"ranges\":{}}}",
+                CURLOPT_HTTPHEADER => array(
+                    "Postman-Token: c417730d-59a2-4781-86e1-2edba9de02ee",
+                    "api_key: ba0c2dad52b3ec",
+                    "cache-control: no-cache"
+                )
+            ));
+
+            $response = curl_exec($curl);
+            $err = curl_error($curl);
+        }
+        
+        if (array_key_exists('user_id', $info)) {
+            
+            $user_id = $info['user_id'];
+            
+            
+            
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => "https://api.leboncoin.fr/finder/search",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_POSTFIELDS => "{\"filters\":{\"owner\":{\"user_id\":\"".$user_id."\"},\"enums\":{\"ad_type\":[\"offer\"]}},\"limit\":100}",
+                CURLOPT_HTTPHEADER => array(
+                    "Postman-Token: e7ce26b5-3715-466a-940e-1e64c45b7013",
+                    "api_key: ba0c2dad52b3ec",
+                    "cache-control: no-cache"
+                ),
+            ));
+            
+            $response = curl_exec($curl);
+            $err = curl_error($curl);
+            
+            
+        }
 
         $lbcRep = false;
         if ($err) {
