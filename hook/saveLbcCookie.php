@@ -19,34 +19,39 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-
-
 // voir "récupérer toutes les annonces d'un compte leboncoin" dans evernote - en prod - date création : 08/10/2018
 
+if (! function_exists('http_parse_headers')) {
 
-if(!function_exists('http_parse_headers')){
-    function http_parse_headers($raw_headers){
+    function http_parse_headers($raw_headers)
+    {
         $headers = array();
-        $key	 = ''; // [+]
-        foreach(explode("\n", $raw_headers) as $h){
+        $key = ''; // [+]
+        foreach (explode("\n", $raw_headers) as $h) {
             $h = explode(':', $h, 2);
-            if(isset($h[1])){
-                if(!isset($headers[$h[0]])){
+            if (isset($h[1])) {
+                if (! isset($headers[$h[0]])) {
                     $headers[$h[0]] = trim($h[1]);
-                }elseif(is_array($headers[$h[0]])){
+                } elseif (is_array($headers[$h[0]])) {
                     // $tmp = array_merge($headers[$h[0]], array(trim($h[1]))); // [-]
                     // $headers[$h[0]] = $tmp; // [-]
-                    $headers[$h[0]] = array_merge($headers[$h[0]], array(trim($h[1]))); // [+]
-                }else{
+                    $headers[$h[0]] = array_merge($headers[$h[0]], array(
+                        trim($h[1])
+                    )); // [+]
+                } else {
                     // $tmp = array_merge(array($headers[$h[0]]), array(trim($h[1]))); // [-]
                     // $headers[$h[0]] = $tmp; // [-]
-                    $headers[$h[0]] = array_merge(array($headers[$h[0]]), array(trim($h[1]))); // [+]
+                    $headers[$h[0]] = array_merge(array(
+                        $headers[$h[0]]
+                    ), array(
+                        trim($h[1])
+                    )); // [+]
                 }
                 $key = $h[0]; // [+]
-            }else{
-                if(substr($h[0], 0, 1)=="\t"){
-                    $headers[$key] .= "\r\n\t".trim($h[0]);
-                }elseif(!$key){
+            } else {
+                if (substr($h[0], 0, 1) == "\t") {
+                    $headers[$key] .= "\r\n\t" . trim($h[0]);
+                } elseif (! $key) {
                     $headers[0] = trim($h[0]);
                     trim($h[0]);
                 }
@@ -55,57 +60,63 @@ if(!function_exists('http_parse_headers')){
         return $headers;
     }
 }
-if(!function_exists('http_parse_cookie')){
-    function http_parse_cookie($szHeader, $object = true){
-        $obj		 = new stdClass;
-        $arrCookie	 = array();
-        $arrObj		 = array();
-        $arrCookie =  explode("\n", $szHeader);
-        for($i = 0; $i<count($arrCookie); $i++){
-            $cookie			 = $arrCookie[$i];
-            $attributes		 = explode(';', $cookie);
-            $arrCookie[$i]	 = array();
-            foreach($attributes as $attrEl){
+if (! function_exists('http_parse_cookie')) {
+
+    function http_parse_cookie($szHeader, $object = true)
+    {
+        $obj = new stdClass();
+        $arrCookie = array();
+        $arrObj = array();
+        $arrCookie = explode("\n", $szHeader);
+        for ($i = 0; $i < count($arrCookie); $i ++) {
+            $cookie = $arrCookie[$i];
+            $attributes = explode(';', $cookie);
+            $arrCookie[$i] = array();
+            foreach ($attributes as $attrEl) {
                 $tmp = explode('=', $attrEl, 2);
-                if(count($tmp)<2){
+                if (count($tmp) < 2) {
                     continue;
                 }
-                $key	 = trim($tmp[0]);
-                $value	 = trim($tmp[1]);
-                if($key=='version'||$key=='path'||$key=='expires'||$key=='domain'||$key=='comment'){
-                    if(!isset($arrObj[$key])){
+                $key = trim($tmp[0]);
+                $value = trim($tmp[1]);
+                if ($key == 'version' || $key == 'path' || $key == 'expires' || $key == 'domain' || $key == 'comment') {
+                    if (! isset($arrObj[$key])) {
                         $arrObj[$key] = $value;
                     }
-                }else{
+                } else {
                     $arrObj['cookies'][$key] = $value;
                 }
             }
         }
-        if($object===true){
-            $obj	 = (object)$arrObj;
-            $return	 = $obj;
-        }else{
+        if ($object === true) {
+            $obj = (object) $arrObj;
+            $return = $obj;
+        } else {
             $return = $arrObj;
         }
         return $return;
     }
 }
 
-
 $cookies = $_POST["cookies"];
 $ref_compte = $_POST["ref_compte"];
-
-
 
 $cookies = http_parse_cookie($cookies);
 
 $luat = $cookies->cookies['luat'];
 
-
 $lbcAcctMg = new \spamtonprof\stp_api\LbcAccountManager();
-$act = $lbcAcctMg ->get(array('ref_compte' => $ref_compte));
+$act = $lbcAcctMg->get(array(
+    'ref_compte' => $ref_compte
+));
 
-$act -> setCookie($luat);
+$act->setCookie($luat);
 $lbcAcctMg->updateCookie($act);
+
+$lbcApi = new \spamtonprof\stp_api\LbcApi();
+$userId = $lbcApi->getUserId($luat);
+
+$act->setUser_id($userId);
+$lbcAcctMg->updateUserId($act);
 
 prettyPrint($act);

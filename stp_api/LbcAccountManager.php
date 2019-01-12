@@ -225,6 +225,14 @@ class LbcAccountManager
         $q->execute();
     }
 
+    public function updateUserId(\spamtonprof\stp_api\LbcAccount $lbcAccount)
+    {
+        $q = $this->_db->prepare("update compte_lbc set user_id = :user_id where ref_compte = :ref_compte");
+        $q->bindValue(":user_id", $lbcAccount->getUser_id());
+        $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
+        $q->execute();
+    }
+
     public function getAccountToScrap($nbCompte)
     {
         $accounts = [];

@@ -18,7 +18,39 @@ class LbcApi implements \JsonSerializable
         $this->slack = new \spamtonprof\slack\Slack();
     }
 
-    function getAdds($text, $offset=0)
+    function getUserId($luat)
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.leboncoin.fr/api/accounts/v1/accounts/me/personaldata",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "Postman-Token: 81bc2fa8-dee0-43d1-a3ab-c861b219a19d",
+                "authorization: Bearer " . $luat,
+                "cache-control: no-cache"
+            )
+        ));
+
+        $response = json_decode(curl_exec($curl));
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            return (false);
+        } else {
+
+            return ($response->userId);
+        }
+    }
+
+    function getAdds($text, $offset = 0)
     {
         $curl = curl_init();
 
