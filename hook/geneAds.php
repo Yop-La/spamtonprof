@@ -41,7 +41,6 @@ $ads = $lbcProcessMg -> generateAds($refClient, $nbAds, $phone, true, $refCompte
 
 $slack = new \spamtonprof\slack\Slack();
 $slack->sendMessages('log-lbc', array(
-    "   --------------   ",
     "LBC : publication sur le compte de ref_compte_lbc : " . $refCompte,
 ));
 

@@ -151,7 +151,7 @@ class LbcProcessManager
                 }
 
                 // if à faire en deuxième car ce deuxième inclus le premier
-            } elseif (strpos($from, 'messagerie.leboncoin.fr') !== false) { // message du bon coin à priori via mailgun
+            } elseif (strpos($from, 'messagerie.leboncoin.fr') !== false) { // message du bon coin à priori via mailgun ou via gmx
 
                 if (strpos($body, 'https://www.leboncoin.fr/phishing.htm') !== false) {
 
@@ -197,24 +197,19 @@ class LbcProcessManager
 
                     $type = $this->messageTypeMg->get($messageType);
 
-                    $labelId = $this->gmailManager->getLabelsIds(array(
+                    $labelNames = array(
                         $type->getType()
-                    ));
+                    );
+
+                    $mailBox = 'mailgun';
+                    if (strpos($lbcProfil, 'gmx') !== false) {
+                        $mailBox = 'gmx';
+                    }
+                    $labelNames[] = $mailBox;
+
+                    $labelId = $this->gmailManager->getLabelsIds($labelNames);
 
                     $this->gmailManager->modifyMessage($gmailId, $labelId, array());
-
-                    // on envoie un message dans slacks
-
-                    $this->msgs[] = "------------------------";
-                    $this->msgs[] = "Nouveau message ! gmailId : " . $gmailId;
-                    $this->msgs[] = "date de réception : " . $dateReception->format(PG_DATETIME_FORMAT);
-                    $this->msgs[] = "   ------   ";
-                    $this->msgs[] = strip_tags($body);
-
-                    if (count($this->msgs) != 0) {
-                        // $this->slack->sendMessages($this->slack::LogLbc, $this->msgs);
-                        $this->msgs = [];
-                    }
 
                     if (count($this->errors) != 0) {
 
@@ -251,7 +246,6 @@ class LbcProcessManager
                         $this->messProspectMg->updateAnswerGmailId($stpMessage);
 
                         // attribuer un libellé pour dire que le message a été lu
-
                         $labelId = $this->gmailManager->getLabelsIds(array(
                             "bot_read_it"
                         ));
@@ -359,6 +353,7 @@ class LbcProcessManager
 
     public function replyToLeadMessages()
     {
+        // ajouter plusieurs messages de réponse pour ne pas être reconnu comme du spam todo
         $message = $this->messProspectMg->getMessageToSend();
 
         if ($message) {
@@ -374,10 +369,9 @@ class LbcProcessManager
             $subject = 'Re: ' . str_replace('leboncoin', 'lebonc...', $message->getSubject());
             $body = $message->getReply();
 
-            // on supprime la partie écrite par 33mail.
-
             $to = $lead->getAdresse_mail(); // 'alex.guillemine@gmail.com'
 
+            // on supprime la partie écrite par 33mail.
             $pattern = '/(<div align="center">.*?<\/div><\/div>)|(This email was sent to the alias(.*?)[\r\n])/';
             $body = preg_replace_callback($pattern, function ($m) {
                 return ("");
@@ -417,18 +411,33 @@ class LbcProcessManager
 
     public function sendLeadReply(\spamtonprof\stp_api\LbcAccount $compteLbc, $subject, $to, $body, $message)
     {
-        $smtpServerMg = new \spamtonprof\stp_api\SmtpServerManager();
-        $smtpServer = $smtpServerMg->get(array(
-            "ref_smtp_server" => $smtpServerMg::smtp2Go
-        ));
-
         $clientMg = new \spamtonprof\stp_api\LbcClientManager();
         $client = $clientMg->get(array(
             "ref_client" => $compteLbc->getRef_client()
         ));
 
-        $send1 = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), $client->getPrenom_client(), true);
-        $send2 = $smtpServer->sendEmail("Stp Reply : |--|" . $message->getRef_message() . "|--|" . $subject, "lebureaudesprofs@gmail.com", $body, $compteLbc->getMail(), $client->getPrenom_client(), true);
+        if (strpos($compteLbc->getMail(), 'gmx') !== false) {
+
+            $gmxActMg = new \spamtonprof\stp_api\GmxActManager();
+            $gmxAct = $gmxActMg->get(array(
+                'ref_compte_lbc' => $compteLbc->getRef_compte()
+            ));
+
+            $smtpServer = new \spamtonprof\stp_api\SmtpServer(array(
+                'host' => 'mail.gmx.com',
+                'port' => 587,
+                'password' => $gmxAct->getPassword(),
+                'username' => $gmxAct->getMail()
+            ));
+        } else {
+            $smtpServerMg = new \spamtonprof\stp_api\SmtpServerManager();
+            $smtpServer = $smtpServerMg->get(array(
+                "ref_smtp_server" => $smtpServerMg::smtp2Go
+            ));
+        }
+
+        $send1 = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), $client->getPrenom_client(), false);
+        $send2 = $smtpServer->sendEmail("Stp Reply : |--|" . $message->getRef_message() . "|--|" . $subject, "lebureaudesprofs@gmail.com", $body, $compteLbc->getMail(), $client->getPrenom_client(), false);
 
         return ($send1 && $send2);
     }
