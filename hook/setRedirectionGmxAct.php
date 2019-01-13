@@ -22,7 +22,7 @@ header("Pragma: no-cache");
 $slack = new \spamtonprof\slack\Slack();
 $slack->sendMessages('log', array_values($_POST));
 
-if ($_POST['password'] = HOOK_SECRET) {
+if ($_POST['password'] == HOOK_SECRET) {
 
     $ref_gmx_act = $_POST['ref_gmx_act'];
     $has_redirection = $_POST['has_redirection'];
