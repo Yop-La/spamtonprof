@@ -479,7 +479,6 @@ class LbcProcessManager
 
             $codePromo = $lbcAccount->getCode_promo();
             $user_id = $lbcAccount->getUser_id();
-            
 
             // step 2 : suppression des annonces dans la base
             $adTempoMg->deleteAll(array(
@@ -487,16 +486,18 @@ class LbcProcessManager
             ));
 
             // step 3 : récupération des annonces via api leboncoin
-            
+
             $ads = false;
-            
-            if($user_id){
-                $ads = $lbcApi->getAdds(array('user_id' => $user_id));
-            }else{
-                $ads = $lbcApi->getAdds(array("code_promo" => $codePromo));
+
+            if ($user_id) {
+                $ads = $lbcApi->getAdds(array(
+                    'user_id' => $user_id
+                ));
+            } else {
+                $ads = $lbcApi->getAdds(array(
+                    "code_promo" => $codePromo
+                ));
             }
-            
-            
 
             // step 4-1 : si il y a des annonces en ligne sur leboncoin
             $disabled = false;
@@ -555,7 +556,7 @@ class LbcProcessManager
     }
 
     // pour générer et retourner les annonces avant publication par zenno
-    public function generateAds($refClient, $nbAds, $phone, $ref_compte, $code_promo = true, $lock = true)
+    public function generateAds($refClient, $nbAds, $phone, $lock = false, $ref_compte = false)
     {
 
         // on récupère le client
@@ -569,7 +570,6 @@ class LbcProcessManager
         $lbcTitleMg = new \spamtonprof\stp_api\LbcTitleManager();
         $communeMg = new \spamtonprof\stp_api\LbcCommuneManager();
         $adMg = new \spamtonprof\stp_api\AddsTempoManager();
-        $lbcAcctMG = new \spamtonprof\stp_api\LbcAccountManager();
 
         $hasTypeTitle = $hasTypeTitleMg->get(array(
             "ref_client_defaut" => $refClient
@@ -648,27 +648,17 @@ class LbcProcessManager
                 $adMg->add($adTempo);
             }
 
-            // récupération du code promo pour ajouter un code promo
-            $lbcAcct = $lbcAcctMG->get(array(
-                'ref_compte' => $ref_compte
-            ));
-
-            if ($code_promo) {
-                $texte->setTexte($texte->getTexte() . PHP_EOL . PHP_EOL . $lbcAcct->getCode_promo());
-            } else {
-
-                $symbols = [
-                    '-',
-                    '_',
-                    '/',
-                    '=',
-                    '.',
-                    '*'
-                ];
-                $symbol = $symbols[rand(0, count($symbols) - 1)];
-                $symbols_line = str_repeat($symbol, rand(10, 50));
-                $texte->setTexte($symbols_line . PHP_EOL . PHP_EOL . $texte->getTexte() . PHP_EOL . PHP_EOL . $symbols_line);
-            }
+            $symbols = [
+                '-',
+                '_',
+                '/',
+                '=',
+                '.',
+                '*'
+            ];
+            $symbol = $symbols[rand(0, count($symbols) - 1)];
+            $symbols_line = str_repeat($symbol, rand(10, 50));
+            $texte->setTexte($symbols_line . PHP_EOL . PHP_EOL . $texte->getTexte() . PHP_EOL . PHP_EOL . $symbols_line);
 
             $ad = new \stdClass();
             $ad->title = $title;

@@ -37,7 +37,7 @@ if(array_key_exists("code_promo", $_POST)){
 
 $lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
 
-$ads = $lbcProcessMg -> generateAds($refClient, $nbAds, $phone, $refCompte, $code_promo);
+$ads = $lbcProcessMg -> generateAds($refClient, $nbAds, $phone, true, $refCompte);
 
 $retour = new stdClass();
 $retour->ads = $ads;
