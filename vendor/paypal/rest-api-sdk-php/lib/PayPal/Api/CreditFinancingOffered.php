@@ -46,7 +46,7 @@ class CreditFinancingOffered extends PayPalModel
     /**
      * Length of financing terms in month
      *
-     * 
+     * @param \PayPal\Api\number $term
      * 
      * @return $this
      */
@@ -59,7 +59,7 @@ class CreditFinancingOffered extends PayPalModel
     /**
      * Length of financing terms in month
      *
-     * 
+     * @return \PayPal\Api\number
      */
     public function getTerm()
     {

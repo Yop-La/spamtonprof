@@ -20,6 +20,7 @@ class Google_Service_ServiceNetworking_Subnetwork extends Google_Model
   public $ipCidrRange;
   public $name;
   public $network;
+  public $outsideAllocation;
 
   public function setIpCidrRange($ipCidrRange)
   {
@@ -44,5 +45,13 @@ class Google_Service_ServiceNetworking_Subnetwork extends Google_Model
   public function getNetwork()
   {
     return $this->network;
+  }
+  public function setOutsideAllocation($outsideAllocation)
+  {
+    $this->outsideAllocation = $outsideAllocation;
+  }
+  public function getOutsideAllocation()
+  {
+    return $this->outsideAllocation;
   }
 }

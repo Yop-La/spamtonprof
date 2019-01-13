@@ -782,6 +782,15 @@ class StpAbonnementManager
                 $q->bindValue(":limit", $limit);
 
                 $q->execute();
+            }else if (array_key_exists("ref_abos", $info)) {
+                
+                $ref_abos = $info["ref_abos"];
+                
+                $ref_abos = toPgArray($ref_abos, true);
+                
+                $q = $this->_db->prepare("select * from stp_abonnement where ref_abonnement in " . $ref_abos );
+                
+                $q->execute();
             }
         }
 
@@ -906,7 +915,7 @@ class StpAbonnementManager
     }
 
     // pour redémarrer un abonnement qui a été arrêté (startDate vaut now ou une date)
-    function restart(int $refAbo, $startDate, bool $testMode = true)
+    function restart(int $refAbo, bool $testMode = true, bool $in_trial = false, $startDate = 'now')
     {
         if ($startDate != 'now') {
             $startDate = \DateTime::createFromFormat('j/m/Y', $startDate);
@@ -919,31 +928,53 @@ class StpAbonnementManager
                 'ref_parent',
                 'ref_plan',
                 'ref_prof',
-                'ref_compte'
+                'ref_compte',
+                'ref_eleve'
             )
         );
         $abo = $this->get(array(
             'ref_abonnement' => $refAbo
         ), $constructor);
 
-        $abo->setRef_statut_abonnement($abo::ACTIF);
+        $statut = $abo::ACTIF;
+        if ($in_trial) {
+            $statut = $abo::ESSAI;
+        }
+
+        $abo->setRef_statut_abonnement($statut);
         $this->updateRefStatutAbonnement($abo);
 
         // mise à jour dans stripe
 
-        $planStripeId = $abo->getPlan()->getRef_plan_stripe();
-        $stripeProfId = $abo->getProf()->getStripe_id();
-        if ($testMode) {
-            $planStripeId = $abo->getPlan()->getRef_plan_stripe_test();
-            $stripeProfId = $abo->getProf()->getStripe_id_test();
+        if (! $in_trial) {
+
+            $planStripeId = $abo->getPlan()->getRef_plan_stripe();
+            $stripeProfId = $abo->getProf()->getStripe_id();
+            if ($testMode) {
+                $planStripeId = $abo->getPlan()->getRef_plan_stripe_test();
+                $stripeProfId = $abo->getProf()->getStripe_id_test();
+            }
+
+            $stripe = new \spamtonprof\stp_api\StripeManager($testMode);
+
+            $invoice_email = $abo->getEleve()->getEmail();
+            $proche = $abo->getProche();
+
+            if ($proche) {
+                $invoice_email = $proche->getEmail();
+            }
+
+            $ret = $stripe->addConnectSubscription($invoice_email, false, $abo->getRef_compte(), $planStripeId, $stripeProfId, $abo->getRef_abonnement(), $abo->getCompte(), $startDate);
+
+            $abo->setSubs_Id($ret["subId"]);
+            $this->updateSubsId($abo);
+        } else {
+
+            $fin_essai = new \DateTime(null, new \DateTimeZone('Europe/Paris'));
+            $fin_essai->sub(new \DateInterval('P10D'));
+            $abo->setFin_essai($fin_essai->format(PG_DATE_FORMAT));
+            $this->updateFinEssai($abo);
         }
-
-        $stripe = new \spamtonprof\stp_api\StripeManager($testMode);
-        $ret = $stripe->addConnectSubscription($abo->getProche()
-            ->getEmail(), false, $abo->getRef_compte(), $planStripeId, $stripeProfId, $abo->getRef_abonnement(), $abo->getCompte(), $startDate);
-
-        $abo->setSubs_Id($ret["subId"]);
-        $this->updateSubsId($abo);
 
         // mise à jout du statut d'abonnement dans algolia
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();

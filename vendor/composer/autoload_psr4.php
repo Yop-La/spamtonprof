@@ -10,6 +10,7 @@ return array(
     'wrapi\\' => array($vendorDir . '/palanik/wrapi/src'),
     'phpseclib\\' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
     'Webmozart\\Assert\\' => array($vendorDir . '/webmozart/assert/src'),
+    'Symfony\\Polyfill\\Ctype\\' => array($vendorDir . '/symfony/polyfill-ctype'),
     'Symfony\\Component\\OptionsResolver\\' => array($vendorDir . '/symfony/options-resolver'),
     'Stripe\\' => array($vendorDir . '/stripe/stripe-php/lib'),
     'Sabre\\Uri\\' => array($vendorDir . '/sabre/uri/lib'),

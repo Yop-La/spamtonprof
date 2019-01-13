@@ -3,7 +3,6 @@
 namespace PayPal\Api;
 
 use PayPal\Common\PayPalResourceModel;
-use PayPal\Transport\PayPalRestCall;
 use PayPal\Validation\ArgumentValidator;
 use PayPal\Rest\ApiContext;
 

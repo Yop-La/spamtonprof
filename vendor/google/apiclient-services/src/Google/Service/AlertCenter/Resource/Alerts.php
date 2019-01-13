@@ -96,4 +96,22 @@ class Google_Service_AlertCenter_Resource_Alerts extends Google_Service_Resource
     $params = array_merge($params, $optParams);
     return $this->call('list', array($params), "Google_Service_AlertCenter_ListAlertsResponse");
   }
+  /**
+   * Restores, or "undeletes", an alert that was marked for deletion within the
+   * past 30 days. Attempting to undelete an alert which was marked for deletion
+   * over 30 days ago (which has been removed from the Alert Center database) or a
+   * nonexistent alert returns a `NOT_FOUND` error. Attempting to undelete an
+   * alert which has not been marked for deletion has no effect. (alerts.undelete)
+   *
+   * @param string $alertId Required. The identifier of the alert to undelete.
+   * @param Google_Service_AlertCenter_UndeleteAlertRequest $postBody
+   * @param array $optParams Optional parameters.
+   * @return Google_Service_AlertCenter_Alert
+   */
+  public function undelete($alertId, Google_Service_AlertCenter_UndeleteAlertRequest $postBody, $optParams = array())
+  {
+    $params = array('alertId' => $alertId, 'postBody' => $postBody);
+    $params = array_merge($params, $optParams);
+    return $this->call('undelete', array($params), "Google_Service_AlertCenter_Alert");
+  }
 }

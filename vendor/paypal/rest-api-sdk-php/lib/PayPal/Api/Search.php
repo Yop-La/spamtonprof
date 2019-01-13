@@ -406,7 +406,7 @@ class Search extends PayPalModel
     /**
      * The offset for the search results.
      *
-     * 
+     * @param \PayPal\Api\number $page
      * 
      * @return $this
      */
@@ -419,7 +419,7 @@ class Search extends PayPalModel
     /**
      * The offset for the search results.
      *
-     * 
+     * @return \PayPal\Api\number
      */
     public function getPage()
     {
@@ -429,7 +429,7 @@ class Search extends PayPalModel
     /**
      * The page size for the search results.
      *
-     * 
+     * @param \PayPal\Api\number $page_size
      * 
      * @return $this
      */
@@ -442,7 +442,7 @@ class Search extends PayPalModel
     /**
      * The page size for the search results.
      *
-     * 
+     * @return \PayPal\Api\number
      */
     public function getPageSize()
     {

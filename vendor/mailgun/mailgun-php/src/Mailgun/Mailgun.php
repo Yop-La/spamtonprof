@@ -104,12 +104,15 @@ class Mailgun
 
     /**
      * @param string $apiKey
+     * @param string $endpoint URL to mailgun servers
      *
      * @return Mailgun
      */
-    public static function create($apiKey)
+    public static function create($apiKey, $endpoint = 'https://api.mailgun.net')
     {
-        $httpClientConfigurator = (new HttpClientConfigurator())->setApiKey($apiKey);
+        $httpClientConfigurator = (new HttpClientConfigurator())
+            ->setApiKey($apiKey)
+            ->setEndpoint($endpoint);
 
         return self::configure($httpClientConfigurator);
     }
@@ -321,6 +324,14 @@ class Mailgun
     public function stats()
     {
         return new Api\Stats($this->httpClient, $this->requestBuilder, $this->hydrator);
+    }
+
+    /**
+     * @return Api\Attachment
+     */
+    public function attachment()
+    {
+        return new Api\Attachment($this->httpClient, $this->requestBuilder, $this->hydrator);
     }
 
     /**

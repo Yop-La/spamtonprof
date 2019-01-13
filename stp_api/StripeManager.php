@@ -158,14 +158,120 @@ class StripeManager
 
         prettyPrint($ret);
     }
-    
+
+    public function retrieveInvoice()
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        $invoice = \Stripe\Invoice::retrieve("in_1DqhYrIcMMHYXO98PryWln1j");
+        prettyPrint($invoice);
+    }
+
+    public function getUnpaidInvoicesOfCancelSub()
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $invoices = \Stripe\Invoice::all([
+            "limit" => 3
+        ]);
+        ;
+
+        // récupération de tous les abos stripes annulées
+        $ref_abos = [];
+        $params = [
+            "limit" => 20,
+            'status' => 'canceled'
+        ];
+
+        do {
+
+            $subs = \Stripe\Subscription::all($params);
+            $subs = $subs->data;
+
+            foreach ($subs as $sub) {
+                $id = $sub->id;
+                $ref_abonnement = $sub->metadata['ref_abonnement'];
+                if ($ref_abonnement) {
+                    $ref_abos[] = [
+                        'ref_abo' => $ref_abonnement,
+                        'sub_id' => $id
+                    ];
+                }
+                $params['starting_after'] = $id;
+            }
+        } while ($subs);
+
+        $i = 0;
+
+        $invoices_abo = [];
+
+        //récupération de toutes les factures impayés failed des abos annulés
+        foreach ($ref_abos as $ref_abo) {
+
+            $sub_id = $ref_abo['sub_id'];
+            $ref_abo = $ref_abo['ref_abo'];
+
+            $invoices = \Stripe\Invoice::all([
+                "limit" => 100,
+                "subscription" => $sub_id
+            ]);
+
+            $invoices = $invoices->data;
+            if ($invoices) {
+                $links = [];
+                $due = false;
+                foreach ($invoices as $invoice) {
+                    if (! $invoice->paid && $invoice->status == 'open') {
+                        $links[] = $invoice->hosted_invoice_url;
+                        $due = true;
+                    }
+                }
+                if ($due) {
+                    $invoices_abo[$ref_abo] = $links;
+                }
+            }
+
+            $i = $i + 1;
+        }
+        
+        //affichage 
+        $ref_abos = array_keys($invoices_abo);
+        $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
+
+        $constructor = array(
+            "construct" => array(
+                'ref_parent',
+                'ref_eleve'
+            )
+        );
+
+        $abos = $aboMg->getAll(array(
+            'actif_account',
+            'ref_abos' => $ref_abos
+        ), $constructor);
+
+        foreach ($abos as $abo) {
+            if ($abo->getProche()) {
+                echo ($abo->getProche()->getEmail() . ' : ' . $abo->getEleve()->getEmail() . '<br>');
+            } else {
+                echo ($abo->getEleve()->getEmail() . '<br>');
+            }
+            $links = $invoices_abo[$abo->getRef_abonnement()];
+            foreach ($links as $link) {
+                echo ($link . '<br>');
+            }
+            echo ('<br><br>');
+        }
+
+        // prettyPrint($abos);
+    }
+
     public function getObjectId($id)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-        
+
         $ret = \Stripe\Event::retrieve($id);
-        
-        return($ret->data->object->id);
+
+        return ($ret->data->object->id);
     }
 
     public function listActiveSubs(int $limit, $starting_after = false)

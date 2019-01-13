@@ -7,13 +7,26 @@ use Ovh\Api;
 class DomainProcessMg
 
 {
+    
+    
+    /**
+     *  utilisation 
+     *  1) ajouter avec addNewDomains() 
+     *  
+     *  
+     *  
+     *  2) préparer $domainPsMg->addMailGunDns(); dans wd2.php
+     *  3) éxécuter : http://localhost/spamtonprof/wp-content/plugins/spamtonprof/hook/ovhAuthentification.php 
+     *      pour récupérer credential ovh ( attention wd2.php sera éxcuté après )
+     * 
+     */
 
     /*
      * pour ajouter des nouveaux domaines à Stp
      * le domain root doit nous appartenir
      *
      */
-    function addNewsDomains(string $root, array $subdomains, $type = 'mailgun',$addToMailGun = false)
+    function addNewsDomains(string $root, array $subdomains, $type = 'mailgun', $addToMailGun = false)
     {
         $domainMg = new \spamtonprof\stp_api\StpDomainManager();
 
@@ -25,6 +38,7 @@ class DomainProcessMg
         foreach ($subdomains as $subdomain) {
 
             $domain = $subdomain . '.' . $root;
+            echo($domain . '<br>');
             $stpDomain = $domainMg->get(array(
                 'name' => $domain
             ));
@@ -120,8 +134,6 @@ class DomainProcessMg
 
             $domain->setMx_ok(true);
             $domainMg->updateMxOk($domain);
-            
-            
         }
     }
 
@@ -199,8 +211,6 @@ class DomainProcessMg
         return ($result);
     }
 
-
-
     function addMailGunDns()
     {
         $domainMg = new \spamtonprof\stp_api\StpDomainManager();
@@ -214,9 +224,8 @@ class DomainProcessMg
             echo ('----------' . $domainName . '----------' . '<br>');
             $root = $domain->getRoot();
             $subdomain = $domain->getSubdomain();
-            $dns = $mg->domains()
-                ->show($domain->getName())
-                ->getOutboundDNSRecords();
+
+            $dns = $mg->getOutBoundDns($domain->getName());
             foreach ($dns as $dn) {
                 $dns_subdomain = str_replace('.' . $root, '', $dn->getName());
                 $target = $dn->getValue();
@@ -230,9 +239,8 @@ class DomainProcessMg
                 echo ('target : ' . $target . '<br>');
                 $this->addDnsOvh($root, $dns_subdomain, $target, $type);
             }
-            $dns = $mg->domains()
-                ->show($domain->getName())
-                ->getInboundDNSRecords();
+            
+            $dns = $mg->getInBoundDns($domain->getName());
             foreach ($dns as $dn) {
                 $target = $dn->getValue() . '.';
                 $type = $dn->getType();
