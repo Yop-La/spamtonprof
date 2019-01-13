@@ -986,13 +986,13 @@ function extractAttribute(array $objects, string $attribute)
     return ($retour);
 }
 
-function readCsv($filePath)
+function readCsv($filePath,$sep=",")
 {
     $rows = [];
 
     $row = 1;
     if (($handle = fopen($filePath, "r")) !== FALSE) {
-        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+        while (($data = fgetcsv($handle, 1000, $sep)) !== FALSE) {
             $num = count($data);
             $row ++;
             $row = [];
