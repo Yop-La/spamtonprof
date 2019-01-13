@@ -26,7 +26,17 @@ class GmxActManager
     public function updateHasRedirection(GmxAct $gmxAct)
     {
         $q = $this->_db->prepare('update gmx_act set has_redirection = :has_redirection where ref_gmx_act = :ref_gmx_act');
-        $q->bindValue(':has_redirection', $gmxAct->getHas_redirection(),\PDO::PARAM_BOOL);
+        $q->bindValue(':has_redirection', $gmxAct->getHas_redirection(), \PDO::PARAM_BOOL);
+        $q->bindValue(':ref_gmx_act', $gmxAct->getRef_gmx_act());
+        $q->execute();
+
+        return ($gmxAct);
+    }
+
+    public function update_ref_compte_lbc(GmxAct $gmxAct)
+    {
+        $q = $this->_db->prepare('update gmx_act set ref_compte_lbc= :ref_compte_lbc where ref_gmx_act = :ref_gmx_act');
+        $q->bindValue(':ref_compte_lbc', $gmxAct->getRef_compte_lbc(), \PDO::PARAM_BOOL);
         $q->bindValue(':ref_gmx_act', $gmxAct->getRef_gmx_act());
         $q->execute();
 
@@ -47,23 +57,19 @@ class GmxActManager
             $q = $this->_db->prepare('select * from gmx_act where ref_gmx_act = :ref_gmx_act');
             $q->bindValue(":ref_gmx_act", $ref_gmx_act);
         }
-        
+
         if (array_key_exists('ref_compte_lbc', $info)) {
-            
+
             $ref_compte_lbc = $info['ref_compte_lbc'];
             $q = $this->_db->prepare('select * from gmx_act where ref_compte_lbc = :ref_compte_lbc');
             $q->bindValue(":ref_compte_lbc", $ref_compte_lbc);
         }
-        
-        if (in_array('virgin', $info)) {
-            
-            $q = $this->_db->prepare('select * from gmx_act where ref_compte_lbc is null');
 
+        if (in_array('virgin', $info)) {
+
+            $q = $this->_db->prepare('select * from gmx_act where ref_compte_lbc is null');
         }
-        
-        
-        
-        
+
         $q->execute();
 
         $data = $q->fetch(\PDO::FETCH_ASSOC);

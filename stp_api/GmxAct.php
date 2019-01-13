@@ -4,9 +4,28 @@ namespace spamtonprof\stp_api;
 class GmxAct implements \JsonSerializable
 {
 
-    protected $ref_gmx_act, $password, $mail, $has_redirection;
+    protected $ref_gmx_act, $password, $mail, $has_redirection, $ref_compte_lbc;
 
     /**
+     *
+     * @return mixed
+     */
+    public function getRef_compte_lbc()
+    {
+        return $this->ref_compte_lbc;
+    }
+
+    /**
+     *
+     * @param mixed $ref_compte_lbc
+     */
+    public function setRef_compte_lbc($ref_compte_lbc)
+    {
+        $this->ref_compte_lbc = $ref_compte_lbc;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getHas_redirection()
@@ -15,6 +34,7 @@ class GmxAct implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $has_redirection
      */
     public function setHas_redirection($has_redirection)
@@ -66,7 +86,6 @@ class GmxAct implements \JsonSerializable
     {
         $this->mail = $mail;
     }
-
 
     public function jsonSerialize()
     {
