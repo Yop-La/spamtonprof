@@ -25,7 +25,7 @@ var mySubmitController = Marionette.Object.extend( {
 
 	actionSubmit: function( response ) {
 
-		
+
 
 		if(response.data.form_id == idFormUpdateText){
 
@@ -59,9 +59,8 @@ var mySubmitController = Marionette.Object.extend( {
 			jQuery("#loadingSpinner").removeClass("hide");
 			jQuery(".content").addClass("hide");
 
-			
-			 textes[indiceCourant] = texteCourant;
-			
+
+
 			ajaxEnCours++;
 			jQuery.post(
 					ajaxurl,
@@ -149,8 +148,6 @@ var myCustomFieldController = Marionette.Object.extend( {
 							textes = retour.textes;
 							indiceCourant = 0;
 							updateIndice();
-
-
 
 
 						})
@@ -245,6 +242,10 @@ jQuery( document ).ready( function( jQuery ) {
 
 
 });
+
+jQuery(".text_lbc").keypress(function() {
+	textes[indiceCourant] = jQuery(".text_lbc").val();	
+})
 
 function updateIndice(){
 	texteCourant =  textes[indiceCourant];
