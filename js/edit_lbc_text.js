@@ -25,6 +25,7 @@ var mySubmitController = Marionette.Object.extend( {
 
 	actionSubmit: function( response ) {
 
+		
 
 		if(response.data.form_id == idFormUpdateText){
 
@@ -58,6 +59,9 @@ var mySubmitController = Marionette.Object.extend( {
 			jQuery("#loadingSpinner").removeClass("hide");
 			jQuery(".content").addClass("hide");
 
+			
+			 textes[indiceCourant] = texteCourant;
+			
 			ajaxEnCours++;
 			jQuery.post(
 					ajaxurl,
