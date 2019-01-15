@@ -1,6 +1,8 @@
 <?php
 namespace spamtonprof\stp_api;
 
+use spamtonprof;
+
 class LbcProcessManager
 {
 
@@ -353,7 +355,7 @@ class LbcProcessManager
 
     public function replyToLeadMessages()
     {
-        // ajouter plusieurs messages de réponse pour ne pas être reconnu comme du spam todo
+ 
         $message = $this->messProspectMg->getMessageToSend();
 
         if ($message) {
@@ -915,13 +917,31 @@ class LbcProcessManager
                 'ref_client' => $refClient
             ));
 
-            $refMailForLead = $client->getRef_mail_for_lead();
 
-            $mailForLead = $mailForLeadMg->get(array(
-                'ref_mail_for_lead' => $refMailForLead
-            ));
+            
+            // récupération du message à envoyer
+            $txtMg = new spamtonprof\stp_api\LbcTexteManager();
+            $nb_txt = $txtMg ->count(array('type' => 'reponse_lbc_general','offset' => 100));
+            
+            
+            $offset = unserializeTemp("/tempo/lbcAnswerIndex");
+            
+            if (! $offset) {
+                $offset = 0;
+                serializeTemp($offset, "/tempo/lbcAnswerIndex");
+            }
+            
+            
+            
+            $txt = $txtMg ->get(array('type' => 'reponse_lbc_general','offset' => $offset));
+            
+            $offset = $offset + 1;
+            $offset = $offset % $nb_txt;
+            
+            serializeTemp($offset, "/tempo/lbcAnswerIndex");
+            
 
-            $body = str_replace('[prof_name]', $client->getPrenom_client(), $mailForLead->getBody());
+            $body = str_replace('[prof_name]', $client->getPrenom_client(), $txt->getTexte());
 
             // on envoie le message
             $gmailMg->sendMessage($body, 'Re: ' . $subject, 'mailsfromlbc@gmail.com', 'mailsfromlbc@gmail.com', 'le.bureau.des.profs@gmail.com', 'Cannelle Gaucher', $threadId);

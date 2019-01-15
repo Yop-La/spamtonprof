@@ -104,6 +104,54 @@ class LbcTexteManager
         return ($types);
     }
 
+    public function count($info)
+    {
+        $q = null;
+        if (is_array($info)) {
+            if (array_key_exists("type", $info)) {
+                $type = $info["type"];
+
+                $q = $this->_db->prepare("select count(*) as nb_txt from textes
+                            where type like :type and texte not like '%not_valid%'");
+                $q->bindValue(":type", $type);
+            }
+        }
+        $q->execute();
+
+        $data = $q->fetch(PDO::FETCH_ASSOC);
+
+        if ($data) {
+            return ($data["nb_txt"]);
+        } else {
+            return (false);
+        }
+    }
+
+    public function get($info)
+    {
+        $q = null;
+        if (is_array($info)) {
+            if (array_key_exists("type", $info) && array_key_exists("offset", $info)) {
+                $type = $info["type"];
+                $offset = $info["offset"];
+
+                $q = $this->_db->prepare("select * from textes 
+                            where type like :type and texte not like '%not_valid%' limit 1 offset :offset;");
+                $q->bindValue(":type", $type);
+                $q->bindValue(":offset", $offset);
+            }
+        }
+        $q->execute();
+
+        $data = $q->fetch(PDO::FETCH_ASSOC);
+
+        if ($data) {
+            return (new \spamtonprof\stp_api\LbcTexte($data));
+        } else {
+            return (false);
+        }
+    }
+
     public function getAll($info)
     {
         $textes = [];
