@@ -924,21 +924,26 @@ class LbcProcessManager
             $nb_txt = $txtMg ->count(array('type' => 'reponse_lbc_general','offset' => 100));
             
             
-            $offset = unserializeTemp("/tempo/lbcAnswerIndex");
+            
+            $typeTxtMg = new \spamtonprof\stp_api\TypeTexteManager();
+            $typeTxt = $typeTxtMg -> get(array('ref_type' => $client->getRef_reponse_lbc()));
+            
+            $typeTxt = $typeTxt->getType();
+            
+            $offset = unserializeTemp("/tempo/lbcAnswerIndex/".$typeTxt);
             
             if (! $offset) {
                 $offset = 0;
-                serializeTemp($offset, "/tempo/lbcAnswerIndex");
+                serializeTemp($offset, "/tempo/lbcAnswerIndex/".$typeTxt);
             }
             
             
-            
-            $txt = $txtMg ->get(array('type' => 'reponse_lbc_general','offset' => $offset));
+            $txt = $txtMg ->get(array('type' => $typeTxt -> getType(),'offset' => $offset));
             
             $offset = $offset + 1;
             $offset = $offset % $nb_txt;
             
-            serializeTemp($offset, "/tempo/lbcAnswerIndex");
+            serializeTemp($offset, "/tempo/lbcAnswerIndex/.$typeTxt");
             
 
             $body = str_replace('[prof_name]', $client->getPrenom_client(), $txt->getTexte());
