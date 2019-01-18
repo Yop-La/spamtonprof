@@ -33,7 +33,7 @@ function redirectTo(slug ,info = "" ){
 
 function showMessage(message){
 	waitForEl("#top-message", function() {
-		jQuery("#band-message").text(message);
+		jQuery("#band-message").html(message);
 		jQuery("#top-message").removeClass("hide");
 		window.scrollTo(0, 0);
 	});

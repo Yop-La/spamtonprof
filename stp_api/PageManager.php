@@ -199,6 +199,11 @@ class PageManager
 
         wp_localize_script('functions_js', 'currentSlug', $this->pageSlug);
 
+        if ($this->pageSlug == "accueil") {
+
+            PageManager::acceuil();
+        }
+
         if ($this->pageSlug == 'abonnement-apres-essai') {
 
             PageManager::abonnementApresEssaiLoader();
@@ -338,6 +343,18 @@ class PageManager
         ), time());
     }
 
+    public static function acceuil()
+
+    {
+        wp_enqueue_script('countdown_js', plugins_url() . '/spamtonprof/js/jquery.countdown-2.2.0/jquery.countdown.min.js', array(
+            'nf-front-end'
+        ), time());
+
+        wp_enqueue_script('acceuil_js', plugins_url() . '/spamtonprof/js/acceuil.js', array(
+            'nf-front-end'
+        ), time());
+    }
+
     public static function lbcAdds()
 
     {
@@ -363,6 +380,10 @@ class PageManager
     {
         wp_enqueue_script('discover_week', plugins_url() . '/spamtonprof/js/discover_week.js', array(
 
+            'nf-front-end'
+        ), time());
+
+        wp_enqueue_script('countdown_js', plugins_url() . '/spamtonprof/js/jquery.countdown-2.2.0/jquery.countdown.min.js', array(
             'nf-front-end'
         ), time());
 
@@ -533,6 +554,10 @@ class PageManager
     public static function tarifs()
 
     {
+        wp_enqueue_script('countdown_js', plugins_url() . '/spamtonprof/js/jquery.countdown-2.2.0/jquery.countdown.min.js', array(
+            'nf-front-end'
+        ), time());
+
         wp_enqueue_script('tarifs', plugins_url() . '/spamtonprof/js/tarifs.js', array(
 
             'nf-front-end'
