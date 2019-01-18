@@ -355,7 +355,6 @@ class LbcProcessManager
 
     public function replyToLeadMessages()
     {
- 
         $message = $this->messProspectMg->getMessageToSend();
 
         if ($message) {
@@ -504,7 +503,7 @@ class LbcProcessManager
                 $ads = $lbcApi->getAdds(array(
                     'user_id' => $user_id
                 ));
-            } else {
+            } else if (! is_null($codePromo)) {
                 $ads = $lbcApi->getAdds(array(
                     "code_promo" => $codePromo
                 ));
@@ -917,34 +916,36 @@ class LbcProcessManager
                 'ref_client' => $refClient
             ));
 
-
-            
             // récupération du message à envoyer
             $txtMg = new spamtonprof\stp_api\LbcTexteManager();
-            $nb_txt = $txtMg ->count(array('type' => 'reponse_lbc_general','offset' => 100));
-            
-            
-            
+            $nb_txt = $txtMg->count(array(
+                'type' => 'reponse_lbc_general',
+                'offset' => 100
+            ));
+
             $typeTxtMg = new \spamtonprof\stp_api\TypeTexteManager();
-            $typeTxt = $typeTxtMg -> get(array('ref_type' => $client->getRef_reponse_lbc()));
-            
+            $typeTxt = $typeTxtMg->get(array(
+                'ref_type' => $client->getRef_reponse_lbc()
+            ));
+
             $typeTxt = $typeTxt->getType();
-            
-            $offset = unserializeTemp("/tempo/lbcAnswerIndex_".$typeTxt);
-            
+
+            $offset = unserializeTemp("/tempo/lbcAnswerIndex_" . $typeTxt);
+
             if (! $offset) {
                 $offset = 0;
-                serializeTemp($offset, "/tempo/lbcAnswerIndex_".$typeTxt);
+                serializeTemp($offset, "/tempo/lbcAnswerIndex_" . $typeTxt);
             }
-            
-            
-            $txt = $txtMg ->get(array('type' => $typeTxt ,'offset' => $offset));
-            
+
+            $txt = $txtMg->get(array(
+                'type' => $typeTxt,
+                'offset' => $offset
+            ));
+
             $offset = $offset + 1;
             $offset = $offset % $nb_txt;
-            
+
             serializeTemp($offset, "/tempo/lbcAnswerIndex_.$typeTxt");
-            
 
             $body = str_replace('[prof_name]', $client->getPrenom_client(), $txt->getTexte());
 
