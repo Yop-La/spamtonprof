@@ -930,20 +930,20 @@ class LbcProcessManager
             
             $typeTxt = $typeTxt->getType();
             
-            $offset = unserializeTemp("/tempo/lbcAnswerIndex/".$typeTxt);
+            $offset = unserializeTemp("/tempo/lbcAnswerIndex_".$typeTxt);
             
             if (! $offset) {
                 $offset = 0;
-                serializeTemp($offset, "/tempo/lbcAnswerIndex/".$typeTxt);
+                serializeTemp($offset, "/tempo/lbcAnswerIndex_".$typeTxt);
             }
             
             
-            $txt = $txtMg ->get(array('type' => $typeTxt -> getType(),'offset' => $offset));
+            $txt = $txtMg ->get(array('type' => $typeTxt ,'offset' => $offset));
             
             $offset = $offset + 1;
             $offset = $offset % $nb_txt;
             
-            serializeTemp($offset, "/tempo/lbcAnswerIndex/.$typeTxt");
+            serializeTemp($offset, "/tempo/lbcAnswerIndex_.$typeTxt");
             
 
             $body = str_replace('[prof_name]', $client->getPrenom_client(), $txt->getTexte());
