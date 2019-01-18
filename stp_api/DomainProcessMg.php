@@ -26,7 +26,7 @@ class DomainProcessMg
      * le domain root doit nous appartenir
      *
      */
-    function addNewsDomains(string $root, array $subdomains, $type = 'mailgun', $addToMailGun = false)
+    function addNewsDomains(string $root, array $subdomains, $type = 'mailgun', $addToMailGun = true)
     {
         $domainMg = new \spamtonprof\stp_api\StpDomainManager();
 
