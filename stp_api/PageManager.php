@@ -204,6 +204,16 @@ class PageManager
             PageManager::acceuil();
         }
 
+        if ($this->pageSlug == "temoignages") {
+
+            PageManager::temoignages();
+        }
+
+        if ($this->pageSlug == "decouvrir-spamtonprof") {
+
+            PageManager::decouvrirSpamtonprof();
+        }
+
         if ($this->pageSlug == 'abonnement-apres-essai') {
 
             PageManager::abonnementApresEssaiLoader();
@@ -351,6 +361,30 @@ class PageManager
         ), time());
 
         wp_enqueue_script('acceuil_js', plugins_url() . '/spamtonprof/js/acceuil.js', array(
+            'nf-front-end'
+        ), time());
+    }
+
+    public static function temoignages()
+
+    {
+        wp_enqueue_script('countdown_js', plugins_url() . '/spamtonprof/js/jquery.countdown-2.2.0/jquery.countdown.min.js', array(
+            'nf-front-end'
+        ), time());
+
+        wp_enqueue_script('acceuil_js', plugins_url() . '/spamtonprof/js/temoignages.js', array(
+            'nf-front-end'
+        ), time());
+    }
+
+    public static function decouvrirSpamtonprof()
+
+    {
+        wp_enqueue_script('countdown_js', plugins_url() . '/spamtonprof/js/jquery.countdown-2.2.0/jquery.countdown.min.js', array(
+            'nf-front-end'
+        ), time());
+
+        wp_enqueue_script('acceuil_js', plugins_url() . '/spamtonprof/js/decouvrir-spamtonprof.js', array(
             'nf-front-end'
         ), time());
     }
