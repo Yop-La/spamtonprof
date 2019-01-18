@@ -114,4 +114,12 @@ class LbcClientManager
         $q->bindValue(":ref_client", $client->getRef_client());
         $q->execute();
     }
+
+    public function updateRefReponseLbc(\spamtonprof\stp_api\LbcClient $client)
+    {
+        $q = $this->_db->prepare("update client set ref_reponse_lbc = :ref_reponse_lbc where ref_client = :ref_client");
+        $q->bindValue(":ref_reponse_lbc", $client->getRef_reponse_lbc());
+        $q->bindValue(":ref_client", $client->getRef_client());
+        $q->execute();
+    }
 }

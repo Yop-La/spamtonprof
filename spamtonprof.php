@@ -326,8 +326,8 @@ function my_pre_population_callback($options, $settings)
         }
     }
 
-    // target "choix type texte" du formulaire "conf client leboncoin"
-    if ($settings['key'] == 'type_texte_1542480094564' || $settings['key'] == 'text_category_1546779674338') {
+    // target "choix type texte" et "reponse_lbc" du formulaire "conf client leboncoin"
+    if ($settings['key'] == 'type_texte_1542480094564' || $settings['key'] == 'text_category_1546779674338' || $settings['key'] == 'listselect_1547763879269' || $settings['key'] == 'listselect_1547763974005') {
 
         if (is_user_logged_in()) {
 
@@ -340,7 +340,7 @@ function my_pre_population_callback($options, $settings)
             foreach ($typeTextes as $typeTexte) {
 
                 $options[] = array(
-                    'label' => $typeTexte->getType(),
+                    'label' => $typeTexte->getType() . ' : ' . $typeTexte->getRef_type(),
                     'value' => $typeTexte->getRef_type()
                 );
             }

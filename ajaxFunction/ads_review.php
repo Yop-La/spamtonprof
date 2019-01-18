@@ -89,15 +89,19 @@ function ajaxUpdateCfgClient()
     $type_texte = $fields->type_texte;
     $domain = $fields->domain;
     $folder_img = $fields->folder_img;
+    $reponse_lbc = $fields->reponse_lbc;
 
     if ($client_action == 'ajout') {
         $client = new \spamtonprof\stp_api\LbcClient(array(
-            'nom_client' => $prenom,
-            'prenom_client' => $nom,
+            'nom_client' => $nom,
+            'prenom_client' => $prenom,
             'domain' => $domain,
             'img_folder' => $folder_img
         ));
         $clientMg->add($client);
+
+        $client->setRef_reponse_lbc($reponse_lbc);
+        $clientMg->updateRefReponseLbc($client);
 
         $choisir_client = $client->getRef_client();
     } else if ($client_action == 'update') {
@@ -116,6 +120,9 @@ function ajaxUpdateCfgClient()
 
         $client->setImg_folder($folder_img);
         $clientMg->updateImgFolder($client);
+
+        $client->setRef_reponse_lbc($reponse_lbc);
+        $clientMg->updateRefReponseLbc($client);
     } else if ($client_action == 'delete') {
 
         $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
@@ -139,8 +146,7 @@ function ajaxUpdateCfgClient()
 
         die();
     }
-    
-    
+
     $hasTypeTexteMg->deleteAll(array(
         'ref_client' => $choisir_client
     ));

@@ -33,6 +33,25 @@ class LbcTexteManager
         return ($titleTextes);
     }
 
+    function addAll($categorie, $nbTextes = 50)
+    {
+        $typeTexteMg = new \spamtonprof\stp_api\TypeTexteManager();
+        $typeTexte = $typeTexteMg->add(new \spamtonprof\stp_api\TypeTexte(array(
+            'type' => $categorie
+        )));
+
+        for ($i = 0; $i < $nbTextes; $i ++) {
+
+            $txt = $this->get(array('type' => "reponse_lbc_general"));
+            
+            $this->add(new \spamtonprof\stp_api\LbcTexte(array(
+                "texte" => $txt->getTexte() . 'not_valid ' . $categorie . ' ' .$i,
+                "type" => $typeTexte->getType(),
+                "ref_type_texte" => $typeTexte->getRef_type()
+            )));
+        }
+    }
+
     public function add(\spamtonprof\stp_api\LbcTexte $texte)
     {
         $q = $this->_db->prepare("insert into textes(texte, type,ref_type_texte) values(:texte, :type,:ref_type_texte)");
@@ -137,6 +156,14 @@ class LbcTexteManager
 
                 $q = $this->_db->prepare("select * from textes 
                             where type like :type and texte not like '%not_valid%' limit 1 offset :offset;");
+                $q->bindValue(":type", $type);
+                $q->bindValue(":offset", $offset);
+            }
+            if (array_key_exists("type", $info)) {
+                $type = $info["type"];
+                
+                $q = $this->_db->prepare("select * from textes
+                            where type like :type limit 1 offset :offset;");
                 $q->bindValue(":type", $type);
                 $q->bindValue(":offset", $offset);
             }

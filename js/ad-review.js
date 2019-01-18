@@ -429,6 +429,11 @@ var myCustomFieldController = Marionette.Object.extend( {
 						jQuery('.folder_img').val(conf.client.img_folder).change();
 						jQuery('.domain').val(conf.client.domain).change();
 
+						console.log("client");
+						console.log(client);
+						
+						jQuery('.reponse_lbc').val(conf.client.ref_reponse_lbc).change();
+						
 						if(conf.typeTexte){
 							jQuery('.type_texte').val(conf.typeTexte.ref_type).change();
 						}else{
