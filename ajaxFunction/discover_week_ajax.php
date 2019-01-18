@@ -527,15 +527,15 @@ function inscriptionEssai()
             "Nouvelle inscription : bien joué la team prospection !!",
             "------ Eleve ----- ",
             "Email élève : " . $eleve->getEmail(),
-            "Prénom élève : " . $eleve->getPrenom(),
-            " Nom élève : " . $eleve->getNom(),
-            "Niveau élève : " . $niveau->getNiveau(),
+            "Prénom élève : " . utf8_encode($eleve->getPrenom()),
+            "Nom élève : " . utf8_encode($eleve->getNom()),
+            "Niveau élève : " . utf8_encode($niveau->getNiveau()),
             "Téléphone élève :" . $eleve->getTelephone(),
             "Formule : " . $formule->getFormule(),
             "------ Parent ----- ",
             "Email parent : " . $proche->getEmail(),
-            "Prénom parent : " . $proche->getPrenom(),
-            " Nom parent : " . $proche->getNom(),
+            "Prénom parent : " . utf8_encode($proche->getPrenom()),
+            "Nom parent : " . utf8_encode($proche->getNom()),
             "Téléphone parent :" . $proche->getTelephone(),
             "Remarque :" . $abonnement->getRemarque_inscription(),
             "Source traffic : " . $source_traffic,
@@ -546,9 +546,9 @@ function inscriptionEssai()
             "Nouvelle inscription : bien joué la team prospection !!",
             "------ Étudiant/Adulte ----- ",
             "Email : " . $eleve->getEmail(),
-            "Prénom : " . $eleve->getPrenom(),
-            " Nom : " . $eleve->getNom(),
-            "Niveau : " . $niveau->getNiveau(),
+            "Prénom : " . utf8_encode($eleve->getPrenom()),
+            " Nom : " . utf8_encode($eleve->getNom()),
+            "Niveau : " . utf8_encode($niveau->getNiveau()),
             "Téléphone :" . $eleve->getTelephone(),
             "Formule : " . $formule->getFormule(),
             "Remarque :" . $abonnement->getRemarque_inscription(),
@@ -723,7 +723,6 @@ function ajaxIsValidCoupon()
         'ref_compte' => $compte->getRef_compte()
     ));
 
-    
     if (count($abos) >= $coupon->getClient_limit()) {
         $retour->statut = 'over';
         $retour->message = utf8_encode('Code promo déjà utilisé');
