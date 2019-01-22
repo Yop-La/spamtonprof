@@ -42,10 +42,12 @@ class LbcTexteManager
 
         for ($i = 0; $i < $nbTextes; $i ++) {
 
-            $txt = $this->get(array('type' => "reponse_lbc_general"));
-            
+            $txt = $this->get(array(
+                'type' => "reponse_lbc_general"
+            ));
+
             $this->add(new \spamtonprof\stp_api\LbcTexte(array(
-                "texte" => $txt->getTexte() . 'not_valid ' . $categorie . ' ' .$i,
+                "texte" => $txt->getTexte() . 'not_valid ' . $categorie . ' ' . $i,
                 "type" => $typeTexte->getType(),
                 "ref_type_texte" => $typeTexte->getRef_type()
             )));
@@ -161,7 +163,7 @@ class LbcTexteManager
             }
             if (array_key_exists("type", $info)) {
                 $type = $info["type"];
-                
+
                 $q = $this->_db->prepare("select * from textes
                             where type like :type limit 1 offset :offset;");
                 $q->bindValue(":type", $type);
@@ -184,14 +186,22 @@ class LbcTexteManager
         $textes = [];
         $q = null;
         if (is_array($info)) {
+
             if (array_key_exists("type_texte", $info) && ! array_key_exists("limit", $info)) {
                 $texteType = $info["type_texte"];
                 $q = $this->_db->prepare("select * from textes where type = :type_texte order by ref_texte desc");
                 $q->bindValue(":type_texte", $texteType);
             }
+
             if (array_key_exists("ref_type_texte", $info) && ! array_key_exists("limit", $info)) {
                 $refTexteType = $info["ref_type_texte"];
                 $q = $this->_db->prepare("select * from textes where ref_type_texte = :ref_type_texte order by ref_texte desc");
+                $q->bindValue(":ref_type_texte", $refTexteType);
+            }
+            
+            if (array_key_exists("ref_type_texte.valid", $info) && ! array_key_exists("limit", $info)) {
+                $refTexteType = $info["ref_type_texte.valid"];
+                $q = $this->_db->prepare("select * from textes where ref_type_texte = :ref_type_texte and texte not like '%not_valid%' order by ref_texte desc");
                 $q->bindValue(":ref_type_texte", $refTexteType);
             }
 
@@ -202,6 +212,9 @@ class LbcTexteManager
                 $q->bindValue(":ref_type_texte", $refTexteType);
                 $q->bindValue(":limit", $limit);
             }
+            
+            
+            
         }
         $q->execute();
 

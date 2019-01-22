@@ -587,6 +587,7 @@ class LbcProcessManager
         $titles = $lbcTitleMg->getAll(array(
             "ref_type_titre" => $hasTypeTitle->getRef_type_titre()
         ));
+        shuffle($titles);
 
         // on récupère les textes
         $hasTypeTexteMg = new \spamtonprof\stp_api\HasTextTypeManager();
@@ -597,8 +598,9 @@ class LbcProcessManager
 
         $lbcTexteMg = new \spamtonprof\stp_api\LbcTexteManager();
         $textes = $lbcTexteMg->getAll(array(
-            "ref_type_texte" => $hasTypeTexte->getRef_type()
+            "ref_type_texte.valid" => $hasTypeTexte->getRef_type()
         ));
+        shuffle($textes);
 
         // on ajoute le num tel aux textes si demandé
         if ($phone != 'pas-de-num') {
@@ -617,10 +619,13 @@ class LbcProcessManager
 
         // récupération des images
         $images = scandir(ABSPATH . 'wp-content/uploads/lbc_images/' . $client->getImg_folder());
-
+        
+        
         unset($images[0]);
         unset($images[1]);
 
+        shuffle($images);
+        
         $nbImages = count($images);
 
         $ads = [];
