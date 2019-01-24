@@ -27,6 +27,13 @@ var matiere = null;
 var idFormEssai = 80;
 
 
+var searching = false;
+
+var popupSearch = 20795;
+if(domain != 'spamtonprof'){
+	codePromoId = 1094;
+	popupSearch = 20794;
+}
 
 
 
@@ -34,42 +41,45 @@ var idFormEssai = 80;
 
 
 jQuery( document ).ready( function( jQuery ) {
-	
-	
+
+
+	showMessage("Utilisez la barre de recherche pour trouver le tarif qui vous va.");
+
+
 //	//debut timer essai	
-//
-//
+
+
 //	var timerEssai = localStorage.getItem("timerEssai");
 //	console.log('timerEssai');
 //	console.log(timerEssai);
-//
+
 //	var printTimer = true;
-//
+
 //	if(!timerEssai){
-//
-//		var timerEssai = new Date().getTime() + 5*24*60*60*1000;	
-//		localStorage.setItem("timerEssai", timerEssai);
-//
+
+//	var timerEssai = new Date().getTime() + 5*24*60*60*1000;	
+//	localStorage.setItem("timerEssai", timerEssai);
+
 //	}
-//
+
 //	jQuery("#band-message").html('<div id = "promo_essai">7 jours d\'essai offerts dans la matière de votre choix </div><br> <div id = "expiration_essai"> Expire dans <span id = "counter-essai"></span><div>');
-//
+
 //	jQuery("#counter-essai").countdown(timerEssai, {elapse: true})
 //	.on('update.countdown', function(event) {
-//		var el = jQuery(this);
-//		if (event.elapsed) {
-//			hideMessage();
-//		} else {
-//			el.html(event.strftime('%D jours %H h %M min %S s'));
-//			if(printTimer){
-//				jQuery("#top-message").removeClass("hide");
-//				window.scrollTo(0, 0);
-//				printTimer = false;
-//			}
-//
-//		}
+//	var el = jQuery(this);
+//	if (event.elapsed) {
+//	hideMessage();
+//	} else {
+//	el.html(event.strftime('%D jours %H h %M min %S s'));
+//	if(printTimer){
+//	jQuery("#top-message").removeClass("hide");
+//	window.scrollTo(0, 0);
+//	printTimer = false;
+//	}
+
+//	}
 //	});
-//
+
 //	//	fin timer essai
 
 
@@ -135,6 +145,13 @@ jQuery( document ).ready( function( jQuery ) {
 
 	function search(){
 
+		if(searching){
+
+			return;
+
+		}
+		searching = true;
+
 		//on enlève les marqueurs d'erreurs de la barre de recherche mobile
 		jQuery('.erreur-recherche').addClass('hide');
 		jQuery('.mobile-search-bar .iwithtext').removeClass('red-border');
@@ -143,7 +160,7 @@ jQuery( document ).ready( function( jQuery ) {
 		jQuery('#search_bar').removeClass('init_search_bar');
 
 		//fermer la popup de recherche sur mobile
-		PUM.close(19581);
+		PUM.close(popupSearch);
 
 		//lancement de la fonction de recherche
 		// on balance une barre de chargement
@@ -244,18 +261,18 @@ jQuery( document ).ready( function( jQuery ) {
 							var i = 0;
 
 							//remplissge colonne par colonne de la table des matières
-							
+
 							formules.forEach(function(formule){
 
 								var formulaSelector  = formulaSelectors[formulaSelectors.length-1];
 
 								if(i > 2){
-									
+
 									formulaSelector  = formulaSelectors[0];
 								}
 
 								j = i % 3;
-								
+
 								var formulaClass = '.matiere'.concat(j+1); 
 
 								matieres = formule.formule.split('|');
@@ -274,7 +291,7 @@ jQuery( document ).ready( function( jQuery ) {
 								//écriture de l'interval
 								jQuery(formulaSelector.concat(' .pricing-column .interval:eq( ',j,' )')).html('Par semaine avec '.concat(formule.matieres.length,' matière(s) incluses'));
 
-						
+
 
 
 
@@ -327,6 +344,8 @@ jQuery( document ).ready( function( jQuery ) {
 					}
 					document.getElementById('sub_heading').scrollIntoView();
 
+					
+					searching = false;
 				});
 
 

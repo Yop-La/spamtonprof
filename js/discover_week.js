@@ -26,11 +26,15 @@ var popEssaiId = 20795;
 var niveau = null;
 var matiere = null;
 
+var searching = false;
+
 var idFormEssai = 80;
 
 var codePromoId = 1163;
+var popupSearch = 20795;
 if(domain != 'spamtonprof'){
 	codePromoId = 1094;
+	popupSearch = 20794;
 }
 
 var mySubmitController = Marionette.Object.extend( {
@@ -344,44 +348,44 @@ function formInit(){
 jQuery( document ).ready( function( jQuery ) {
 
 
+showMessage("Hop, hop, pas si vite. Inscrits toi avec un de tes parents pour être sûr d'avoir un prof.");
 
 
-//
-//
+
 //	//debut timer essai	
-//
-//
+
+
 //	var timerEssai = localStorage.getItem("timerEssai");
 //	console.log('timerEssai');
 //	console.log(timerEssai);
-//
+
 //	var printTimer = true;
-//
+
 //	if(!timerEssai){
-//
-//		var timerEssai = new Date().getTime() + 5*24*60*60*1000;	
-//		localStorage.setItem("timerEssai", timerEssai);
-//
+
+//	var timerEssai = new Date().getTime() + 5*24*60*60*1000;	
+//	localStorage.setItem("timerEssai", timerEssai);
+
 //	}
-//
+
 //	jQuery("#band-message").html('<div id = "promo_essai">7 jours d\'essai offerts dans la matière de votre choix </div><br> <div id = "expiration_essai"> Expire dans <span id = "counter-essai"></span><div>');
-//
+
 //	jQuery("#counter-essai").countdown(timerEssai, {elapse: true})
 //	.on('update.countdown', function(event) {
-//		var el = jQuery(this);
-//		if (event.elapsed) {
-//			hideMessage();
-//		} else {
-//			el.html(event.strftime('%D jours %H h %M min %S s'));
-//			if(printTimer){
-//				jQuery("#top-message").removeClass("hide");
-//				window.scrollTo(0, 0);
-//				printTimer = false;
-//			}
-//
-//		}
+//	var el = jQuery(this);
+//	if (event.elapsed) {
+//	hideMessage();
+//	} else {
+//	el.html(event.strftime('%D jours %H h %M min %S s'));
+//	if(printTimer){
+//	jQuery("#top-message").removeClass("hide");
+//	window.scrollTo(0, 0);
+//	printTimer = false;
+//	}
+
+//	}
 //	});
-//
+
 //	//	fin timer essai	
 
 
@@ -422,6 +426,8 @@ jQuery( document ).ready( function( jQuery ) {
 
 	// pour lancer automatiquement la recherche quand les champs de recherche sont complétés
 	function launchSearch(validNiveauInput, validMatiereInput){
+
+
 
 		var fieldNiveauId = '#aa-niveau';
 		var fieldMatiereId = '#aa-matiere';
@@ -466,16 +472,29 @@ jQuery( document ).ready( function( jQuery ) {
 			});
 
 		});
+
+
+
+
+
+
 	}
 
 	function search(){
+
+		if(searching){
+
+			return;
+
+		}
+		searching = true;
 
 		//on enlève les marqueurs d'erreurs de la barre de recherche mobile
 		jQuery('.erreur-recherche').addClass('hide');
 		jQuery('.mobile-search-bar .iwithtext').removeClass('red-border');
 
 		//fermer la popup de recherche sur mobile
-		PUM.close(19581);
+		PUM.close(popupSearch);
 
 		//lancement de la fonction de recherche
 		// on balance une barre de chargement
@@ -492,6 +511,8 @@ jQuery( document ).ready( function( jQuery ) {
 		jQuery("#no_res").addClass('hide');
 
 
+
+
 		ajaxEnCours++;
 		jQuery.post(
 				ajaxurl,
@@ -503,6 +524,7 @@ jQuery( document ).ready( function( jQuery ) {
 				})
 				.done(function(retour){
 
+					console.log("retour retour");
 					console.log(retour);
 
 					if(!retour.error){
@@ -532,14 +554,17 @@ jQuery( document ).ready( function( jQuery ) {
 						}
 
 						//chargement des formules
-
 						nbFormule = formules.length;
+
 
 						// on enlève le template et les tous les blocs 
 						jQuery('.matiere-box').remove();
 
 
+
 						if(nbFormule == 0){ //si pas de formules
+
+
 							showMessage("Aucune formule ne correspond à la matière et au niveau demandé");
 
 							jQuery('#keyword').text(getMatiereFieldValue().concat(' - ',getNiveauFieldValue()));
@@ -620,11 +645,6 @@ jQuery( document ).ready( function( jQuery ) {
 							});
 						}
 
-
-
-
-
-
 					}else{
 						showMessage(retour.message);
 
@@ -658,6 +678,9 @@ jQuery( document ).ready( function( jQuery ) {
 
 					}
 					document.getElementById('find-formule').scrollIntoView();
+
+
+					searching = false;
 
 				});
 
@@ -957,6 +980,35 @@ jQuery( document ).ready( function( jQuery ) {
 		jQuery(".erreur-".concat(indexName)).removeClass('hide');
 
 	}
+
+
+
+	waitForEl('.iwithtext',function(){
+		var counter = 0;
+		var clickSearchMobile = false;
+		jQuery('.iwithtext').click(function(){
+			clickSearchMobile = true;	
+		});
+		setInterval(function(){
+
+
+
+			if(counter % 2 == 0 || clickSearchMobile){
+				jQuery(".iwithtext").addClass("orange-border");
+				console.log("dendas");
+			}else{
+				jQuery(".iwithtext").removeClass("orange-border");
+				console.log("dehors");
+			}
+			counter=counter+1;
+
+
+		}, 500);
+
+
+	});
+
+
 
 
 
