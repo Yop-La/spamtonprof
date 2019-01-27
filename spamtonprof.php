@@ -84,6 +84,8 @@ require_once (dirname(__FILE__) . '/ajaxFunction/ads_review.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/edit_lbc_text.php');
 
+require_once (dirname(__FILE__) . '/ajaxFunction/lbc-report.php');
+
 add_action('template_redirect', 'handleRedirections');
 
 function handleRedirections()

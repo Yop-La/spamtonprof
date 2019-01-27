@@ -140,6 +140,49 @@ class LbcAccountManager
         return ($accounts);
     }
 
+    public function getReport($info = false)
+    {
+        $ret = [];
+
+        $q = null;
+
+        if (is_array($info)) {
+
+            if (array_key_exists("global_nb_ads", $info)) {
+
+                $q = $this->_db->prepare("select  prenom_client,client.ref_client, sum(nb_annonces_online) as nb_adds 
+                    from compte_lbc, client where  compte_lbc.ref_client = client.ref_client
+                        group by client.ref_client,prenom_client order by nb_adds desc");
+            }
+
+            if (array_key_exists("ads_by_day", $info)) {
+
+                $q = $this->_db->prepare("select  client.prenom_client as prenom, sum(nb_annonces_online) as nb_ads, date(date_creation) as date_creation from compte_lbc,client
+                    where nb_annonces_online != 0 and compte_lbc.ref_client = client.ref_client
+                    group by date(date_creation), client.prenom_client
+                    order by date_creation desc,nb_ads desc ;");
+            }
+
+            if (array_key_exists("ads_by_domain", $info)) {
+
+                $q = $this->_db->prepare("select client.ref_client, client.prenom_client, regexp_matches(mail, '@.*')  as domain , sum(nb_annonces_online)from compte_lbc , client
+                    where compte_lbc.ref_client = client.ref_client
+                    group by regexp_matches(mail, '@.*')  ,client.ref_client, client.prenom_client
+                    order by ref_client desc , domain 
+                ");
+            }
+        }
+
+        $q->execute();
+
+        while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
+
+            $ret[] = array_values($data);
+        }
+
+        return ($ret);
+    }
+
     public function updateDisabled(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
         $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
