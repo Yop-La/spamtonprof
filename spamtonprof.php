@@ -358,7 +358,8 @@ function my_pre_population_callback($options, $settings)
 
             $domains = $domainMg->getAll(array(
                 'in_black_list' => false,
-                'mx_ok' => true
+                'mx_ok' => true,
+                'disabled' => false
             ));
 
             foreach ($domains as $domain) {

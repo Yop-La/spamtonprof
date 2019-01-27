@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class StpDomain implements \JsonSerializable
 {
 
-    protected $name, $ref_domain, $mail_provider, $mx_ok, $in_black_list, $root, $subdomain;
+    protected $name, $ref_domain, $mail_provider, $mx_ok, $in_black_list, $root, $subdomain, $disabled;
 
     public function __construct(array $donnees = array())
     {
@@ -34,6 +34,24 @@ class StpDomain implements \JsonSerializable
                 $this->$method($value);
             }
         }
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getDisabled()
+    {
+        return $this->disabled;
+    }
+
+    /**
+     *
+     * @param mixed $disabled
+     */
+    public function setDisabled($disabled)
+    {
+        $this->disabled = $disabled;
     }
 
     /**

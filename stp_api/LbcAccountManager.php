@@ -171,6 +171,15 @@ class LbcAccountManager
                     order by ref_client desc , domain 
                 ");
             }
+
+            if (array_key_exists("domains_stats", $info)) {
+
+                $q = $this->_db->prepare("select name, mail_provider, count(name) as nb_emails,sum(nb_annonces_online) as nb_adds,stp_domain.disabled from stp_domain, compte_lbc 
+                    where    compte_lbc.mail like '%' || stp_domain.name || '%' 
+                    group by name, stp_domain.disabled,mail_provider
+                    order by nb_adds desc;  
+                ");
+            }
         }
 
         $q->execute();
