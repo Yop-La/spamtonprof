@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.7.4.4
+ * Version: 1.1.7.4.5
  *
  *
  * Author: yopla
@@ -327,7 +327,7 @@ function my_pre_population_callback($options, $settings)
     }
 
     // target "choix type texte" et "reponse_lbc" du formulaire "conf client leboncoin"
-    if ($settings['key'] == 'type_texte_1542480094564' || $settings['key'] == 'text_category_1546779674338' || $settings['key'] == 'listselect_1547763879269' || $settings['key'] == 'listselect_1547763974005') {
+    if ($settings['key'] == 'type_texte_1542480094564' || $settings['key'] == 'text_category_1546779674338' || $settings['key'] == 'listselect_1547763879269' || $settings['key'] == 'listselect_1547763974005' || $settings['key'] == 'listselect_1548592246093') {
 
         if (is_user_logged_in()) {
 
