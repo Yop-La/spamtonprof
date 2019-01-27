@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.7.4.5
+ * Version: 1.1.7.4.6
  *
  *
  * Author: yopla
@@ -84,7 +84,7 @@ require_once (dirname(__FILE__) . '/ajaxFunction/ads_review.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/edit_lbc_text.php');
 
-require_once (dirname(__FILE__) . '/ajaxFunction/lbc-report.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/edit_lbc_text.php');
 
 add_action('template_redirect', 'handleRedirections');
 
