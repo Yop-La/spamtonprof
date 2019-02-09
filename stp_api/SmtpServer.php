@@ -185,7 +185,8 @@ class SmtpServer implements \JsonSerializable
         // send the message, check for errors
         if (! $mail->send()) {
             $this->slack->sendMessages("log", array(
-                $mail->ErrorInfo
+                $mail->ErrorInfo,
+                'expe : ' . $from
             ));
             return (false);
         } else {
