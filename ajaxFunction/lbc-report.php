@@ -26,21 +26,19 @@ function lbcReport()
 
     $retour->tab1 = $data;
 
-    $lbcCompteMg = new \spamtonprof\stp_api\LbcAccountManager();
+    
     $data = $lbcCompteMg->getReport(array(
         'ads_by_day' => 'ads_by_day'
     ));
 
     $retour->tab2 = $data;
 
-    $lbcCompteMg = new \spamtonprof\stp_api\LbcAccountManager();
     $data = $lbcCompteMg->getReport(array(
         'ads_by_domain' => 'ads_by_domain'
     ));
 
     $retour->tab3 = $data;
 
-    $lbcCompteMg = new \spamtonprof\stp_api\LbcAccountManager();
     $data = $lbcCompteMg->getReport(array(
         'domains_stats' => 'domains_stats'
     ));
