@@ -503,10 +503,12 @@ class LbcProcessManager
                 $ads = $lbcApi->getAdds(array(
                     'user_id' => $user_id
                 ));
+                $msgs[] = "User_id : " . $user_id;
             } else if (! is_null($codePromo)) {
                 $ads = $lbcApi->getAdds(array(
                     "code_promo" => $codePromo
                 ));
+                $msgs[] = "Pas de user_id : ";
             }
 
             // step 4-1 : si il y a des annonces en ligne sur leboncoin
