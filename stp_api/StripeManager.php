@@ -204,7 +204,7 @@ class StripeManager
 
         $invoices_abo = [];
 
-        //récupération de toutes les factures impayés failed des abos annulés
+        // récupération de toutes les factures impayés failed des abos annulés
         foreach ($ref_abos as $ref_abo) {
 
             $sub_id = $ref_abo['sub_id'];
@@ -232,8 +232,8 @@ class StripeManager
 
             $i = $i + 1;
         }
-        
-        //affichage 
+
+        // affichage
         $ref_abos = array_keys($invoices_abo);
         $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
 
@@ -764,11 +764,47 @@ class StripeManager
     {
         $endDay = \DateTime::createFromFormat(PG_DATE_FORMAT, $endDay);
 
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         \Stripe\Subscription::update($subId, [
             'trial_end' => $endDay->getTimestamp(),
             'prorate' => $prorate
         ]);
+    }
+
+    public function sendInvoice($customer_id, $after)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $after = \DateTime::createFromFormat('j/m/Y', $after);
+        $after = $after->getTimestamp();
+
+        $invoices = \Stripe\Invoice::all([
+            "customer" => $customer_id,
+            "date" => array(
+                "gt" => $after
+            ),
+            "limit" => 50
+        ]);
+
+        $invoices = $invoices->data;
+        
+        
+
+
+        foreach ($invoices as $invoice) {
+            
+            
+            echo ($invoice->invoice_pdf . "<br>");
+        }
+        
+        echo('<br><br><br><br> Link to pay <br><br>');
+        
+        foreach ($invoices as $invoice) {
+            
+            
+            echo ($invoice->hosted_invoice_url . "<br>");
+        }
+
+        // $invoice = \Stripe\Invoice::retrieve("in_1CFfetIcMMHYXO986qA1Rhuu");
+        //
     }
 }
