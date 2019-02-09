@@ -85,6 +85,15 @@ class LbcClientManager
         $q->execute();
     }
 
+    public function updatePrenom(\spamtonprof\stp_api\LbcClient $client)
+    {
+        $q = $this->_db->prepare("update client set prenom_client = :prenom_client where ref_client = :ref_client");
+
+        $q->bindValue(":prenom_client", $client->getPrenom_client());
+        $q->bindValue(":ref_client", $client->getRef_client());
+        $q->execute();
+    }
+
     public function updateNom(\spamtonprof\stp_api\LbcClient $client)
     {
         $q = $this->_db->prepare("update client set nom_client = :nom_client where ref_client = :ref_client");
