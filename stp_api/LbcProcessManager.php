@@ -437,8 +437,8 @@ class LbcProcessManager
             ));
         }
 
-        $send1 = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), $client->getPrenom_client(), false);
-        $send2 = $smtpServer->sendEmail("Stp Reply : |--|" . $message->getRef_message() . "|--|" . $subject, "lebureaudesprofs@gmail.com", $body, $compteLbc->getMail(), $client->getPrenom_client(), false);
+        $send1 = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), $compteLbc->getPrenom(), false);
+        $send2 = $smtpServer->sendEmail("Stp Reply : |--|" . $message->getRef_message() . "|--|" . $subject, "lebureaudesprofs@gmail.com", $body, $compteLbc->getMail(), $compteLbc->getPrenom(), false);
 
         return ($send1 && $send2);
     }
@@ -582,6 +582,7 @@ class LbcProcessManager
         $lbcTitleMg = new \spamtonprof\stp_api\LbcTitleManager();
         $communeMg = new \spamtonprof\stp_api\LbcCommuneManager();
         $adMg = new \spamtonprof\stp_api\AddsTempoManager();
+        $actMg = new \spamtonprof\stp_api\LbcAccountManager();
 
         $hasTypeTitle = $hasTypeTitleMg->get(array(
             "ref_client_defaut" => $refClient
@@ -604,6 +605,15 @@ class LbcProcessManager
         ));
         shuffle($textes);
 
+        // on récupère le compte lbc
+        $prenom = '[prenom]';
+        if ($ref_compte) {
+            $act = $actMg->get(array(
+                'ref_compte' => $ref_compte
+            ));
+            $prenom = $act->getPrenom();
+        }
+
         // on ajoute le num tel aux textes si demandé
         if ($phone != 'pas-de-num') {
             $textes = $lbcTexteMg->addPhoneLine($textes, $phone);
@@ -621,13 +631,12 @@ class LbcProcessManager
 
         // récupération des images
         $images = scandir(ABSPATH . 'wp-content/uploads/lbc_images/' . $client->getImg_folder());
-        
-        
+
         unset($images[0]);
         unset($images[1]);
 
         shuffle($images);
-        
+
         $nbImages = count($images);
 
         $ads = [];
@@ -647,7 +656,7 @@ class LbcProcessManager
                 'alexandre',
                 'Anahyse',
                 'anahyse'
-            ), $client->getPrenom_client(), $texte->getTexte()));
+            ), $prenom, $texte->getTexte()));
 
             // récupération de l'image
             $image = 'https://spamtonprof.com/wp-content/uploads/lbc_images/' . $client->getImg_folder() . '/' . $images[($i % $nbImages) + 2];
@@ -954,7 +963,7 @@ class LbcProcessManager
 
             serializeTemp($offset, "/tempo/lbcAnswerIndex_.$typeTxt");
 
-            $body = str_replace('[prof_name]', $client->getPrenom_client(), $txt->getTexte());
+            $body = str_replace('[prof_name]', $act->getPrenom(), $txt->getTexte());
 
             // on envoie le message
             $gmailMg->sendMessage($body, 'Re: ' . $subject, 'mailsfromlbc@gmail.com', 'mailsfromlbc@gmail.com', 'le.bureau.des.profs@gmail.com', 'Cannelle Gaucher', $threadId);

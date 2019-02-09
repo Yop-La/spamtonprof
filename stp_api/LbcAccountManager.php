@@ -261,6 +261,14 @@ class LbcAccountManager
         $q->execute();
     }
 
+    public function updatePrenom(\spamtonprof\stp_api\LbcAccount $lbcAccount)
+    {
+        $q = $this->_db->prepare("update compte_lbc set prenom = :prenom where ref_compte = :ref_compte");
+        $q->bindValue(":prenom", $lbcAccount->getPrenom());
+        $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
+        $q->execute();
+    }
+
     public function updateCodePromo(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
         $q = $this->_db->prepare("update compte_lbc set code_promo = :code_promo where ref_compte = :ref_compte");

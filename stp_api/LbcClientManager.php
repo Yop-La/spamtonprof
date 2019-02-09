@@ -56,6 +56,9 @@ class LbcClientManager
         if (in_array('all', $info)) {
 
             $q = $this->_db->prepare("select * from client");
+        } else if (in_array('with_ref_cat_prenom', $info)) {
+
+            $q = $this->_db->prepare("select * from client where ref_cat_prenom is not null");
         }
 
         $q->execute();
@@ -79,15 +82,6 @@ class LbcClientManager
                 $q->bindValue(":ref_client", $refClient);
             }
         }
-        $q->execute();
-    }
-
-    public function updatePrenom(\spamtonprof\stp_api\LbcClient $client)
-    {
-        $q = $this->_db->prepare("update client set prenom_client = :prenom_client where ref_client = :ref_client");
-
-        $q->bindValue(":prenom_client", $client->getPrenom_client());
-        $q->bindValue(":ref_client", $client->getRef_client());
         $q->execute();
     }
 
