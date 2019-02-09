@@ -11,7 +11,7 @@ use Exception;
 class LbcTexte implements \JsonSerializable
 {
 
-    protected $ref_texte, $texte, $type, $ref_type_texte;
+    protected $ref_texte, $texte, $type, $ref_type_texte, $nb_online;
 
     /**
      *
@@ -20,6 +20,24 @@ class LbcTexte implements \JsonSerializable
     public function getRef_type_texte()
     {
         return $this->ref_type_texte;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getNb_online()
+    {
+        return $this->nb_online;
+    }
+
+    /**
+     *
+     * @param mixed $nb_online
+     */
+    public function setNb_online($nb_online)
+    {
+        $this->nb_online = $nb_online;
     }
 
     /**

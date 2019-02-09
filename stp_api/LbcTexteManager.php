@@ -100,6 +100,15 @@ class LbcTexteManager
         $q->execute();
     }
 
+    public function updateNbOnline(\spamtonprof\stp_api\LbcTexte $texte)
+    {
+        $q = $this->_db->prepare("update textes set nb_online = :nb_online where ref_texte =:ref_texte");
+
+        $q->bindValue(":ref_texte", $texte->getNb_online());
+        $q->bindValue(":texte", $texte->getTexte());
+        $q->execute();
+    }
+
     public function updateTexte(\spamtonprof\stp_api\LbcTexte $texte)
     {
         $q = $this->_db->prepare("update textes set texte = :texte where ref_texte =:ref_texte");
@@ -198,7 +207,7 @@ class LbcTexteManager
                 $q = $this->_db->prepare("select * from textes where ref_type_texte = :ref_type_texte order by ref_texte desc");
                 $q->bindValue(":ref_type_texte", $refTexteType);
             }
-            
+
             if (array_key_exists("ref_type_texte.valid", $info) && ! array_key_exists("limit", $info)) {
                 $refTexteType = $info["ref_type_texte.valid"];
                 $q = $this->_db->prepare("select * from textes where ref_type_texte = :ref_type_texte and texte not like '%not_valid%' order by ref_texte desc");
@@ -212,9 +221,6 @@ class LbcTexteManager
                 $q->bindValue(":ref_type_texte", $refTexteType);
                 $q->bindValue(":limit", $limit);
             }
-            
-            
-            
         }
         $q->execute();
 
