@@ -161,22 +161,18 @@ class LbcTexteManager
     {
         $q = null;
         if (is_array($info)) {
-            if (array_key_exists("type", $info) && array_key_exists("offset", $info)) {
-                $type = $info["type"];
-                $offset = $info["offset"];
+            if (array_key_exists("type_random", $info)) {
+                $type = $info["type_random"];
 
                 $q = $this->_db->prepare("select * from textes 
-                            where type like :type and texte not like '%not_valid%' limit 1 offset :offset;");
+                            where type like :type and texte not like '%not_valid%' ORDER BY random() limit 1;");
                 $q->bindValue(":type", $type);
-                $q->bindValue(":offset", $offset);
-            }
-            if (array_key_exists("type", $info)) {
+            } else if (array_key_exists("type", $info)) {
                 $type = $info["type"];
 
                 $q = $this->_db->prepare("select * from textes
-                            where type like :type limit 1 offset :offset;");
+                            where type like :type limit 1");
                 $q->bindValue(":type", $type);
-                $q->bindValue(":offset", $offset);
             }
         }
         $q->execute();

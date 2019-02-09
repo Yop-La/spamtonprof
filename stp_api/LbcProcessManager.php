@@ -946,24 +946,40 @@ class LbcProcessManager
 
             $typeTxt = $typeTxt->getType();
 
-            $offset = unserializeTemp("/tempo/lbcAnswerIndex_" . $typeTxt);
-
-            if (! $offset) {
-                $offset = 0;
-                serializeTemp($offset, "/tempo/lbcAnswerIndex_" . $typeTxt);
-            }
-
             $txt = $txtMg->get(array(
-                'type' => $typeTxt,
-                'offset' => $offset
+                'type_random' => $typeTxt
             ));
 
-            $offset = $offset + 1;
-            $offset = $offset % $nb_txt;
+            $txt = $txt->getTexte();
 
-            serializeTemp($offset, "/tempo/lbcAnswerIndex_.$typeTxt");
+            $spamtonprofs = array(
+                'sppamtonprof',
+                'spaamtonprof',
+                'spammtonprof',
+                'spamttonprof',
+                'spamtoonprof',
+                'spamtonnprof',
+                'spamtonpprof',
+                'spamtonprrof',
+                'spamtonproof',
+                'pamtonprof',
+                'spmtonprof',
+                'spatonprof',
+                'spamonprof',
+                'spamtnprof',
+                'spamtoprof',
+                'spamtonrof'
+            );
 
-            $body = str_replace('[prof_name]', $act->getPrenom(), $txt->getTexte());
+            $spamtonprof = $spamtonprofs[array_rand($spamtonprofs, 1)];
+
+            $txt = str_replace(array(
+                'spamtonprof',
+                'sppamtonprof',
+                'spamtonpprof'
+            ), $spamtonprof, $txt);
+
+            $body = str_replace('[prof_name]', $act->getPrenom(), $txt);
 
             // on envoie le message
             $gmailMg->sendMessage($body, 'Re: ' . $subject, 'mailsfromlbc@gmail.com', 'mailsfromlbc@gmail.com', 'le.bureau.des.profs@gmail.com', 'Cannelle Gaucher', $threadId);
