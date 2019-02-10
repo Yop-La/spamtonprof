@@ -594,11 +594,9 @@ class LbcProcessManager
 
         // on récupère les textes
         $hasTypeTexteMg = new \spamtonprof\stp_api\HasTextTypeManager();
-
-        $hasTypeTexte = $hasTypeTexteMg->get(array(
-            "ref_client_defaut" => $refClient
-        ));
-
+        $hasTypeTexte = $hasTypeTexteMg->get_next($refClient);
+        
+        
         $lbcTexteMg = new \spamtonprof\stp_api\LbcTexteManager();
         $textes = $lbcTexteMg->getAll(array(
             "ref_type_texte.valid" => $hasTypeTexte->getRef_type()
