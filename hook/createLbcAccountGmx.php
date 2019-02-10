@@ -61,6 +61,8 @@ $lbcAct->setPassword($gmxAct->getPassword());
 $lbcAct->setPrenom($prenom->getPrenom());
 $lbcAct = $lbcAccountMg->add($lbcAct);
 
+$lbcAccountMg->updatePrenom($lbcAct);
+
 // étape 5 : on associe au compte gmx le compte lbc créé
 $gmxAct->setRef_compte_lbc($lbcAct->getRef_compte());
 $gmxActMg->update_ref_compte_lbc($gmxAct);
