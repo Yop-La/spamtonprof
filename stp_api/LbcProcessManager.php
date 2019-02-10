@@ -610,12 +610,13 @@ class LbcProcessManager
             ));
             $prenom = $act->getPrenom();
 
-            // si il y a un lock c'est qu'il y a une publication -> mettre à jour date publication
-            if ($lock) {
+            $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
 
-                $act->setDate_publication(new \DateTime(null, new \DateTimeZone("Europe/Paris")));
-                $actMg->update_date_publication($act);
-            }
+            $slack = new \spamtonprof\slack\Slack();
+            $slack->sendMessages('log', 'Date de publication : ' . $now->format(PG_DATETIME_FORMAT));
+
+            $act->setDate_publication($now);
+            $actMg->update_date_publication($act);
         }
 
         // on ajoute le num tel aux textes si demandé
