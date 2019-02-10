@@ -595,21 +595,27 @@ class LbcProcessManager
         // on récupère les textes
         $hasTypeTexteMg = new \spamtonprof\stp_api\HasTextTypeManager();
         $hasTypeTexte = $hasTypeTexteMg->get_next($refClient);
-        
-        
+
         $lbcTexteMg = new \spamtonprof\stp_api\LbcTexteManager();
         $textes = $lbcTexteMg->getAll(array(
             "ref_type_texte.valid" => $hasTypeTexte->getRef_type()
         ));
         shuffle($textes);
 
-        // on récupère le compte lbc
+        // on récupère le compte lbc pour avoir le prénom à mettre dans les annonces
         $prenom = '[prenom]';
         if ($ref_compte) {
             $act = $actMg->get(array(
                 'ref_compte' => $ref_compte
             ));
             $prenom = $act->getPrenom();
+
+            // si il y a un lock c'est qu'il y a une publication -> mettre à jour date publication
+            if ($lock) {
+
+                $act->setDate_publication(new \DateTime(null, new \DateTimeZone("Europe/Paris")));
+                $actMg->update_date_publication($act);
+            }
         }
 
         // on ajoute le num tel aux textes si demandé

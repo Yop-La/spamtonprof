@@ -11,12 +11,30 @@ use Exception;
 class LbcAccount implements \JsonSerializable
 {
 
-    protected $ref_compte, $mail, $password, $nb_annonces_online, $date_derniere_activite, $disabled, $date_of_disabling, $ref_client, $ref_expe, $expe, $code_promo, $prenom_client, $nom_client, $controle_date, $objectID, $date_creation, $telephone, $cookie, $user_id, $prenom;
+    protected $ref_compte, $mail, $password, $nb_annonces_online, $date_derniere_activite, $disabled, $date_of_disabling, $ref_client, $ref_expe, $expe, $code_promo, $prenom_client, $nom_client, $controle_date, $objectID, $date_creation, $telephone, $cookie, $user_id, $prenom, $date_publication;
 
     public function __construct(array $donnees = array())
 
     {
         $this->hydrate($donnees);
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getDate_publication()
+    {
+        return $this->date_publication;
+    }
+
+    /**
+     *
+     * @param mixed $date_publication
+     */
+    public function setDate_publication($date_publication)
+    {
+        $this->date_publication = $date_publication;
     }
 
     /**

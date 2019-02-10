@@ -80,6 +80,15 @@ class GmxActManager
             $q = $this->_db->prepare('select * from gmx_act where ref_compte_lbc is null and smtp_enabled is true');
         }
 
+        if (in_array('valid', $info)) {
+
+            $q = $this->_db->prepare("
+                select * from gmx_act where ref_compte_lbc in
+                    (select ref_compte from compte_lbc where now() >= ( date_publication +  interval '1 day')
+                        and nb_annonces_online != 0
+                        order by date_publication )");
+        }
+
         $q->execute();
 
         $data = $q->fetch(\PDO::FETCH_ASSOC);

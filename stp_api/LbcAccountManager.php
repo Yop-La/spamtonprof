@@ -202,6 +202,15 @@ class LbcAccountManager
         $q->execute();
     }
 
+    public function update_date_publication(\spamtonprof\stp_api\LbcAccount $lbcAccount)
+    {
+        $q = $this->_db->prepare("update compte_lbc set date_publication = :date_publication where ref_compte = :ref_compte");
+        $q->bindValue(":date_publication", $lbcAccount->getDate_publication()
+            ->format(PG_DATETIME_FORMAT));
+        $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
+        $q->execute();
+    }
+
     public function updateControleDate(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
         $q = $this->_db->prepare("update compte_lbc set controle_date = :controle_date where ref_compte = :ref_compte");
