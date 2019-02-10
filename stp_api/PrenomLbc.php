@@ -11,6 +11,11 @@ class PrenomLbc implements \JsonSerializable
         $this->hydrate($donnees);
     }
 
+    public function inc_nb_use()
+    {
+        $this->nb_use = $this->nb_use + 1;
+    }
+
     public function hydrate(array $donnees)
     {
         foreach ($donnees as $key => $value) {

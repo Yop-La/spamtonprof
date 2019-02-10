@@ -41,16 +41,27 @@ $gmxAct = $gmxActMg->get(array(
     'ref_gmx_act' => $ref_gmx_act
 ));
 
-// étape 3 : on créé un compte lbc dans compte_lbc (adresse mail, password,
+// étape 3 : on récupère un prénom
+
+$prenomLbcMg = new \spamtonprof\stp_api\PrenomLbcManager();
+$prenom = $prenomLbcMg->get(array(
+    'moins_utilise' => 'moins_utilise'
+));
+
+$prenom->inc_nb_use();
+$prenomLbcMg->updateNbUse($prenom);
+
+// étape 4 : on créé un compte lbc dans compte_lbc (adresse mail, password,
 $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
 $lbcAct = new \spamtonprof\stp_api\LbcAccount();
 $lbcAct->setMail($gmxAct->getMail());
 $lbcAct->setRef_client($ref_client);
 $lbcAct->setTelephone($telephone);
 $lbcAct->setPassword($gmxAct->getPassword());
+$lbcAct->setPrenom($prenom->getPrenom());
 $lbcAct = $lbcAccountMg->add($lbcAct);
 
-// étape 4 : on associe au compte gmx le compte lbc créé
+// étape 5 : on associe au compte gmx le compte lbc créé
 $gmxAct->setRef_compte_lbc($lbcAct->getRef_compte());
 $gmxActMg->update_ref_compte_lbc($gmxAct);
 
