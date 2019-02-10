@@ -19,7 +19,6 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-
 // récupération des entrées
 
 serializeTemp($_POST);
@@ -29,19 +28,20 @@ $refClient = $_POST["ref_client"];
 $phone = $_POST["phone"];
 $refCompte = $_POST["ref_compte"];
 
-$code_promo =false;
-if(array_key_exists("code_promo", $_POST)){
+$code_promo = false;
+if (array_key_exists("code_promo", $_POST)) {
     $code_promo = $_POST["code_promo"];
 }
 
-
 $lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
 
-$ads = $lbcProcessMg -> generateAds($refClient, $nbAds, $phone, true, $refCompte);
+$ads = $lbcProcessMg->generateAds($refClient, $nbAds, $phone, true, $refCompte);
 
 $slack = new \spamtonprof\slack\Slack();
 $slack->sendMessages('log-lbc', array(
     "LBC : publication sur le compte de ref_compte_lbc : " . $refCompte,
+    'params',
+    json_encode($_POST)
 ));
 
 $retour = new stdClass();
