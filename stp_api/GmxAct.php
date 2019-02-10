@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class GmxAct implements \JsonSerializable
 {
 
-    protected $ref_gmx_act, $password, $mail, $has_redirection, $ref_compte_lbc;
+    protected $ref_gmx_act, $password, $mail, $has_redirection, $ref_compte_lbc, $smtp_enabled;
 
     /**
      *
@@ -13,6 +13,24 @@ class GmxAct implements \JsonSerializable
     public function getRef_compte_lbc()
     {
         return $this->ref_compte_lbc;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getSmtp_enabled()
+    {
+        return $this->smtp_enabled;
+    }
+
+    /**
+     *
+     * @param mixed $smtp_enabled
+     */
+    public function setSmtp_enabled($smtp_enabled)
+    {
+        $this->smtp_enabled = $smtp_enabled;
     }
 
     /**

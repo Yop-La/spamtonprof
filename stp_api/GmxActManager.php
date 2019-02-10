@@ -33,6 +33,16 @@ class GmxActManager
         return ($gmxAct);
     }
 
+    public function update_smtp_enabled(GmxAct $gmxAct)
+    {
+        $q = $this->_db->prepare('update gmx_act set smtp_enabled = :smtp_enabled where ref_gmx_act = :ref_gmx_act');
+        $q->bindValue(':smtp_enabled', $gmxAct->getSmtp_enabled(), \PDO::PARAM_BOOL);
+        $q->bindValue(':ref_gmx_act', $gmxAct->getRef_gmx_act());
+        $q->execute();
+
+        return ($gmxAct);
+    }
+
     public function update_ref_compte_lbc(GmxAct $gmxAct)
     {
         $q = $this->_db->prepare('update gmx_act set ref_compte_lbc= :ref_compte_lbc where ref_gmx_act = :ref_gmx_act');
@@ -67,7 +77,7 @@ class GmxActManager
 
         if (in_array('virgin', $info)) {
 
-            $q = $this->_db->prepare('select * from gmx_act where ref_compte_lbc is null');
+            $q = $this->_db->prepare('select * from gmx_act where ref_compte_lbc is null and smtp_enabled is true');
         }
 
         $q->execute();
