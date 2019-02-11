@@ -51,6 +51,33 @@ class LbcAccountManager
     public function get($info)
     {
         $q = null;
+
+        if (array_key_exists("valid_lbc_act", $info) && array_key_exists("act_type", $info)) {
+            $ref_client = $info["valid_lbc_act"];
+            $act_type = $info["act_type"];
+
+            $query = "select * from compte_lbc 
+                            where now() >= ( date_publication +  interval '1 day')
+                                and nb_annonces_online != 0
+						         and ref_client = :ref_client
+						         and ref_compte in (select ref_compte_lbc from gmx_act where smtp_enabled is true)
+                            order by nb_annonces_online limit 1";
+
+            if ($act_type == 'stp') {
+                $query = "select * from compte_lbc 
+                            where now() >= ( date_publication +  interval '1 day')
+                                and nb_annonces_online != 0
+						         and ref_client = :ref_client
+						         and mail not like '%gmx%'
+                            order by nb_annonces_online limit 1";
+            }
+
+            $q = $this->_db->prepare($query);
+            $q->execute(array(
+                ":ref_client" => $ref_client
+            ));
+        }
+
         if (array_key_exists("ref_compte", $info)) {
             $refCompte = $info["ref_compte"];
             $q = $this->_db->prepare("select * from compte_lbc where ref_compte = :ref_compte");
@@ -308,6 +335,7 @@ class LbcAccountManager
 
         $q = $this->_db->prepare("select * from compte_lbc 
         where now() - interval '2 hour' > date_creation and (disabled = false or disabled is null) and (uncheckable = false or uncheckable is null)
+            and ref_client = 25
             order by date_publication desc limit :nb_compte");
         $q->bindValue(":nb_compte", $nbCompte);
         $q->execute();
