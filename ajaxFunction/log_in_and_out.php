@@ -52,7 +52,7 @@ function ajaxCheckLogIn()
         ));
     }
     
-    if (array_key_exists("prof", $user->get_role_caps())) {
+    if ($user && array_key_exists("prof", $user->get_role_caps())) {
         
         $profMg = new \spamtonprof\stp_api\StpProfManager();
         
@@ -77,7 +77,7 @@ function ajaxCheckLogIn()
             "redirection" => $redirection,
             "message" => $message
         );
-    } elseif (array_key_exists("client", $user->get_role_caps())) {
+    } elseif ($user && array_key_exists("client", $user->get_role_caps())) {
         
         $user = $user;
         $redirection = 'dashboard-eleve';

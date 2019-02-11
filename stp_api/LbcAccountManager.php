@@ -308,7 +308,7 @@ class LbcAccountManager
 
         $q = $this->_db->prepare("select * from compte_lbc 
         where now() - interval '2 hour' > date_creation and (disabled = false or disabled is null) and (uncheckable = false or uncheckable is null)
-            order by nb_annonces_online, ref_compte desc limit :nb_compte");
+            order by date_publication desc limit :nb_compte");
         $q->bindValue(":nb_compte", $nbCompte);
         $q->execute();
 
