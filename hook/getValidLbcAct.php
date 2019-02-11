@@ -21,9 +21,6 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 $slack = new \spamtonprof\slack\Slack();
-$slack->sendMessages('log-lbc', array(
-    'publication sur un compte existant'
-));
 
 $password = $_POST['password'];
 $ref_client = $_POST['ref_client'];

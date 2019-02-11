@@ -168,6 +168,61 @@ jQuery( document ).ready( function( jQuery ) {
 
 				});
 
+
+
+				waitForEl('#table_5', function() {
+
+
+
+					table5 = jQuery('#table_5').DataTable( {
+						data: data.tab5,
+						columns: [
+							{ title: "Ref_compte" },
+							{ title: "mail" },
+							{ title: "nb_online","searchable": false },
+							{ title: "date_creation"},
+							{ title: "date_publication"},
+							{ title: "user_id"},
+							{ title: "prenom"},
+							{ title: "disabled"}
+							],
+							"order": [[ 4, "desc" ]],
+							"autoWidth": false
+					} );
+
+
+					jQuery('#table_5 tbody').on( 'click', 'td', function () {
+
+						var cell = table5.cell( this );
+						var rowIdx = cell.index().row;
+
+
+						var data = table5.rows( rowIdx ).data()[0];
+
+
+						var user_id = data[5];
+
+						$link = 'https://www.leboncoin.fr/profil/'.concat(user_id,'/offres');
+
+						var win = window.open($link, '_blank');
+						if (win) {
+							//Browser has allowed it to be opened
+							win.focus();
+						} else {
+							//Browser has blocked it
+							alert('Please allow popups for this website');
+						}
+
+					});
+
+
+				});
+
+
+
+
+
+
 				jQuery("#loadingSpinner").addClass("hide");
 				jQuery(".content").removeClass("hide");
 

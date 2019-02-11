@@ -45,6 +45,13 @@ function lbcReport()
 
     $retour->tab4 = $data;
 
+    $data = $lbcCompteMg->getReport(array(
+        'acts_details' => 'acts_details'
+    ));
+    
+    $retour->tab5 = $data;
+    
+    
     echo (json_encode($retour));
 
     die();

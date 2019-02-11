@@ -181,6 +181,14 @@ class LbcAccountManager
                     from compte_lbc, client where  compte_lbc.ref_client = client.ref_client
                         group by client.ref_client,prenom_client order by nb_adds desc");
             }
+            
+            if (array_key_exists("acts_details", $info)) {
+                
+                $q = $this->_db->prepare("
+                    select ref_compte, mail, nb_annonces_online, date_creation, date_publication, user_id, prenom, disabled 
+                            from compte_lbc 
+                            order by date_publication desc");
+            }
 
             if (array_key_exists("ads_by_day", $info)) {
 
