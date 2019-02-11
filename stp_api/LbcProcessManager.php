@@ -612,9 +612,6 @@ class LbcProcessManager
 
             $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
 
-            $slack = new \spamtonprof\slack\Slack();
-            $slack->sendMessages('log', array('Date de publication : ' . $now->format(PG_DATETIME_FORMAT)));
-
             $act->setDate_publication($now);
             $actMg->update_date_publication($act);
         }
