@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class HasTextType implements \JsonSerializable
 {
 
-    protected $ref_has_text_type, $ref_type, $ref_client, $last_used;
+    protected $ref_has_text_type, $ref_type, $ref_client, $last_used, $defaut;
 
     public function __construct(array $donnees = array())
     {
@@ -20,6 +20,8 @@ class HasTextType implements \JsonSerializable
             }
         }
     }
+    
+    
 
     /**
      *
