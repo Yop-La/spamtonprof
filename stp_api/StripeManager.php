@@ -113,8 +113,12 @@ class StripeManager
 
                 $part_prof = 1 - $commission / 100;
 
-                $charge->transfer_group = $chargeId; // on utilise la charge id comme id de groupage de transactions
-                $charge->save();
+                // on récupère le payement intent pour mettre à jour son transfer group
+                $PaymentIntentId = $charge->payment_intent;
+                $PaymentIntent = \Stripe\PaymentIntent::retrieve($PaymentIntentId);
+
+                $PaymentIntent->transfer_group = $chargeId;
+                $PaymentIntent->save();
 
                 // on transfère 75 % au prof
                 \Stripe\Transfer::create(array(
@@ -683,6 +687,35 @@ class StripeManager
         return ($transfert);
     }
 
+    public function getChargeWithoutTransfer()
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $ref_abos = [];
+        $params = [
+            "limit" => 20
+        ];
+
+        do {
+
+            $charges = \Stripe\Charge::all($params);
+            prettyPrint($charges);
+            $subs = $charges->data;
+
+            foreach ($subs as $sub) {
+                $id = $sub->id;
+                $ref_abonnement = $sub->metadata['ref_abonnement'];
+                if ($ref_abonnement) {
+                    $ref_abos[] = [
+                        'ref_abo' => $ref_abonnement,
+                        'sub_id' => $id
+                    ];
+                }
+                $params['starting_after'] = $id;
+            }
+        } while ($subs);
+    }
+
     /* pour mettre à jour la cb d'un compte stripe */
     public function updateCb($refCompte, $testMode, $token)
     {
@@ -786,21 +819,16 @@ class StripeManager
         ]);
 
         $invoices = $invoices->data;
-        
-        
-
 
         foreach ($invoices as $invoice) {
-            
-            
+
             echo ($invoice->invoice_pdf . "<br>");
         }
-        
-        echo('<br><br><br><br> Link to pay <br><br>');
-        
+
+        echo ('<br><br><br><br> Link to pay <br><br>');
+
         foreach ($invoices as $invoice) {
-            
-            
+
             echo ($invoice->hosted_invoice_url . "<br>");
         }
 
