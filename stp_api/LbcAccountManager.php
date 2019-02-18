@@ -342,9 +342,9 @@ class LbcAccountManager
         $accounts = [];
 
         $q = $this->_db->prepare("select * from compte_lbc 
-        where now() - interval '2 hour' > date_creation and (disabled = false or disabled is null) and (uncheckable = false or uncheckable is null)
-            and ref_client = 25
-            order by date_publication desc limit :nb_compte");
+        where now() - interval '48 hour' > date_creation and (disabled = false or disabled is null) and (uncheckable = false or uncheckable is null)
+            and ( now() - interval '48 hour' > controle_date or controle_date is null)
+            order by date_publication desc, nb_annonces_online limit :nb_compte");
         $q->bindValue(":nb_compte", $nbCompte);
         $q->execute();
 
