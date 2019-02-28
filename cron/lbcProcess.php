@@ -32,7 +32,7 @@ $lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
 
 $automatic_answer = true;
 $nb_step = 3;
-if (array_key_exists('automatic_answer', $_POST) && $_POST['automatic_answer'] == "false") {
+if (array_key_exists('automatic_answer', $_GET) && $_GET['automatic_answer'] == "false") {
 
     $automatic_answer = false;
     $nb_step = 2;
