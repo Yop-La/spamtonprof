@@ -449,6 +449,11 @@ class LbcProcessManager
 
         if ($message) {
 
+            $slack = new \spamtonprof\slack\Slack();
+            $slack->sendMessages('message-lbc', array(
+                "Nouveau message du bon coin"
+            ));
+
             $this->forwadLeadMessages($message);
 
             // on attribue le libellé pour dire que le message a été transféré
@@ -936,10 +941,6 @@ class LbcProcessManager
 
             // récupération du message à envoyer
             $txtMg = new spamtonprof\stp_api\LbcTexteManager();
-            $nb_txt = $txtMg->count(array(
-                'type' => 'reponse_lbc_general',
-                'offset' => 100
-            ));
 
             $typeTxtMg = new \spamtonprof\stp_api\TypeTexteManager();
             $typeTxt = $typeTxtMg->get(array(
