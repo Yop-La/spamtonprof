@@ -75,15 +75,25 @@ $newAccount->setControle_date(null);
 $newAccount->setTelephone($numTel);
 $newAccount->setPassword(wp_generate_password() . rand(12, 100));
 
+
+
+$prenomLbcMg = new \spamtonprof\stp_api\PrenomLbcManager();
+$prenom = $prenomLbcMg->get(array(
+    'moins_utilise' => 'moins_utilise'
+));
+
+$prenom->inc_nb_use();
+$prenomLbcMg->updateNbUse($prenom);
+
+$newAccount->setPrenom($prenom->getPrenom());
+
 $newAccount = $lbcAccountMg->add($newAccount);
 
 // étape 4 : génération du compte promo
-$hashids = new \Hashids\Hashids("stpsalt", 5); // génération du code promo
-$code_promo = $hashids->encode($newAccount->getRef_compte());
-$newAccount->setCode_promo($code_promo);
+// $hashids = new \Hashids\Hashids("stpsalt", 5); // génération du code promo
+// $code_promo = $hashids->encode($newAccount->getRef_compte());
+// $newAccount->setCode_promo($code_promo);
+// $lbcAccountMg->updateCodePromo($newAccount);
 
-$lbcAccountMg->updateCodePromo($newAccount);
-
-$newAccount->setPrenom_client($client->getPrenom_client());
 
 prettyPrint($newAccount);
