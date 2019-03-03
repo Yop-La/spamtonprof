@@ -74,6 +74,7 @@ $newAccount->setCode_promo(null);
 $newAccount->setControle_date(null);
 $newAccount->setTelephone($numTel);
 $newAccount->setPassword(wp_generate_password() . rand(12, 100));
+$newAccount = $lbcAccountMg->add($newAccount);
 
 
 
@@ -86,8 +87,7 @@ $prenom->inc_nb_use();
 $prenomLbcMg->updateNbUse($prenom);
 
 $newAccount->setPrenom($prenom->getPrenom());
-
-$newAccount = $lbcAccountMg->add($newAccount);
+$lbcAccountMg->updatePrenom($newAccount);
 
 // étape 4 : génération du compte promo
 // $hashids = new \Hashids\Hashids("stpsalt", 5); // génération du code promo
