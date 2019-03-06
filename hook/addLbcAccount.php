@@ -80,8 +80,10 @@ $newAccount = $lbcAccountMg->add($newAccount);
 
 $prenomLbcMg = new \spamtonprof\stp_api\PrenomLbcManager();
 $prenom = $prenomLbcMg->get(array(
-    'moins_utilise' => 'moins_utilise'
+    'moins_utilise' => 'moins_utilise',
+    "ref_cat_prenom" => $client->getRef_cat_prenom()
 ));
+
 
 $prenom->inc_nb_use();
 $prenomLbcMg->updateNbUse($prenom);

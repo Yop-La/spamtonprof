@@ -35,10 +35,22 @@ class PrenomLbcManager
     public function get($info)
     {
         $q = null;
-        if (array_key_exists("moins_utilise", $info)) {
-            $q = $this->_db->prepare("select * from prenom_lbc order by nb_use");
+        if (array_key_exists("moins_utilise", $info) && array_key_exists("ref_cat_prenom", $info)) {
+            
+            $ref_cat_prenom = $info["ref_cat_prenom"];
+            
+            
+            $q = $this->_db->prepare("select * from prenom_lbc 
+                where cat = :ref_cat_prenom
+                order by nb_use");
+            
+            $q->bindValue(":ref_cat_prenom", $ref_cat_prenom);
+            
+            
         }
 
+        
+        
         $q->execute();
 
         $donnees = $q->fetch(\PDO::FETCH_ASSOC);
