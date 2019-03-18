@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.7.7.3
+ * Version: 1.1.7.7.4
  *
  *
  * Author: yopla
@@ -87,6 +87,18 @@ require_once (dirname(__FILE__) . '/ajaxFunction/edit_lbc_text.php');
 require_once (dirname(__FILE__) . '/ajaxFunction/lbc-report.php');
 
 add_action('template_redirect', 'handleRedirections');
+
+function is_test_user(){
+    
+    $user = wp_get_current_user();
+    if($user){
+        if (strpos($user->user_email, 'yopla.33mail') !== false) {
+            return(true);
+        }
+    }
+    return(false);
+    
+}
 
 function handleRedirections()
 {

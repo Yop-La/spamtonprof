@@ -17,7 +17,11 @@ function ajaxAttribuerProf()
 
     $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
 
-    $now = $now->add(new \DateInterval("PT30M"));
+    if (! is_test_user()) {
+
+        $now = $now->add(new \DateInterval("PT30M"));
+        
+    }
 
     $refAbonnement = $_POST["refAbonnement"];
     $refProf = $_POST["refProf"];

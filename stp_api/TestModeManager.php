@@ -45,8 +45,6 @@ class TestModeManager
     public function __construct($param) // $param can be true of false or pageslug
 
     {
-        $user = wp_get_current_user();
-
         if ($param == "true") {
 
             $this->testMode = true;
@@ -64,10 +62,9 @@ class TestModeManager
             }
         }
 
-        if (strpos($user->user_email, 'yopla.33mail') !== false) {
+        if (is_test_user()) {
 
             $this->testMode = true;
-            
         }
     }
 
