@@ -29,7 +29,7 @@ function ajaxAttribuerProf()
 
     
     
-    if (! $abo->getTest()) {
+    if (! $abonnement->getTest()) {
         
         $now = $now->add(new \DateInterval("PT30M"));
         
