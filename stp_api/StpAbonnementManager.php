@@ -214,7 +214,8 @@ class StpAbonnementManager
 
         $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
 
-        $q = $this->_db->prepare("select * from stp_abonnement where first_prof_assigned = false and date_attribution_prof <= :now");
+        $q = $this->_db->prepare("select * from stp_abonnement 
+                where first_prof_assigned = false and ( date_attribution_prof <= :now )");
         $q->bindValue(":now", $now->format(PG_DATETIME_FORMAT));
 
         $q->execute();

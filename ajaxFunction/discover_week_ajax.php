@@ -430,6 +430,12 @@ function inscriptionEssai()
     }
 
     // étape n° 7 - insérer l'abonnement
+    
+    $test = false;
+    if (strpos($email_eleve, 'yopla.33mail') !== false) {
+        $test  = true;
+    }
+    
 
     $abonnement = new \spamtonprof\stp_api\StpAbonnement(array(
         "ref_eleve" => $eleve->getRef_eleve(),
@@ -437,10 +443,13 @@ function inscriptionEssai()
         "ref_statut_abonnement" => \spamtonprof\stp_api\StpStatutAbonnementManager::ESSAI,
         "date_creation" => $now,
         "remarque_inscription" => $remarques,
-        "ref_plan" => $plan->getRef_plan()
+        "ref_plan" => $plan->getRef_plan(),
+        "test" => $test
     ));
 
     $abonnement = $abonnementMg->add($abonnement);
+    
+    
 
     $logAboMg = new \spamtonprof\stp_api\StpLogAbonnementManager();
     $logAboMg->add(new \spamtonprof\stp_api\StpLogAbonnement(array(
