@@ -25,7 +25,7 @@ function ajaxAttribuerProf()
     $refProf = $_POST["refProf"];
 
     $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
-    $abo = $abonnementMg->get(array('ref_abonnement' => $refAbonnement));
+    $abonnement = $abonnementMg->get(array('ref_abonnement' => $refAbonnement));
 
     
     
@@ -36,9 +36,9 @@ function ajaxAttribuerProf()
     }
     
     
-    $abo->setRef_prof($refProf);
-    $abo->setDate_attribution_prof($now);
-    $abo->setFirst_prof_assigned(false);
+    $abonnement->setRef_prof($refProf);
+    $abonnement->setDate_attribution_prof($now);
+    $abonnement->setFirst_prof_assigned(false);
     
 
     $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
