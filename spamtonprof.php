@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.7.7.8
+ * Version: 1.1.7.8.0
  *
  *
  * Author: yopla
