@@ -88,6 +88,11 @@ class StripeManager
                 $charge = \Stripe\Charge::retrieve($chargeId);
 
                 $commission = 25;
+                if ($profId == "acct_1D0z7ZI85S4kxqgW") {
+                    $commission = 20;
+                    
+                }
+                
 
                 if ($discount) { // on change la commission
 
@@ -276,6 +281,15 @@ class StripeManager
         $ret = \Stripe\Event::retrieve($id);
 
         return ($ret->data->object->id);
+    }
+
+    public function is_in_trial($sub_id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $sub = \Stripe\Subscription::retrieve($sub_id);
+
+        return ($sub->status == 'trialing');
     }
 
     public function listActiveSubs(int $limit, $starting_after = false)
