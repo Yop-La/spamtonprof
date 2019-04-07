@@ -221,6 +221,9 @@ class StripeManager
                         "transfer_group" => $chargeId,
                         "source_transaction" => $chargeId
                     ));
+                }else{
+                    $charge->metadata['no_transfert'] = true;
+                    $charge->save();
                 }
                 
                 $messages[] = "Transfert vers : " . $profId . " (" . $prof->getEmail_stp() . ")  de " . $part_prof / 100 . " € à " . round((1 - $com - $com_solde) * 100, 2) . "% réussi";
@@ -817,33 +820,41 @@ class StripeManager
         return ($transfert);
     }
 
-    public function getChargeWithoutTransfer()
+    public function getChargeWithoutTransfer($nb_iter)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        $slack = new \spamtonprof\slack\Slack();
         
         $ref_abos = [];
         $params = [
             "limit" => 20
         ];
-        
+        $iter = 0;
         do {
             
             $charges = \Stripe\Charge::all($params);
-            prettyPrint($charges);
-            $subs = $charges->data;
+
+            $charges = $charges->data;
             
-            foreach ($subs as $sub) {
-                $id = $sub->id;
-                $ref_abonnement = $sub->metadata['ref_abonnement'];
-                if ($ref_abonnement) {
-                    $ref_abos[] = [
-                        'ref_abo' => $ref_abonnement,
-                        'sub_id' => $id
-                    ];
-                }
+            foreach ($charges as $charge) {
+                $id = $charge->id;
+                $amount = $charge->amount;
+                $status = $charge->status;
+                $transfer_group = $charge->transfer_group;  
+                
                 $params['starting_after'] = $id;
+                
+
+                
+                if($amount<=0 || $transfer_group || $status != 'succeeded'){
+                    continue;
+                }
+                $slack->sendMessages('stripe', array("-----",'charge sans transfert : ' . $id));
+                echo($id.'<br>');
+                   
             }
-        } while ($subs);
+            $iter++;
+        } while ($nb_iter != $iter);
     }
 
     /* pour mettre Ã  jour la cb d'un compte stripe */
