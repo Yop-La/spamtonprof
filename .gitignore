@@ -25,3 +25,6 @@ tempo/*
 
 
 *.csv
+.settings/org.eclipse.wst.validation.prefs
+.buildpath
+.project
