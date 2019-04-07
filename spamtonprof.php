@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.7.8.1
+ * Version: 1.1.7.8.2
  *
  *
  * Author: yopla
@@ -230,7 +230,7 @@ function my_pre_population_callback($options, $settings)
         }
     }
 
-    // target "Les matières" du formulaire "Editer une formule"
+    // target "Les matiï¿½res" du formulaire "Editer une formule"
     if ($settings['key'] == 'listmultiselect_1541622233707') {
 
         $matiereMg = new \spamtonprof\stp_api\StpMatiereManager();
@@ -266,7 +266,7 @@ function my_pre_population_callback($options, $settings)
         }
     }
 
-    // target "choisir élève" du formulaire "inscription essai"
+    // target "choisir ï¿½lï¿½ve" du formulaire "inscription essai"
     if ($settings['key'] == 'choix_eleve_1542061024363') {
 
         if (is_user_logged_in()) {
@@ -298,7 +298,7 @@ function my_pre_population_callback($options, $settings)
         }
     }
 
-    // target "choix client leboncoin" du formulaire "Sélectionner client leboncoin"
+    // target "choix client leboncoin" du formulaire "Sï¿½lectionner client leboncoin"
     if ($settings['key'] == 'choisir_un_client_leboncoin_1542472364642' || $settings['key'] == 'choisir_client_1542481215387') {
 
         if (is_user_logged_in()) {

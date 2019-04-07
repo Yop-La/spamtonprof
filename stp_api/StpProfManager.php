@@ -70,6 +70,15 @@ class StpProfManager
 
             $q->bindValue(':ref_prof', $refProf);
         }
+        
+        if (array_key_exists('stripe_id', $info)) {
+            
+            $stripe_id = $info['stripe_id'];
+            
+            $q = $this->_db->prepare('select * from stp_prof where stripe_id = :stripe_id');
+            
+            $q->bindValue(':stripe_id', $stripe_id);
+        }
 
         if (! is_null($q)) {
 
