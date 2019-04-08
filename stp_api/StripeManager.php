@@ -221,10 +221,9 @@ class StripeManager
                         "transfer_group" => $chargeId,
                         "source_transaction" => $chargeId
                     ));
-                }else{
-                    $charge->metadata['no_transfert'] = true;
-                    $charge->save();
                 }
+                $charge->metadata['part_prof'] = $part_prof;
+                $charge->save();
                 
                 $messages[] = "Transfert vers : " . $profId . " (" . $prof->getEmail_stp() . ")  de " . $part_prof / 100 . " € à " . round((1 - $com - $com_solde) * 100, 2) . "% réussi";
                 
@@ -820,12 +819,13 @@ class StripeManager
         return ($transfert);
     }
 
-    public function getChargeWithoutTransfer($nb_iter)
+    // pour avoir les charges pas traités ( qui n'ont pas fait l'objet d'un transfert et/ou d'une régularisation de solde 
+    public function getUnhandledCharge($nb_iter)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-        $slack = new \spamtonprof\slack\Slack();
+//         $slack = new \spamtonprof\slack\Slack();
         
-        $ref_abos = [];
+        $charge_ids = [];
         $params = [
             "limit" => 20
         ];
@@ -841,20 +841,22 @@ class StripeManager
                 $amount = $charge->amount;
                 $status = $charge->status;
                 $transfer_group = $charge->transfer_group;  
+                $part_prof = $charge->metadata['part_prof'];
                 
                 $params['starting_after'] = $id;
                 
 
                 
-                if($amount<=0 || $transfer_group || $status != 'succeeded'){
+                if($amount<=0 || $transfer_group || $status != 'succeeded' || $part_prof != null){
                     continue;
                 }
-                $slack->sendMessages('stripe', array("-----",'charge sans transfert : ' . $id));
-                echo($id.'<br>');
+//                 $slack->sendMessages('stripe', array("-----",'charge sans transfert : ' . $id));
+                $charge_ids[] = $id;
                    
             }
             $iter++;
         } while ($nb_iter != $iter);
+        return($charge_ids);
     }
 
     /* pour mettre Ã  jour la cb d'un compte stripe */
