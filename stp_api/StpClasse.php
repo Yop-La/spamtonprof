@@ -73,4 +73,11 @@ class StpClasse implements \JsonSerializable
         $vars = get_object_vars($this);
         return $vars;
     }
+    
+    public function __toString()
+    {
+        $return = '-- Classe -- '+$this->ref_classe+'\n';
+        $return = $return + $this->classe + "\n";
+        return($return);
+    }
 }

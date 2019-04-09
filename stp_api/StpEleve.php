@@ -242,17 +242,17 @@ class StpEleve implements \JsonSerializable
     public function setHasToSend()
     {
         if (! $this->getParent_required()) {
-
+            
             $this->hasToSendToEleve = true;
             $this->hasToSendToParent = false;
         } else {
-
+            
             if ($this->getSame_email()) {
-
+                
                 $this->hasToSendToEleve = false;
                 $this->hasToSendToParent = true;
             } else {
-
+                
                 $this->hasToSendToEleve = true;
                 $this->hasToSendToParent = true;
             }
@@ -262,7 +262,7 @@ class StpEleve implements \JsonSerializable
     public function toArray()
     {
         $retour = [];
-
+        
         foreach ($this as $key => $value) {
             $retour[$key] = $value;
         }
@@ -428,5 +428,20 @@ class StpEleve implements \JsonSerializable
     public function setSeq_email_parent_essai($seq_email_parent_essai)
     {
         $this->seq_email_parent_essai = $seq_email_parent_essai;
+    }
+
+    public function __toString()
+    {
+        $return = "Eleve: ";
+        $return = $return . $this->prenom . " " . $this->nom . "\n";
+        $return = $return . $this->email . "\n";
+        
+        $niveau = $this->niveau;
+        if($niveau){
+            $niveau = \spamtonprof\stp_api\StpNiveau::cast($niveau);
+            $return = $return . $niveau->__toString() ;
+        }
+        
+        return($return);
     }
 }

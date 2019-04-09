@@ -13,6 +13,11 @@ class StpNiveau implements \JsonSerializable
     {
         return $this->gr_id;
     }
+    
+    public static function cast(\spamtonprof\stp_api\StpNiveau $niveau)
+    {
+        return ($niveau);
+    }
 
     /**
      * @param mixed $gr_id
@@ -97,5 +102,11 @@ class StpNiveau implements \JsonSerializable
     {
         $vars = get_object_vars($this);
         return $vars;
+    }
+    
+    public function __toString()
+    {
+        $return = $this->niveau . "\n";
+        return($return);
     }
 }

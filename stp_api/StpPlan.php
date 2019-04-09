@@ -181,5 +181,11 @@ class StpPlan implements \JsonSerializable
     {
         $this->formule = $formule;
     }
+    
+    public function __toString()
+    {
+        $return = "Plan: " . $this->tarif  . ' € par semaine ' . "\n";
+        return($return);
+    }
 }
 

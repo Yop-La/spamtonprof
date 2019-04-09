@@ -415,6 +415,7 @@ class StpAbonnement implements \JsonSerializable
      */
     public function getEleve()
     {
+        
         return $this->eleve;
     }
 
@@ -625,4 +626,39 @@ class StpAbonnement implements \JsonSerializable
             return (false);
         }
     }
+    
+    public function __toString(){
+        
+        
+        $return = "Abonnement " . strval($this->ref_abonnement) . "\n--\n";
+        
+        
+        
+        $eleve = $this->eleve;
+        if($eleve){
+            $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
+            $return = $return . "<div class='eleve'>" . $eleve->__toString() . "--\n</div>";
+        }
+        
+        $proche = $this->proche;
+        if($proche){
+            $proche = \spamtonprof\stp_api\StpProche::cast($proche);
+            $return = $return . "<div class='proche'>" .  $proche->__toString(). "--\n</div>";
+        }
+        
+        $formule = $this->formule;
+        if($formule){
+            $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
+            $return = $return . "<div class='proche'>" . $formule ->__toString(). "</div>";
+        }
+        
+        $plan = $this->plan;
+        if($plan){
+            $plan = \spamtonprof\stp_api\StpPlan::cast($plan);
+            $return = $return . "<div class='plan'>" . $plan ->__toString(). "</div>";
+        }
+        return($return);
+    }
+    
+    
 }

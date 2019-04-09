@@ -145,4 +145,12 @@ class StpProche implements \JsonSerializable
     {
         return ($proche);
     }
+    
+    public function __toString()
+    {
+        $return = "Proche: ";
+        $return = $return . $this->prenom . " " . $this->nom . "\n";
+        $return = $return . $this->email . "\n";
+        return($return);
+    }
 }

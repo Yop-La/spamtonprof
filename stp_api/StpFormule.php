@@ -188,14 +188,14 @@ class StpFormule implements \JsonSerializable
         $this->matieres = $matieres;
     }
 
-    // pour retourner le custom field matières de getresponse ( sequence essai )
+    // pour retourner le custom field matiï¿½res de getresponse ( sequence essai )
     public function toGetResponse()
     {
         $matieres = $this->getMatieres();
         for ($i = 0; $i < count($matieres); $i ++) {
             $matiere = $matieres[$i];
             if ($matiere == "francais") {
-                $matieres[$i] = "français";
+                $matieres[$i] = "franï¿½ais";
             }
         }
         $matieres = implode("_", $matieres);
@@ -254,6 +254,12 @@ class StpFormule implements \JsonSerializable
     public function setRef_product_stripe($ref_product_stripe)
     {
         $this->ref_product_stripe = $ref_product_stripe;
+    }
+    
+    public function __toString()
+    {
+        $return = "Formule: " . $this->formule . "\n";
+        return($return);
     }
 }
 

@@ -75,15 +75,20 @@ class StripeManager
                 return ($com_solde);
             }
             
-            $part_prof_before = (1 - $com) * $charge_amt;
-            
-            if ($solde >= $part_prof_before) {
+            // si le prof doit de l'argent à spamtonprof
+            if ($solde > 0) {
                 
-                $com_solde = 1 - $com;
-            } else {
+                $part_prof_before = (1 - $com) * $charge_amt;
                 
-                $com_solde = $solde / $charge_amt;
+                if ($solde >= $part_prof_before) {
+                    
+                    $com_solde = 1 - $com;
+                } else {
+                    
+                    $com_solde = $solde / $charge_amt;
+                }
             }
+            
             return (100 * $com_solde);
         }
     }
@@ -96,43 +101,77 @@ class StripeManager
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         
         $discount = false;
+        $str_abo = false;
+        $prof = false;
         
         $messages = [];
         $messages[] = "---------";
         
         $chargeId = $chargeIdMan;
         $subId = false;
-        if ($event_json && ! $chargeIdMan) {
-            $messages[] = "Event id : " . $event_json->id;
-            $chargeId = $event_json->data->object->charge;
-            $subId = $event_json->data->object->subscription;
-            $discount = $event_json->data->object->discount;
-            $amount_paid = $event_json->data->object->amount_paid;
-            
-            if ($amount_paid == 0) {
-                $messages[] = "Facture d'un montant nul";
-                $slack->sendMessages("stripe", $messages);
-                return;
-            }
-        } else {
-            $messages[] = "Transfert manuel";
-        }
-        
-        $charge = \Stripe\Charge::retrieve($chargeId);
-        $charge_amt = $charge->amount;
-        $transfert_group = $charge->transfer_group;
-        
-        if (! $subId) {
-            $invoice = $this->retrieve_invoice($charge->invoice);
-            $subId = $invoice->subscription;
-        }
-        
-        $messages[] = "Nouveau paiement réussi";
-        $messages[] = "chargeId : " . $chargeId;
         
         try {
             
+            if ($event_json && ! $chargeIdMan) {
+                $messages[] = "Event id : " . $event_json->id;
+                $chargeId = $event_json->data->object->charge;
+                $subId = $event_json->data->object->subscription;
+                $discount = $event_json->data->object->discount;
+                $amount_paid = $event_json->data->object->amount_paid;
+                
+                if ($amount_paid == 0) {
+                    $messages[] = "Facture d'un montant nul";
+                    return;
+                }
+                
+                if (! $subId) {
+                    $messages[] = "Facture sans abonnement. Faire transfert manuellement si nécessaire";
+                    return;
+                }
+            } else {
+                $messages[] = "Transfert manuel";
+            }
+            
+            $charge = \Stripe\Charge::retrieve($chargeId);
+            $charge_amt = $charge->amount;
+            $transfert_group = $charge->transfer_group;
+            
+            $messages[] = "Nouveau paiement réussi";
+            $messages[] = "chargeId : " . $chargeId;
+            
+            if (! $subId) {
+                $invoice = $this->retrieve_invoice($charge->invoice);
+                $subId = $invoice->subscription;
+            }
+            
             $sub = \Stripe\Subscription::retrieve($subId);
+            
+            $ref_abonnement = $sub->metadata['ref_abonnement'];
+            
+            if ($ref_abonnement) {
+                
+                $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
+                
+                $constructor = array(
+                    "construct" => array(
+                        'ref_eleve',
+                        'ref_parent',
+                        'ref_formule',
+                        'ref_plan'
+                    ),
+                    "ref_eleve" => array(
+                        "construct" => array(
+                            'ref_niveau'
+                        )
+                    )
+                );
+                
+                $abo = $aboMg->get(array(
+                    'ref_abonnement' => $ref_abonnement
+                ), $constructor);
+                
+                $str_abo = strip_tags($abo->__toString());
+            }
             
             if ($sub->metadata["stripe_prof_id"] != "") {
                 
@@ -144,8 +183,11 @@ class StripeManager
                 ));
                 
                 if ($transfert_group) {
-                    $messages[] = "Transfert déjà fait pour ce paiement";
-                    return;
+                    
+                    try {
+                        $transfert = \Stripe\Transfer::retrieve($transfert_group);
+                        $messages[] = "Transfert déjà fait pour ce paiement";
+                    } catch (\Exception $e) {}
                 }
                 
                 $messages[] = "Montant : " . $charge_amt / 100 . "€";
@@ -213,7 +255,7 @@ class StripeManager
                     $charge->transfer_group = $chargeId;
                     $charge->save();
                     
-                    // on transfÃ¨re 75 % au prof
+                    // on transfère au prof
                     \Stripe\Transfer::create(array(
                         "amount" => $part_prof,
                         "currency" => "eur",
@@ -233,14 +275,17 @@ class StripeManager
                     $messages[] = "Le nouveau solde est de : " . $new_solde . " € ( il était de " . $solde . " € )";
                 }
             } else {
-                $messages[] = "Un abonnement vient d'être facturé sans compte prof associé";
+                $messages[] = "Cet abonnement vient d'être facturé sans compte prof associé";
+            }
+            
+            if ($str_abo) {
+                $messages[] = 'Pour ' . $str_abo;
             }
         } catch (\Exception $e) {
             
             $messages[] = $e->getMessage();
             return;
         } finally {
-            $messages[] = $event_json;
             $slack->sendMessages("stripe", $messages);
         }
     }
@@ -250,6 +295,13 @@ class StripeManager
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $act = \Stripe\Account::retrieve($stripe_id);
         return ($act);
+    }
+
+    public function retrieve_sub($sub_id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        $sub = \Stripe\Subscription::retrieve($sub_id);
+        return ($sub);
     }
 
     public function retrieve_charge($charge_id)
@@ -819,11 +871,11 @@ class StripeManager
         return ($transfert);
     }
 
-    // pour avoir les charges pas traités ( qui n'ont pas fait l'objet d'un transfert et/ou d'une régularisation de solde 
+    // pour avoir les charges pas traités ( qui n'ont pas fait l'objet d'un transfert et/ou d'une régularisation de solde
     public function getUnhandledCharge($nb_iter)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-//         $slack = new \spamtonprof\slack\Slack();
+        // $slack = new \spamtonprof\slack\Slack();
         
         $charge_ids = [];
         $params = [
@@ -833,30 +885,27 @@ class StripeManager
         do {
             
             $charges = \Stripe\Charge::all($params);
-
+            
             $charges = $charges->data;
             
             foreach ($charges as $charge) {
                 $id = $charge->id;
                 $amount = $charge->amount;
                 $status = $charge->status;
-                $transfer_group = $charge->transfer_group;  
+                $transfer_group = $charge->transfer_group;
                 $part_prof = $charge->metadata['part_prof'];
                 
                 $params['starting_after'] = $id;
                 
-
-                
-                if($amount<=0 || $transfer_group || $status != 'succeeded' || $part_prof != null){
+                if ($amount <= 0 || $transfer_group || $status != 'succeeded' || $part_prof != null) {
                     continue;
                 }
-//                 $slack->sendMessages('stripe', array("-----",'charge sans transfert : ' . $id));
+                // $slack->sendMessages('stripe', array("-----",'charge sans transfert : ' . $id));
                 $charge_ids[] = $id;
-                   
             }
-            $iter++;
+            $iter ++;
         } while ($nb_iter != $iter);
-        return($charge_ids);
+        return ($charge_ids);
     }
 
     /* pour mettre Ã  jour la cb d'un compte stripe */
