@@ -1,6 +1,6 @@
 <?php
 /**
- * pour terminer inscription à l'essai après attribution prof manuelle
+ * pour terminer inscription ï¿½ l'essai aprï¿½s attribution prof manuelle
  * tourne toutes les heures
  * 
  * 
@@ -95,7 +95,7 @@ foreach ($abonnements as $abonnement) {
         $eleveMg->updateSeqEmailParentEssai($eleve);
     }
 
-    // définir les dates de début et de fin d'essai
+    // dï¿½finir les dates de dï¿½but et de fin d'essai
     $begin = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
 
     $abonnement->setDebut_essai($begin->format(PG_DATE_FORMAT));
@@ -109,7 +109,7 @@ foreach ($abonnements as $abonnement) {
 
     $emailRecap = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/mail_recap_prof.html");
     
-    // ajout des infos élèves aux mails récap
+    // ajout des infos ï¿½lï¿½ves aux mails rï¿½cap
     $emailRecap = str_replace(array(
         "prenom_eleve",
         "nom_eleve",
@@ -128,7 +128,7 @@ foreach ($abonnements as $abonnement) {
         $abonnement->getRemarque_inscription()
     ), $emailRecap);
 
-    // ajout des infos du bilan scolaire au mail récap
+    // ajout des infos du bilan scolaire au mail rï¿½cap
 
     $constructor = array(
         "construct" => array(
@@ -156,7 +156,7 @@ foreach ($abonnements as $abonnement) {
         $i ++;
     }
 
-    // ajout des infos parents aux mails récap
+    // ajout des infos parents aux mails rï¿½cap
     if ($eleve->getParent_required()) {
         $emailRecap = str_replace(array(
             "prenom_parent",
@@ -202,7 +202,7 @@ foreach ($abonnements as $abonnement) {
     }
     $emailRecap = $dom->saveHTML();
 
-    // envoi du mail au prof et à moi
+    // envoi du mail au prof et Ã  moi
 
     $smtpMg = new \spamtonprof\stp_api\SmtpServerManager();
 
@@ -210,14 +210,14 @@ foreach ($abonnements as $abonnement) {
         "ref_smtp_server" => $smtpMg::smtp2Go
     ));
 
-    $smtp->sendEmail("Nouvelle inscription à la semaine découverte", $prof->getEmail_stp(), $emailRecap, "alexandre@spamtonprof.com", "Alex de SpamTonProf", true, array(
+    $smtp->sendEmail("Nouvelle inscription Ã  la semaine dÃ©couverte", $prof->getEmail_stp(), $emailRecap, "alexandre@spamtonprof.com", "Alex de SpamTonProf", true, array(
         "alexandre@spamtonprof.com"
     ));
 
     $abonnement->setFirst_prof_assigned(true);
     $abonnementMg->updateFirstProfAssigned($abonnement);
 
-    // mise à jour de l'index
+    // mise ï¿½ jour de l'index
 
     $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
 

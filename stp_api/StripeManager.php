@@ -171,6 +171,8 @@ class StripeManager
                 ), $constructor);
                 
                 $str_abo = strip_tags($abo->__toString());
+            } else {
+                $messages[] = "Oups, pas d'abonnement associé à ce paiement ...";
             }
             
             if ($sub->metadata["stripe_prof_id"] != "") {
@@ -287,6 +289,21 @@ class StripeManager
             return;
         } finally {
             $slack->sendMessages("stripe", $messages);
+            
+            if ($prof) {
+                
+                $body = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/info-paiement-prof.html");
+                $body = str_replace("[[prof-name]]", $prof->getPrenom(), $body);
+                $body = str_replace("[[details-paiement]]", nl2br(implode("\n", $messages)), $body);
+                
+                $smtpMg = new \spamtonprof\stp_api\SmtpServerManager();
+                $smtp = $smtpMg->get(array(
+                    "ref_smtp_server" => $smtpMg::smtp2Go
+                ));
+                $smtp->sendEmail("Un paiement vient d'être réalisé", $prof->getEmail_stp(), $body, "alexandre@spamtonprof.com", "Alex de SpamTonProf", true, array(
+                    "alexandre@spamtonprof.com"
+                ));
+            }
         }
     }
 

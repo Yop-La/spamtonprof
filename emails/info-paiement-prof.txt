@@ -1,0 +1,8 @@
+﻿Hello [[prof-name]],
+
+Un nouveau paiement vient d'être réalisé. En cas de problème, réponds directement à cet email.
+
+Voici les détails du paiement:
+
+[[details-paiement]]
+ 
