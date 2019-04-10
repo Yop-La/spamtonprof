@@ -52,7 +52,7 @@ class GoogleManager
         $accessToken;
         
         if (! $account) {
-            echo ("ajouté : " . $gmailAdress . " à la table prof <br><br><br>");
+            echo ("ajoutï¿½ : " . $gmailAdress . " ï¿½ la table prof <br><br><br>");
             exit(0);
         }
         
@@ -63,7 +63,7 @@ class GoogleManager
             // Request authorization from the user.
             $authUrl = $client->createAuthUrl();
             
-            $authCode = "4/IQFqEXkLBaVBs2Sa3IITdJZ9c_YlgW_llhyGDGakKDWm3Er6FaySYpw"; // à remplir par ce qui sera donné par $authUrl
+            $authCode = "4/IQFqEXkLBaVBs2Sa3IITdJZ9c_YlgW_llhyGDGakKDWm3Er6FaySYpw"; // ï¿½ remplir par ce qui sera donnï¿½ par $authUrl
             
             if ($authCode == "") {
                 echo ("la2");
@@ -340,8 +340,7 @@ class GoogleManager
                 
                 
                 $historyResponse = $service->users_history->listUsersHistory($userId, $opt_param);
-                prettyPrint($historyResponse);
-                $pageToken = false; // à enlever si on veut itérer sur plusieurs pages et décommenter en dessous aussi
+                $pageToken = false; // ï¿½ enlever si on veut itï¿½rer sur plusieurs pages et dï¿½commenter en dessous aussi
                                     // if ($historyResponse->getHistory()) {
                 $histories = array_merge($histories, $historyResponse->getHistory());
                 // $pageToken = $historyResponse->getNextPageToken();
@@ -438,7 +437,7 @@ class GoogleManager
     }
 
     /*
-     * sert à créer un message pour l'envoyer à partir de gmail
+     * sert ï¿½ crï¿½er un message pour l'envoyer ï¿½ partir de gmail
      *
      */
     private function createMessage($body, $subject, $to, $replyTo, $from, $fromName)
