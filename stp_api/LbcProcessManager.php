@@ -48,6 +48,8 @@ class LbcProcessManager
     {
         $lastHistoryId = $this->gmailAccount->getLast_history_id();
         
+        echo("Dernier history id ( avant process ) : " . $lastHistoryId . '<br>');
+        
         $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
         
         $now->sub(new \DateInterval("PT2H"));
@@ -82,7 +84,7 @@ class LbcProcessManager
             $messageId = $this->gmailManager->getHeader($message, "Message-Id");
             $body = $this->gmailManager->getBody($message);
             
-            $timeStamp = $msg->internalDate / 1000;
+            $timeStamp = $message->internalDate / 1000;
             $dateReception = new \DateTime();
             $dateReception->setTimestamp($timeStamp);
             $dateReception->setTimezone(new \DateTimeZone('Europe/Paris'));
@@ -257,7 +259,7 @@ class LbcProcessManager
                         $this->gmailManager->modifyMessage($gmailId, $labelId, array());
                     }
                 }
-            } elseif (strpos(lower($subject), "renouvelez gratuitement") !== false) {
+            } elseif (strpos(strtolower($subject), "renouvelez gratuitement") !== false) {
                 
                 try {
                     
