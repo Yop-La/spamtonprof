@@ -29,6 +29,102 @@ class StpAbonnementManager
 
         return ($StpAbonnement);
     }
+    
+    public function stopSubscription($refAbonnement, $testMode){
+        
+        // on rÃ©cupÃ¨re l'abonnement
+        $constructor = array(
+            "construct" => array(
+                'ref_prof',
+                'ref_eleve',
+                'ref_parent',
+                'ref_formule'
+            )
+        );
+        
+        $abonnement = $this->get(array(
+            "ref_abonnement" => $refAbonnement
+        ), $constructor);
+        
+        $eleve = $abonnement->getEleve();
+        $proche = $abonnement->getProche();
+        $prof = $abonnement->getProf();
+        $formule = $abonnement->getFormule();
+        
+        $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
+        $prof = \spamtonprof\stp_api\StpProf::cast($prof);
+        
+        if ($proche) {
+            $proche = \spamtonprof\stp_api\StpProche::cast($proche);
+        }
+        $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
+        
+        // rÃ©silier abonnement stripe
+        $stripeMg = new \spamtonprof\stp_api\StripeManager($testMode);
+        $stripeMg->stopSubscription($abonnement->getSubs_Id());
+        
+        // statut abonnement de actif Ã  pas actif
+        $abonnement->setRef_statut_abonnement($abonnement::TERMINE);
+        $this->updateRefStatutAbonnement($abonnement);
+        
+        $logAboMg = new \spamtonprof\stp_api\StpLogAbonnementManager();
+        $logAboMg->add(new \spamtonprof\stp_api\StpLogAbonnement(array(
+            "ref_abonnement" => $abonnement->getRef_abonnement(),
+            "ref_statut_abo" => $abonnement->getRef_statut_abonnement()
+        )));
+        
+        // envoyer mails de rÃ©siliation Ã  famille + prof (pour demander temoignage)
+        
+        $smtpMg = new \spamtonprof\stp_api\SmtpServerManager();
+        $smtp = $smtpMg->get(array(
+            "ref_smtp_server" => $smtpMg::smtp2Go
+        ));
+        $expeMg = new \spamtonprof\stp_api\StpExpeManager();
+        $expe = $expeMg->get("info@spamtonprof.com");
+        
+        if ($eleve->hasToSendToParent()) {
+            $body_parent = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/resiliation_abonnement_parent.html");
+            $body_parent = str_replace("[[prof_name]]", ucfirst($prof->getPrenom()), $body_parent);
+            $body_parent = str_replace("[[eleve_name]]", ucfirst($eleve->getPrenom()), $body_parent);
+            $body_parent = str_replace("[[name]]", ucfirst($proche->getPrenom()), $body_parent);
+            $body_parent = str_replace("[[formule]]", $formule->getFormule(), $body_parent);
+            
+            $smtp->sendEmail("C'est fait : l'abonnement de " . $eleve->getPrenom() . " est rÃ©siliÃ©.", $proche->getEmail(), $body_parent, $expe->getEmail(), "Alexandre de SpamTonProf", true);
+        }
+        
+        if ($eleve->hasToSendToEleve()) {
+            $body_eleve = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/resiliation_abonnement_eleve.html");
+            $body_eleve = str_replace("[[name]]", ucfirst($eleve->getPrenom()), $body_eleve);
+            $body_eleve = str_replace("[[prof_name]]", ucfirst($prof->getPrenom()), $body_eleve);
+            $body_eleve = str_replace("[[formule]]", $formule->getFormule(), $body_eleve);
+            $smtp->sendEmail("C'est fait : ton abonnement est rï¿½siliï¿½.", $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alexandre de SpamTonProf", true);
+        }
+        
+        // envoi prof
+        $body_prof = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/resilier_prof.html");
+        $body_prof = str_replace("[[eleve_name]]", ucfirst($eleve->getPrenom()), $body_prof);
+        $body_prof = str_replace("[[formule]]", $formule->getFormule(), $body_prof);
+        $body_prof = str_replace("[[name]]", ucfirst($prof->getPrenom()), $body_prof);
+        $body_prof = str_replace("[[adresse_eleve]]", $eleve->getEmail(), $body_prof);
+        
+        if ($proche) {
+            $body_prof = str_replace("[[adresse_parent]]", $proche->getEmail(), $body_prof);
+        }
+        
+        $smtp->sendEmail("Tu peux rÃ©cupÃ©rer un tÃ©moignage ! ", $prof->getEmail_stp(), $body_prof, $expe->getEmail(), "Alexandre de SpamTonProf", true);
+        
+        // mise Ã  jour de l'index
+        $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+        
+        $constructor = array(
+            "construct" => array(
+                'ref_statut_abonnement'
+            )
+        );
+        
+        $algoliaMg->updateAbonnement($abonnement->getRef_abonnement(), $constructor);
+        
+    }
 
     /*
      * pour remonter les abonnements sans prof dans le dashboard choisir prof
@@ -64,7 +160,7 @@ class StpAbonnementManager
     }
 
     /*
-     * pour retourner les abonnements dont la période d'essai est terminé
+     * pour retourner les abonnements dont la pï¿½riode d'essai est terminï¿½
      */
     public function getTrialCompleted()
     {
@@ -95,7 +191,7 @@ class StpAbonnementManager
     }
 
     /*
-     * pour récupérer le nombre de message des abonnements durant les 7 derniers jours
+     * pour rï¿½cupï¿½rer le nombre de message des abonnements durant les 7 derniers jours
      */
     public function getNbMessage()
     {
@@ -125,7 +221,7 @@ class StpAbonnementManager
      * pour interrompre un abonnement
      *
      * date de fin : date de fin de l'essai ( = date de facturation)
-     * la date de debut doit être au minimum celle d'aujourdh'ui si avant 20h ( le cron tourne à 20h )
+     * la date de debut doit ï¿½tre au minimum celle d'aujourdh'ui si avant 20h ( le cron tourne ï¿½ 20h )
      */
     function interrupt($debut, $fin, $refAbo, $prorate = true, $prolongation = false)
     {
@@ -158,7 +254,7 @@ class StpAbonnementManager
                 $interruMg->updateFin($interru);
                 $interruMg->updateProlongation($interru);
             } else {
-                echo ("aucune interruption trouvé. L'interruption originale n'a pa dû être réalisé");
+                echo ("aucune interruption trouvï¿½. L'interruption originale n'a pa dï¿½ ï¿½tre rï¿½alisï¿½");
             }
         }
     }
@@ -198,7 +294,7 @@ class StpAbonnementManager
 
     /*
      *
-     * pour remettre à zéro messages tous les abonnements
+     * pour remettre ï¿½ zï¿½ro messages tous les abonnements
      *
      */
     public function resetNbMessage()
@@ -207,7 +303,7 @@ class StpAbonnementManager
         $q->execute();
     }
 
-    // pour remonter les abonnements qui viennent de se voir attribuer un prof pour la première fois après l'inscription
+    // pour remonter les abonnements qui viennent de se voir attribuer un prof pour la premiï¿½re fois aprï¿½s l'inscription
     public function getHasNotFirstProfAssignement()
     {
         $abonnements = [];
@@ -757,7 +853,7 @@ class StpAbonnementManager
                     )');
                 $q->bindValue(':ref_interruption', $ref_interruption);
                 $q->execute();
-            } else if (array_search("get_trial_account_to_desactivate", $info, true) !== false && array_key_exists("limit", $info)) { // compte en essai dont l'essai est terminé et sans message depuis 5 jours
+            } else if (array_search("get_trial_account_to_desactivate", $info, true) !== false && array_key_exists("limit", $info)) { // compte en essai dont l'essai est terminï¿½ et sans message depuis 5 jours
 
                 $limit = $info["limit"];
 
@@ -792,6 +888,17 @@ class StpAbonnementManager
                 $q = $this->_db->prepare("select * from stp_abonnement where ref_abonnement in " . $ref_abos );
                 
                 $q->execute();
+            } else if (array_key_exists("with_statut", $info) && array_key_exists("limit", $info) ) {
+                
+                $ref_statut_abonnement = $info["with_statut"];
+                $limit = $info["limit"];
+                
+                $q = $this->_db->prepare("select *  from stp_abonnement
+	               where ref_statut_abonnement = :ref_statut_abonnement
+                        limit :limit");
+                $q->bindValue(':ref_statut_abonnement', $ref_statut_abonnement);
+                $q->bindValue(':limit', $limit);
+                $q->execute();
             }
         }
 
@@ -813,7 +920,7 @@ class StpAbonnementManager
         return ($abonnements);
     }
 
-    // pour désactier les comptes tests . $email peut valoir yopla ou test pex ( tout dépend de la convenation de nommage des emails test
+    // pour dï¿½sactier les comptes tests . $email peut valoir yopla ou test pex ( tout dï¿½pend de la convenation de nommage des emails test
     function desactiveTestAccount($email)
     {
         $abonnements = $this->getAll(array(
@@ -855,7 +962,7 @@ class StpAbonnementManager
             $stripe->updateStripeProfId($subId, $prof->getStripe_id());
         }
 
-        // mise à jour algolia
+        // mise ï¿½ jour algolia
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
 
         $constructor = array(
@@ -910,12 +1017,12 @@ class StpAbonnementManager
             $gr->updateTrialList($refAbo);
         }
 
-        // mise à jour algolia
+        // mise ï¿½ jour algolia
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
         $algoliaMg->updateAbonnement($abo->getRef_abonnement(), $constructor);
     }
 
-    // pour redémarrer un abonnement qui a été arrêté (startDate vaut now ou une date)
+    // pour redï¿½marrer un abonnement qui a ï¿½tï¿½ arrï¿½tï¿½ (startDate vaut now ou une date)
     function restart(int $refAbo, bool $testMode = true, bool $in_trial = false, $startDate = 'now')
     {
         if ($startDate != 'now') {
@@ -923,7 +1030,7 @@ class StpAbonnementManager
             $startDate = $startDate->getTimestamp();
         }
 
-        // mise à jour dans la bdd
+        // mise ï¿½ jour dans la bdd
         $constructor = array(
             "construct" => array(
                 'ref_parent',
@@ -945,7 +1052,7 @@ class StpAbonnementManager
         $abo->setRef_statut_abonnement($statut);
         $this->updateRefStatutAbonnement($abo);
 
-        // mise à jour dans stripe
+        // mise ï¿½ jour dans stripe
 
         if (! $in_trial) {
 
@@ -977,7 +1084,7 @@ class StpAbonnementManager
             $this->updateFinEssai($abo);
         }
 
-        // mise à jout du statut d'abonnement dans algolia
+        // mise ï¿½ jout du statut d'abonnement dans algolia
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
 
         $constructor = array(
@@ -1017,7 +1124,7 @@ class StpAbonnementManager
         $algoliaMg->updateAbonnement($refAbo, $constructor);
     }
 
-    // mise à jour du plan de paiement et de la formule
+    // mise ï¿½ jour du plan de paiement et de la formule
     function updateFormule($refAbo, int $refFormule, bool $testMode = true)
     {
         $constructor = array(
@@ -1031,21 +1138,21 @@ class StpAbonnementManager
             "ref_abonnement" => $refAbo
         ), $constructor);
 
-        // on récupère le nouveau plan
+        // on rï¿½cupï¿½re le nouveau plan
         $planMg = new \spamtonprof\stp_api\StpPlanManager();
 
         $plan = $planMg->getDefault(array(
             "ref_formule" => $refFormule
         ));
 
-        // mise à jour du plan et de la formule dans la base
+        // mise ï¿½ jour du plan et de la formule dans la base
 
         $abo->setRef_plan($plan->getRef_plan());
         $this->updateRefPlan($abo);
         $abo->setRef_formule($refFormule);
         $this->updateRefFormule($abo);
 
-        // traitement spécifique aux status
+        // traitement spï¿½cifique aux status
         if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ESSAI) {
             $gr = new \GetResponse();
             $gr->updateTrialList($refAbo);
@@ -1054,12 +1161,12 @@ class StpAbonnementManager
             $stripe->updateSubscriptionPlan($abo->getSubs_Id(), $plan);
         }
 
-        // mise à jour algolia
+        // mise ï¿½ jour algolia
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
         $algoliaMg->updateAbonnement($abo->getRef_abonnement(), $constructor);
     }
 
-    // pour avoir les conversions de Amina à partir d'un tableau de numéro de téléphone non formaté
+    // pour avoir les conversions de Amina ï¿½ partir d'un tableau de numï¿½ro de tï¿½lï¿½phone non formatï¿½
     function getAnimaSubscription($nums)
     {
         $constructor = array(
@@ -1077,11 +1184,11 @@ class StpAbonnementManager
         return ($abonnements);
     }
 
-    // pour mettre à jour l'email d'un parent
+    // pour mettre ï¿½ jour l'email d'un parent
     function updateEmailParent($email, $refAbo)
     {
 
-        // on récupère l'abonnement
+        // on rï¿½cupï¿½re l'abonnement
         $constructor = array(
             "construct" => array(
                 'ref_eleve',
@@ -1092,10 +1199,9 @@ class StpAbonnementManager
             )
         );
 
-        $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
         $procheMg = new \spamtonprof\stp_api\StpProcheManager();
 
-        $abo = $abonnementMg->get(array(
+        $abo = $this->get(array(
             "ref_abonnement" => $refAbo
         ), $constructor);
 
@@ -1134,7 +1240,7 @@ class StpAbonnementManager
             $gr->addParentInTrialSequence1($eleve, $prof, $formule, $parent, $dayOfCycle);
         }
 
-        // mise à jour de l'email dans la base
+        // mise ï¿½ jour de l'email dans la base
         $parent->setEmail($email);
 
         $procheMg->updateEmail($parent);

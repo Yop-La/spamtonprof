@@ -39,6 +39,11 @@ class StripeManager
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         
         $subscription = \Stripe\Subscription::retrieve($subscriptionId);
+        
+        if ($subscription->status == "canceled") {
+            return;
+        }
+        
         $subscription->cancel();
     }
 
