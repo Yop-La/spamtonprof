@@ -925,6 +925,19 @@ function extractFirstMail($string)
     return ($emails[0][0]);
 }
 
+function extract_url($string,$pattern)
+{
+    
+    $matches = array();
+    
+    preg_match_all($pattern, $string, $matches);
+    
+    $url = $matches[0][0];
+    
+    
+    return ($url);
+}
+
 function toSimilarTo(array $elements)
 {
     $nbElem = count($elements);

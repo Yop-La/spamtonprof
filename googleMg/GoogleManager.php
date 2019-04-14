@@ -142,6 +142,8 @@ class GoogleManager
         return $messages;
     }
 
+    
+    // ['format' => 'full']
     public function getMessage($messageId, $format = ['format' => 'metadata', 'metadataHeaders' => ['From','Date']])
     {
         try {

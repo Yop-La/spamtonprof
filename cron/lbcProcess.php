@@ -6,8 +6,8 @@ use spamtonprof\slack\Slack;
  *
  *
  * ce script sert :
- * - à enregistrer les messages de prospects dans la bdd
- * - à attribuer des libellées aux emails
+ * - ï¿½ enregistrer les messages de prospects dans la bdd
+ * - ï¿½ attribuer des libellï¿½es aux emails
  *
  *
  * il tourne tous les 5 minutes et il est en prod
@@ -52,7 +52,7 @@ if ($lbcReaderInt == 0) {
     echo ("process 2 : redirection des emails vers lebureaudesprofs + envoi des emails aux prospects depuis mailsfromlbc@gmail.com" . "<br>");
     $lbcProcessMg->processNewMessages();
 } elseif ($automatic_answer && $lbcReaderInt == 2) {
-    echo ("process 3 : réponse automatique aux premiers messages des prospects" . "<br>");
+    echo ("process 3 : rÃ©ponse automatique aux premiers messages des prospects" . "<br>");
     $lbcProcessMg->sendAutomaticAnswer();
 }
 
