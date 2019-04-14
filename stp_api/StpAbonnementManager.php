@@ -97,7 +97,7 @@ class StpAbonnementManager
             $body_eleve = str_replace("[[name]]", ucfirst($eleve->getPrenom()), $body_eleve);
             $body_eleve = str_replace("[[prof_name]]", ucfirst($prof->getPrenom()), $body_eleve);
             $body_eleve = str_replace("[[formule]]", $formule->getFormule(), $body_eleve);
-            $smtp->sendEmail("C'est fait : ton abonnement est r�sili�.", $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alexandre de SpamTonProf", true);
+            $smtp->sendEmail("C'est fait : ton abonnement est résilié.", $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alexandre de SpamTonProf", true);
         }
         
         // envoi prof
