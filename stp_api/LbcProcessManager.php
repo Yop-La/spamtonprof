@@ -276,6 +276,13 @@ class LbcProcessManager
                         "date_reception" => $dateReception->format(PG_DATETIME_FORMAT)
                     )));
                     
+                    // attribuer un libelle pour dire que le message a ete lu
+                    $labelId = $this->gmailManager->getLabelsIds(array(
+                        "bot_read_it"
+                    ));
+                    
+                    $this->gmailManager->modifyMessage($gmailId, $labelId, array());
+                    
                     $this->slack->sendMessages('log-lbc', array(
                         "Récupération du lien de renouvellement d'annonce :" . $url,
                         "Avec pour compte : " . $act->getMail()
@@ -283,7 +290,7 @@ class LbcProcessManager
                 } catch (\Exception $e) {
                     
                     $this->slack->sendMessages('log-lbc', array(
-                        "Erreur lors de la récupérationdu lien de renouvellement d'annonce :" . $url,
+                        "Erreur lors de la récupération du lien de renouvellement d'annonce :" . $url,
                         "Avec pour compte : " . $act->getMail()
                     ));
                 }
