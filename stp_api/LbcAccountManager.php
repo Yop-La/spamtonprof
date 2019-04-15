@@ -18,8 +18,8 @@ class LbcAccountManager
     }
 
     /**
-     * fonction qui renvoie tous les comptes actif sur lesquels des annonces ont été publiées durant
-     * les 10 dernières heures
+     * fonction qui renvoie tous les comptes actif sur lesquels des annonces ont ï¿½tï¿½ publiï¿½es durant
+     * les 10 derniï¿½res heures
      */
     public function getAccountToCheck($nbHours)
     {
@@ -67,6 +67,7 @@ class LbcAccountManager
                 $query = "select * from compte_lbc 
                             where now() >= ( date_publication +  interval '1 day')
                                 and nb_annonces_online != 0
+                                 and disabled is false
 						         and ref_client = :ref_client
 						         and mail not like '%gmx%'
                             order by nb_annonces_online limit 1";

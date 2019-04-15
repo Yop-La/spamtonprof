@@ -1,8 +1,9 @@
 <?php
 /**
  * 
- *  renvoie un compte leboncoin validé (ie avec des annonces) ayant une adresse mail
- *  d'un nom de domaine appartenant à spamtonprof
+ *  renvoie un compte leboncoin valide (ie avec des annonces) ayant une adresse mail
+ *  d'un nom de domaine appartenant a spamtonprof
+ *  en prod
  *  
  */
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
