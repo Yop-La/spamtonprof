@@ -41,6 +41,7 @@ if ($password == HOOK_SECRET) {
     $slack->sendMessages('log-lbc', array(
         'publication sur un compte existant',
         'ref_compte : ' . $act->getRef_compte(),
+        'email : ' . $act->getMail(),
         'ads online : ' . $act->getNb_annonces_online()
     ));
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * 
- *  pour générer des annonces lbc avant publication par zenno
+ *  pour generer des annonces lbc avant publication par zenno
  *  
  */
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
@@ -19,7 +19,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-// récupération des entrées
+// recuperation des entrees
 
 serializeTemp($_POST);
 
