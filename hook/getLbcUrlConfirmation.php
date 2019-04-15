@@ -53,7 +53,7 @@ do {
         
         $matches = array();
         
-        $pattern = '#\bhttps?://.*leboncoin.fr.*#';
+        $pattern = '#\bhttps?://.*leboncoin.fr/compte/part/activation[^"]*#';
         preg_match_all($pattern, $body, $matches);
         
         $confirmationUrl = $matches[0][0];
