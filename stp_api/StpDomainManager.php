@@ -15,7 +15,7 @@ class StpDomainManager
 
     public function add(StpDomain $stpDomain)
     {
-        $q = $this->_db->prepare('insert into stp_domain(name, mail_provider, mx_ok, in_black_list) values( :name,:mail_provider,:mx_ok,:in_black_list)');
+        $q = $this->_db->prepare('insert into stp_domain(name, mail_provider, mx_ok, in_black_list,disabled) values( :name,:mail_provider,:mx_ok,:in_black_list,false)');
         $q->bindValue(':name', $stpDomain->getName());
         $q->bindValue(':mail_provider', $stpDomain->getMail_provider());
         $q->bindValue(':mx_ok', $stpDomain->getMx_ok(), PDO::PARAM_BOOL);

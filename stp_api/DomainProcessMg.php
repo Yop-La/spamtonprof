@@ -15,14 +15,14 @@ class DomainProcessMg
      *  
      *  
      *  
-     *  2) préparer $domainPsMg->addMailGunDns(); dans wd2.php
-     *  3) éxécuter : http://localhost/spamtonprof/wp-content/plugins/spamtonprof/hook/ovhAuthentification.php 
-     *      pour récupérer credential ovh ( attention wd2.php sera éxcuté après )
+     *  2) preparer $domainPsMg->addMailGunDns(); dans wd2.php
+     *  3) executer : http://localhost/spamtonprof/wp-content/plugins/spamtonprof/hook/ovhAuthentification.php 
+     *      pour recuperer credential ovh ( attention wd2.php sera excute apres )
      * 
      */
 
     /*
-     * pour ajouter des nouveaux domaines à Stp
+     * pour ajouter des nouveaux domaines a Stp
      * le domain root doit nous appartenir
      *
      */
@@ -56,19 +56,19 @@ class DomainProcessMg
                     $mg->addDomain($domain);
                 }
             } else {
-                echo ($stpDomain->getName() . ' existe déjà !');
+                echo ($stpDomain->getName() . ' existe deja !');
             }
         }
     }
 
     /*
-     * checkDnsConf($domain) -> pour un nom de doamine regarde si la conf est valide et met à jour la colonne dans la base stp
+     * checkDnsConf($domain) -> pour un nom de doamine regarde si la conf est valide et met a jour la colonne dans la base stp
      *
      */
 
     /*
-     * cette fonction récupère tous les noms de domaines sans configuration dns adapté à mailgun
-     * conf_done -> true or false ( va remplacer la colonne mx_ok ) -> changement à faire dans le select
+     * cette fonction recupere tous les noms de domaines sans configuration dns adapte a mailgun
+     * conf_done -> true or false ( va remplacer la colonne mx_ok ) -> changement a faire dans le select
      * conf_valid -> true or false
      *
      */
@@ -138,7 +138,7 @@ class DomainProcessMg
     }
 
     /*
-     * cette fonction récupère tous les noms de domaines where mx_ok is false
+     * cette fonction recupere tous les noms de domaines where mx_ok is false
      * et fait la conf dns pour forwardemail
      *
      */

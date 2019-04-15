@@ -1,7 +1,7 @@
 <?php
 /**
  * 
- *  ppour générer un compte lbc avant publication d'annonces par zenno ( en prod )
+ *  pour generer un compte lbc avant publication d'annonces par zenno ( en prod )
  *  
  */
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
@@ -19,12 +19,12 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-// pour récupérer l'url de confirmation de création d'un compte lbc
+// pour recuperer l'url de confirmation de creation d'un compte lbc
 /*
- * paramètres :
+ * parametres :
  * - l'email du compte lbc
- * - le temps d'attente avant nouvelle tentative de récupération
- * - le nombre de tentatives à faire
+ * - le temps d'attente avant nouvelle tentative de recuperation
+ * - le nombre de tentatives a faire
  */
 
 $gmail = new \spamtonprof\googleMg\GoogleManager('mailsfromlbc@gmail.com');
@@ -39,37 +39,37 @@ $ret = new \stdClass();
 $indexTry = 0;
 
 do {
-    $msgs = $gmail->listMessages($email . ' "Confirmez la demande de création de votre compte"');
-
+    $msgs = $gmail->listMessages($email . ' "Confirmez la demande"');
+    
     if (count($msgs) == 1) {
-
+        
         $msg = $msgs[0];
-
+        
         $msg = $gmail->getMessage($msg->id, [
             'format' => 'full'
         ]);
-
+        
         $body = $gmail->getBody($msg);
-
+        
         $matches = array();
-
+        
         $pattern = '#\bhttps?://.*leboncoin.fr.*#';
         preg_match_all($pattern, $body, $matches);
-
+        
         $confirmationUrl = $matches[0][0];
-
+        
         $ret->url = $confirmationUrl;
         prettyPrint($ret);
     }
     $indexTry = $indexTry + 1;
     $slack->sendMessages('log-lbc', array(
-        'Echec n°' . $indexTry . ' de récupération du mail de confirmation pour l\'email : ' . $email
+        'Echec' . $indexTry . ' de recuperation du mail de confirmation pour l\'email : ' . $email
     ));
     sleep($timeBreak);
 } while ($nbTry != $indexTry);
 
 $slack->sendMessages('log-lbc', array(
-    'Impossible de récupérer l\'email de confirmation pour l\'email : ' . $email . '. Fin de publication.'
+    'Impossible de recuperer l\'email de confirmation pour l\'email : ' . $email . '. Fin de publication.'
 ));
 
 $ret->url = "no_confirmation_email_found";
