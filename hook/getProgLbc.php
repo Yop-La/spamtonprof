@@ -1,7 +1,7 @@
 <?php
 /**
  * 
- *  ppour générer un compte lbc avant publication d'annonces par zenno ( en prod )
+ *  ppour generer un compte lbc avant publication d'annonces par zenno ( en prod )
  *  
  */
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
@@ -21,7 +21,7 @@ header("Pragma: no-cache");
 
 /*
  *
- * est appelé par le template zenno afin de récupérer le compte à publier
+ * est appele par le template zenno afin de recuperer le compte a publier
  * et de le notifier dans slack afin d'estimer le temps de publication
  *
  */
@@ -40,7 +40,7 @@ if ($index >= $nbRows) {
     prettyPrint('false');
 
     $slack->sendMessages('log-lbc', array(
-        "Fin de publication : le sheet a été parcouru en entier"
+        "Fin de publication : le sheet a ete parcouru en entier"
     ));
 }
 
@@ -49,7 +49,7 @@ $clientMg = new \spamtonprof\stp_api\LbcClientManager();
 
 $slack->sendMessages('log-lbc', array(
     "   --------------   ",
-    "LBC : publication de la ligne du sheet n° : " . ($index + 1) . " sur " . $nbRows,
+    "LBC : publication de la ligne du sheet n : " . ($index + 1) . " sur " . $nbRows,
     implode(" - ", $rows[$index])
 ));
 

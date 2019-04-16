@@ -22,12 +22,14 @@ header("Pragma: no-cache");
 $lbcRenewalUrlMg = new \spamtonprof\stp_api\LbcRenewalUrlManager();
 $urls = $lbcRenewalUrlMg -> getAll('to_renew');
 
-$act = false;
+$retour = "false";
 $lbcAccountManager = new \spamtonprof\stp_api\LbcAccountManager();
+
 
 if(count($urls) != 0){
     $act = $lbcAccountManager ->get(array('ref_compte' => $urls[0] ->getRef_compte_lbc()));
+    $retour = array('urls' => $urls, 'act' => $act);
 }
 
-$retour = array('urls' => $urls, 'act' => $act);
+
 prettyPrint(array('retour' => $retour));
