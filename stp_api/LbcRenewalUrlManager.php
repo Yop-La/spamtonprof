@@ -8,7 +8,7 @@ class LbcRenewalUrlManager
 
     private $_db;
 
-    const TO_RENEW = 1;
+    const TO_RENEW = 1,FAIL = 2,DONE = 3;
 
     public function __construct()
     {
@@ -50,4 +50,40 @@ class LbcRenewalUrlManager
         }
         return ($urls);
     }
+
+    public function get($info)
+    {
+        $q = false;
+        
+        if (array_key_exists('ref_url', $info)) {
+            $ref_url = $info['ref_url'];
+            $q = $this->_db->prepare("select * from lbc_renewal_url where ref_url = :ref_url;");
+            $q->bindValue(':ref_url', $ref_url);
+        }
+        if ($q) {
+            
+            $q->execute();
+            $data = $q->fetch(PDO::FETCH_ASSOC);
+            
+            if ($data) {
+                return (new \spamtonprof\stp_api\LbcRenewalUrl($data));
+            }
+        }
+        return (false);
+    }
+    
+    
+    public function updateStatut(\spamtonprof\stp_api\LbcRenewalUrl $url)
+    {
+        $q = $this->_db->prepare('update lbc_renewal_url set statut = :statut where ref_url = :ref_url');
+        
+        $q->bindValue(':statut', $url->getStatut());
+        
+        $q->bindValue(':ref_url', $url->getRef_url());
+        
+        $q->execute();
+        
+        return ($url);
+    }
+    
 }
