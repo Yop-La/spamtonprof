@@ -19,8 +19,10 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
+$ref_compte = $_GET['ref_compte'];
+
 $lbcRenewalUrlMg = new \spamtonprof\stp_api\LbcRenewalUrlManager();
-$urls = $lbcRenewalUrlMg -> getAll('to_renew');
+$urls = $lbcRenewalUrlMg -> getAll(array('to_renew' => $ref_compte));
 
 $retour = "false";
 $lbcAccountManager = new \spamtonprof\stp_api\LbcAccountManager();

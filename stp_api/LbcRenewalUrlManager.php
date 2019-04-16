@@ -33,9 +33,11 @@ class LbcRenewalUrlManager
         $q = false;
         $urls = [];
         
-        if ($info == "to_renew") {
-            $q = $this->_db->prepare("select * from lbc_renewal_url where ref_compte_lbc in  
-                (select ref_compte_lbc from lbc_renewal_url where statut = 1 order by date_reception desc limit 1);");
+        if (array_key_exists('to_renew', $info)) {
+            $ref_compte = $info['to_renew'];
+            $q = $this->_db->prepare("select * from lbc_renewal_url where ref_compte_lbc in
+                (select ref_compte_lbc from lbc_renewal_url where statut = 1 and ref_compte_lbc not in (:ref_compte) order by date_reception desc limit 1);");
+            $q->bindValue(':ref_compte', $ref_compte);
         }
         if ($q) {
             
@@ -44,7 +46,6 @@ class LbcRenewalUrlManager
             while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
                 
                 $urls[] = new \spamtonprof\stp_api\LbcRenewalUrl($data);
-                
             }
         }
         return ($urls);
