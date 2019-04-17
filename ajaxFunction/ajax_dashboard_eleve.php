@@ -1,6 +1,6 @@
 <?php
 
-// toutes ces fonction seront �x�cut�s par un appel ajax r�alis� dans dashboard-eleve.js sur la page dont le slug est dashboard-eleve
+// toutes ces fonction seront executes par un appel ajax realise dans dashboard-eleve.js sur la page dont le slug est dashboard-eleve
 add_action('wp_ajax_ajaxCreateSubscription', 'ajaxCreateSubscription');
 
 add_action('wp_ajax_nopriv_ajaxCreateSubscription', 'ajaxCreateSubscription');
@@ -73,7 +73,7 @@ function ajaxCreateSubscription()
     $source = $_POST["source"];
     $testMode = $_POST["testMode"];
     
-    // on r�cup�re l'abonnement
+    // on recupere l'abonnement
     $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
     $constructor = array(
         "construct" => array(
@@ -109,7 +109,7 @@ function ajaxCreateSubscription()
     $plan = \spamtonprof\stp_api\StpPlan::cast($plan);
     $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
     
-    // d�termination de l'email client
+    // determination de l'email client
     $emailClient = "alexandre@spamtonprof.com";
     if ($proche) {
         $proche = \spamtonprof\stp_api\StpProche::cast($proche);
@@ -118,16 +118,16 @@ function ajaxCreateSubscription()
         $emailClient = $eleve->getEmail();
     }
     
-    // r�cup�ration du coupon si il existe
+    // recuperation du coupon si il existe
     $couponMg = new \spamtonprof\stp_api\StpCouponManager();
     $coupon = $couponMg->get(array(
         'ref_coupon' => $abonnement->getRef_coupon()
     ));
-    if (! $coupon) { // pour pouvoir passer le coupon � la fonction addConnectSubscription
+    if (! $coupon) { // pour pouvoir passer le coupon a la fonction addConnectSubscription
         $coupon = null;
     }
     
-    // on ajoute l'abonnement � stripe pour d�biter le client de mani�re r�currente
+    // on ajoute l'abonnement a stripe pour debiter le client de maniere recurrente
     $stripeMg = new \spamtonprof\stp_api\StripeManager($testMode);
     
     if ($testMode == "true") {
@@ -140,7 +140,7 @@ function ajaxCreateSubscription()
     if (! $ids) {
         
         $retour->error = true;
-        $retour->message = utf8_encode("Impossible de d�biter votre moyen de paiement");
+        $retour->message = utf8_encode("Impossible de débiter votre moyen de paiement");
         echo (json_encode($retour));
         die();
     } else {
@@ -174,14 +174,14 @@ function ajaxCreateSubscription()
             $body_parent = str_replace("[[name_proche]]", ucfirst($eleve->getPrenom()), $body_parent);
             $body_parent = str_replace("[[name]]", ucfirst($proche->getPrenom()), $body_parent);
             
-            $smtp->sendEmail("F�licitations, " . ucfirst($eleve->getPrenom()) . " a compris notre philosophie", $proche->getEmail(), $body_parent, $expe->getEmail(), "Alexandre de SpamTonProf", true);
+            $smtp->sendEmail("Félicitations, " . ucfirst($eleve->getPrenom()) . " a compris notre philosophie", $proche->getEmail(), $body_parent, $expe->getEmail(), "Alexandre de SpamTonProf", true);
         }
         
         if ($eleve->hasToSendToEleve()) {
             $body_eleve = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/abonnement_eleve.html");
             $body_eleve = str_replace("[[name]]", ucfirst($eleve->getPrenom()), $body_eleve);
             $body_eleve = str_replace("[[prof_name]]", ucfirst($prof->getPrenom()), $body_eleve);
-            $smtp->sendEmail("F�licitations, tu a compris notre philosophie", $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alexandre de SpamTonProf", true);
+            $smtp->sendEmail("Félicitations, tu as compris notre philosophie", $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alexandre de SpamTonProf", true);
         }
         
         // envoi prof

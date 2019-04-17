@@ -52,7 +52,7 @@ class GoogleManager
         $accessToken;
         
         if (! $account) {
-            echo ("ajout� : " . $gmailAdress . " � la table prof <br><br><br>");
+            echo ("ajouté : " . $gmailAdress . " à la table prof <br><br><br>");
             exit(0);
         }
         
@@ -63,7 +63,7 @@ class GoogleManager
             // Request authorization from the user.
             $authUrl = $client->createAuthUrl();
             
-            $authCode = "4/IQFqEXkLBaVBs2Sa3IITdJZ9c_YlgW_llhyGDGakKDWm3Er6FaySYpw"; // � remplir par ce qui sera donn� par $authUrl
+            $authCode = "4/IQFqEXkLBaVBs2Sa3IITdJZ9c_YlgW_llhyGDGakKDWm3Er6FaySYpw"; // a remplir par ce qui sera donne par $authUrl
             
             if ($authCode == "") {
                 echo ("la2");
@@ -342,7 +342,7 @@ class GoogleManager
                 
                 
                 $historyResponse = $service->users_history->listUsersHistory($userId, $opt_param);
-                $pageToken = false; // � enlever si on veut it�rer sur plusieurs pages et d�commenter en dessous aussi
+                $pageToken = false; // a enlever si on veut iterer sur plusieurs pages et decommenter en dessous aussi
                                     // if ($historyResponse->getHistory()) {
                 $histories = array_merge($histories, $historyResponse->getHistory());
                 // $pageToken = $historyResponse->getNextPageToken();
@@ -439,7 +439,7 @@ class GoogleManager
     }
 
     /*
-     * sert � cr�er un message pour l'envoyer � partir de gmail
+     * sert a creer un message pour l'envoyer a partir de gmail
      *
      */
     private function createMessage($body, $subject, $to, $replyTo, $from, $fromName)

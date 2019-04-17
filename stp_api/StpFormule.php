@@ -188,14 +188,14 @@ class StpFormule implements \JsonSerializable
         $this->matieres = $matieres;
     }
 
-    // pour retourner le custom field mati�res de getresponse ( sequence essai )
+    // pour retourner le custom field matieres de getresponse ( sequence essai )
     public function toGetResponse()
     {
         $matieres = $this->getMatieres();
         for ($i = 0; $i < count($matieres); $i ++) {
             $matiere = $matieres[$i];
             if ($matiere == "francais") {
-                $matieres[$i] = "fran�ais";
+                $matieres[$i] = "français";
             }
         }
         $matieres = implode("_", $matieres);

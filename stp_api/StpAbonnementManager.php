@@ -160,7 +160,7 @@ class StpAbonnementManager
     }
 
     /*
-     * pour retourner les abonnements dont la p�riode d'essai est termin�
+     * pour retourner les abonnements dont la periode d'essai est termine
      */
     public function getTrialCompleted()
     {
@@ -191,7 +191,7 @@ class StpAbonnementManager
     }
 
     /*
-     * pour r�cup�rer le nombre de message des abonnements durant les 7 derniers jours
+     * pour recuperer le nombre de message des abonnements durant les 7 derniers jours
      */
     public function getNbMessage()
     {
@@ -221,7 +221,7 @@ class StpAbonnementManager
      * pour interrompre un abonnement
      *
      * date de fin : date de fin de l'essai ( = date de facturation)
-     * la date de debut doit �tre au minimum celle d'aujourdh'ui si avant 20h ( le cron tourne � 20h )
+     * la date de debut doit etre au minimum celle d'aujourdh'ui si avant 20h ( le cron tourne a 20h )
      */
     function interrupt($debut, $fin, $refAbo, $prorate = true, $prolongation = false)
     {
@@ -254,7 +254,7 @@ class StpAbonnementManager
                 $interruMg->updateFin($interru);
                 $interruMg->updateProlongation($interru);
             } else {
-                echo ("aucune interruption trouv�. L'interruption originale n'a pa d� �tre r�alis�");
+                echo ("aucune interruption trouvé. L'interruption originale n'a pa dû être réalisé");
             }
         }
     }
@@ -294,7 +294,7 @@ class StpAbonnementManager
 
     /*
      *
-     * pour remettre � z�ro messages tous les abonnements
+     * pour remettre a zéro messages tous les abonnements
      *
      */
     public function resetNbMessage()
@@ -303,7 +303,7 @@ class StpAbonnementManager
         $q->execute();
     }
 
-    // pour remonter les abonnements qui viennent de se voir attribuer un prof pour la premi�re fois apr�s l'inscription
+    // pour remonter les abonnements qui viennent de se voir attribuer un prof pour la premiere fois apres l'inscription
     public function getHasNotFirstProfAssignement()
     {
         $abonnements = [];
@@ -853,7 +853,7 @@ class StpAbonnementManager
                     )');
                 $q->bindValue(':ref_interruption', $ref_interruption);
                 $q->execute();
-            } else if (array_search("get_trial_account_to_desactivate", $info, true) !== false && array_key_exists("limit", $info)) { // compte en essai dont l'essai est termin� et sans message depuis 5 jours
+            } else if (array_search("get_trial_account_to_desactivate", $info, true) !== false && array_key_exists("limit", $info)) { // compte en essai dont l'essai est termine et sans message depuis 5 jours
 
                 $limit = $info["limit"];
 
@@ -920,7 +920,7 @@ class StpAbonnementManager
         return ($abonnements);
     }
 
-    // pour d�sactier les comptes tests . $email peut valoir yopla ou test pex ( tout d�pend de la convenation de nommage des emails test
+    // pour desactier les comptes tests . $email peut valoir yopla ou test pex ( tout depend de la convenation de nommage des emails test
     function desactiveTestAccount($email)
     {
         $abonnements = $this->getAll(array(
@@ -962,7 +962,7 @@ class StpAbonnementManager
             $stripe->updateStripeProfId($subId, $prof->getStripe_id());
         }
 
-        // mise � jour algolia
+        // mise a jour algolia
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
 
         $constructor = array(
@@ -1017,12 +1017,12 @@ class StpAbonnementManager
             $gr->updateTrialList($refAbo);
         }
 
-        // mise � jour algolia
+        // mise a jour algolia
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
         $algoliaMg->updateAbonnement($abo->getRef_abonnement(), $constructor);
     }
 
-    // pour red�marrer un abonnement qui a �t� arr�t� (startDate vaut now ou une date)
+    // pour redemarrer un abonnement qui a ete arrete (startDate vaut now ou une date)
     function restart(int $refAbo, bool $testMode = true, bool $in_trial = false, $startDate = 'now')
     {
         if ($startDate != 'now') {
@@ -1030,7 +1030,7 @@ class StpAbonnementManager
             $startDate = $startDate->getTimestamp();
         }
 
-        // mise � jour dans la bdd
+        // mise a jour dans la bdd
         $constructor = array(
             "construct" => array(
                 'ref_parent',
@@ -1052,7 +1052,7 @@ class StpAbonnementManager
         $abo->setRef_statut_abonnement($statut);
         $this->updateRefStatutAbonnement($abo);
 
-        // mise � jour dans stripe
+        // mise a jour dans stripe
 
         if (! $in_trial) {
 
@@ -1084,7 +1084,7 @@ class StpAbonnementManager
             $this->updateFinEssai($abo);
         }
 
-        // mise � jout du statut d'abonnement dans algolia
+        // mise a jour du statut d'abonnement dans algolia
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
 
         $constructor = array(
@@ -1124,7 +1124,7 @@ class StpAbonnementManager
         $algoliaMg->updateAbonnement($refAbo, $constructor);
     }
 
-    // mise � jour du plan de paiement et de la formule
+    // mise a jour du plan de paiement et de la formule
     function updateFormule($refAbo, int $refFormule, bool $testMode = true)
     {
         $constructor = array(
@@ -1138,21 +1138,21 @@ class StpAbonnementManager
             "ref_abonnement" => $refAbo
         ), $constructor);
 
-        // on r�cup�re le nouveau plan
+        // on recupere le nouveau plan
         $planMg = new \spamtonprof\stp_api\StpPlanManager();
 
         $plan = $planMg->getDefault(array(
             "ref_formule" => $refFormule
         ));
 
-        // mise � jour du plan et de la formule dans la base
+        // mise a jour du plan et de la formule dans la base
 
         $abo->setRef_plan($plan->getRef_plan());
         $this->updateRefPlan($abo);
         $abo->setRef_formule($refFormule);
         $this->updateRefFormule($abo);
 
-        // traitement sp�cifique aux status
+        // traitement specifique aux status
         if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ESSAI) {
             $gr = new \GetResponse();
             $gr->updateTrialList($refAbo);
@@ -1161,12 +1161,12 @@ class StpAbonnementManager
             $stripe->updateSubscriptionPlan($abo->getSubs_Id(), $plan);
         }
 
-        // mise � jour algolia
+        // mise a jour algolia
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
         $algoliaMg->updateAbonnement($abo->getRef_abonnement(), $constructor);
     }
 
-    // pour avoir les conversions de Amina � partir d'un tableau de num�ro de t�l�phone non format�
+    // pour avoir les conversions de Amina a partir d'un tableau de numero de telephone non formate
     function getAnimaSubscription($nums)
     {
         $constructor = array(
@@ -1184,11 +1184,11 @@ class StpAbonnementManager
         return ($abonnements);
     }
 
-    // pour mettre � jour l'email d'un parent
+    // pour mettre a jour l'email d'un parent
     function updateEmailParent($email, $refAbo)
     {
 
-        // on r�cup�re l'abonnement
+        // on recupere l'abonnement
         $constructor = array(
             "construct" => array(
                 'ref_eleve',
@@ -1240,7 +1240,7 @@ class StpAbonnementManager
             $gr->addParentInTrialSequence1($eleve, $prof, $formule, $parent, $dayOfCycle);
         }
 
-        // mise � jour de l'email dans la base
+        // mise a jour de l'email dans la base
         $parent->setEmail($email);
 
         $procheMg->updateEmail($parent);
