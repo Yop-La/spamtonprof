@@ -29,10 +29,13 @@ header("Pragma: no-cache");
 $slack = new \spamtonprof\slack\Slack();
 
 $index = $_GET["index"];
+$sheetName = $_GET["sheet_name"];
+
+
 
 $ggMg = new \spamtonprof\googleMg\GoogleManager('soutien.par.mail@gmail.com');
 
-$rows = $ggMg->readSheet();
+$rows = $ggMg->readSheet('1dUtoN7GsgfPtWJcoanlwYn1o83i9ABaxZeefz6aOfts', $sheetName);
 
 $nbRows = count($rows);
 
