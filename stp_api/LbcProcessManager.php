@@ -265,7 +265,13 @@ class LbcProcessManager
                     
                     $to = extractFirstMail($to);
                     
-                    $url = extract_url($body, '#\bhttps://leboncoin.fr/ai\?id=\d+#');
+                    
+                    $urls = extract_url($body);
+                    $url = $urls[0][2];
+                    
+                    $url = htmlspecialchars_decode($url);
+                    
+                    
                     
                     $act = $this->lbcAccountMg->get(array(
                         "mail" => $to

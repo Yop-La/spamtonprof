@@ -925,17 +925,13 @@ function extractFirstMail($string)
     return ($emails[0][0]);
 }
 
-function extract_url($string,$pattern)
+function extract_url($string)
 {
-    
     $matches = array();
     
-    preg_match_all($pattern, $string, $matches);
+    preg_match_all('#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $string, $matches);
     
-    $url = $matches[0][0];
-    
-    
-    return ($url);
+    return ($matches);
 }
 
 function toSimilarTo(array $elements)
