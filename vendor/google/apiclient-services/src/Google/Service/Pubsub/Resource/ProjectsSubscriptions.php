@@ -56,9 +56,10 @@ class Google_Service_Pubsub_Resource_ProjectsSubscriptions extends Google_Servic
    * If the name is not provided in the request, the server will assign a random
    * name for this subscription on the same project as the topic, conforming to
    * the [resource name
-   * format](https://cloud.google.com/pubsub/docs/overview#names). The generated
-   * name is populated in the returned Subscription object. Note that for REST API
-   * requests, you must specify a name in the request. (subscriptions.create)
+   * format](https://cloud.google.com/pubsub/docs/admin#resource_names). The
+   * generated name is populated in the returned Subscription object. Note that
+   * for REST API requests, you must specify a name in the request.
+   * (subscriptions.create)
    *
    * @param string $name The name of the subscription. It must have the format
    * `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
@@ -228,10 +229,7 @@ class Google_Service_Pubsub_Resource_ProjectsSubscriptions extends Google_Servic
    * which allow you to manage message acknowledgments in bulk. That is, you can
    * set the acknowledgment state of messages in an existing subscription to the
    * state captured by a snapshot. Note that both the subscription and the
-   * snapshot must be on the same topic. BETA: This feature is part of a beta
-   * release. This API might be changed in backward-incompatible ways and is not
-   * recommended for production use. It is not subject to any SLA or deprecation
-   * policy. (subscriptions.seek)
+   * snapshot must be on the same topic. (subscriptions.seek)
    *
    * @param string $subscription The subscription to affect.
    * @param Google_Service_Pubsub_SeekRequest $postBody

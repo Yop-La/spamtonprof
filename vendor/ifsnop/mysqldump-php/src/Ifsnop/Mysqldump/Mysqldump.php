@@ -1,9 +1,9 @@
 <?php
 
 /**
- * PHP version of mysqldump cli that comes with MySQL
+ * PHP version of mysqldump cli that comes with MySQL.
  *
- * mysql mysqldump pdo php7 php5 database php sql
+ * Tags: mysql mysqldump pdo php7 php5 database php sql hhvm mariadb mysql-backup.
  *
  * @category Library
  * @package  Ifsnop\Mysqldump
@@ -20,12 +20,9 @@ use PDO;
 use PDOException;
 
 /**
- * PHP version of mysqldump cli that comes with MySQL
- *
- * mysql mysqldump pdo php7 php5 database php sql
+ * Class Mysqldump.
  *
  * @category Library
- * @package  Ifsnop\Mysqldump
  * @author   Diego Torres <ifsnop@github.com>
  * @license  http://www.gnu.org/copyleft/gpl.html GNU General Public License
  * @link     https://github.com/ifsnop/mysqldump-php
@@ -34,40 +31,43 @@ use PDOException;
 class Mysqldump
 {
 
-    // Same as mysqldump
+    // Same as mysqldump.
     const MAXLINESIZE = 1000000;
 
-    // Available compression methods as constants
-    const GZIP = 'Gzip';
+    // List of available compression methods as constants.
+    const GZIP  = 'Gzip';
     const BZIP2 = 'Bzip2';
-    const NONE = 'None';
+    const NONE  = 'None';
 
-    // Available connection strings
-    const UTF8 = 'utf8';
+    // List of available connection strings.
+    const UTF8    = 'utf8';
     const UTF8MB4 = 'utf8mb4';
 
     /**
-     * Database username
+     * Database username.
      * @var string
      */
     public $user;
+
     /**
-     * Database password
+     * Database password.
      * @var string
      */
     public $pass;
+
     /**
-     * Connection string for PDO
+     * Connection string for PDO.
      * @var string
      */
     public $dsn;
+
     /**
-     * Destination filename, defaults to stdout
+     * Destination filename, defaults to stdout.
      * @var string
      */
-    public $fileName = 'php://output';
+    public $fileName = 'php://stdout';
 
-    // Internal stuff
+    // Internal stuff.
     private $tables = array();
     private $views = array();
     private $triggers = array();
@@ -82,21 +82,33 @@ class Mysqldump
     private $version;
     private $tableColumnTypes = array();
     private $transformColumnValueCallable;
+
     /**
-     * database name, parsed from dsn
+     * Database name, parsed from dsn.
      * @var string
      */
     private $dbName;
+
     /**
-     * host name, parsed from dsn
+     * Host name, parsed from dsn.
      * @var string
      */
     private $host;
+
     /**
-     * dsn string parsed as an array
+     * Dsn string parsed as an array.
      * @var array
      */
     private $dsnArray = array();
+
+    /**
+     * Keyed on table name, with the value as the conditions.
+     * e.g. - 'users' => 'date_registered > NOW() - INTERVAL 6 MONTH'
+     *
+     * @var array
+     */
+    private $tableWheres = array();
+    private $tableLimits = array();
 
     /**
      * Constructor of Mysqldump. Note that in the case of an SQLite database
@@ -159,7 +171,7 @@ class Mysqldump
         $this->pass = $pass;
         $this->parseDsn($dsn);
 
-        // this drops MYSQL dependency, only use the constant if it's defined
+        // This drops MYSQL dependency, only use the constant if it's defined.
         if ("mysql" === $this->dbType) {
             $pdoSettingsDefault[PDO::MYSQL_ATTR_USE_BUFFERED_QUERY] = false;
         }
@@ -191,7 +203,6 @@ class Mysqldump
 
     /**
      * Destructor of Mysqldump. Unsets dbHandlers and database objects.
-     *
      */
     public function __destruct()
     {
@@ -200,7 +211,7 @@ class Mysqldump
 
     /**
      * Custom array_replace_recursive to be used if PHP < 5.3
-     * Replaces elements from passed arrays into the first array recursively
+     * Replaces elements from passed arrays into the first array recursively.
      *
      * @param array $array1 The array in which elements are replaced
      * @param array $array2 The array from which elements will be extracted
@@ -224,6 +235,63 @@ class Mysqldump
     }
 
     /**
+     * Keyed by table name, with the value as the conditions:
+     * e.g. 'users' => 'date_registered > NOW() - INTERVAL 6 MONTH AND deleted=0'
+     *
+     * @param array $tableWheres
+     */
+    public function setTableWheres(array $tableWheres)
+    {
+        $this->tableWheres = $tableWheres;
+    }
+
+    /**
+     * @param $tableName
+     *
+     * @return boolean|mixed
+     */
+    public function getTableWhere($tableName)
+    {
+        if (!empty($this->tableWheres[$tableName])) {
+            return $this->tableWheres[$tableName];
+        } elseif ($this->dumpSettings['where']) {
+            return $this->dumpSettings['where'];
+        }
+
+        return false;
+    }
+
+    /**
+     * Keyed by table name, with the value as the numeric limit:
+     * e.g. 'users' => 3000
+     *
+     * @param array $tableLimits
+     */
+    public function setTableLimits(array $tableLimits)
+    {
+        $this->tableLimits = $tableLimits;
+    }
+
+    /**
+     * Returns the LIMIT for the table.  Must be numeric to be returned.
+     * @param $tableName
+     * @return boolean
+     */
+    public function getTableLimit($tableName)
+    {
+        if (empty($this->tableLimits[$tableName])) {
+            return false;
+        }
+
+        $limit = $this->tableLimits[$tableName];
+        if (!is_numeric($limit)) {
+            return false;
+        }
+
+        return $limit;
+    }
+
+    /**
      * Parse DSN string and extract dbname value
      * Several examples of a DSN string
      *   mysql:host=localhost;dbname=testdb
@@ -231,6 +299,7 @@ class Mysqldump
      *   mysql:unix_socket=/tmp/mysql.sock;dbname=testdb
      *
      * @param string $dsn dsn string to parse
+     * @return boolean
      */
     private function parseDsn($dsn)
     {
@@ -269,13 +338,13 @@ class Mysqldump
     }
 
     /**
-     * Connect with PDO
+     * Connect with PDO.
      *
      * @return null
      */
     private function connect()
     {
-        // Connecting with PDO
+        // Connecting with PDO.
         try {
             switch ($this->dbType) {
                 case 'sqlite':
@@ -316,10 +385,11 @@ class Mysqldump
     }
 
     /**
-     * Main call
+     * Primary function, triggers dumping.
      *
      * @param string $filename  Name of file to write sql dump to
      * @return null
+     * @throws \Exception
      */
     public function start($filename = '')
     {
@@ -353,8 +423,8 @@ class Mysqldump
             }
         }
 
-        // Get table, view, trigger, procedures and events
-        // structures from database
+        // Get table, view, trigger, procedures and events structures from
+        // database.
         $this->getDatabaseStructureTables();
         $this->getDatabaseStructureViews();
         $this->getDatabaseStructureTriggers();
@@ -370,7 +440,7 @@ class Mysqldump
         // If there still are some tables/views in include-tables array,
         // that means that some tables or views weren't found.
         // Give proper error and exit.
-        // This check will be removed once include-tables supports regexps
+        // This check will be removed once include-tables supports regexps.
         if (0 < count($this->dumpSettings['include-tables'])) {
             $name = implode(",", $this->dumpSettings['include-tables']);
             throw new Exception("Table (".$name.") not found in database");
@@ -382,18 +452,20 @@ class Mysqldump
         $this->exportProcedures();
         $this->exportEvents();
 
-        // Restore saved parameters
+        // Restore saved parameters.
         $this->compressManager->write(
             $this->typeAdapter->restore_parameters()
         );
-        // Write some stats to output file
+        // Write some stats to output file.
         $this->compressManager->write($this->getDumpFileFooter());
-        // Close output file
+        // Close output file.
         $this->compressManager->close();
+
+        return;
     }
 
     /**
-     * Returns header for dump file
+     * Returns header for dump file.
      *
      * @return string
      */
@@ -419,7 +491,7 @@ class Mysqldump
     }
 
     /**
-     * Returns footer for dump file
+     * Returns footer for dump file.
      *
      * @return string
      */
@@ -552,7 +624,7 @@ class Mysqldump
      * Compare if $table name matches with a definition inside $arr
      * @param $table string
      * @param $arr array with strings or patterns
-     * @return bool
+     * @return boolean
      */
     private function matches($table, $arr)
     {
@@ -942,7 +1014,7 @@ class Mysqldump
      */
     protected function hookTransformColumnValue($tableName, $colName, $colValue, $row)
     {
-        if (! $this->transformColumnValueCallable) {
+        if (!$this->transformColumnValueCallable) {
             return $colValue;
         }
 
@@ -977,9 +1049,19 @@ class Mysqldump
 
         $stmt = "SELECT ".implode(",", $colStmt)." FROM `$tableName`";
 
-        if ($this->dumpSettings['where']) {
-            $stmt .= " WHERE {$this->dumpSettings['where']}";
+        // Table specific conditions override the default 'where'
+        $condition = $this->getTableWhere($tableName);
+
+        if ($condition) {
+            $stmt .= " WHERE {$condition}";
         }
+
+        $limit = $this->getTableLimit($tableName);
+
+        if ($limit) {
+            $stmt .= " LIMIT {$limit}";
+        }
+
         $resultSet = $this->dbHandler->query($stmt);
         $resultSet->setFetchMode(PDO::FETCH_ASSOC);
 
@@ -1071,10 +1153,10 @@ class Mysqldump
     /**
      * Table rows extractor, close locks and commits after dump
      *
-     * @param string $tableName  Name of table to export
-     * @param int $count         Number of rows inserted
+     * @param string $tableName Name of table to export.
+     * @param integer    $count     Number of rows inserted.
      *
-     * @return null
+     * @return void
      */
     public function endListValues($tableName, $count = 0)
     {
@@ -1109,11 +1191,10 @@ class Mysqldump
 
         if (!$this->dumpSettings['skip-comments']) {
             $this->compressManager->write(
-                "-- Dumped table `$tableName` with $count row(s)".PHP_EOL.
-                "--".PHP_EOL.PHP_EOL
+                "-- Dumped table `".$tableName."` with $count row(s)".PHP_EOL.
+                '--'.PHP_EOL.PHP_EOL
             );
         }
-
 
         return;
     }

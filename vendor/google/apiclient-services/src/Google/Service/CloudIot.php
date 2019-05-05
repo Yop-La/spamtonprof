@@ -57,6 +57,7 @@ class Google_Service_CloudIot extends Google_Service
     parent::__construct($client);
     $this->rootUrl = 'https://cloudiot.googleapis.com/';
     $this->servicePath = '';
+    $this->batchPath = 'batch';
     $this->version = 'v1';
     $this->serviceName = 'cloudiot';
 
@@ -231,6 +232,14 @@ class Google_Service_CloudIot extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
+                'gatewayListOptions.gatewayType' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'gatewayListOptions.associationsGatewayId' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
                 'fieldMask' => array(
                   'location' => 'query',
                   'type' => 'string',
@@ -256,14 +265,6 @@ class Google_Service_CloudIot extends Google_Service
                   'location' => 'query',
                   'type' => 'string',
                   'repeated' => true,
-                ),
-                'gatewayListOptions.gatewayType' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
-                'gatewayListOptions.associationsGatewayId' => array(
-                  'location' => 'query',
-                  'type' => 'string',
                 ),
               ),
             ),'modifyCloudToDeviceConfig' => array(

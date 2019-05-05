@@ -28,3 +28,17 @@ tempo/*
 .settings/org.eclipse.wst.validation.prefs
 .buildpath
 .project
+
+generated_text
+
+images
+
+markov_table
+
+results
+
+text
+
+title
+
+urls

@@ -129,17 +129,17 @@ class Google_Service_CloudResourceManager_Resource_Folders extends Google_Servic
    *
    * @param array $optParams Optional parameters.
    *
+   * @opt_param string pageToken A pagination token returned from a previous call
+   * to `ListFolders` that indicates where this listing should continue from. This
+   * field is optional.
+   * @opt_param int pageSize The maximum number of Folders to return in the
+   * response. This field is optional.
    * @opt_param string parent The resource name of the Organization or Folder
    * whose Folders are being listed. Must be of the form `folders/{folder_id}` or
    * `organizations/{org_id}`. Access to this method is controlled by checking the
    * `resourcemanager.folders.list` permission on the `parent`.
    * @opt_param bool showDeleted Controls whether Folders in the DELETE_REQUESTED
    * state should be returned. Defaults to false. This field is optional.
-   * @opt_param string pageToken A pagination token returned from a previous call
-   * to `ListFolders` that indicates where this listing should continue from. This
-   * field is optional.
-   * @opt_param int pageSize The maximum number of Folders to return in the
-   * response. This field is optional.
    * @return Google_Service_CloudResourceManager_ListFoldersResponse
    */
   public function listFolders($optParams = array())
@@ -155,8 +155,8 @@ class Google_Service_CloudResourceManager_Resource_Folders extends Google_Servic
    * failure, a FolderOperationError categorizing the failure cause will be
    * returned - if the failure occurs synchronously then the FolderOperationError
    * will be returned via the Status.details field and if it occurs asynchronously
-   * then the FolderOperation will be returned via the the Operation.error field.
-   * In addition, the Operation.metadata field will be populated with a
+   * then the FolderOperation will be returned via the Operation.error field. In
+   * addition, the Operation.metadata field will be populated with a
    * FolderOperation message as an aid to stateless clients. Folder moves will be
    * rejected if they violate either the naming, height or fanout constraints
    * described in the CreateFolder documentation. The caller must have

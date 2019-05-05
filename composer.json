@@ -12,6 +12,7 @@
 		"ovh/ovh": "^2.0",
 		"mailgun/mailgun-php": "^2.6",
 		"php-http/curl-client": "^1.7",
-		"guzzlehttp/psr7": "^1.5"
+		"guzzlehttp/psr7": "^1.5",
+		"gregwar/image": "2.*"
 	}
 }

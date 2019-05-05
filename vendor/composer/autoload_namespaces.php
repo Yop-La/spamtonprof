@@ -10,6 +10,8 @@ return array(
     'PayPal' => array($vendorDir . '/paypal/rest-api-sdk-php/lib'),
     'Mailgun' => array($vendorDir . '/mailgun/mailgun-php/src'),
     'Hashids' => array($vendorDir . '/hashids/hashids/lib'),
+    'Gregwar\\Image' => array($vendorDir . '/gregwar/image'),
+    'Gregwar\\Cache' => array($vendorDir . '/gregwar/cache'),
     'Google_Service_' => array($vendorDir . '/google/apiclient-services/src'),
     'Google_' => array($vendorDir . '/google/apiclient/src'),
     'AlgoliaSearch' => array($vendorDir . '/algolia/algoliasearch-client-php/src'),

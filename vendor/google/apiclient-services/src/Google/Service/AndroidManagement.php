@@ -41,6 +41,7 @@ class Google_Service_AndroidManagement extends Google_Service
   public $enterprises_devices_operations;
   public $enterprises_enrollmentTokens;
   public $enterprises_policies;
+  public $enterprises_webApps;
   public $enterprises_webTokens;
   public $signupUrls;
   
@@ -54,6 +55,7 @@ class Google_Service_AndroidManagement extends Google_Service
     parent::__construct($client);
     $this->rootUrl = 'https://androidmanagement.googleapis.com/';
     $this->servicePath = '';
+    $this->batchPath = 'batch';
     $this->version = 'v1';
     $this->serviceName = 'androidmanagement';
 
@@ -254,6 +256,10 @@ class Google_Service_AndroidManagement extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
+                'pageSize' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
+                ),
                 'filter' => array(
                   'location' => 'query',
                   'type' => 'string',
@@ -261,10 +267,6 @@ class Google_Service_AndroidManagement extends Google_Service
                 'pageToken' => array(
                   'location' => 'query',
                   'type' => 'string',
-                ),
-                'pageSize' => array(
-                  'location' => 'query',
-                  'type' => 'integer',
                 ),
               ),
             ),
@@ -336,6 +338,78 @@ class Google_Service_AndroidManagement extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
+                'pageSize' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+              ),
+            ),'patch' => array(
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'PATCH',
+              'parameters' => array(
+                'name' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'updateMask' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+              ),
+            ),
+          )
+        )
+    );
+    $this->enterprises_webApps = new Google_Service_AndroidManagement_Resource_EnterprisesWebApps(
+        $this,
+        $this->serviceName,
+        'webApps',
+        array(
+          'methods' => array(
+            'create' => array(
+              'path' => 'v1/{+parent}/webApps',
+              'httpMethod' => 'POST',
+              'parameters' => array(
+                'parent' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'delete' => array(
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'DELETE',
+              'parameters' => array(
+                'name' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'get' => array(
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'GET',
+              'parameters' => array(
+                'name' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'list' => array(
+              'path' => 'v1/{+parent}/webApps',
+              'httpMethod' => 'GET',
+              'parameters' => array(
+                'parent' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
                 'pageToken' => array(
                   'location' => 'query',
                   'type' => 'string',
@@ -393,11 +467,11 @@ class Google_Service_AndroidManagement extends Google_Service
               'path' => 'v1/signupUrls',
               'httpMethod' => 'POST',
               'parameters' => array(
-                'callbackUrl' => array(
+                'projectId' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'projectId' => array(
+                'callbackUrl' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),

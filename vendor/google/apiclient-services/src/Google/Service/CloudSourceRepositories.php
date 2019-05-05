@@ -57,6 +57,7 @@ class Google_Service_CloudSourceRepositories extends Google_Service
     parent::__construct($client);
     $this->rootUrl = 'https://sourcerepo.googleapis.com/';
     $this->servicePath = '';
+    $this->batchPath = 'batch';
     $this->version = 'v1';
     $this->serviceName = 'sourcerepo';
 
@@ -169,6 +170,16 @@ class Google_Service_CloudSourceRepositories extends Google_Service
               'httpMethod' => 'POST',
               'parameters' => array(
                 'resource' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'sync' => array(
+              'path' => 'v1/{+name}:sync',
+              'httpMethod' => 'POST',
+              'parameters' => array(
+                'name' => array(
                   'location' => 'path',
                   'type' => 'string',
                   'required' => true,

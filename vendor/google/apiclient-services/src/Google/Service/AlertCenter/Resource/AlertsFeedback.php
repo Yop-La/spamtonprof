@@ -26,10 +26,11 @@
 class Google_Service_AlertCenter_Resource_AlertsFeedback extends Google_Service_Resource
 {
   /**
-   * Creates new feedback for an alert. (feedback.create)
+   * Creates new feedback for an alert. Attempting to create a feedback for a non-
+   * existent alert returns `NOT_FOUND` error. (feedback.create)
    *
    * @param string $alertId Required. The identifier of the alert this feedback
-   * belongs to. Returns a `NOT_FOUND` error if no such alert.
+   * belongs to.
    * @param Google_Service_AlertCenter_AlertFeedback $postBody
    * @param array $optParams Optional parameters.
    *
@@ -45,11 +46,11 @@ class Google_Service_AlertCenter_Resource_AlertsFeedback extends Google_Service_
     return $this->call('create', array($params), "Google_Service_AlertCenter_AlertFeedback");
   }
   /**
-   * Lists all the feedback for an alert. (feedback.listAlertsFeedback)
+   * Lists all the feedback for an alert. Attempting to list feedbacks for a non-
+   * existent alert returns `NOT_FOUND` error. (feedback.listAlertsFeedback)
    *
    * @param string $alertId Required. The alert identifier. The "-" wildcard could
-   * be used to represent all alerts. If alert does not exist returns a
-   * `NOT_FOUND` error.
+   * be used to represent all alerts.
    * @param array $optParams Optional parameters.
    *
    * @opt_param string filter Optional. A query string for filtering alert

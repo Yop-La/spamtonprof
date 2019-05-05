@@ -30,7 +30,12 @@
  */
 class Google_Service_CloudIdentity extends Google_Service
 {
-
+  /** See, change, create, and delete any of the Cloud Identity Groups that you can access, including the members of each group. */
+  const CLOUD_IDENTITY_GROUPS =
+      "https://www.googleapis.com/auth/cloud-identity.groups";
+  /** See any Cloud Identity Groups that you can access, including group members and their emails. */
+  const CLOUD_IDENTITY_GROUPS_READONLY =
+      "https://www.googleapis.com/auth/cloud-identity.groups.readonly";
 
   public $groups;
   public $groups_memberships;
@@ -45,6 +50,7 @@ class Google_Service_CloudIdentity extends Google_Service
     parent::__construct($client);
     $this->rootUrl = 'https://cloudidentity.googleapis.com/';
     $this->servicePath = '';
+    $this->batchPath = 'batch';
     $this->version = 'v1';
     $this->serviceName = 'cloudidentity';
 
@@ -103,11 +109,11 @@ class Google_Service_CloudIdentity extends Google_Service
               'path' => 'v1/groups:lookup',
               'httpMethod' => 'GET',
               'parameters' => array(
-                'groupKey.namespace' => array(
+                'groupKey.id' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'groupKey.id' => array(
+                'groupKey.namespace' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),

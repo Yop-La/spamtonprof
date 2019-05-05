@@ -85,7 +85,7 @@ Plain old PHP:
     $dump->start('storage/work/dump.sql');
 ```
 
-Refer to the [wiki](https://github.com/ifsnop/mysqldump-php/wiki/full-example) for some examples and a comparision between mysqldump and mysqldump-php dumps.
+Refer to the [wiki](https://github.com/ifsnop/mysqldump-php/wiki/Full-usage-example) for some examples and a comparision between mysqldump and mysqldump-php dumps.
 
 ## Changing values when exporting
 You can register a callable that will be used to transform values during the export. An example use-case for this is removing sensitive data from database dumps:
@@ -102,6 +102,32 @@ $dumper->setTransformColumnValueHook(function ($tableName, $colName, $colValue) 
 });
 
 $dumper->start('storage/work/dump.sql');
+```
+
+## Table specific export conditions
+You can register table specific 'where' clauses to limit data on a per table basis.  These override the default `where` dump setting:
+
+```php
+$dumper = new IMysqldump\Mysqldump('mysql:host=localhost;dbname=testdb', 'username', 'password');
+
+$dumper->setTableWheres(array(
+    'users' => 'date_registered > NOW() - INTERVAL 3 MONTH AND deleted=0',
+    'logs' => 'date_logged > NOW() - INTERVAL 1 DAY',
+    'posts' => 'isLive=1'
+));
+```
+
+## Table specific export limits
+You can register table specific 'limits' to limit the returned rows on a per table basis:
+
+```php
+$dumper = new IMysqldump\Mysqldump('mysql:host=localhost;dbname=testdb', 'username', 'password');
+
+$dumper->setTableLimits(array(
+    'users' => 300,
+    'logs' => 50,
+    'posts' => 10
+));
 ```
 
 ## Constructor and default parameters
@@ -277,12 +303,14 @@ Current code for testing is an ugly hack. Probably there are much better ways
 of doing them using PHPUnit, so PR's are welcomed. The testing script creates
 and populates a database using all possible datatypes. Then it exports it
 using both mysqldump-php and mysqldump, and compares the output. Only if
-it is identical tests are OK.
+it is identical tests are OK. After [this](https://github.com/ifsnop/mysqldump-php/commit/8496fbb1b26dde404804bc8865ec32044da5b813)
+commit, some test are performed using phpunit.
 
 Some tests are skipped if mysql server doesn't support them.
 
-A couple of tests are only compared between original sql code and
-mysqldump-php, because mysqldump doesn't work,
+A couple of tests are only comparing between original sql code and
+mysqldump-php generated sql, because some options are not available in
+mysqldump.
 
 ## Bugs (from mysqldump, not from mysqldump-php)
 
@@ -293,9 +321,9 @@ used, if the value is empty.
 ## Backporting
 
 mysqldump-php is not backwards compatible with php 5.2 because we it uses
-namespaces. It can be trivially fixed.
+namespaces. However, it could be trivially fixed if needed.
 
-## TODO
+## Todo
 
 Write more tests, test with mariadb also.
 
