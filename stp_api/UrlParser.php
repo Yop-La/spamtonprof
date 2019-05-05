@@ -13,14 +13,6 @@ class UrlParser implements \JsonSerializable
     
     {}
 
-    public function parseUrl($url)
-    {
-        $resultat = \Unirest\Request::get("https://lexper.p.rapidapi.com/v1.1/extract?media=1&url=" . urlencode($url), array(
-            "X-RapidAPI-Host" => "lexper.p.rapidapi.com",
-            "X-RapidAPI-Key" => "28f7caf9aemsh70133f11f89f57fp1f9d39jsnc723011e3abe"
-        ));
-        return ($resultat);
-    }
 
  
     public function parseUrls(array $urls, $limit = 20)
@@ -41,7 +33,7 @@ class UrlParser implements \JsonSerializable
             curl_setopt($curl_arr[$i], CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl_arr[$i], CURLOPT_HTTPHEADER, array(
                 "X-RapidAPI-Host: lexper.p.rapidapi.com",
-                "X-RapidAPI-Key: 28f7caf9aemsh70133f11f89f57fp1f9d39jsnc723011e3abe"
+                "X-RapidAPI-Key: " . RAPID_API_KEY
             ));
             
             curl_multi_add_handle($master, $curl_arr[$i]);
