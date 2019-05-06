@@ -56,7 +56,7 @@ class UrlParser implements \JsonSerializable
             }
         }
         
-        return ($this->parseResults($results));
+        return (array('brut'=>$results,"clean" => $this->parseResults($results)));
     }
 
     private function parseResults($results)

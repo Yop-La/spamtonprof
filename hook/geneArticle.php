@@ -37,7 +37,6 @@ if ($password == CRON_KEY) {
     
     $urls = json_decode($urls);
     
-    
     if (property_exists($urls, 'error')) {
         
         $slack->sendMessages('log-spam-google', array(
@@ -50,14 +49,16 @@ if ($password == CRON_KEY) {
     $urls = $urls->serps;
     $msgs[] = 'Nb urls: ' . count($urls);
     
-    
     $urlParser = new \spamtonprof\stp_api\UrlParser();
     
     $result = $urlParser->parseUrls($urls, 20);
     
-    $texts = $result['texts'];
-    $titles = $result['titles'];
-    $images = $result['images'];
+    $result_clean = $result['clean'];
+    $result_brut = $result['brut'];
+    
+    $texts = $result_clean['texts'];
+    $titles = $result_clean['titles'];
+    $images = $result_clean['images'];
     
     $corpus_body = implode(" ", $texts);
     $corpus_title = implode(" ", $titles);
@@ -83,13 +84,17 @@ if ($password == CRON_KEY) {
     
     $time_elapsed_secs = microtime(true) - $start;
     
-    $msgs[] = 'Execution time: ' . round($time_elapsed_secs,2) . ' secondes ';
+    $msgs[] = 'Execution time: ' . round($time_elapsed_secs, 2) . ' secondes ';
     $msgs[] = ' ----- ';
     
     $slack->sendMessages('log-spam-google', $msgs);
     
-    
-    echo ($article);
+    prettyPrint(array(
+        "retour" => array(
+            "parsing_result" => $result_brut,
+            "article" => $article
+        )
+    ));
     
     die();
 } else {
