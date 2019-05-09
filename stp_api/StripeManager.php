@@ -949,9 +949,12 @@ class StripeManager
             return (false);
         }
     }
+    
 
-    // pour crÃ©er tous les produits et les plans dÃ©finis dans la base stp qui ne sont pas dans stripe
-    public function createProductsAndPlans()
+    // pour creer tous les produits et les plans definis dans la base stp 
+    // attention les formules et plans doivent déjà existés dans la base stp
+    
+    public function createProductsAndPlans($query)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         
@@ -964,14 +967,13 @@ class StripeManager
             )
         );
         
-        $formules = $formuleMg->getAll(array(
-            'getFormuleNotInStripe' => $this->testMode
-        ), $constructor);
+        $formules = $formuleMg->getAll($query, $constructor);
         
         foreach ($formules as $formule) {
             
+            // crér la formule dans stripe
             $strProduct = \Stripe\Product::create(array(
-                "name" => "From Tool : " . $formule->getFormule(),
+                "name" => "Ref ".$formule->getRef_formule().": " . $formule->getFormule(),
                 "type" => "service"
             ));
             
@@ -983,7 +985,7 @@ class StripeManager
                 $formuleMg->updateRefProductStripe($formule);
             }
             
-            // crÃ©er la formule dans stripe
+            // crér les plans dans stripe
             $plans = $formule->getPlans();
             foreach ($plans as $plan) {
                 
