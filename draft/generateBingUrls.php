@@ -1,5 +1,5 @@
 <?php
-
+bugbugbug
 /*
  *
  * pour faire un contr�le des publications en ligne avec les mails envoy�s par leboncon

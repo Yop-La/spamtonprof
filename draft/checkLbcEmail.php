@@ -1,8 +1,8 @@
 <?php
-
+bugbugbug
 /*
  *
- * pour faire un contrôle des publications en ligne avec les mails envoyés par leboncon
+ * pour faire un contrï¿½le des publications en ligne avec les mails envoyï¿½s par leboncon
  *
  */
 require_once (dirname(__FILE__) . '/wp-config.php');
@@ -41,7 +41,7 @@ foreach ($ads as $ad) {
 $adTempoMg = new \spamtonprof\stp_api\AddsTempoManager();
 
 foreach ($refComptes as $refCompte) {
-    // 4-1-2 : on va mettre à jour la ref_commune de adds_tempo
+    // 4-1-2 : on va mettre ï¿½ jour la ref_commune de adds_tempo
     $adsTemp = $adTempoMg->getAll(array(
         "ref_compte" => $refCompte
     ));
@@ -110,13 +110,13 @@ foreach ($messages as $message) {
     ]);
     $body = $gmail->getBody($message);
 
-    // récupération de l'email
+    // rï¿½cupï¿½ration de l'email
     $match = [];
     preg_match_all("/[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+.[a-zA-Z]{2,4}/", $body, $match);
     $email = $match[0][0];
     $row[] = $email;
 
-    // récupération de l'ad id
+    // rï¿½cupï¿½ration de l'ad id
     $match = [];
     // preg_match_all('#cours_particuliers/([0-9]+)\.htm#', $body, $match);
     preg_match_all('#\b(([\w-]+://?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/)))#', $body, $match);

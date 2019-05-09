@@ -1,8 +1,8 @@
 <?php
-
+bugbugbug
 /*
  *
- * pour faire un contrôle des publications en ligne avec les mails envoyés par leboncon
+ * pour faire un contrï¿½le des publications en ligne avec les mails envoyï¿½s par leboncon
  *
  */
 require_once (dirname(__FILE__) . '/wp-config.php');
@@ -26,7 +26,7 @@ header("Pragma: no-cache");
 
 /**
  * 
- *  à utiliser quand ajout d'un client pour lui attribuer des emails
+ *  ï¿½ utiliser quand ajout d'un client pour lui attribuer des emails
  */
 
 

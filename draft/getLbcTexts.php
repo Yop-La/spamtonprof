@@ -1,8 +1,10 @@
-<?php
 
+
+<?php
+bugbugbug
 /*
  *
- * pour faire un contrôle des publications en ligne avec les mails envoyés par leboncon
+ * pour faire un contrï¿½le des publications en ligne avec les mails envoyï¿½s par leboncon
  *
  */
 require_once (dirname(__FILE__) . '/wp-config.php');
@@ -30,7 +32,7 @@ $lbcApi = new \spamtonprof\stp_api\LbcApi();
 $offset = 0;
 $all_txt = [];
 while ($txts = $lbcApi->getTexts(array(
-    'code_promo' => utf8_encode("maths lycée école d'ingénieur")
+    'code_promo' => utf8_encode("maths lycï¿½e ï¿½cole d'ingï¿½nieur")
 ), $offset)) {
     $all_txt = array_merge($all_txt, $txts);
     $offset = $offset + 100;
