@@ -83,6 +83,13 @@ class StpFormuleManager
 
                 $q = $this->_db->prepare('SELECT * FROM stp_formule where ref_formule in (select ref_formule from stp_abonnement where ref_eleve = :ref_eleve)');
                 $q->bindValue(':ref_eleve', $refEleve);
+            }else if (array_key_exists('all_ref_formule_sup', $info)) {
+                
+                $refFormule = $info['all_ref_formule_sup'];
+                
+                $q = $this->_db->prepare('SELECT * FROM stp_formule where ref_formule >= :ref_formule');
+                $q->bindValue(':ref_formule', $refFormule);
+                
             }
         } else {
             $q = $this->_db->prepare("select * from stp_formule");
