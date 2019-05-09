@@ -85,8 +85,13 @@ if ($password == CRON_KEY) {
     $time_elapsed_secs = microtime(true) - $start;
     
     $msgs[] = 'Execution time: ' . round($time_elapsed_secs, 2) . ' secondes ';
-    $msgs[] = ' ----- ';
     
+    if (strlen($article) <= 5000) {
+        $msgs[] = 'génération avortée - article trop court';
+        $slack->sendMessages('log-spam-google', $msgs);
+        die();
+    }
+    $msgs[] = ' ----- ';
     $slack->sendMessages('log-spam-google', $msgs);
     
     prettyPrint(array(
