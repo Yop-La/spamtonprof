@@ -137,6 +137,27 @@ class StpFormuleManager
         return ($formule);
     }
 
+    public function update_ref_prof(\spamtonprof\stp_api\StpFormule $formule)
+    {
+        $q = $this->_db->prepare('update stp_formule set ref_prof = :ref_prof where ref_formule = :ref_formule');
+        $q->bindValue(':ref_prof', $formule->getRef_prof());
+        $q->bindValue(':ref_formule', $formule->getRef_formule());
+        $q->execute();
+        
+        return ($formule);
+    }
+    
+    
+    public function update_from_tool(\spamtonprof\stp_api\StpFormule $formule)
+    {
+        $q = $this->_db->prepare('update stp_formule set from_tool = :from_tool where ref_formule = :ref_formule');
+        $q->bindValue(':from_tool', $formule->getFrom_tool(),PDO::PARAM_BOOL);
+        $q->bindValue(':ref_formule', $formule->getRef_formule());
+        $q->execute();
+        
+        return ($formule);
+    }
+    
     public function updateClasses(\spamtonprof\stp_api\StpFormule $formule)
     {
         $q = $this->_db->prepare('update stp_formule set classes = :classes where ref_formule = :ref_formule');
