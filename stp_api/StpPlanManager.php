@@ -39,7 +39,7 @@ class StpPlanManager
 
             if (array_key_exists("ref_formule", $info)) {
                 $refFormule = $info["ref_formule"];
-                $q = $this->_db->prepare("select * from stp_plan_paiement where ref_formule = :ref_formule and nom = 'defaut'");
+                $q = $this->_db->prepare("select * from stp_plan_paiement where ref_formule = :ref_formule and defaut is true");
                 $q->bindValue(":ref_formule", $refFormule);
                 $q->execute();
             }
@@ -88,6 +88,17 @@ class StpPlanManager
         return ($plans);
     }
 
+    
+    public function update_defaut(\spamtonprof\stp_api\StpPlan $plan)
+    {
+        $q = $this->_db->prepare('update stp_plan_paiement set defaut = :defaut where ref_plan = :ref_plan');
+        $q->bindValue(':defaut', $plan->getDefaut(),PDO::PARAM_BOOL);
+        $q->bindValue(':ref_plan', $plan->getRef_plan());
+        $q->execute();
+        
+        return ($plan);
+    }
+    
     public function updateRefPlanOld(\spamtonprof\stp_api\StpPlan $plan)
     {
         $q = $this->_db->prepare('update stp_plan_paiement set ref_plan_old = :ref_plan_old where ref_plan = :ref_plan');
