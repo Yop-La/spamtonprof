@@ -934,6 +934,13 @@ function extract_url($string)
     return ($matches);
 }
 
+function randomDateInRange(DateTime $start, DateTime $end) {
+    $randomTimestamp = mt_rand($start->getTimestamp(), $end->getTimestamp());
+    $randomDate = new DateTime();
+    $randomDate->setTimestamp($randomTimestamp);
+    return $randomDate;
+}
+
 function toSimilarTo(array $elements)
 {
     $nbElem = count($elements);
