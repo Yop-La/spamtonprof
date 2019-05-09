@@ -1,6 +1,6 @@
 <?php
 
-// toutes ces fonction seront ÈxÈcutÈs par un appel ajax rÈalisÈ dans discover_week.js sur la page dont le slug est semaine-decouverte
+// toutes ces fonction seront executes par un appel ajax realise dans discover_week.js sur la page dont le slug est semaine-decouverte
 add_action('wp_ajax_ajaxGetFormules', 'ajaxGetFormules');
 
 add_action('wp_ajax_nopriv_ajaxGetFormules', 'ajaxGetFormules');
@@ -61,7 +61,7 @@ function inscriptionEssai()
     $niveau = json_decode(stripslashes($fields->niveau));
     $formule = json_decode(stripslashes($fields->formule));
 
-    // on rÈcupËre la matiËre, le niveau, la formule et le plan
+    // on recupere la matiere, le niveau, la formule et le plan
     $matiereMg = new \spamtonprof\stp_api\StpMatiereManager();
     $matiere = $matiereMg->get(array(
         'ref_matiere' => $matiere->ref_matiere
@@ -93,8 +93,8 @@ function inscriptionEssai()
     $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
     $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
 
-    $envoiEleve = false; // pour savoir si il faut envoyer le mail de bienvenue ‡ l'ÈlËve et lui crÈer un compte wordpress
-    $envoiParent = false; // pour savoir si il faut envoyer le mail de bienvenue au parent et lui crÈer un compte wordpress
+    $envoiEleve = false; // pour savoir si il faut envoyer le mail de bienvenue a l'eleve et lui creer un compte wordpress
+    $envoiParent = false; // pour savoir si il faut envoyer le mail de bienvenue au parent et lui creer un compte wordpress
 
     $proche = false;
     $eleve = false;
@@ -127,7 +127,7 @@ function inscriptionEssai()
         ));
     }
 
-    // pour vÈrifier qu'un ÈlËve n'essaye pas de s'inscrire en proche ou rÈciproquement
+    // pour verifier qu'un eleve n'essaye pas de s'inscrire en proche ou reciproquement
 
     if ($prospect) {
 
@@ -162,7 +162,7 @@ function inscriptionEssai()
 
                 die();
             }
-            // on compte le nomre d'essai de l'ÈlËve
+            // on compte le nomre d'essai de l'eleve
             $abos = $abonnementMg->getAll(array(
                 'ref_eleve' => $choix_eleve,
                 'ref_statut_abonnement' => 2
@@ -224,7 +224,7 @@ function inscriptionEssai()
 
     $now = new DateTime(null, new DateTimeZone("Europe/Paris"));
 
-    // Ètape n∞1 : rÈcupÈrer le proche (on l'ajoute si prospect sinon on le rÈcupËre)
+    // etape 1 : recuperer le proche (on l'ajoute si prospect sinon on le recupere)
 
     if ($prospect) {
 
@@ -243,7 +243,7 @@ function inscriptionEssai()
         }
     } else {
 
-        // Ètape n∞1 : on rÈcupËre le proche
+        // etape 1 : on recupere le proche
         $current_user = wp_get_current_user();
 
         $compte = $compteMg->get(array(
@@ -259,7 +259,7 @@ function inscriptionEssai()
         }
     }
 
-    // Ètape n∞2 : crÈation du compte famille si prospect sinon on le rÈcupËre
+    // etape 2 : creation du compte famille si prospect sinon on le recupere
 
     $compte = null;
     $compteMg = new \spamtonprof\stp_api\StpCompteManager();
@@ -286,7 +286,7 @@ function inscriptionEssai()
         ));
     }
 
-    // Ètape n∞3 : ajout de l'ÈlËve
+    // etape 3 : ajout de l'eleve
     if ($prospect || $choix_eleve == 'nouveau') {
         $eleve = new \spamtonprof\stp_api\StpEleve(array(
             'email' => $email_eleve,
@@ -313,16 +313,16 @@ function inscriptionEssai()
         $eleveMg->updateRefNiveau($eleve);
     }
 
-    // Ètape n∞4 : savoir ‡ qui envoyer le mail de bienvenu et ‡ qui crÈer les comptes wp
+    // etape 4 : savoir a qui envoyer le mail de bienvenu et a qui creer les comptes wp
 
     $eleve->setHasToSend();
 
     $envoiEleve = $eleve->getHasToSendToEleve();
     $envoiParent = $eleve->getHasToSendToParent();
 
-    // Ètape n∞5 : crÈer les nouveaux comptes wordpress
+    // etape 5 : creer les nouveaux comptes wordpress
 
-    // Ètape n∞5-1 : crÈation du compte ÈlËve
+    // etape 5-1 : creation du compte eleve
 
     if ($envoiEleve && ($prospect || $choix_eleve == 'nouveau')) {
 
@@ -344,7 +344,7 @@ function inscriptionEssai()
 
             $eleveMg->updateRefCompteWp($eleve);
 
-            // connexion au compte ÈlËve pour les prochaines visites
+            // connexion au compte eleve pour les prochaines visites
             wp_signon(array(
                 'user_login' => $email_eleve,
                 'user_password' => $passwordEleve,
@@ -354,7 +354,7 @@ function inscriptionEssai()
             // insertion du compte stp wordpress
         } else {
             $slack->sendMessages('log', array(
-                'erreur de crÈation du compte wp ÈlËve : ' . $email_eleve
+                'erreur de creation du compte wp eleve : ' . $email_eleve
             ));
 
             $retour->error = true;
@@ -365,7 +365,7 @@ function inscriptionEssai()
             die();
         }
     }
-    // Ètape n∞5-2 : crÈation du compte proche si il existe
+    // etape 5-2 : creation du compte proche si il existe
 
     if ($envoiParent && $prospect) {
 
@@ -397,7 +397,7 @@ function inscriptionEssai()
             } else {
 
                 $slack->sendMessages('log', array(
-                    'erreur de crÈation du compte wp proche : ' . $email_responsable
+                    'erreur de creation du compte wp proche : ' . $email_responsable
                 ));
 
                 $retour->error = true;
@@ -410,7 +410,7 @@ function inscriptionEssai()
         }
     }
 
-    // Ètape n∞6 : code promo
+    // etape 6 : code promo
     $couponMg = new \spamtonprof\stp_api\StpCouponManager();
     $coupon = $couponMg->get(array(
         'name' => $code_promo
@@ -429,7 +429,7 @@ function inscriptionEssai()
         }
     }
 
-    // Ètape n∞ 7 - insÈrer l'abonnement
+    // etape 7 - inserer l'abonnement
     
     $test = false;
     if (strpos($email_eleve, 'yopla.33mail') !== false) {
@@ -477,7 +477,7 @@ function inscriptionEssai()
         $abonnementMg->updateRefCoupon($abonnement);
     }
 
-    // Ètape n∞ 8 - insÈrer les remarques d'inscription
+    // etape  8 - inserer les remarques d'inscription
 
     $stpRemarqueMg = new \spamtonprof\stp_api\StpRemarqueInscriptionManager();
 
@@ -528,37 +528,37 @@ function inscriptionEssai()
         }
     }
 
-    // Ètape n∞9 - envoi d'un message dans slack pour dire qu'il y a une attribution de prof en attente
+    // etape 9 - envoi d'un message dans slack pour dire qu'il y a une attribution de prof en attente
     $messages;
     if ($proche) {
 
         $messages = array(
-            "Nouvelle inscription : bien jouÈ la team prospection !!",
+            "Nouvelle inscription : bien jou√© la team prospection !!",
             "------ Eleve ----- ",
-            "Email ÈlËve : " . $eleve->getEmail(),
-            "PrÈnom ÈlËve : " . utf8_encode($eleve->getPrenom()),
-            "Nom ÈlËve : " . utf8_encode($eleve->getNom()),
-            "Niveau ÈlËve : " . utf8_encode($niveau->getNiveau()),
-            "TÈlÈphone ÈlËve :" . $eleve->getTelephone(),
+            "Email √©l√®ve : " . $eleve->getEmail(),
+            "Pr√©nom √©l√®ve : " . utf8_encode($eleve->getPrenom()),
+            "Nom √©l√®ve : " . utf8_encode($eleve->getNom()),
+            "Niveau √©l√®ve : " . utf8_encode($niveau->getNiveau()),
+            "T√©l√©phone √©l√®ve :" . $eleve->getTelephone(),
             "Formule : " . $formule->getFormule(),
             "------ Parent ----- ",
             "Email parent : " . $proche->getEmail(),
-            "PrÈnom parent : " . utf8_encode($proche->getPrenom()),
+            "Pr√©nom parent : " . utf8_encode($proche->getPrenom()),
             "Nom parent : " . utf8_encode($proche->getNom()),
-            "TÈlÈphone parent :" . $proche->getTelephone(),
+            "T√©l√©phone parent :" . $proche->getTelephone(),
             "Remarque :" . $abonnement->getRemarque_inscription(),
             "Source traffic : " . $source_traffic,
             "Coupon : " . $code_promo
         );
     } else {
         $messages = array(
-            "Nouvelle inscription : bien jouÈ la team prospection !!",
-            "------ …tudiant/Adulte ----- ",
+            "Nouvelle inscription : bien jou√© la team prospection !!",
+            "------ √©tudiant/Adulte ----- ",
             "Email : " . $eleve->getEmail(),
-            "PrÈnom : " . utf8_encode($eleve->getPrenom()),
+            "Pr√©nom : " . utf8_encode($eleve->getPrenom()),
             " Nom : " . utf8_encode($eleve->getNom()),
             "Niveau : " . utf8_encode($niveau->getNiveau()),
-            "TÈlÈphone :" . $eleve->getTelephone(),
+            "T√©l√©phone :" . $eleve->getTelephone(),
             "Formule : " . $formule->getFormule(),
             "Remarque :" . $abonnement->getRemarque_inscription(),
             "Source traffic : " . $source_traffic,
@@ -567,11 +567,11 @@ function inscriptionEssai()
     }
     $messages[] = " ---------- ";
     $messages[] = "[URGENT] : Rendez vous dans le back office pour lui attribuer un prof";
-    $messages[] = "et mettre un check sur le message dËs que c'est fait !";
+    $messages[] = "et mettre un check sur le message d√®s que c'est fait !";
 
     $slack->sendMessages("inscription-essai", $messages);
 
-    // Ètape n∞10 - envoi d'un mail de bienvenue et de mise en attente au parent et ‡ l'ÈlËve
+    // √©tape 10 - envoi d'un mail de bienvenue et de mise en attente au parent et a l'eleve
 
     $profResponsable = $formule->getProf()->getPhrase_responsable();
 
@@ -598,7 +598,7 @@ function inscriptionEssai()
 
     echo (json_encode($retour));
 
-    // Ètape n∞11 : mettre ‡ jour l'index
+    // etape 11 : mettre a jour l'index
     $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
     $algoliaMg->addAbonnement($abonnement->getRef_abonnement());
 
@@ -643,12 +643,12 @@ function ajaxGetFormules()
 
     if (! $matiere) {
         $retour->error = true;
-        $retour->message = utf8_encode("Impossible de trouver cette matiËre. Veuillez essayer d'en saisir une autre ");
+        $retour->message = utf8_encode("Impossible de trouver cette mati√®re. Veuillez essayer d'en saisir une autre ");
         echo (json_encode($retour));
         die();
     }
 
-    // on trouve les formules correspondants au niveau et ‡ la matiËre
+    // on trouve les formules correspondants au niveau et a la matiere
     $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
 
     $constructor = array(
@@ -674,11 +674,11 @@ function ajaxGetFormules()
 }
 
 /*
- * pour vÈrifier que le coupon saisi est valide c'est ‡ dire
+ * pour verifier que le coupon saisi est valide c'est a dire
  *
  * si il existe et si le client/prospect a le droit de l'utiliser
  * si prospect -> oui, il a le droit de l'utiliser
- * si client -> Áa dÈpend
+ * si client -> ca depend
  *
  */
 function ajaxIsValidCoupon()
@@ -719,7 +719,7 @@ function ajaxIsValidCoupon()
         die();
     }
 
-    // cas du client connectÈ
+    // cas du client connecte
     $compteMg = new \spamtonprof\stp_api\StpCompteManager();
 
     $compte = $compteMg->get(array(
@@ -734,7 +734,7 @@ function ajaxIsValidCoupon()
 
     if (count($abos) >= $coupon->getClient_limit()) {
         $retour->statut = 'over';
-        $retour->message = utf8_encode('Code promo dÈj‡ utilisÈ');
+        $retour->message = utf8_encode('Code promo d√©j√† utilis√©');
         echo (json_encode($retour));
         die();
     }
