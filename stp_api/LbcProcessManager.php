@@ -48,7 +48,7 @@ class LbcProcessManager
     {
         $lastHistoryId = $this->gmailAccount->getLast_history_id();
         
-        echo("Dernier history id ( avant process ) : " . $lastHistoryId . '<br>');
+        echo ("Dernier history id ( avant process ) : " . $lastHistoryId . '<br>');
         
         $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
         
@@ -265,13 +265,10 @@ class LbcProcessManager
                     
                     $to = extractFirstMail($to);
                     
-                    
                     $urls = extract_url($body);
                     $url = $urls[0][2];
                     
                     $url = htmlspecialchars_decode($url);
-                    
-                    
                     
                     $act = $this->lbcAccountMg->get(array(
                         "mail" => $to
@@ -623,11 +620,25 @@ class LbcProcessManager
     public function generateAds($refClient, $nbAds, $phone, $lock = false, $ref_compte = false)
     {
         
-        // on recupere le client
         $clientMg = new \spamtonprof\stp_api\LbcClientManager();
+        // on recupere le client
         $client = $clientMg->get(array(
             'ref_client' => $refClient
         ));
+        
+        // si il y a une seule annonce c'est que c'est une premire annonce sur un compte vierge. On doit mettre une annonce qui passe ( celle de Valentin )
+        $ref_client_content = $refClient;
+        $client_content = $client;
+        if ($nbAds == 1) {
+            
+            $ref_client_content = 25;
+            $client_content = $clientMg->get(array(
+                'ref_client' => $ref_client_content
+            ));
+            
+        }
+        
+        
         
         // on recupere les titres
         $hasTypeTitleMg = new \spamtonprof\stp_api\HasTitleTypeManager();
@@ -637,7 +648,7 @@ class LbcProcessManager
         $actMg = new \spamtonprof\stp_api\LbcAccountManager();
         
         $hasTypeTitle = $hasTypeTitleMg->get(array(
-            "ref_client_defaut" => $refClient
+            "ref_client_defaut" => $ref_client_content
         ));
         $titles = $lbcTitleMg->getAll(array(
             "ref_type_titre" => $hasTypeTitle->getRef_type_titre()
@@ -646,7 +657,7 @@ class LbcProcessManager
         
         // on recupere les textes
         $hasTypeTexteMg = new \spamtonprof\stp_api\HasTextTypeManager();
-        $hasTypeTexte = $hasTypeTexteMg->get_next($refClient);
+        $hasTypeTexte = $hasTypeTexteMg->get_next($ref_client_content);
         
         $lbcTexteMg = new \spamtonprof\stp_api\LbcTexteManager();
         $textes = $lbcTexteMg->getAll(array(
@@ -684,7 +695,7 @@ class LbcProcessManager
         $nbCommunes = count($communes);
         
         // recuperation des images
-        $images = scandir(ABSPATH . 'wp-content/uploads/lbc_images/' . $client->getImg_folder());
+        $images = scandir(ABSPATH . 'wp-content/uploads/lbc_images/' . $client_content->getImg_folder());
         
         unset($images[0]);
         unset($images[1]);
@@ -713,7 +724,7 @@ class LbcProcessManager
             ), $prenom, $texte->getTexte()));
             
             // recuperation de l'image
-            $image = 'https://spamtonprof.com/wp-content/uploads/lbc_images/' . $client->getImg_folder() . '/' . $images[($i % $nbImages) + 2];
+            $image = 'https://spamtonprof.com/wp-content/uploads/lbc_images/' . $client_content->getImg_folder() . '/' . $images[($i % $nbImages) + 2];
             
             // recuperation de la commune
             $commune = $communes[$i % $nbCommunes];
