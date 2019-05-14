@@ -70,7 +70,7 @@ class LbcAccountManager
                                  and disabled is false
 						         and ref_client = :ref_client
 						         and mail not like '%gmx%'
-                            order by nb_annonces_online limit 1";
+                            order by nb_annonces_online, date_creation desc limit 1";
             }
 
             $q = $this->_db->prepare($query);
