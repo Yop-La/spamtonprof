@@ -90,6 +90,13 @@ class StpFormuleManager
                 $q = $this->_db->prepare('SELECT * FROM stp_formule where ref_formule >= :ref_formule');
                 $q->bindValue(':ref_formule', $refFormule);
                 
+            }else if (array_key_exists('custom', $info)) {
+                
+                $custom = $info['custom'];
+                
+                $q = $this->_db->prepare('SELECT * FROM stp_formule ' . $custom);
+                
+                
             }
         } else {
             $q = $this->_db->prepare("select * from stp_formule");
