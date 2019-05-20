@@ -9,7 +9,7 @@ namespace spamtonprof\stp_api;
 class LbcTexteGenerator
 {
 
-    protected $lbcBaseTexts, $nbTexteToGene = 100, $nbPara, $nbTexte, $pas, $nbTextMax, $geneTextesIndexs, // contient la composition des textes générés. Un élement de ce tableau est par exemple ( 4 , 1 , 3, 5 ) ie un
+    protected $lbcBaseTexts, $nbTexteToGene = 100, $nbPara, $nbTexte, $pas, $nbTextMax, $geneTextesIndexs, // contient la composition des textes gï¿½nï¿½rï¿½s. Un ï¿½lement de ce tableau est par exemple ( 4 , 1 , 3, 5 ) ie un
                                                                                                            // texte de 4 paras dont le 1er para vient du texte de base 4 , le second du texte de base 1 ,
     $texteIndexsSelected, $textesGenerated;
 
@@ -37,15 +37,15 @@ class LbcTexteGenerator
     }
 
     /*
-     * cette fonction génère des indices des textes que l'on va utiliser pour récupérer les textes parmi tous les textes possibles
+     * cette fonction gï¿½nï¿½re des indices des textes que l'on va utiliser pour rï¿½cupï¿½rer les textes parmi tous les textes possibles
      *
-     * c'est grâce à cette fonction que l'on peut sélectionner les textes
-     * en fait , elle sélectionne les textes avec un pas parmi tous les indices de textes possible triées
+     * c'est grï¿½ce ï¿½ cette fonction que l'on peut sï¿½lectionner les textes
+     * en fait , elle sï¿½lectionne les textes avec un pas parmi tous les indices de textes possible triï¿½es
      * un texte est ici un tableau. Exemple : ( 1 , 1 , 2 , 4 ) est un texte de 4 paragraphes .
-     * Le 1er paragraphe vient du texte de base n°1
-     * Le 2eme para vient du texte de base n°1
-     * Le 3eme para vient du texte de base n°2
-     * Le 4eme para vient du texte de base n°4
+     * Le 1er paragraphe vient du texte de base nï¿½1
+     * Le 2eme para vient du texte de base nï¿½1
+     * Le 3eme para vient du texte de base nï¿½2
+     * Le 4eme para vient du texte de base nï¿½4
      *
      */
     private function setTextIndexs()
@@ -62,7 +62,7 @@ class LbcTexteGenerator
         }
     }
 
-    public function generateTexts($withSymbols = true)
+    public function generateTexts($withSymbols = false)
     {
         $this->setGeneTextesIndexs();
         ;
@@ -144,7 +144,7 @@ class LbcTexteGenerator
         return ($texteGene);
     }
 
-    // retourne le premier texte généré
+    // retourne le premier texte gï¿½nï¿½rï¿½
     private function getFirstTextGenerated($nbPara)
     {
         $texteGene = [];
@@ -161,7 +161,7 @@ class LbcTexteGenerator
     private function setGeneTextesIndexs()
     {
         
-        // on parcoure l'ensemble des textes possibles pour récupérer uniquement ceux dont les indices sont dans $texteIndex
+        // on parcoure l'ensemble des textes possibles pour rï¿½cupï¿½rer uniquement ceux dont les indices sont dans $texteIndex
         for ($texteIndex = 0; $texteIndex <= $this->nbTextMax - 1; $texteIndex ++) {
             
             if ($texteIndex == 0) {
