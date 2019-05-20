@@ -76,16 +76,22 @@ $newAccount->setTelephone($numTel);
 $newAccount->setPassword(wp_generate_password() . rand(12, 100));
 $newAccount = $lbcAccountMg->add($newAccount);
 
-$prenomLbcMg = new \spamtonprof\stp_api\PrenomLbcManager();
-$prenom = $prenomLbcMg->get(array(
-    'moins_utilise' => 'moins_utilise',
-    "ref_cat_prenom" => $client->getRef_cat_prenom()
-));
+$prenom = $client->getPrenom_client();
 
-$prenom->inc_nb_use();
-$prenomLbcMg->updateNbUse($prenom);
+if ($client->getRef_cat_prenom()) {
+    $prenomLbcMg = new \spamtonprof\stp_api\PrenomLbcManager();
+    $prenom = $prenomLbcMg->get(array(
+        'moins_utilise' => 'moins_utilise',
+        "ref_cat_prenom" => $client->getRef_cat_prenom()
+    ));
+    
+    $prenom->inc_nb_use();
+    
+    $prenomLbcMg->updateNbUse($prenom);
+    $prenom = $prenom->getPrenom();
+}
 
-$newAccount->setPrenom($prenom->getPrenom());
+$newAccount->setPrenom($prenom);
 $lbcAccountMg->updatePrenom($newAccount);
 
 // etape 4 : generation du compte promo
