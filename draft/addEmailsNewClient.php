@@ -30,21 +30,24 @@ header("Pragma: no-cache");
  */
 
 
+$ref_client_to_copy = 11;
+$new_ref_client = 27;
+
 $compteMg = new \spamtonprof\stp_api\LbcAccountManager();
 
 $comptes = $compteMg->getAll(array(
-    'ref_client' => 12
+    'ref_client' => $ref_client_to_copy
 ));
 
 foreach ($comptes as $compte) {
     $mail = $compte->getMail();
     $mail = strtolower($mail);
-    $mail = str_replace('thomas', 'valentin', $mail);
+    $mail = str_replace('thomas', 'sebastien', $mail);
     
     $pattern = '/\d+/i';
     $replacement = '';
     $mail = preg_replace($pattern, $replacement, $mail);
-    $compteMg->add(new \spamtonprof\stp_api\LbcAccount(array('mail' => $mail,'ref_client' => 25)));
+    $compteMg->add(new \spamtonprof\stp_api\LbcAccount(array('mail' => $mail,'ref_client' => $new_ref_client)));
 }
 
 prettyPrint($comptes);
