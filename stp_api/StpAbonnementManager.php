@@ -1125,7 +1125,7 @@ class StpAbonnementManager
     }
 
     // mise a jour du plan de paiement et de la formule
-    function updateFormule($refAbo, int $refFormule, bool $testMode = true)
+    function updateFormule($refAbo, int $refFormule, bool $testMode = true, $defaut_plan = true)
     {
         $constructor = array(
             "construct" => array(
@@ -1141,9 +1141,20 @@ class StpAbonnementManager
         // on recupere le nouveau plan
         $planMg = new \spamtonprof\stp_api\StpPlanManager();
 
-        $plan = $planMg->getDefault(array(
-            "ref_formule" => $refFormule
-        ));
+        
+        if($defaut_plan === true){
+            
+            $plan = $planMg->getDefault(array(
+                "ref_formule" => $refFormule
+            ));
+        }else{
+            
+            $plan = $planMg->get(array(
+                "ref_formule" => $refFormule,
+                'nom' => $defaut_plan
+            ));
+        }
+        
 
         // mise a jour du plan et de la formule dans la base
 
