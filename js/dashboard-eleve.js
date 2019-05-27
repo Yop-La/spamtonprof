@@ -46,7 +46,7 @@ jQuery( document ).ready( function( $ ) {
 
 			console.log("abo")
 			console.log(abo)
-			rowEssai.find(".prenom-eleve").html(abo.eleve.prenom);
+			rowEssai.find(".prenom-eleve").html(abo.eleve.prenom.capitalize());
 			rowEssai.find(".nom-formule").html(abo.formule.formule.split("|")[0]. concat(" - ",abo.eleve.niveau.niveau));
 
 			montantAbo = abo.plan.tarif;
@@ -180,7 +180,7 @@ jQuery( document ).ready( function( $ ) {
 			rowAbo.removeClass("row-abo-template");
 
 
-			rowAbo.find(".prenom-eleve").html(abo.eleve.prenom);
+			rowAbo.find(".prenom-eleve").html(abo.eleve.prenom.capitalize());
 			rowAbo.find(".nom-formule").html(abo.formule.formule);
 
 			rowAbo.find(".prof").html(abo.prof.prenom.concat(" ",abo.prof.nom));
@@ -302,7 +302,7 @@ jQuery( document ).ready( function( $ ) {
 			rowAbo.removeClass("row-abo-fini-template");
 
 
-			rowAbo.find(".prenom-eleve").html(abo.eleve.prenom);
+			rowAbo.find(".prenom-eleve").html(abo.eleve.prenom.capitalize());
 			rowAbo.find(".nom-formule").html(abo.formule.formule);
 			rowAbo.find(".date-resiliation").html(abo.dateDernierStatut);
 
@@ -335,6 +335,65 @@ jQuery( document ).ready( function( $ ) {
 			e.preventDefault();
 		});
 
+
+
+
+
+	});
+
+
+	waitForEl(".row-eleve", function() {
+
+
+		// pour charger et remplir les lignes d'abonnement
+		nbEleves = eleves.length;
+
+		console.log(nbEleves)
+		console.log(eleves)
+		
+
+		for(var i = 0; i< nbEleves ; i++){
+
+			eleve = eleves[i];
+
+			rowEleve = jQuery(".row-eleve-template").clone();
+			rowEleve.insertAfter(".row-eleve-template");
+			rowEleve.removeClass(".row-eleve-template");
+
+			rowEleve.find(".famille-prenom-eleve").html(eleve.prenom.capitalize().concat(' ',eleve.nom.capitalize()));
+			rowEleve.find(".famille-classe-eleve").html(eleve.niveau.niveau);
+			rowEleve.find(".famille-eleve-email").html(eleve.email);
+			rowEleve.find(".famille-eleve-telephone").html(eleve.telephone);
+
+			
+
+			rowEleve.removeClass("hide");
+
+
+		}
+
+//		// pour attacher la popup d'annulation ou d'interruption au bouton d'annulation
+//		jQuery('.pause').click(function(e) {
+//
+//
+//
+//			console.log("fr");
+//
+//			e.preventDefault();
+//		});
+//
+//		jQuery('.arreter').click(function(e) {
+//
+//			indiceAbo = jQuery(this).parents(".row-abo").find(".ref-abo").val();
+//			jQuery("#popmake-".concat(popupArret," .ref-abo")).val(indiceAbo);
+//
+//
+//
+//			console.log("fr");
+//
+//			e.preventDefault();
+//		});
+//
 
 
 
