@@ -7,11 +7,11 @@ use Exception;
 
 /*
  *
- * Cette classe sert à gérér ( CRUD ) les plans de paiement paypal
+ * Cette classe sert ï¿½ gï¿½rï¿½r ( CRUD ) les plans de paiement paypal
  *
  * attention un billing plan ( equivalent service/produit dans stripe ) ne peut avoir qu'un seul type de paiement definition regulier
  *
- * ainsi ici un billing plan est équivalent à un plan dans stp
+ * ainsi ici un billing plan est ï¿½quivalent ï¿½ un plan dans stp
  *
  *
  *
@@ -38,7 +38,7 @@ class TestModeManager
 
 {
 
-    static $pagesSlugInTest = [];
+    static $pagesSlugInTest = ['payer-prof'];
 
     private $testMode;
 

@@ -86,6 +86,9 @@ require_once (dirname(__FILE__) . '/ajaxFunction/edit_lbc_text.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/lbc-report.php');
 
+require_once (dirname(__FILE__) . '/ajaxFunction/payer_prof.php');
+
+
 add_action('template_redirect', 'handleRedirections');
 
 function is_test_user(){

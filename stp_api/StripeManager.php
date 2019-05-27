@@ -131,6 +131,7 @@ class StripeManager
                 
                 if (! $subId) {
                     $messages[] = "Facture sans abonnement. Faire transfert manuellement si nécessaire";
+//                     $messages[] = json_encode($string)
                     return;
                 }
             } else {
@@ -752,6 +753,21 @@ class StripeManager
             
             $planPaiementManager->update($planPaiement);
         }
+    }
+    
+    public function prof_charging($amt, $token)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        
+        $charge = \Stripe\Charge::create([
+            'amount' => $amt,
+            'currency' => 'eur',
+            'description' => 'Example charge',
+            'source' => $token,
+            "metadata" => ["prof_email" => "sebastien@spamtonprof.com"]
+        ]);
+        
+        return ($charge);
     }
 
     public function getAllSusbscriptions()
