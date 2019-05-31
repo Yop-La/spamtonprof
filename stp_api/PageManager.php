@@ -432,6 +432,7 @@ class PageManager
     
     {
         wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/stage-ete.css');
+
     }
 
     public static function discoverWeek()
@@ -739,7 +740,10 @@ class PageManager
         
         wp_enqueue_style('css_data_table', "https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.css");
     }
-}
-
-    
+}
+
+
+
+    
+
     
