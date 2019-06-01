@@ -1,5 +1,4 @@
 <?php
-
 namespace spamtonprof\stp_api;
 
 /*
@@ -8,7 +7,6 @@ namespace spamtonprof\stp_api;
  *
  *
  */
-
 class PageManager
 
 {
@@ -54,7 +52,6 @@ class PageManager
 
         $is_admin = ($is_admin) ? 'true' : 'false';
         $printNum = "false";
-
 
         wp_localize_script('functions_js', 'isAdmin', $is_admin);
         wp_localize_script('functions_js', 'isLogged', $isLogged);
@@ -149,7 +146,7 @@ class PageManager
                     )
                 ));
 
-                for ($i = 0; $i < count($eleves); $i++) {
+                for ($i = 0; $i < count($eleves); $i ++) {
 
                     $eleveTemp = $eleves[$i];
                     $eleveTemp["inTrial"] = $eleveMg->isInTrial($eleveTemp["ref_eleve"]);
@@ -254,10 +251,10 @@ class PageManager
         }
 
         if ($this->pageSlug == 'stage-bac') {
-            
+
             PageManager::stageBac();
         }
-        
+
         if ($this->pageSlug == 'stage-ete') {
 
             PageManager::stageEte();
@@ -448,19 +445,16 @@ class PageManager
         ), time());
     }
 
-    
     public static function stageBac()
-    
+
     {
         wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/stage-ete.css');
-        
     }
-    
+
     public static function stageEte()
 
     {
         wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/stage-ete.css');
-
     }
 
     public static function paiement()
@@ -473,14 +467,26 @@ class PageManager
             'nf-front-end'
         ), time());
 
-
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
 
-        wp_enqueue_script('select2_js', "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js");
-
-//        wp_enqueue_script('select2_css', "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css");
-
-
+        wp_enqueue_script('stripe_checkout_js', 'https://checkout.stripe.com/checkout.js');
+        
+        wp_enqueue_script('stripe_main_js', 'https://js.stripe.com/v3/');
+        
+        
+        if (isset($_GET['ref_formule'])) {
+        
+            
+            $ref_formule = $_GET['ref_formule'];
+            $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
+            $formule = $formuleMg -> get(array('ref_formule' => $ref_formule),array(
+                "construct" => array(
+                    'defaultPlan'
+                )
+            ));
+            
+            wp_localize_script('functions_js', 'formule', json_decode(json_encode($formule),true));
+        }
     }
 
     public static function discoverWeek()

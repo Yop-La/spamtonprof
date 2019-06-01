@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.8.1.1
+ * Version: 1.1.8.1.2
  *
  *
  * Author: yopla
@@ -401,7 +401,7 @@ function my_pre_population_callback($options, $settings)
 
             $options[] = array(
                 'label' => $niveau->getNiveau(),
-                'value' => $niveau->getSigle()
+                'value' => $niveau->getRef_niveau()
             );
         }
 
