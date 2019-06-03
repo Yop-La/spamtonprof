@@ -582,7 +582,7 @@ class StripeManager
 
                 "email client : " . $emailClient,
 
-                "Faut voir Ã§a avec le client",
+                "Faut voir ça avec le client",
 
                 "Erreur : " . $e->getMessage()
             ));
