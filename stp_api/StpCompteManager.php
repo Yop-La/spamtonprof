@@ -71,7 +71,7 @@ class StpCompteManager
     }
 
     /*
-     * retourne le numéro de list d'essai parent occupé ( ie dont l'abonnement associé est en essai ) du compte $refCompte
+     * retourne le numï¿½ro de list d'essai parent occupï¿½ ( ie dont l'abonnement associï¿½ est en essai ) du compte $refCompte
      * ou 0 si il n'y aucun abonnement en essai
      *
      */
@@ -131,15 +131,6 @@ class StpCompteManager
                 ));
             }
 
-            if (LOCAL) {
-                if ($compte1 && $compte2) {
-                    if ($eleve->getLocal() && ! $proche->getLocal()) {
-                        return ($compte1);
-                    } else if (! $eleve->getLocal() && $proche->getLocal()) {
-                        return ($compte2);
-                    }
-                }
-            }
 
             if ($compte1) {
                 return ($compte1);
