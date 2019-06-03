@@ -107,15 +107,15 @@ jQuery(document).ready(function ($) {
 		allowRememberMe: false,
 		token: function(token) {
 
-			
+
 
 			jQuery("#loading_screen").removeClass("hide");
 			jQuery(".content").addClass("hide");
-			
+
 			console.log("token stripe");
 			console.log(token);
 
-
+			hideMessage();
 
 			// soumission ajax des champs du form pour création inscription
 			ajaxEnCours++;
@@ -133,40 +133,44 @@ jQuery(document).ready(function ($) {
 
 						error = retour.error;
 						message = retour.message;
+						redirect_url = "stage-ete/paiement?ref_formule=".concat(formule.ref_formule)
 
 						if(error){
+
 
 
 							ajaxEnCours--;
 							if(ajaxEnCours == 0){
 
 
-
 								if(message == "compte_existe_deja"){
 
-									redirectTo("semaine-decouverte" ,"Oops : vous avez déjà un compte. Connectez vous pour faire une autre inscription ! " );
+									redirectTo(redirect_url ,"Oops : vous avez déjà un compte. Connectez vous pour faire une autre inscription ! " );
 								}else if(message == "essai_deja_fait"){
-									redirectTo("semaine-decouverte" ,"Oops : vous avez déjà fait un essai pour cette matière ! Venez en parler avec nous." );
+									redirectTo(redirect_url ,"Oops : vous avez déjà fait un essai pour cette matière ! Venez en parler avec nous." );
 								}else if(message == "deja_2_essai"){
 
-									redirectTo("semaine-decouverte" ,"Oops : il y a déjà 2 essais en cours ! Revenez quand au moins un essai sera fini" );
+									redirectTo(redirect_url ,"Oops : il y a déjà 2 essais en cours ! Revenez quand au moins un essai sera fini" );
 								}else if(message == "eleve_deja_essai"){
 
-									redirectTo("semaine-decouverte" ,"Oops : tu es déjà entrain de faire un essai. Reviens quand tu auras fini." );
+									redirectTo(redirect_url ,"Oops : tu es déjà entrain de faire un essai. Reviens quand tu auras fini." );
 								}else if(message == "eleve_existe_deja"){
 
-									redirectTo("semaine-decouverte" ,"Oops : l'élève renseigné a déjà un compte. Sélectionnez le lors de l'inscription." );
+									redirectTo(redirect_url ,"Oops : l'élève renseigné a déjà un compte. Sélectionnez le lors de l'inscription." );
 								}else if(message == "parent_pas_eleve"){
 
-									redirectTo("semaine-decouverte" ,"Oops : un parent ne peux pas s'inscrire en tant qu'élève. Venez en discuter avec nous." );
-								}
+									redirectTo(redirect_url ,"Oops : un parent ne peux pas s'inscrire en tant qu'élève. Venez en discuter avec nous." );
+								}else if(message == "erreur_paiement"){
+
+									redirectTo(redirect_url ,"Oops : Le paiement n'est pas passé. Veuillez réessayer ou venez en discuter avec nous." );
+								}								
 
 							}
 
 						}else{
 
-							showMessage("done")
-//							redirectTo("remerciement-eleve" ,"Félicitations. Tu pourras démarrer la semaine de découverte dans 1 jour !" );
+
+							redirectTo(redirect_url  ,"Félicitations. On vient d'envoyer un email avec tout les détails." );
 
 
 
@@ -183,8 +187,13 @@ jQuery(document).ready(function ($) {
 							jQuery("#loading_screen").addClass("hide");
 							jQuery(".hide_loading").removeClass("hide");
 						}
+					})
+					.always(function() {
+						if(ajaxEnCours == 0){
+							jQuery("#loading_screen").addClass("hide");
+							jQuery(".hide_loading").removeClass("hide");
+						}
 					});
-
 
 
 		}
@@ -201,10 +210,23 @@ jQuery(document).ready(function ($) {
 		description = 'Paiement de '.concat(montant,' € en 2 fois')
 
 		emailCheckout = "alexandre@spamtonprof.com";
-		if(jQuery(".parent_required_checkbox").is(':checked')){
-			emailCheckout = jQuery(".mail_responsable").val()
+
+
+		// user loggé
+		if (typeof userType !== 'undefined') {
+
+			if (typeof proche !== 'undefined') {
+				emailCheckout = proche.email;
+			}else{
+				emailCheckout = eleves[0].email
+			}
 		}else{
-			emailCheckout = jQuery(".email_eleve").val();
+
+			if(jQuery(".parent_required_checkbox").is(':checked')){
+				emailCheckout = jQuery(".mail_responsable").val()
+			}else{
+				emailCheckout = jQuery(".email_eleve").val();
+			}
 		}
 
 		// Open Checkout with further options:

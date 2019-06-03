@@ -38,7 +38,7 @@ class TestModeManager
 
 {
 
-    static $pagesSlugInTest = ['paiement'];
+    static $pagesSlugInTest = [];
 
     private $testMode;
 

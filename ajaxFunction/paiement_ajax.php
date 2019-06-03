@@ -8,37 +8,26 @@ add_action('wp_ajax_nopriv_paiement_inscription', 'paiement_inscription');
 // uniquement utilisé pour le stage d'été pour le moment
 function paiement_inscription()
 {
-
-    /* on s'occupe d'abord de l'essai pour prospect */
     header('Content-type: application/json');
 
     $retour = new \stdClass();
     $retour->error = false;
     $retour->message = 'ok';
 
-    echo (json_encode($retour));
-    die();
-
     $slack = new \spamtonprof\slack\Slack();
 
+    // $_POST = unserializeTemp('/tempo/prospect');
+
     $fields = $_POST['fields'];
-    $token = $_POST['token'];
+    $token = $_POST['token_stripe'];
     $test_mode = $_POST['test_mode'];
-    
+
     $fields = json_decode(stripslashes($fields));
 
-    serializeTemp('/tempo/prospect',$fields);
-//     serializeTemp('/tempo/prospect-same-email',$fields);
-//     serializeTemp('/tempo/client-exis',$fields);
-//     serializeTemp('/tempo/client-nv',$fields);
-//     serializeTemp('/tempo/client-nv-same-email',$fields);
-    
-    die();
-    
     $choix_eleve = $fields->choix_eleve; // vaut false si prospect ou nouveau ou ref_eleve (si !prospect )
     $prenom_eleve = $fields->prenom_eleve;
     $nom_eleve = $fields->nom_eleve;
-    $email_eleve = lower(trim($fields->email_eleve));
+    $email_eleve = strtolower(trim($fields->email_eleve));
     $telephone_eleve = $fields->telephone_eleve;
 
     $prospect = boolval($fields->prospect);
@@ -46,34 +35,27 @@ function paiement_inscription()
     $statut_parent = $fields->statut_parent;
     $prenom_responsable = $fields->prenom_responsable;
     $nom_responsable = $fields->nom_responsable;
-    $email_responsable = lower(trim($fields->mail_responsable));
+    $email_responsable = strtolower(trim($fields->mail_responsable));
     $telephone_responsable = $fields->telephone_responsable;
     $remarques = $fields->remarques;
-    $code_promo = $fields->code_promo;
+
     $source_traffic = $fields->source_traffic;
-    $parent_required = boolval($fields->parent_required);
+    $parent_saisi = boolval($fields->parent_required);
 
     $ref_formule = $fields->ref_formule;
     $ref_niveau = $fields->ref_niveau;
     $date_stage = $fields->date_stage;
-    
-    
+
     $sameEmail = $email_eleve == $email_responsable;
 
     $procheMg = new \spamtonprof\stp_api\StpProcheManager();
     $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
-    $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
 
     $envoiEleve = false; // pour savoir si il faut envoyer le mail de bienvenue a l'eleve et lui creer un compte wordpress
     $envoiParent = false; // pour savoir si il faut envoyer le mail de bienvenue au parent et lui creer un compte wordpress
 
     $proche = false;
     $eleve = false;
-
-    $local = false;
-    if (LOCAL) {
-        $local = true;
-    }
 
     $current_user = wp_get_current_user();
 
@@ -136,25 +118,41 @@ function paiement_inscription()
             }
         }
     }
-    
-    // étape 0 : faire le paiement
-    
+    // étape - 2 : récupération de la formule et du plan
+
+    $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
+    $formule = $formuleMg->get(array(
+        'ref_formule' => $ref_formule
+    ), array(
+        "construct" => array(
+            'defaultPlan'
+        )
+    ));
+
+    $plan = $formule->getDefaultPlan();
+    $plan = \spamtonprof\stp_api\StpPlan::cast($plan);
+
+    // étape -1 : récupération du prof
+
+    $profMg = new \spamtonprof\stp_api\StpProfManager();
+    $prof = $profMg->get(array(
+        'ref_prof' => 59
+    ));
 
     $now = new DateTime(null, new DateTimeZone("Europe/Paris"));
 
-    // etape 1 : recuperer le proche (on l'ajoute si prospect sinon on le recupere)
+    // etape 0 : recuperer le proche (on l'ajoute si prospect sinon on le recupere)
 
     if ($prospect) {
 
-        if ($parent_required) {
+        if ($parent_saisi) {
 
             $proche = new \spamtonprof\stp_api\StpProche(array(
                 'email' => $email_responsable,
                 'prenom' => $prenom_responsable,
                 'nom' => $nom_responsable,
                 'telephone' => $telephone_responsable,
-                'statut_proche' => $statut_parent,
-                'local' => $local
+                'statut_proche' => $statut_parent
             ));
 
             $proche = $procheMg->add($proche);
@@ -172,10 +170,6 @@ function paiement_inscription()
         $proche = $procheMg->get(array(
             'ref_proche' => $compte->getRef_proche()
         ));
-
-        if (! $proche) {
-            $parent_required = false;
-        }
     }
 
     // etape 2 : creation du compte famille si prospect sinon on le recupere
@@ -205,12 +199,47 @@ function paiement_inscription()
         ));
     }
 
-    // etape 3 : ajout de l'eleve
+    // étape 3 : faire le paiement
+    $email_client = $email_eleve;
+    if ($email_responsable) {
+        $email_client = $email_responsable;
+    }
+
+    $stripe = new \spamtonprof\stp_api\StripeManager($test_mode);
+
+    $plan_stripe_id = $plan->getRef_plan_stripe();
+    $prof_stripe_id = $prof->getStripe_id();
+    if ($test_mode == 'true') {
+        $plan_stripe_id = $plan->getRef_plan_stripe_test();
+        $prof_stripe_id = $prof->getStripe_id_test();
+    }
+
+    $ret_stripe = $stripe->addInstallmentPlan($email_client, $token, $plan_stripe_id, $prof_stripe_id, $compte);
+
+    if ($ret_stripe) {
+        $customer_id_stripe = $ret_stripe["cusId"];
+        $subs_id_stripe = $ret_stripe["subId"];
+    } else {
+        $compteMg->delete($compte);
+        $procheMg->delete($proche);
+
+        $retour->error = true;
+        $retour->message = "erreur_paiement";
+        echo (json_encode($retour));
+        die();
+    }
+
+    // etape 4 : ajout de l'eleve
 
     $niveauMg = new \spamtonprof\stp_api\StpNiveauManager();
     $niveau = $niveauMg->get(array(
-        'ref_niveau' => $choix_eleve
+        'ref_niveau' => $ref_niveau
     ));
+
+    $parent_required = false;
+    if ($proche) {
+        $parent_required = true;
+    }
 
     if ($prospect || $choix_eleve == 'nouveau') {
         $eleve = new \spamtonprof\stp_api\StpEleve(array(
@@ -221,8 +250,7 @@ function paiement_inscription()
             'telephone' => $telephone_eleve,
             "same_email" => $sameEmail,
             "ref_compte" => $compte->getRef_compte(),
-            "parent_required" => $parent_required,
-            "local" => $local
+            "parent_required" => $parent_required
         ));
         $eleve = $eleveMg->add($eleve);
 
@@ -238,16 +266,16 @@ function paiement_inscription()
         $eleveMg->updateRefNiveau($eleve);
     }
 
-    // etape 4 : savoir a qui envoyer le mail de bienvenu et a qui creer les comptes wp
+    // etape 5 : savoir a qui envoyer le mail de bienvenu et a qui creer les comptes wp
 
     $eleve->setHasToSend();
 
     $envoiEleve = $eleve->getHasToSendToEleve();
     $envoiParent = $eleve->getHasToSendToParent();
 
-    // etape 5 : creer les nouveaux comptes wordpress
+    // etape 6 : creer les nouveaux comptes wordpress
 
-    // etape 5-1 : creation du compte eleve
+    // etape 6-1 : creation du compte eleve
 
     if ($envoiEleve && ($prospect || $choix_eleve == 'nouveau')) {
 
@@ -290,7 +318,7 @@ function paiement_inscription()
             die();
         }
     }
-    // etape 5-2 : creation du compte proche si il existe
+    // etape 6-2 : creation du compte proche si il existe
 
     if ($envoiParent && $prospect) {
 
@@ -334,132 +362,50 @@ function paiement_inscription()
             }
         }
     }
-    
-    // étape 6 : récupération du plan et de la formule qui est stage été
-//     $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
-//     $formule = $formuleMg -> get(array('ref_formule' => ));
 
-//     // etape 7 - inserer le stage ( ou l'abonnement dans le futur peut être )
+    // etape 7 - inserer le stage ( ou l'abonnement dans le futur peut être )
 
-//     $test = false;
-//     if (strpos($email_eleve, 'yopla.33mail') !== false || strpos($email_eleve, 'test') !== false) {
-//         $test = true;
-//     }
+    $date_stage = DateTime::createFromFormat('d-m-Y', $date_stage);
 
-//     $stageMg = new \spamtonprof\stp_api\StpStageManager();
-//     $stageMg->add(new \spamtonprof\stp_api\StpStage(array(
-//         'ref_proche' => $proche->getRef_proche(),
-//         'ref_eleve' => $eleve->getRef_eleve(),
-//         'ref_plan' => ,
-//         'date_debut',
-//         'date_inscription',
-//         'remarque_inscription',
-//         'ref_prof',
-//         'ref_compte',
-//         'subs_id',
-//         'test'
-//     )));
+    $test = false;
+    if (strpos($email_eleve, 'yopla.33mail') !== false || strpos($email_eleve, 'test') !== false || LOCAL) {
+        $test = true;
+    }
 
-    $abonnement = new \spamtonprof\stp_api\StpAbonnement(array(
-        "ref_eleve" => $eleve->getRef_eleve(),
-        "ref_formule" => $formule->getRef_formule(),
-        "ref_statut_abonnement" => \spamtonprof\stp_api\StpStatutAbonnementManager::ESSAI,
-        "date_creation" => $now,
-        "remarque_inscription" => $remarques,
-        "ref_plan" => $plan->getRef_plan(),
-        "test" => $test
-    ));
+    $stageMg = new \spamtonprof\stp_api\StpStageManager();
 
-    $abonnement = $abonnementMg->add($abonnement);
+    $params_stage = array(
+        'ref_eleve' => $eleve->getRef_eleve(),
+        'ref_plan' => $plan->getRef_plan(),
+        'ref_formule' => $plan->getRef_formule(),
+        'date_debut' => $date_stage->format(PG_DATE_FORMAT),
+        'date_inscription' => $now->format(PG_DATETIME_FORMAT),
+        'remarque_inscription' => $remarques,
+        'ref_prof' => $prof->getRef_prof(),
+        'ref_compte' => $compte->getRef_compte(),
+        'subs_id' => $subs_id_stripe,
+        'test' => $test
+    );
 
-    $logAboMg = new \spamtonprof\stp_api\StpLogAbonnementManager();
-    $logAboMg->add(new \spamtonprof\stp_api\StpLogAbonnement(array(
-        "ref_abonnement" => $abonnement->getRef_abonnement(),
-        "ref_statut_abo" => $abonnement->getRef_statut_abonnement()
-    )));
-
-    $abonnement->setRef_compte($compte->getRef_compte());
-    $abonnementMg->updateRefCompte($abonnement);
+    $stage = $stageMg->add(new \spamtonprof\stp_api\StpStage($params_stage));
 
     if ($proche) {
 
-        $abonnement->setRef_proche($proche->getRef_proche());
-        $abonnementMg->updateRefProche($abonnement);
-    }
-
-    $abonnement->setFirst_prof_assigned(false);
-    $abonnementMg->updateFirstProfAssigned($abonnement);
-
-    $abonnement->setInterruption(false);
-    $abonnementMg->updateInterruption($abonnement);
-
-    if ($coupon) {
-        $abonnement->setRef_coupon($coupon->getRef_coupon());
-        $abonnementMg->updateRefCoupon($abonnement);
-    }
-
-    // etape 8 - inserer les remarques d'inscription
-
-    $stpRemarqueMg = new \spamtonprof\stp_api\StpRemarqueInscriptionManager();
-
-    $matieres = $formule->getMatieres();
-
-    foreach ($matieres as $matiere) {
-
-        if ($matiere1 == $matiere->getMatiere()) {
-            $stpRemarque = new \spamtonprof\stp_api\StpRemarqueInscription(array(
-                "ref_abonnement" => $abonnement->getRef_abonnement(),
-                "remarque" => $remarques_matiere1,
-                "ref_matiere" => $matiere->getRef_matiere()
-            ));
-
-            $stpRemarqueMg->add($stpRemarque);
-        } else if ($matiere2 == $matiere->getMatiere()) {
-            $stpRemarque = new \spamtonprof\stp_api\StpRemarqueInscription(array(
-                "ref_abonnement" => $abonnement->getRef_abonnement(),
-                "remarque" => $remarques_matiere2,
-                "ref_matiere" => $matiere->getRef_matiere()
-            ));
-
-            $stpRemarqueMg->add($stpRemarque);
-        } else if ($matiere3 == $matiere->getMatiere()) {
-            $stpRemarque = new \spamtonprof\stp_api\StpRemarqueInscription(array(
-                "ref_abonnement" => $abonnement->getRef_abonnement(),
-                "remarque" => $remarques_matiere3,
-                "ref_matiere" => $matiere->getRef_matiere()
-            ));
-
-            $stpRemarqueMg->add($stpRemarque);
-        } else if ($matiere4 == $matiere->getMatiere()) {
-            $stpRemarque = new \spamtonprof\stp_api\StpRemarqueInscription(array(
-                "ref_abonnement" => $abonnement->getRef_abonnement(),
-                "remarque" => $remarques_matiere4,
-                "ref_matiere" => $matiere->getRef_matiere()
-            ));
-
-            $stpRemarqueMg->add($stpRemarque);
-        } else if ($matiere5 == $matiere->getMatiere()) {
-            $stpRemarque = new \spamtonprof\stp_api\StpRemarqueInscription(array(
-                "ref_abonnement" => $abonnement->getRef_abonnement(),
-                "remarque" => $remarques_matiere5,
-                "ref_matiere" => $matiere->getRef_matiere()
-            ));
-
-            $stpRemarqueMg->add($stpRemarque);
-        }
+        $stage->setRef_proche($proche->getRef_proche());
+        $stageMg->updateRefProche($stage);
     }
 
     // etape 9 - envoi d'un message dans slack pour dire qu'il y a une attribution de prof en attente
-    $messages;
+
     if ($proche) {
 
         $messages = array(
-            "Nouvelle inscription : bien joué la team prospection !!",
+            "Un nouveau stage vient d'être facturé : " . $formule->getFormule(),
             "------ Eleve ----- ",
             "Email élève : " . $eleve->getEmail(),
             "Prénom élève : " . utf8_encode($eleve->getPrenom()),
             "Nom élève : " . utf8_encode($eleve->getNom()),
-            "Niveau élève : " . utf8_encode($niveau->getNiveau()),
+            "Niveau élève : " . $niveau->getNiveau(),
             "Téléphone élève :" . $eleve->getTelephone(),
             "Formule : " . $formule->getFormule(),
             "------ Parent ----- ",
@@ -467,34 +413,30 @@ function paiement_inscription()
             "Prénom parent : " . utf8_encode($proche->getPrenom()),
             "Nom parent : " . utf8_encode($proche->getNom()),
             "Téléphone parent :" . $proche->getTelephone(),
-            "Remarque :" . $abonnement->getRemarque_inscription(),
-            "Source traffic : " . $source_traffic,
-            "Coupon : " . $code_promo
+            "Remarque :" . $stage->getRemarque_inscription(),
+            "Source traffic : " . $source_traffic
         );
     } else {
         $messages = array(
-            "Nouvelle inscription : bien joué la team prospection !!",
+            "Un nouveau stage vient d'être facturé " . $formule->getFormule(),
             "------ étudiant/Adulte ----- ",
             "Email : " . $eleve->getEmail(),
             "Prénom : " . utf8_encode($eleve->getPrenom()),
             " Nom : " . utf8_encode($eleve->getNom()),
-            "Niveau : " . utf8_encode($niveau->getNiveau()),
+            "Niveau : " . $niveau->getNiveau(),
             "Téléphone :" . $eleve->getTelephone(),
             "Formule : " . $formule->getFormule(),
-            "Remarque :" . $abonnement->getRemarque_inscription(),
-            "Source traffic : " . $source_traffic,
-            "Coupon : " . $code_promo
+            "Remarque :" . $stage->getRemarque_inscription(),
+            "Source traffic : " . $source_traffic
         );
     }
     $messages[] = " ---------- ";
     $messages[] = "[URGENT] : Rendez vous dans le back office pour lui attribuer un prof";
     $messages[] = "et mettre un check sur le message dès que c'est fait !";
 
-    $slack->sendMessages("inscription-essai", $messages);
+    $slack->sendMessages("stage-reserve", $messages);
 
-    // étape 10 - envoi d'un mail de bienvenue et de mise en attente au parent et a l'eleve
-
-    $profResponsable = $formule->getProf()->getPhrase_responsable();
+    // étape 10 - envoi d'un mail de bienvenue et de mise en attente au parent et de l'élève
 
     $expeMg = new \spamtonprof\stp_api\StpExpeManager();
     $expe = $expeMg->get("info@spamtonprof.com");
@@ -504,24 +446,34 @@ function paiement_inscription()
     ));
 
     if ($envoiEleve) {
-        $body_eleve = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/bienvenue-essai-eleve.html");
-        $body_eleve = str_replace("[prof-responsable]", $profResponsable, $body_eleve);
+        $slack->sendMessages('log', array(
+            'envoi eleve dedans'
+        ));
+        $body_eleve = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/stage_ete_eleve.txt");
+        $body_eleve = str_replace("[[prenom-eleve]]", $eleve->getPrenom(), $body_eleve);
+        $body_eleve = str_replace("[[date-stage]]", $date_stage->format(FR_DATE_FORMAT) . " le matin.", $body_eleve);
+        $body_eleve = str_replace("[[prenom-prof]]", $prof->getPrenom(), $body_eleve);
         $smtp->sendEmail("Bienvenue " . $eleve->getPrenom(), $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alexandre de SpamTonProf", true);
     }
 
     if ($envoiParent) {
-        $body_parent = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/bienvenue-essai-parent.html");
-        $body_parent = str_replace("[prof-responsable]", $profResponsable, $body_parent);
-        $body_parent = str_replace("[prenom-eleve]", $eleve->getPrenom(), $body_parent);
+        $slack->sendMessages('log', array(
+            'envoi parent dedans'
+        ));
+        $body_parent = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/stage_ete_parent.txt");
+
+        $body_parent = str_replace("[[prenom-eleve]]", $eleve->getPrenom(), $body_parent);
+        $body_parent = str_replace("[[date-stage]]", $date_stage->format(FR_DATE_FORMAT) . " le matin.", $body_parent);
+        $body_parent = str_replace("[[prenom-parent]]", $proche->getPrenom(), $body_parent);
+        $body_parent = str_replace("[[prenom-prof]]", $prof->getPrenom(), $body_parent);
 
         $smtp->sendEmail("Bienvenue " . $proche->getPrenom(), $proche->getEmail(), $body_parent, $expe->getEmail(), "Alexandre de SpamTonProf", true);
     }
 
+    // // etape 11 : mettre a jour l'index
+    // $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+    // $algoliaMg->addAbonnement($abonnement->getRef_abonnement());
+
     echo (json_encode($retour));
-
-    // etape 11 : mettre a jour l'index
-    $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
-    $algoliaMg->addAbonnement($abonnement->getRef_abonnement());
-
     die();
 }
