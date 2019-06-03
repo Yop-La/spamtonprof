@@ -1,0 +1,19 @@
+Bonjour [[prenom-parent]],
+
+Nous avons bien reçu votre inscription ! 
+
+Toute l'équipe de SpamTonProf vous souhaite la bienvenue !
+
+[[prenom-eleve]] commencera son stage d'été le [[date-stage]].
+
+Son professeur est [[prenom-prof]] !
+
+Si vous ne l'avez pas encore eu au téléphone je vous invite à l'appeler au 07 57 93 39 94 afin qu'il fasse un petit bilan pédagogique avec [[prenom-eleve]], lui donne des recommandations et les premiers exercices.
+
+Je vous rappelle que vous pouvez ensuite solliciter Sébastien en illimité par mails et et par téléphone afin que [[prenom-eleve]] travaille et progresse le plus possible pendant cette semaine.
+
+J'espère que ça va vous plaire.
+
+À bientôt,
+
+Alexandre le directeur et toute son équipe
