@@ -48,7 +48,7 @@ var mySubmitController = Marionette.Object.extend( {
 
 		// form essai
 		if(response.data.form_id == idFormEssai){
-			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#loading_screen").removeClass("hide");
 			jQuery(".content").addClass("hide");
 			jQuery("#res_recherche").addClass('hide');
 			jQuery("#no_res").addClass('hide');
@@ -136,7 +136,7 @@ var mySubmitController = Marionette.Object.extend( {
 						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".hide_loading").removeClass("hide");
 						}
 					});
@@ -505,7 +505,7 @@ showMessage("Hop, hop, pas si vite. Inscrits toi avec un de tes parents pour êt
 		matiere = getMatiereFieldValue();
 		niveau = getNiveauFieldValue();
 
-		jQuery("#loadingSpinner").removeClass("hide");
+		jQuery("#loading_screen").removeClass("hide");
 		jQuery(".content").addClass("hide");
 		jQuery("#res_recherche").addClass('hide');
 		jQuery("#no_res").addClass('hide');
@@ -570,7 +570,7 @@ showMessage("Hop, hop, pas si vite. Inscrits toi avec un de tes parents pour êt
 							jQuery('#keyword').text(getMatiereFieldValue().concat(' - ',getNiveauFieldValue()));
 
 
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".content").removeClass("hide");
 							jQuery("#res_recherche").addClass('hide');
 							jQuery("#no_res").removeClass('hide');
@@ -648,7 +648,7 @@ showMessage("Hop, hop, pas si vite. Inscrits toi avec un de tes parents pour êt
 					}else{
 						showMessage(retour.message);
 
-						jQuery("#loadingSpinner").addClass("hide");
+						jQuery("#loading_screen").addClass("hide");
 						jQuery(".content").removeClass("hide");
 						jQuery("#res_recherche").addClass('hide');
 						jQuery("#no_res").addClass('hide');
@@ -667,7 +667,7 @@ showMessage("Hop, hop, pas si vite. Inscrits toi avec un de tes parents pour êt
 				.always(function() {
 					ajaxEnCours--;
 					if(ajaxEnCours == 0){
-						jQuery("#loadingSpinner").addClass("hide");
+						jQuery("#loading_screen").addClass("hide");
 						jQuery(".content").removeClass("hide");
 					}
 					if(nbFormule == 0){

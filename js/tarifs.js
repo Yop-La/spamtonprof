@@ -171,7 +171,7 @@ jQuery( document ).ready( function( jQuery ) {
 		matiere = getMatiereFieldValue();
 		niveau = getNiveauFieldValue();
 
-		jQuery("#loadingSpinner").removeClass("hide");
+		jQuery("#loading_screen").removeClass("hide");
 		jQuery(".content").addClass("hide");
 		jQuery("#res_recherche").addClass('hide');
 		jQuery("#no_res").addClass('hide');
@@ -220,7 +220,7 @@ jQuery( document ).ready( function( jQuery ) {
 							jQuery('#keyword').text(getMatiereFieldValue().concat(' - ',getNiveauFieldValue()));
 
 
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".content").removeClass("hide");
 							jQuery("#res_recherche").addClass('hide');
 							jQuery("#no_res").removeClass('hide');
@@ -313,7 +313,7 @@ jQuery( document ).ready( function( jQuery ) {
 					}else{
 						showMessage(retour.message);
 
-						jQuery("#loadingSpinner").addClass("hide");
+						jQuery("#loading_screen").addClass("hide");
 						jQuery(".content").removeClass("hide");
 						jQuery("#res_recherche").addClass('hide');
 						jQuery("#no_res").addClass('hide');
@@ -332,7 +332,7 @@ jQuery( document ).ready( function( jQuery ) {
 				.always(function() {
 					ajaxEnCours--;
 					if(ajaxEnCours == 0){
-						jQuery("#loadingSpinner").addClass("hide");
+						jQuery("#loading_screen").addClass("hide");
 						jQuery(".content").removeClass("hide");
 					}
 					if(nbFormule == 0){

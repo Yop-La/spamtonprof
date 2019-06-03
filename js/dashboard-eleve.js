@@ -404,7 +404,7 @@ jQuery( document ).ready( function( $ ) {
 	function resilierAbonnement(abo){
 
 
-		jQuery("#fountainTextG").removeClass("hide");
+		jQuery("#loading_screen").removeClass("hide");
 		jQuery(".hide_loading").addClass("hide");
 		PUM.close(popupArret);
 
@@ -423,7 +423,7 @@ jQuery( document ).ready( function( $ ) {
 				ajaxEnCours--;
 				if(ajaxEnCours == 0){
 					jQuery(".hide_loading").removeClass("hide");
-					jQuery("#fountainTextG").addClass("hide");
+					jQuery("#loading_screen").addClass("hide");
 				}
 			}else{
 				redirectTo('dashboard-eleve','L\'abonnement va être bientôt résilié (un mail de confirmation va être envoyé)');
@@ -434,7 +434,7 @@ jQuery( document ).ready( function( $ ) {
 			ajaxEnCours--;
 			if(ajaxEnCours == 0){
 				jQuery(".hide_loading").removeClass("hide");
-				jQuery("#fountainTextG").addClass("hide");
+				jQuery("#loading_screen").addClass("hide");
 			}
 		});
 	}
@@ -444,7 +444,7 @@ jQuery( document ).ready( function( $ ) {
 
 	function createSubscription(refAbonnement, source, testMode){
 
-		jQuery("#fountainTextG").removeClass("hide");
+		jQuery("#loading_screen").removeClass("hide");
 		jQuery(".hide_loading").addClass("hide");
 
 		ajaxEnCours++;
@@ -463,7 +463,7 @@ jQuery( document ).ready( function( $ ) {
 				ajaxEnCours--;
 				if(ajaxEnCours == 0){
 					jQuery(".hide_loading").removeClass("hide");
-					jQuery("#fountainTextG").addClass("hide");
+					jQuery("#loading_screen").addClass("hide");
 				}
 			}else{
 				redirectTo('dashboard-eleve','Félicitations : le paiement est passé. L\'inscription est bien validé.');
@@ -474,14 +474,14 @@ jQuery( document ).ready( function( $ ) {
 			ajaxEnCours--;
 			if(ajaxEnCours == 0){
 				jQuery(".hide_loading").removeClass("hide");
-				jQuery("#fountainTextG").addClass("hide");
+				jQuery("#loading_screen").addClass("hide");
 			}
 		});
 	}
 
 	function updateCb(refCompte, source, testMode){
 
-		jQuery("#fountainTextG").removeClass("hide");
+		jQuery("#loading_screen").removeClass("hide");
 		jQuery(".hide_loading").addClass("hide");
 
 		ajaxEnCours++;
@@ -510,7 +510,7 @@ jQuery( document ).ready( function( $ ) {
 			ajaxEnCours--;
 			if(ajaxEnCours == 0){
 				jQuery(".hide_loading").removeClass("hide");
-				jQuery("#fountainTextG").addClass("hide");
+				jQuery("#loading_screen").addClass("hide");
 			}
 		});
 	}

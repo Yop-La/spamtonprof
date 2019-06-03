@@ -106,7 +106,7 @@ jQuery( document ).ready( function( $ ) {
 
 				console.log(refAbo);
 				console.log(email);
-				jQuery("#fountainTextG").removeClass("hide");
+				jQuery("#loading_screen").removeClass("hide");
 				jQuery(".hide_loading").addClass("hide");
 				jQuery.post(
 						ajaxurl,
@@ -128,7 +128,7 @@ jQuery( document ).ready( function( $ ) {
 								showMessage("Il y a un problème. Contacter l'équipe et donner leur ce message d'erreur : ".concat(message));
 								ajaxEnCours--;
 								if(ajaxEnCours == 0){
-									jQuery("#fountainTextG").addClass("hide");
+									jQuery("#loading_screen").addClass("hide");
 									jQuery(".hide_loading").removeClass("hide");
 								}
 							}else{
@@ -146,7 +146,7 @@ jQuery( document ).ready( function( $ ) {
 
 						})
 						.always(function(){
-							jQuery("#fountainTextG").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".hide_loading").removeClass("hide");
 						});
 

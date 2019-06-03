@@ -28,7 +28,7 @@ var mySubmitController = Marionette.Object.extend( {
 
 		// titles form
 		if(response.data.form_id == idForm){
-			jQuery("#fountainTextG").removeClass("hide");
+			jQuery("#loading_screen").removeClass("hide");
 			jQuery(".hide_loading").addClass("hide");
 
 
@@ -68,7 +68,7 @@ var mySubmitController = Marionette.Object.extend( {
 					.always(function(err){
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#fountainTextG").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".hide_loading").removeClass("hide");
 
 						}
