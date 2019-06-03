@@ -15,7 +15,7 @@ class StpAbonnementManager
 
     public function add(StpAbonnement $StpAbonnement)
     {
-        $q = $this->_db->prepare('insert into stp_abonnement(ref_eleve, ref_formule, ref_statut_abonnement, date_creation, remarque_inscription, ref_plan) values( :ref_eleve,:ref_formule,:ref_statut_abonnement,:date_creation,:remarque_inscription,:ref_plan)');
+        $q = $this->_db->prepare('insert into stp_abonnement(ref_eleve, ref_formule, ref_statut_abonnement, date_creation, remarque_inscription, ref_plan, test) values( :ref_eleve,:ref_formule,:ref_statut_abonnement,:date_creation,:remarque_inscription,:ref_plan, :test)');
         $q->bindValue(':ref_eleve', $StpAbonnement->getRef_eleve());
         $q->bindValue(':ref_formule', $StpAbonnement->getRef_formule());
         $q->bindValue(':ref_statut_abonnement', $StpAbonnement->getRef_statut_abonnement());
@@ -23,6 +23,7 @@ class StpAbonnementManager
             ->format(PG_DATETIME_FORMAT));
         $q->bindValue(':remarque_inscription', $StpAbonnement->getRemarque_inscription());
         $q->bindValue(':ref_plan', $StpAbonnement->getRef_plan());
+        $q->bindValue(':test', $StpAbonnement->getTest(),PDO::PARAM_BOOL);
         $q->execute();
 
         $StpAbonnement->setRef_abonnement($this->_db->lastInsertId());
