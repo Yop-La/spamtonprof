@@ -4,7 +4,23 @@ namespace spamtonprof\stp_api;
 class StpPlan implements \JsonSerializable
 {
 
-    protected $ref_plan, $nom, $tarif, $ref_formule, $ref_plan_stripe, $ref_plan_stripe_test, $ref_plan_old, $formule, $defaut;
+    protected $ref_plan, $nom, $tarif, $ref_formule, $ref_plan_stripe, $ref_plan_stripe_test, $ref_plan_old, $formule, $defaut, $installments;
+
+    /**
+     * @return mixed
+     */
+    public function getInstallments()
+    {
+        return $this->installments;
+    }
+
+    /**
+     * @param mixed $installments
+     */
+    public function setInstallments($installments)
+    {
+        $this->installments = $installments;
+    }
 
     public function __construct(array $donnees = array())
     
