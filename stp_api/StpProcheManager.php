@@ -48,6 +48,14 @@ class StpProcheManager
         $q->execute();
         return ($proche);
     }
+    
+    public function delete(StpProche $proche)
+    {
+        $q = $this->_db->prepare('delete from stp_proche where ref_proche = :ref_proche');
+        $q->bindValue(':ref_proche', $proche->getRef_proche());
+        $q->execute();
+        return ($proche);
+    }
 
     public function get($info)
     {
