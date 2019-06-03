@@ -432,7 +432,7 @@ function inscriptionEssai()
     // etape 7 - inserer l'abonnement
     
     $test = false;
-    if (strpos($email_eleve, 'yopla.33mail') !== false) {
+    if (strpos($email_eleve, 'yopla.33mail') !== false || strpos($email_eleve, 'test') !== false) {
         $test  = true;
     }
     
