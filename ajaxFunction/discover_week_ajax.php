@@ -99,10 +99,7 @@ function inscriptionEssai()
     $proche = false;
     $eleve = false;
 
-    $local = false;
-    if (LOCAL) {
-        $local = true;
-    }
+    
 
     $current_user = wp_get_current_user();
 
@@ -235,8 +232,7 @@ function inscriptionEssai()
                 'prenom' => $prenom_responsable,
                 'nom' => $nom_responsable,
                 'telephone' => $telephone_responsable,
-                'statut_proche' => $statut_parent,
-                'local' => $local
+                'statut_proche' => $statut_parent
             ));
 
             $proche = $procheMg->add($proche);
@@ -296,8 +292,7 @@ function inscriptionEssai()
             'telephone' => $telephone_eleve,
             "same_email" => $sameEmail,
             "ref_compte" => $compte->getRef_compte(),
-            "parent_required" => $parent_required,
-            "local" => $local
+            "parent_required" => $parent_required
         ));
         $eleve = $eleveMg->add($eleve);
 
@@ -432,7 +427,7 @@ function inscriptionEssai()
     // etape 7 - inserer l'abonnement
     
     $test = false;
-    if (strpos($email_eleve, 'yopla.33mail') !== false || strpos($email_eleve, 'test') !== false) {
+    if (strpos($email_eleve, 'yopla.33mail') !== false || strpos($email_eleve, 'test') !== false || LOCAL) {
         $test  = true;
     }
     
