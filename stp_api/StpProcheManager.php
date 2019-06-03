@@ -15,13 +15,12 @@ class StpProcheManager
 
     public function add(StpProche $StpProche)
     {
-        $q = $this->_db->prepare('insert into stp_proche(email, prenom, nom, telephone, statut_proche, local) values( :email,:prenom,:nom,:telephone, :statut_proche, :local)');
+        $q = $this->_db->prepare('insert into stp_proche(email, prenom, nom, telephone, statut_proche) values( :email,:prenom,:nom,:telephone, :statut_proche)');
         $q->bindValue(':email', $StpProche->getEmail());
         $q->bindValue(':prenom', $StpProche->getPrenom());
         $q->bindValue(':nom', $StpProche->getNom());
         $q->bindValue(':telephone', $StpProche->getTelephone());
         $q->bindValue(':statut_proche', $StpProche->getStatut_proche());
-        $q->bindValue(':local', $StpProche->getLocal(), PDO::PARAM_BOOL);
         $q->execute();
 
         $StpProche->setRef_proche($this->_db->lastInsertId());

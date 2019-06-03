@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class StpEleve implements \JsonSerializable
 {
 
-    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil, $ref_compte, $seq_email_parent_essai, $hasToSendToEleve, $hasToSendToParent, $ref_niveau, $parent_required, $niveau, $local, $gr_id, $formules, $abos;
+    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil, $ref_compte, $seq_email_parent_essai, $hasToSendToEleve, $hasToSendToParent, $ref_niveau, $parent_required, $niveau, $gr_id, $formules, $abos;
 
     /**
      *
@@ -96,23 +96,7 @@ class StpEleve implements \JsonSerializable
         $this->gr_id = $gr_id;
     }
 
-    /**
-     *
-     * @return mixed
-     */
-    public function getLocal()
-    {
-        return $this->local;
-    }
 
-    /**
-     *
-     * @param mixed $local
-     */
-    public function setLocal($local)
-    {
-        $this->local = $local;
-    }
 
     /**
      *

@@ -15,7 +15,7 @@ class StpEleveManager
 
     public function add(StpEleve $StpEleve)
     {
-        $q = $this->_db->prepare('insert into stp_eleve(email, prenom, ref_niveau, nom, telephone, same_email, parent_required,ref_compte, local) values(:email, :prenom, :ref_niveau, :nom, :telephone, :same_email, :parent_required,:ref_compte, :local)');
+        $q = $this->_db->prepare('insert into stp_eleve(email, prenom, ref_niveau, nom, telephone, same_email, parent_required,ref_compte) values(:email, :prenom, :ref_niveau, :nom, :telephone, :same_email, :parent_required,:ref_compte)');
         $q->bindValue(':email', $StpEleve->getEmail());
         $q->bindValue(':prenom', $StpEleve->getPrenom());
         $q->bindValue(':ref_niveau', $StpEleve->getRef_niveau());
@@ -24,7 +24,6 @@ class StpEleveManager
         $q->bindValue(':same_email', $StpEleve->getSame_email(), \PDO::PARAM_BOOL);
         $q->bindValue(':parent_required', $StpEleve->getParent_required(), \PDO::PARAM_BOOL);
         $q->bindValue(':ref_compte', $StpEleve->getRef_compte());
-        $q->bindValue(':local', $StpEleve->getLocal(), PDO::PARAM_BOOL);
 
         $q->execute();
         $StpEleve->setRef_eleve($this->_db->lastInsertId());

@@ -4,25 +4,8 @@ namespace spamtonprof\stp_api;
 class StpProche implements \JsonSerializable
 {
 
-    protected $email, $prenom, $nom, $telephone, $ref_proche, $ref_compte_wp, $statut_proche, $local;
+    protected $email, $prenom, $nom, $telephone, $ref_proche, $ref_compte_wp, $statut_proche;
 
-    /**
-     *
-     * @return mixed
-     */
-    public function getLocal()
-    {
-        return $this->local;
-    }
-
-    /**
-     *
-     * @param mixed $local
-     */
-    public function setLocal($local)
-    {
-        $this->local = $local;
-    }
 
     /**
      *
