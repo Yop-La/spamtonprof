@@ -112,10 +112,16 @@ class PageManager
                 $abosEssai = [];
                 $abosTermine = [];
 
-                $proche = null;
+                $proche = false;
+                $ref_proche = $compte->getRef_proche();
+                if ($ref_proche) {
+                    $proche = $procheMg->get((array(
+                        'ref_proche' => $ref_proche
+                    )));
+                    wp_localize_script('functions_js', 'proche', json_decode(json_encode($proche),true));
+                }
+                
                 foreach ($abonnements as $abonnement) {
-
-                    $proche = $abonnement->getProche();
 
                     switch ($abonnement->getRef_statut_abonnement()) {
                         case $abonnement::ACTIF:
@@ -133,10 +139,6 @@ class PageManager
                 wp_localize_script('functions_js', 'abosActif', $abosActif);
                 wp_localize_script('functions_js', 'abosEssai', $abosEssai);
                 wp_localize_script('functions_js', 'abosTermine', $abosTermine);
-
-                if ($proche) {
-                    wp_localize_script('functions_js', 'proche', $proche->toArray());
-                }
 
                 $eleves = $eleveMg->getAll(array(
                     "ref_compte" => $compte->getRef_compte()
@@ -470,22 +472,22 @@ class PageManager
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
 
         wp_enqueue_script('stripe_checkout_js', 'https://checkout.stripe.com/checkout.js');
-        
+
         wp_enqueue_script('stripe_main_js', 'https://js.stripe.com/v3/');
-        
-        
+
         if (isset($_GET['ref_formule'])) {
-        
-            
+
             $ref_formule = $_GET['ref_formule'];
             $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
-            $formule = $formuleMg -> get(array('ref_formule' => $ref_formule),array(
+            $formule = $formuleMg->get(array(
+                'ref_formule' => $ref_formule
+            ), array(
                 "construct" => array(
                     'defaultPlan'
                 )
             ));
-            
-            wp_localize_script('functions_js', 'formule', json_decode(json_encode($formule),true));
+
+            wp_localize_script('functions_js', 'formule', json_decode(json_encode($formule), true));
         }
     }
 
