@@ -11,7 +11,7 @@ class StpPlanManager
 
     // Instance de PDO
     public function __construct()
-    
+
     {
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
         // todostp faire pareil pour getresponse_api
@@ -21,29 +21,29 @@ class StpPlanManager
     {
         $q = $this->_db->prepare("insert into stp_plan_paiement( nom, tarif, ref_formule) 
                         values( :nom, :tarif, :ref_formule);");
-        
+
         $q->bindValue(":nom", $plan->getNom());
         $q->bindValue(":tarif", $plan->getTarif());
         $q->bindValue(":ref_formule", $plan->getRef_formule());
-        
+
         $q->execute();
-        
+
         $plan->setRef_plan($this->_db->lastInsertId());
-        
+
         return ($plan);
     }
 
     public function getDefault($info)
     {
         if (is_array($info)) {
-            
+
             if (array_key_exists("ref_formule", $info)) {
                 $refFormule = $info["ref_formule"];
                 $q = $this->_db->prepare("select * from stp_plan_paiement where ref_formule = :ref_formule and defaut is true");
                 $q->bindValue(":ref_formule", $refFormule);
                 $q->execute();
             }
-            
+
             $data = $q->fetch(PDO::FETCH_ASSOC);
             if ($data) {
                 $plan = new \spamtonprof\stp_api\StpPlan($data);
@@ -58,9 +58,9 @@ class StpPlanManager
         $plans = $this->getAll(array(
             'ref_formule' => $ref_formule
         ));
-        
+
         foreach ($plans as $plan) {
-            
+
             if ($plan->getNom() == $nom_plan) {
                 $plan->setDefaut(true);
             } else {
@@ -74,32 +74,32 @@ class StpPlanManager
     {
         $plans = [];
         $q = null;
-        
+
         if (is_array($info)) {
-            
+
             if (array_key_exists("ref_formule", $info)) {
                 $refFormule = $info["ref_formule"];
                 $q = $this->_db->prepare("select * from stp_plan_paiement where ref_formule = :ref_formule");
                 $q->bindValue(":ref_formule", $refFormule);
             }
         }
-        
+
         if ($info == "all") {
-            
+
             $q = $this->_db->prepare("select * from stp_plan_paiement");
         }
-        
+
         $q->execute();
-        
+
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
-            
+
             $plan = new \spamtonprof\stp_api\StpPlan($data);
-            
+
             if ($constructor) {
                 $constructor["objet"] = $plan;
                 $this->construct($constructor);
             }
-            
+
             $plans[] = $plan;
         }
         return ($plans);
@@ -111,7 +111,37 @@ class StpPlanManager
         $q->bindValue(':defaut', $plan->getDefaut(), PDO::PARAM_BOOL);
         $q->bindValue(':ref_plan', $plan->getRef_plan());
         $q->execute();
-        
+
+        return ($plan);
+    }
+
+    public function update_label_installment(\spamtonprof\stp_api\StpPlan $plan)
+    {
+        $q = $this->_db->prepare('update stp_plan_paiement set label_installment = :label_installment where ref_plan = :ref_plan');
+        $q->bindValue(':label_installment', $plan->getLabel_installment());
+        $q->bindValue(':ref_plan', $plan->getRef_plan());
+        $q->execute();
+
+        return ($plan);
+    }
+
+    public function update_nb_days(\spamtonprof\stp_api\StpPlan $plan)
+    {
+        $q = $this->_db->prepare('update stp_plan_paiement set nb_days = :nb_days where ref_plan = :ref_plan');
+        $q->bindValue(':nb_days', $plan->getNb_days());
+        $q->bindValue(':ref_plan', $plan->getRef_plan());
+        $q->execute();
+
+        return ($plan);
+    }
+
+    public function update_installments(\spamtonprof\stp_api\StpPlan $plan)
+    {
+        $q = $this->_db->prepare('update stp_plan_paiement set installments = :installments where ref_plan = :ref_plan');
+        $q->bindValue(':installments', $plan->getInstallments());
+        $q->bindValue(':ref_plan', $plan->getRef_plan());
+        $q->execute();
+
         return ($plan);
     }
 
@@ -121,7 +151,7 @@ class StpPlanManager
         $q->bindValue(':ref_plan_old', $plan->getRef_plan_old());
         $q->bindValue(':ref_plan', $plan->getRef_plan());
         $q->execute();
-        
+
         return ($plan);
     }
 
@@ -131,7 +161,7 @@ class StpPlanManager
         $q->bindValue(':ref_plan_stripe', $plan->getRef_plan_stripe());
         $q->bindValue(':ref_plan', $plan->getRef_plan());
         $q->execute();
-        
+
         return ($plan);
     }
 
@@ -141,7 +171,7 @@ class StpPlanManager
         $q->bindValue(':ref_plan_stripe_test', $plan->getRef_plan_stripe_test());
         $q->bindValue(':ref_plan', $plan->getRef_plan());
         $q->execute();
-        
+
         return ($plan);
     }
 
@@ -152,7 +182,7 @@ class StpPlanManager
             $q->execute([
                 ':ref_plan' => $info
             ]);
-            
+
             if ($q->rowCount() <= 0) {
                 return (false);
             } else {
@@ -171,14 +201,14 @@ class StpPlanManager
             }
             if (array_key_exists('ref_plan', $info)) {
                 $refPlan = $info['ref_plan'];
-                
+
                 $q = $this->_db->prepare('SELECT * FROM stp_plan_paiement WHERE ref_plan =:ref_plan');
                 $q->bindValue(':ref_plan', $refPlan);
                 $q->execute();
             }
-            
+
             $data = $q->fetch(PDO::FETCH_ASSOC);
-            
+
             if (! $data) {
                 return (false);
             } else {
@@ -195,19 +225,19 @@ class StpPlanManager
     public function construct($constructor)
     {
         $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
-        
+
         $plan = $this->cast($constructor["objet"]);
-        
+
         $constructOrders = $constructor["construct"];
-        
+
         foreach ($constructOrders as $constructOrder) {
-            
+
             switch ($constructOrder) {
                 case "ref_formule":
                     $formule = $formuleMg->get(array(
                         'ref_formule' => $plan->getRef_formule()
                     ));
-                    
+
                     $plan->setFormule($formule);
                     break;
             }

@@ -4,9 +4,46 @@ namespace spamtonprof\stp_api;
 class StpPlan implements \JsonSerializable
 {
 
-    protected $ref_plan, $nom, $tarif, $ref_formule, $ref_plan_stripe, $ref_plan_stripe_test, $ref_plan_old, $formule, $defaut, $installments;
+    protected $ref_plan, $nom, $tarif, $ref_formule, $ref_plan_stripe, $ref_plan_stripe_test, $ref_plan_old, $formule, $defaut, $installments, $label_installment, $nb_days;
 
     /**
+     *
+     * @return mixed
+     */
+    public function getNb_days()
+    {
+        return $this->nb_days;
+    }
+
+    /**
+     *
+     * @param mixed $nb_days
+     */
+    public function setNb_days($nb_days)
+    {
+        $this->nb_days = $nb_days;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getLabel_installment()
+    {
+        return $this->label_installment;
+    }
+
+    /**
+     *
+     * @param mixed $label_installment
+     */
+    public function setLabel_installment($label_installment)
+    {
+        $this->label_installment = $label_installment;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getInstallments()
@@ -15,6 +52,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $installments
      */
     public function setInstallments($installments)
@@ -23,28 +61,27 @@ class StpPlan implements \JsonSerializable
     }
 
     public function __construct(array $donnees = array())
-    
+
     {
         $this->hydrate($donnees);
     }
 
     public function hydrate(array $donnees)
-    
+
     {
         foreach ($donnees as $key => $value) {
-            
+
             $method = 'set' . ucfirst($key);
-            
+
             if (method_exists($this, $method)) {
-                
+
                 $this->$method($value);
             }
         }
     }
-    
-    
 
     /**
+     *
      * @return mixed
      */
     public function getDefaut()
@@ -53,6 +90,7 @@ class StpPlan implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $defaut
      */
     public function setDefaut($defaut)
@@ -189,7 +227,7 @@ class StpPlan implements \JsonSerializable
     public function jsonSerialize()
     {
         $vars = get_object_vars($this);
-        
+
         return $vars;
     }
 
@@ -215,11 +253,11 @@ class StpPlan implements \JsonSerializable
     {
         $this->formule = $formule;
     }
-    
+
     public function __toString()
     {
-        $return = "Plan: " . $this->tarif  . ' € par semaine ' . "\n";
-        return($return);
+        $return = "Plan: " . $this->tarif . ' € par semaine ' . "\n";
+        return ($return);
     }
 }
 
