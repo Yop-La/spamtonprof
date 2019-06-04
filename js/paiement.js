@@ -6,6 +6,14 @@ jQuery(document).ready(function ($) {
 	var token_stripe = false;
 	var plan_choisi ;
 	var plan_loadding_done = false
+	
+	var plan_field_key = 'plan_1559631886435';
+	var date_stage_field_key = 'date_stage_1559397531716'
+
+	if(domain == 'spamtonpropf'){
+		plan_field_key = 'plan_1559669558988';
+		date_stage_field_key = 'date_stage_1559397531716';
+	}
 
 	var nameSpaceController = Marionette.Object.extend( {
 
@@ -20,7 +28,7 @@ jQuery(document).ready(function ($) {
 				console.log('plan')
 				console.log(formule.plans);
 
-				options = nfRadio.channel('form-86').request('get:form').getFieldByKey('plan_1559631886435' ).get('options');
+				options = nfRadio.channel('form-86').request('get:form').getFieldByKey(plan_field_key ).get('options');
 
 
 
@@ -43,9 +51,9 @@ jQuery(document).ready(function ($) {
 
 				});
 
-				nfRadio.channel('form-86').request('get:form').getFieldByKey('plan_1559631886435' ).set('options',options)
+				nfRadio.channel('form-86').request('get:form').getFieldByKey(plan_field_key ).set('options',options)
 
-				nfRadio.channel('form-86').request('get:form').getFieldByKey('plan_1559631886435' ).trigger('reRender');
+				nfRadio.channel('form-86').request('get:form').getFieldByKey(plan_field_key ).trigger('reRender');
 
 			}
 
@@ -92,7 +100,7 @@ jQuery(document).ready(function ($) {
 				});
 
 
-				options = nfRadio.channel('form-86').request('get:form').getFieldByKey('date_stage_1559397531716' ).get('options');
+				options = nfRadio.channel('form-86').request('get:form').getFieldByKey(date_stage_field_key ).get('options');
 
 				new_options.push(options[0]);
 
@@ -120,9 +128,9 @@ jQuery(document).ready(function ($) {
 				console.log('new_options');
 				console.log(new_options);
 
-				nfRadio.channel('form-86').request('get:form').getFieldByKey('date_stage_1559397531716' ).set('options',new_options)
+				nfRadio.channel('form-86').request('get:form').getFieldByKey(date_stage_field_key ).set('options',new_options)
 
-				nfRadio.channel('form-86').request('get:form').getFieldByKey('date_stage_1559397531716' ).trigger('reRender');
+				nfRadio.channel('form-86').request('get:form').getFieldByKey(date_stage_field_key ).trigger('reRender');
 
 
 
