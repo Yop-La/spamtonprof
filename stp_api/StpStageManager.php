@@ -13,12 +13,12 @@ class StpStageManager
 
     public function add(StpStage $stpStage)
     {
-        $q = $this->_db->prepare('insert into stp_stage(ref_eleve, ref_formule, ref_plan, date_debut, date_inscription, remarque_inscription, ref_prof, ref_compte, subs_id, test) 
-            values(:ref_eleve,:ref_formule,:ref_plan,:date_debut,:date_inscription,:remarque_inscription,:ref_prof,:ref_compte,:subs_id, :test)');
+        $q = $this->_db->prepare('insert into stp_stage(ref_eleve, ref_formule, ref_plan, ref_date_stage, date_inscription, remarque_inscription, ref_prof, ref_compte, subs_id, test) 
+            values(:ref_eleve,:ref_formule,:ref_plan,:ref_date_stage,:date_inscription,:remarque_inscription,:ref_prof,:ref_compte,:subs_id, :test)');
         $q->bindValue(':ref_eleve', $stpStage->getRef_eleve());
         $q->bindValue(':ref_formule', $stpStage->getRef_formule());
         $q->bindValue(':ref_plan', $stpStage->getRef_plan());
-        $q->bindValue(':date_debut', $stpStage->getDate_debut());
+        $q->bindValue(':ref_date_stage', $stpStage->getRef_date_stage());
         $q->bindValue(':date_inscription', $stpStage->getDate_inscription());
         $q->bindValue(':remarque_inscription', $stpStage->getRemarque_inscription());
         $q->bindValue(':ref_prof', $stpStage->getRef_prof());

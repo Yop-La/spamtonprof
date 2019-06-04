@@ -4,7 +4,23 @@ namespace spamtonprof\stp_api;
 class StpStage implements \JsonSerializable
 {
 
-    protected $ref_proche, $ref_eleve, $ref_formule, $ref_plan, $date_debut, $date_inscription, $remarque_inscription, $ref_prof, $ref_compte, $subs_id, $ref_stage, $test;
+    protected $ref_proche, $ref_eleve, $ref_formule, $ref_plan, $ref_date_stage, $date_inscription, $remarque_inscription, $ref_prof, $ref_compte, $subs_id, $ref_stage, $test;
+
+    /**
+     * @return mixed
+     */
+    public function getRef_date_stage()
+    {
+        return $this->ref_date_stage;
+    }
+
+    /**
+     * @param mixed $ref_date_stage
+     */
+    public function setRef_date_stage($ref_date_stage)
+    {
+        $this->ref_date_stage = $ref_date_stage;
+    }
 
     /**
      * @return mixed
@@ -14,6 +30,8 @@ class StpStage implements \JsonSerializable
         return $this->test;
     }
 
+    
+    
     /**
      * @param mixed $test
      */
@@ -79,15 +97,7 @@ class StpStage implements \JsonSerializable
         $this->ref_plan = $ref_plan;
     }
 
-    public function getDate_debut()
-    {
-        return $this->date_debut;
-    }
 
-    public function setDate_debut($date_debut)
-    {
-        $this->date_debut = $date_debut;
-    }
 
     public function getDate_inscription()
     {
