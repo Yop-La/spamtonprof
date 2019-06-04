@@ -17,7 +17,9 @@ function paiement_inscription()
     $slack = new \spamtonprof\slack\Slack();
 
     // $_POST = unserializeTemp('/tempo/prospect');
-
+    serializeTemp($_POST,'/tempo/prospect');
+    
+    
     $fields = $_POST['fields'];
     $token = $_POST['token_stripe'];
     $test_mode = $_POST['test_mode'];
@@ -44,7 +46,8 @@ function paiement_inscription()
 
     $ref_formule = $fields->ref_formule;
     $ref_niveau = $fields->ref_niveau;
-    $date_stage = $fields->date_stage;
+    $ref_date_stage = $fields->date_stage;
+    $ref_plan = $fields->plan;
 
     $sameEmail = $email_eleve == $email_responsable;
 
@@ -121,16 +124,12 @@ function paiement_inscription()
     // étape - 2 : récupération de la formule et du plan
 
     $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
+    $planMg = new \spamtonprof\stp_api\StpPlanManager();
     $formule = $formuleMg->get(array(
         'ref_formule' => $ref_formule
-    ), array(
-        "construct" => array(
-            'defaultPlan'
-        )
     ));
 
-    $plan = $formule->getDefaultPlan();
-    $plan = \spamtonprof\stp_api\StpPlan::cast($plan);
+    $plan = $planMg->get(array('ref_plan' => $ref_plan));
 
     // étape -1 : récupération du prof
 
@@ -365,7 +364,6 @@ function paiement_inscription()
 
     // etape 7 - inserer le stage ( ou l'abonnement dans le futur peut être )
 
-    $date_stage = DateTime::createFromFormat('d-m-Y', $date_stage);
 
     $test = false;
     if (strpos($email_eleve, 'yopla.33mail') !== false || strpos($email_eleve, 'test') !== false || LOCAL) {
@@ -378,7 +376,7 @@ function paiement_inscription()
         'ref_eleve' => $eleve->getRef_eleve(),
         'ref_plan' => $plan->getRef_plan(),
         'ref_formule' => $plan->getRef_formule(),
-        'date_debut' => $date_stage->format(PG_DATE_FORMAT),
+        'ref_date_stage' => $ref_date_stage,
         'date_inscription' => $now->format(PG_DATETIME_FORMAT),
         'remarque_inscription' => $remarques,
         'ref_prof' => $prof->getRef_prof(),
@@ -444,6 +442,9 @@ function paiement_inscription()
     $smtp = $smtpMg->get(array(
         "ref_smtp_server" => $smtpMg::smtp2Go
     ));
+    
+    $dateFormuleManager = new \spamtonprof\stp_api\StpDateFormuleManager();
+    $dateFormule = $dateFormuleManager -> get(array("ref_date_formule" => $ref_date_stage));
 
     if ($envoiEleve) {
         $slack->sendMessages('log', array(
@@ -451,7 +452,7 @@ function paiement_inscription()
         ));
         $body_eleve = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/stage_ete_eleve.txt");
         $body_eleve = str_replace("[[prenom-eleve]]", $eleve->getPrenom(), $body_eleve);
-        $body_eleve = str_replace("[[date-stage]]", $date_stage->format(FR_DATE_FORMAT) . " le matin.", $body_eleve);
+        $body_eleve = str_replace("[[date-stage]]", lcfirst($dateFormule->getLibelle()), $body_eleve);
         $body_eleve = str_replace("[[prenom-prof]]", $prof->getPrenom(), $body_eleve);
         $smtp->sendEmail("Bienvenue " . $eleve->getPrenom(), $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alexandre de SpamTonProf", true);
     }
@@ -463,7 +464,7 @@ function paiement_inscription()
         $body_parent = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/stage_ete_parent.txt");
 
         $body_parent = str_replace("[[prenom-eleve]]", $eleve->getPrenom(), $body_parent);
-        $body_parent = str_replace("[[date-stage]]", $date_stage->format(FR_DATE_FORMAT) . " le matin.", $body_parent);
+        $body_parent = str_replace("[[date-stage]]", lcfirst($dateFormule->getLibelle()), $body_parent);
         $body_parent = str_replace("[[prenom-parent]]", $proche->getPrenom(), $body_parent);
         $body_parent = str_replace("[[prenom-prof]]", $prof->getPrenom(), $body_parent);
 

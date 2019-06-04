@@ -464,9 +464,11 @@ class PageManager
     {
         wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/paiement.css');
 
-        wp_enqueue_script('discover_week', plugins_url() . '/spamtonprof/js/paiement.js', array(
+        wp_enqueue_script('paiement_js', plugins_url() . '/spamtonprof/js/paiement.js', array(
 
             'nf-front-end'
+            
+            
         ), time());
 
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
@@ -483,11 +485,15 @@ class PageManager
                 'ref_formule' => $ref_formule
             ), array(
                 "construct" => array(
-                    'defaultPlan'
+                    'plans'
                 )
             ));
-
+            
+            $dateFormuleMg = new \spamtonprof\stp_api\StpDateFormuleManager();
+            $dates_formule = $dateFormuleMg -> getAll(array('ref_formule' => $ref_formule));
+            
             wp_localize_script('functions_js', 'formule', json_decode(json_encode($formule), true));
+            wp_localize_script('functions_js', 'dates_formule', json_decode(json_encode($dates_formule), true));
         }
     }
 

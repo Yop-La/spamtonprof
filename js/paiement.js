@@ -4,6 +4,137 @@ jQuery(document).ready(function ($) {
 	var ajaxEnCours = 0;
 	var idPaiementStage = 86;
 	var token_stripe = false;
+	var plan_choisi ;
+	var plan_loadding_done = false
+
+	var nameSpaceController = Marionette.Object.extend( {
+
+		initialize: function() {
+			this.listenTo( nfRadio.channel( 'form' ), 'render:view', this.doCustomStuff );
+		},
+
+		doCustomStuff: function( view ) {
+
+			if(!plan_loadding_done){
+				plan_loadding_done = true;
+				console.log('plan')
+				console.log(formule.plans);
+
+				options = nfRadio.channel('form-86').request('get:form').getFieldByKey('plan_1559631886435' ).get('options');
+
+
+
+				order_option = -1
+				formule.plans.forEach(function(plan) {
+
+					new_option = clone(options[0])
+
+					if(order_option == -1){
+						order_option = new_option.order
+					}
+					order_option = order_option + 1
+
+
+					new_option.order = order_option
+					new_option.value = plan.ref_plan
+					new_option.label = plan.nom
+
+					options.push(new_option)
+
+				});
+
+				nfRadio.channel('form-86').request('get:form').getFieldByKey('plan_1559631886435' ).set('options',options)
+
+				nfRadio.channel('form-86').request('get:form').getFieldByKey('plan_1559631886435' ).trigger('reRender');
+
+			}
+
+
+		},
+
+	});
+
+	//Create a new object for custom validation of a custom field.
+	var myCustomFieldController = Marionette.Object.extend( {
+
+		initialize: function() {
+
+			// Listen to the render:view event for a field type. Example: Textbox field.
+			this.listenTo( nfRadio.channel( 'listselect' ), 'change:modelValue', this.renderViewListSelect );
+
+		},
+
+		renderViewListSelect: function( view ) {
+
+
+			value = view.attributes.value;
+			label = view.attributes.label;
+
+
+			if(label == 'plan' && value != ''){
+
+				new_options = [];
+
+
+				ref_plan = value
+
+				plans = formule.plans;
+				plans.forEach(function(plan){
+					if(plan.ref_plan == ref_plan){
+						plan_choisi = plan
+					}
+				})
+
+				waitForEl(".label_plan", function () {
+
+					jQuery('.label_plan').text(plan_choisi.label_installment)
+
+				});
+
+
+				options = nfRadio.channel('form-86').request('get:form').getFieldByKey('date_stage_1559397531716' ).get('options');
+
+				new_options.push(options[0]);
+
+				order_option = -1
+				dates_formule.forEach(function(date_formule){
+
+					if(date_formule.ref_plan == value){
+
+						new_option = clone(new_options[0])
+
+						if(order_option == -1){
+							order_option = new_option.order
+						}
+						order_option = order_option + 1
+
+						new_option.order = order_option
+						new_option.value = date_formule.ref_date_formule
+						new_option.label = date_formule.libelle
+
+						new_options.push(new_option)
+
+					}
+				});
+
+				console.log('new_options');
+				console.log(new_options);
+
+				nfRadio.channel('form-86').request('get:form').getFieldByKey('date_stage_1559397531716' ).set('options',new_options)
+
+				nfRadio.channel('form-86').request('get:form').getFieldByKey('date_stage_1559397531716' ).trigger('reRender');
+
+
+
+			}
+
+
+
+
+		}
+
+	});
+
 
 
 	var mySubmitController = Marionette.Object.extend( {
@@ -203,11 +334,13 @@ jQuery(document).ready(function ($) {
 	function popCheckout(formule) {
 
 
-		console.log("valider clique")
 
-		montant = formule.defaultPlan.tarif
 
-		description = 'Paiement de '.concat(montant,' € en 2 fois')
+		montant = plan_choisi.tarif
+
+
+
+		description = plan_choisi.label_installment
 
 		emailCheckout = "alexandre@spamtonprof.com";
 
@@ -244,10 +377,10 @@ jQuery(document).ready(function ($) {
 	};
 
 
-//	// Close Checkout on page navigation:
-//	window.addEventListener('popstate', function() {
-//	handler.close();
-//	});
+	// Close Checkout on page navigation:
+	window.addEventListener('popstate', function() {
+		handler.close();
+	});
 
 	/** fin formulaire de paiement stripe **/
 
@@ -255,6 +388,10 @@ jQuery(document).ready(function ($) {
 
 
 	formInit();
+
+	new nameSpaceController();
+
+	new myCustomFieldController();
 
 	new mySubmitController();
 
