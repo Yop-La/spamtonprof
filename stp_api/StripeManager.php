@@ -1066,6 +1066,7 @@ class StripeManager
 
     // pour creer tous les produits et les plans definis dans la base stp
     // attention les formules et plans doivent déjà existés dans la base stp
+    /*     $query = array('custom' => ' where ref_formule >= 150' ) */
     public function createProductsAndPlans($query)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
