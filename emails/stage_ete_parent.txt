@@ -4,7 +4,7 @@ Nous avons bien reçu votre inscription !
 
 Toute l'équipe de SpamTonProf vous souhaite la bienvenue !
 
-[[prenom-eleve]] commencera son stage d'été le [[date-stage]].
+Le stage de [[prenom-eleve]] aura lieu [[date-stage]]
 
 Son professeur est [[prenom-prof]] !
 

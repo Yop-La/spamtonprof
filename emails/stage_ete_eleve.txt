@@ -4,7 +4,7 @@ Nous avons bien reçu ton inscription !
 
 Toute l'équipe de SpamTonProf te souhaite la bienvenue !
 
-Ton stage commences le [[date-stage]] avec ton professeur qui est [[prenom-prof]].
+Ton stage avec  [[prenom-prof]] ( ton prof ) aurau lieu [[date-stage]]
 
 Si tu ne l'as pas encore eu au téléphone je t'invite à l'appeler au 07 57 93 39 94 afin qu'il fasse un petit bilan toi, qu'il te donne des recommandations et les premiers exercices.
 
