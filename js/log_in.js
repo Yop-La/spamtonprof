@@ -39,7 +39,7 @@ var mySubmitController = Marionette.Object.extend( {
 
 		// titles form
 		if(response.data.form_id == idFormLogIn){
-			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#loading_screen").removeClass("hide");
 			jQuery(".hide_loading").addClass("hide");
 			ajaxEnCours++;
 
@@ -73,7 +73,7 @@ var mySubmitController = Marionette.Object.extend( {
 
 						}else{
 							showMessage("L'adresse mail ou le mot passe est incorrect");
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".hide_loading").removeClass("hide");
 						}
 					})
@@ -83,7 +83,7 @@ var mySubmitController = Marionette.Object.extend( {
 						showMessage("Il y a un problème. Veuillez raffraichir la page puis réessayer. Contactez l'équipe si le problème persiste");
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".hide_loading").removeClass("hide");
 						}
 					});
