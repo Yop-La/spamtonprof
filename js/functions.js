@@ -16,7 +16,7 @@ var waitForEl = function(selector, callback) {
 };
 
 String.prototype.capitalize = function() {
-    return this.charAt(0).toUpperCase() + this.slice(1);
+	return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
 function isEmail(email) {
@@ -58,6 +58,10 @@ function toFieldId(id){
 
 	return("#nf-field-".concat(id));
 
+}
+
+function clone(src) {
+	return Object.assign({}, src);
 }
 
 (function(window){
