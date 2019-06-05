@@ -13,9 +13,9 @@ class StpMatiereManager
 
     public function add(StpMatiere $StpMatiere)
     {
-        $q = $this->_db->prepare('insert into stp_matiere(ref_matiere, matiere) values( :ref_matiere,:matiere)');
-        $q->bindValue(':ref_matiere', $StpMatiere->getRef_matiere());
+        $q = $this->_db->prepare('insert into stp_matiere(matiere, matiere_complet) values( :matiere, :matiere_complet)');
         $q->bindValue(':matiere', $StpMatiere->getMatiere());
+        $q->bindValue(':matiere_complet', $StpMatiere->getMatiere_complet());
         $q->execute();
 
         $StpMatiere->setRef_matiere($this->_db->lastInsertId());
@@ -73,6 +73,10 @@ class StpMatiereManager
             $q = $this->_db->prepare('select * from stp_matiere');
             $q->execute();
         }
+        if (in_array('gr_id_null', $info)) {
+            $q = $this->_db->prepare('select * from stp_matiere where gr_id is null');
+            $q->execute();
+        }
 
         $matieres = [];
         while ($data = $q->fetch(\PDO::FETCH_ASSOC)) {
@@ -90,13 +94,13 @@ class StpMatiereManager
         $q->execute();
     }
 
-    // pour ajouter les nouveaux matières aux tags de getresponse et à mettre jour la ref dans stp_matiere
+    // pour ajouter les nouveaux matiï¿½res aux tags de getresponse et ï¿½ mettre jour la ref dans stp_matiere
     function resetGrTags()
     {
         $gr = new \GetResponse();
 
         $matieres = $this->getAll(array(
-            'all'
+            'gr_id_null'
         ));
 
         foreach ($matieres as $matiere) {
