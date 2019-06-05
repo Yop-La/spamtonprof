@@ -46,7 +46,7 @@ var mySubmitController = Marionette.Object.extend( {
 
 		// add formula form
 		if(response.data.form_id == idAdFormulaForm){
-			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#loading_screen").removeClass("hide");
 			jQuery("#onglets").addClass("hide");
 
 			nomFormule = response.data.fields[idNomFormule].value;
@@ -78,7 +78,7 @@ var mySubmitController = Marionette.Object.extend( {
 					.always(function() {
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery("#onglets").removeClass("hide");
 						}
 					});
@@ -87,7 +87,7 @@ var mySubmitController = Marionette.Object.extend( {
 
 		// edit formula form
 		if(response.data.form_id == idEditFormulaForm){
-			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#loading_screen").removeClass("hide");
 			jQuery("#onglets").addClass("hide");
 
 			refFormule = response.data.fields[idSelectFormula].value;
@@ -132,7 +132,7 @@ var mySubmitController = Marionette.Object.extend( {
 					.always(function() {
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery("#onglets").removeClass("hide");
 						}
 					});
@@ -188,7 +188,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 
 			console.log(value);
 
-			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#loading_screen").removeClass("hide");
 			jQuery("#onglets").addClass("hide");
 
 
@@ -258,7 +258,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 					.always(function() {
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery("#onglets").removeClass("hide");
 						}
 					});
@@ -291,7 +291,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 
 
 
-			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#loading_screen").removeClass("hide");
 			jQuery("#onglets").addClass("hide");
 
 
@@ -372,7 +372,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 					.always(function() {
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery("#onglets").removeClass("hide");
 						}
 					});
