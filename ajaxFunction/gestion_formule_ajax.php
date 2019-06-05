@@ -6,7 +6,7 @@ use spamtonprof\stp_api\Abonnement;
 use spamtonprof\stp_api\AbonnementManager;
 use spamtonprof\slack\Slack;
 
-// toutes ces fonction seront éxécutés par un appel ajax réalisé dans adds-back-office.js sur la page dont le slug est gestion-formule
+// toutes ces fonction seront ï¿½xï¿½cutï¿½s par un appel ajax rï¿½alisï¿½ dans adds-back-office.js sur la page dont le slug est gestion-formule
 add_action('wp_ajax_ajaxAddFormula', 'ajaxAddFormula');
 
 add_action('wp_ajax_nopriv_ajaxAddFormula', 'ajaxAddFormula');
@@ -44,14 +44,17 @@ function ajaxAddFormula()
     ));
     $formuleMg->add($formule);
 
-    // on ajoute le plan par défaut
+    // on ajoute le plan par dÃ©faut
     $planMg = new \spamtonprof\stp_api\StpPlanManager();
     $plan = new \spamtonprof\stp_api\StpPlan(array(
         'nom' => 'defaut',
         'tarif' => $tarif,
         'ref_formule' => $formule->getRef_formule()
     ));
-    $planMg->add($plan);
+    $plan = $planMg->add($plan);
+
+    $plan->setDefaut(true);
+    $planMg->update_defaut($plan);
 
     $retour->formule = $formule;
 
@@ -153,7 +156,6 @@ function ajaxGetBusyLevels()
         die();
     }
 
-
     // on ajoute la formule
     $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
 
@@ -178,7 +180,7 @@ function ajaxGetBusyLevels()
 
     $retour->niveaux = $niveaux;
     $retour->matieres = $matieres;
-    
+
     echo (json_encode($retour));
 
     die();
