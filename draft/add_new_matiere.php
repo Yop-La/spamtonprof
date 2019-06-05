@@ -62,5 +62,7 @@ if (defined('PROBLEME_CLIENT')) {
 }
 
 
+$algolia = new \spamtonprof\stp_api\AlgoliaManager();
+$algolia ->resetMatiereIndex();
 
 
