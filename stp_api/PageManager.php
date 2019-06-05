@@ -118,9 +118,9 @@ class PageManager
                     $proche = $procheMg->get((array(
                         'ref_proche' => $ref_proche
                     )));
-                    wp_localize_script('functions_js', 'proche', json_decode(json_encode($proche),true));
+                    wp_localize_script('functions_js', 'proche', json_decode(json_encode($proche), true));
                 }
-                
+
                 foreach ($abonnements as $abonnement) {
 
                     switch ($abonnement->getRef_statut_abonnement()) {
@@ -450,6 +450,10 @@ class PageManager
     public static function stageBac()
 
     {
+        wp_enqueue_script('countdown_js', plugins_url() . '/spamtonprof/js/jquery.countdown-2.2.0/jquery.countdown.min.js');
+
+        wp_enqueue_script('paiement_js', plugins_url() . '/spamtonprof/js/stage-bac.js');
+        
         wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/stage-ete.css');
     }
 
@@ -467,8 +471,6 @@ class PageManager
         wp_enqueue_script('paiement_js', plugins_url() . '/spamtonprof/js/paiement.js', array(
 
             'nf-front-end'
-            
-            
         ), time());
 
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
@@ -488,10 +490,12 @@ class PageManager
                     'plans'
                 )
             ));
-            
+
             $dateFormuleMg = new \spamtonprof\stp_api\StpDateFormuleManager();
-            $dates_formule = $dateFormuleMg -> getAll(array('ref_formule' => $ref_formule));
-            
+            $dates_formule = $dateFormuleMg->getAll(array(
+                'ref_formule' => $ref_formule
+            ));
+
             wp_localize_script('functions_js', 'formule', json_decode(json_encode($formule), true));
             wp_localize_script('functions_js', 'dates_formule', json_decode(json_encode($dates_formule), true));
         }
