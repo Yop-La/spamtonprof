@@ -531,9 +531,11 @@ class LbcProcessManager
         // step 1 :recuperer les comptes ages d'au moins 2h.
         $lbcAccounts = $lbcAccountMg->getAccountToScrap($nbCompte);
         
+        $i = 0;
+        $msgs = [];
         foreach ($lbcAccounts as $lbcAccount) {
             
-            $msgs = [];
+            
             $msgs[] = "Controle de " . $lbcAccount->getRef_compte();
             
             $codePromo = $lbcAccount->getCode_promo();
@@ -611,8 +613,15 @@ class LbcProcessManager
             $lbcAccount->setControle_date($now);
             $lbcAccountMg->updateControleDate($lbcAccount);
             
+            
             $msgs[] = $nbAnnonce . "en ligne";
-            $slack->sendMessages("log-lbc", $msgs);
+            
+            
+            if($i % 10 == 0){
+                $slack->sendMessages("log-lbc", $msgs);
+                $msgs=[];
+            }
+            $i ++;
         }
     }
 
