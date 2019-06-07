@@ -452,7 +452,7 @@ class PageManager
     {
         wp_enqueue_script('countdown_js', plugins_url() . '/spamtonprof/js/jquery.countdown-2.2.0/jquery.countdown.min.js');
 
-        wp_enqueue_script('paiement_js', plugins_url() . '/spamtonprof/js/stage-bac.js');
+        wp_enqueue_script('paiement_js', plugins_url() . '/spamtonprof/js/stage-bac.js',array(),time());
         
         wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/stage-ete.css');
     }
@@ -460,6 +460,10 @@ class PageManager
     public static function stageEte()
 
     {
+        wp_enqueue_script('countdown_js', plugins_url() . '/spamtonprof/js/jquery.countdown-2.2.0/jquery.countdown.min.js');
+        
+        wp_enqueue_script('paiement_js', plugins_url() . '/spamtonprof/js/stage-ete.js',array('nf-front-end'),time());
+        
         wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/stage-ete.css');
     }
 
