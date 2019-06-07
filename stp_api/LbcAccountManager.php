@@ -141,6 +141,13 @@ class LbcAccountManager
                 $q = $this->_db->prepare("select * from compte_lbc where ref_client = :ref_client");
                 $q->bindValue(":ref_client", $refClient);
                 $q->execute();
+            } else if (array_key_exists("no_cookies", $info)) {
+
+                $ref_compte = $info["no_cookies"];
+
+                $q = $this->_db->prepare("select * from compte_lbc where ref_compte >= :ref_compte and cookie is null");
+                $q->bindValue(":ref_compte", $ref_compte);
+                $q->execute();
             }
         } else {
 
@@ -182,9 +189,9 @@ class LbcAccountManager
                     from compte_lbc, client where  compte_lbc.ref_client = client.ref_client
                         group by client.ref_client,prenom_client order by nb_adds desc");
             }
-            
+
             if (array_key_exists("acts_details", $info)) {
-                
+
                 $q = $this->_db->prepare("
                     select ref_compte, mail, nb_annonces_online, date_creation, date_publication, user_id, prenom, disabled 
                             from compte_lbc 
