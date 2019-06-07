@@ -4,11 +4,6 @@ namespace spamtonprof\stp_api;
 use PDO;
 use DateTime;
 use Exception;
-use PayPal\Api\Plan;
-use PayPal\Api\Agreement;
-use PayPal\Api\Payer;
-use PayPal\Api\Currency;
-
 /*
  *
  * Cette classe sert Ã  gÃ©rÃ©r ( CRUD ) les plans de paiement stripe
@@ -696,7 +691,7 @@ class StripeManager
             $planId = $plan->getRef_plan_stripe_test();
         }
 
-        // mise Ã  jour de l'abonnement stripe
+        // mise à jour de l'abonnement stripe
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $sub = \Stripe\Subscription::retrieve($subId);
 
