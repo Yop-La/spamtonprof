@@ -638,7 +638,7 @@ class LbcProcessManager
         // si il y a une seule annonce c'est que c'est une premire annonce sur un compte vierge. On doit mettre une annonce qui passe ( celle de Valentin )
         $ref_client_content = $refClient;
         $client_content = $client;
-        if ($nbAds == 1) {
+        if (false && $nbAds == 1) {
             
             $ref_client_content = 25;
             $client_content = $clientMg->get(array(
