@@ -1,8 +1,8 @@
 <?php
+use FastRoute\RouteParser\Std;
+
 /**
- * 
- *  pour sauvergarder le cookie leboncoin d'un compte lbc
- *  
+ * pour sauvergarder le cookie leboncoin d'un compte lbc
  */
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
 $wp->init();
@@ -19,7 +19,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-// voir "récupérer toutes les annonces d'un compte leboncoin" dans evernote - en prod - date création : 08/10/2018
+// voir "rï¿½cupï¿½rer toutes les annonces d'un compte leboncoin" dans evernote - en prod - date crï¿½ation : 08/10/2018
 
 if (! function_exists('http_parse_headers')) {
 
@@ -98,25 +98,43 @@ if (! function_exists('http_parse_cookie')) {
     }
 }
 
-$cookies = $_POST["cookies"];
-$ref_compte = $_POST["ref_compte"];
+$ret = new \stdClass();
+$ret->ret = "false";
+if (array_key_exists("cookies", $_POST) && array_key_exists("ref_compte", $_POST)) {
 
-$cookies = http_parse_cookie($cookies);
+    $cookies = $_POST["cookies"];
+    $ref_compte = $_POST["ref_compte"];
 
-$luat = $cookies->cookies['luat'];
+    $cookies = http_parse_cookie($cookies);
 
-$lbcAcctMg = new \spamtonprof\stp_api\LbcAccountManager();
-$act = $lbcAcctMg->get(array(
-    'ref_compte' => $ref_compte
-));
+    if (property_exists($cookies, "cookies")) {
+        $luat = $cookies->cookies['luat'];
 
-$act->setCookie($luat);
-$lbcAcctMg->updateCookie($act);
+        $lbcAcctMg = new \spamtonprof\stp_api\LbcAccountManager();
+        $act = $lbcAcctMg->get(array(
+            'ref_compte' => $ref_compte
+        ));
 
-$lbcApi = new \spamtonprof\stp_api\LbcApi();
-$userId = $lbcApi->getUserId($luat);
+        $act->setCookie($luat);
+        $lbcAcctMg->updateCookie($act);
 
-$act->setUser_id($userId);
-$lbcAcctMg->updateUserId($act);
+        $lbcApi = new \spamtonprof\stp_api\LbcApi();
+        $userId = $lbcApi->getUserId($luat);
 
-prettyPrint($act);
+        $act->setUser_id($userId);
+        $lbcAcctMg->updateUserId($act);
+
+        $lbcAcctMg = new \spamtonprof\stp_api\LbcAccountManager();
+        $act = $lbcAcctMg->get(array(
+            'ref_compte' => $ref_compte
+        ));
+
+        if ($act->getCookie()) {
+            $ret->ret = $act;
+        }
+    }
+}
+
+prettyPrint($ret);
+
+
