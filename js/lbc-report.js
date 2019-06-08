@@ -125,7 +125,7 @@ jQuery( document ).ready( function( jQuery ) {
 						disabled = !disabled;
 						console.log(disabled)
 
-						jQuery("#loadingSpinner").removeClass("hide");
+						jQuery("#loading_screen").removeClass("hide");
 						jQuery(".content").addClass("hide");
 
 
@@ -148,7 +148,7 @@ jQuery( document ).ready( function( jQuery ) {
 
 
 
-									jQuery("#loadingSpinner").addClass("hide");
+									jQuery("#loading_screen").addClass("hide");
 									jQuery(".content").removeClass("hide");
 
 								})
@@ -223,7 +223,7 @@ jQuery( document ).ready( function( jQuery ) {
 
 
 
-				jQuery("#loadingSpinner").addClass("hide");
+				jQuery("#loading_screen").addClass("hide");
 				jQuery(".content").removeClass("hide");
 
 

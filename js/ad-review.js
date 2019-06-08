@@ -23,7 +23,7 @@ var mySubmitController = Marionette.Object.extend( {
 
 
 		if(response.data.form_id == idCfgClient){
-			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#loading_screen").removeClass("hide");
 			jQuery(".content").addClass("hide");
 
 			fields = response.data.fields;
@@ -75,7 +75,7 @@ var mySubmitController = Marionette.Object.extend( {
 						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".hide_loading").removeClass("hide");
 						}
 					});
@@ -83,7 +83,7 @@ var mySubmitController = Marionette.Object.extend( {
 
 
 		if(response.data.form_id == idAdReview){
-			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#loading_screen").removeClass("hide");
 			jQuery(".content").addClass("hide");
 
 
@@ -210,7 +210,7 @@ var mySubmitController = Marionette.Object.extend( {
 
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".content").removeClass("hide");
 							jQuery('.imgs_ads').removeClass('hide');
 						}
@@ -222,7 +222,7 @@ var mySubmitController = Marionette.Object.extend( {
 						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".hide_loading").removeClass("hide");
 						}
 					});
@@ -258,7 +258,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 		if(label == 'type_titre' && value != ''){
 
 
-			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#loading_screen").removeClass("hide");
 			jQuery(".content").addClass("hide");
 
 			ajaxEnCours++;
@@ -294,7 +294,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".content").removeClass("hide");
 						}
 
@@ -305,7 +305,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".hide_loading").removeClass("hide");
 						}
 					});
@@ -320,7 +320,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 
 
 
-			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#loading_screen").removeClass("hide");
 			jQuery(".content").addClass("hide");
 
 			ajaxEnCours++;
@@ -352,7 +352,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".content").removeClass("hide");
 						}
 
@@ -363,7 +363,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".hide_loading").removeClass("hide");
 						}
 					});
@@ -384,7 +384,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 
 
 
-			jQuery("#loadingSpinner").removeClass("hide");
+			jQuery("#loading_screen").removeClass("hide");
 			jQuery(".content").addClass("hide");
 
 
@@ -456,7 +456,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".content").removeClass("hide");
 						}
 
@@ -467,7 +467,7 @@ var myCustomFieldController = Marionette.Object.extend( {
 						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loadingSpinner").addClass("hide");
+							jQuery("#loading_screen").addClass("hide");
 							jQuery(".hide_loading").removeClass("hide");
 						}
 					});
