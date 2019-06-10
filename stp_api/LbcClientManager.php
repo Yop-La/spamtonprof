@@ -94,6 +94,14 @@ class LbcClientManager
         $q->execute();
     }
 
+    public function update_label(\spamtonprof\stp_api\LbcClient $client)
+    {
+        $q = $this->_db->prepare("update client set label = :label where ref_client = :ref_client");
+        $q->bindValue(":label", $client->getLabel());
+        $q->bindValue(":ref_client", $client->getRef_client());
+        $q->execute();
+    }
+    
     public function updateNom(\spamtonprof\stp_api\LbcClient $client)
     {
         $q = $this->_db->prepare("update client set nom_client = :nom_client where ref_client = :ref_client");
@@ -118,6 +126,15 @@ class LbcClientManager
         $q->execute();
     }
 
+    public function update_ref_cat_prenom(\spamtonprof\stp_api\LbcClient $client)
+    {
+        $q = $this->_db->prepare("update client set ref_cat_prenom = :ref_cat_prenom where ref_client = :ref_client");
+        $q->bindValue(":ref_cat_prenom", $client->getRef_cat_prenom());
+        $q->bindValue(":ref_client", $client->getRef_client());
+        $q->execute();
+    }
+    
+    
     public function updateRefReponseLbc(\spamtonprof\stp_api\LbcClient $client)
     {
         $q = $this->_db->prepare("update client set ref_reponse_lbc = :ref_reponse_lbc where ref_client = :ref_client");

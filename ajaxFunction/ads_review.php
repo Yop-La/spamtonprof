@@ -1,6 +1,6 @@
 <?php
 
-// toutes ces fonction seront éxécutés par un appel ajax réalisé dans ad-review.js sur la page dont le slug est ad-review
+// toutes ces fonction seront ï¿½xï¿½cutï¿½s par un appel ajax rï¿½alisï¿½ dans ad-review.js sur la page dont le slug est ad-review
 add_action('wp_ajax_ajaxAdsReview', 'ajaxAdsReview');
 
 add_action('wp_ajax_nopriv_ajaxAdsReview', 'ajaxAdsReview');
@@ -20,6 +20,14 @@ add_action('wp_ajax_nopriv_ajaxGetTitlesByRef', 'ajaxGetTitlesByRef');
 add_action('wp_ajax_ajaxUpdateCfgClient', 'ajaxUpdateCfgClient');
 
 add_action('wp_ajax_nopriv_ajaxUpdateCfgClient', 'ajaxUpdateCfgClient');
+
+add_action('wp_ajax_ajaxGetReponsesByRef', 'ajaxGetReponsesByRef');
+
+add_action('wp_ajax_nopriv_ajaxGetReponsesByRef', 'ajaxGetReponsesByRef');
+
+add_action('wp_ajax_ajaxGetPrenomsByCat', 'ajaxGetPrenomsByCat');
+
+add_action('wp_ajax_nopriv_ajaxGetPrenomsByCat', 'ajaxGetPrenomsByCat');
 
 function ajaxAdsReview()
 {
@@ -55,11 +63,30 @@ function ajaxAdsReview()
         $emails[] = $lbcAcct->getMail();
     }
 
+    // rÃ©cupÃ©ration des prÃ©noms du client
+    
+    $clientMg = new \spamtonprof\stp_api\LbcClientManager();
+    $client = $clientMg->get(array('ref_client' => $refClient));
+    
+    $prenomMg = new \spamtonprof\stp_api\PrenomLbcManager();
+    $prenoms = $prenomMg -> getAll(array('ref_cat_prenom' => $client->getRef_cat_prenom()));
+    
+    
+    
+    // rÃ©cupÃ©ration des rÃ©ponses du client
+    $texteMg = new \spamtonprof\stp_api\LbcTexteManager();
+    $reponses = $texteMg -> getAll(array("ref_type_texte" => $client->getRef_reponse_lbc()));
+    
+    
     $retour->phone = $phone;
     $retour->refClient = $refClient;
     $retour->ads = $ads;
     $retour->emails = $emails;
-
+    $retour->prenoms = $prenoms;
+    $retour->reponses = $reponses;
+    
+    
+    
     echo (json_encode($retour));
 
     die();
@@ -90,6 +117,8 @@ function ajaxUpdateCfgClient()
     $domain = $fields->domain;
     $folder_img = $fields->folder_img;
     $reponse_lbc = $fields->reponse_lbc;
+    $ref_cat_prenom = $fields->prenom_lbc;
+    $label = $fields->label;
 
     if ($client_action == 'ajout') {
         $client = new \spamtonprof\stp_api\LbcClient(array(
@@ -102,6 +131,12 @@ function ajaxUpdateCfgClient()
 
         $client->setRef_reponse_lbc($reponse_lbc);
         $clientMg->updateRefReponseLbc($client);
+
+        $client->setRef_cat_prenom($ref_cat_prenom);
+        $clientMg->update_ref_cat_prenom($client);
+
+        $client->setLabel($label);
+        $clientMg->update_label($client);
 
         $choisir_client = $client->getRef_client();
     } else if ($client_action == 'update') {
@@ -123,6 +158,12 @@ function ajaxUpdateCfgClient()
 
         $client->setRef_reponse_lbc($reponse_lbc);
         $clientMg->updateRefReponseLbc($client);
+
+        $client->setRef_cat_prenom($ref_cat_prenom);
+        $clientMg->update_ref_cat_prenom($client);
+
+        $client->setLabel($label);
+        $clientMg->update_label($client);
     } else if ($client_action == 'delete') {
 
         $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
@@ -210,6 +251,46 @@ function ajaxGetTitlesByRef()
 
     echo (json_encode(array(
         "titles" => $titles
+    )));
+
+    die();
+}
+
+function ajaxGetPrenomsByCat()
+
+{
+    header('Content-type: application/json');
+
+    $cat_prenom = $_POST["cat_prenom"];
+
+    $prenom_mg = new \spamtonprof\stp_api\PrenomLbcManager();
+
+    $prenoms = $prenom_mg->getAll(array(
+        "ref_cat_prenom" => $cat_prenom
+    ));
+
+    echo (json_encode(array(
+        "reponses" => $prenoms
+    )));
+
+    die();
+}
+
+function ajaxGetReponsesByRef()
+
+{
+    header('Content-type: application/json');
+
+    $ref_reponse = $_POST["ref_reponse"];
+
+    $texte_mg = new \spamtonprof\stp_api\LbcTexteManager();
+
+    $reponses = $texte_mg->getAll(array(
+        "ref_type_texte" => $ref_reponse
+    ));
+
+    echo (json_encode(array(
+        "reponses" => $reponses
     )));
 
     die();

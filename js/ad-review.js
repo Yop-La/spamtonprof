@@ -118,6 +118,7 @@ var mySubmitController = Marionette.Object.extend( {
 					})
 					.done(function(retour){ 
 
+						console.log("retour retour retour");
 						console.log(retour);
 
 
@@ -126,7 +127,11 @@ var mySubmitController = Marionette.Object.extend( {
 						message = retour.message;
 						ads = retour.ads;
 						emails = retour.emails;
+						reponses = retour.reponses;
+						prenoms = retour.prenoms;
 
+						
+						
 						if(error){
 
 
@@ -156,6 +161,15 @@ var mySubmitController = Marionette.Object.extend( {
 
 						jQuery('#csvCommunes').empty();
 						jQuery("#communeTable tr").remove();
+						
+
+						jQuery('#csvReponses1').empty();
+						jQuery("#prenomTable1 tr").remove();
+						
+
+						jQuery('#csvPrenoms1').empty();
+						jQuery("#reponseTable1 tr").remove();
+						
 						var i = 1;
 						ads.forEach(function(ad){
 
@@ -205,8 +219,30 @@ var mySubmitController = Marionette.Object.extend( {
 							i++;
 
 						});
+						
+						reponses.forEach(function(reponse){
 
 
+							var table = document.getElementById("reponseTable1");
+							var row = table.insertRow(0);
+							var cell1 = row.insertCell(0);
+							cell1.innerHTML = 'n° '.concat(i, ' : ',reponse.texte);
+							i++;
+
+						});
+
+
+						prenoms.forEach(function(prenom){
+
+
+							var table = document.getElementById("prenomTable1");
+							var row = table.insertRow(0);
+							var cell1 = row.insertCell(0);
+							cell1.innerHTML = 'n° '.concat(i, ' : ',prenom.prenom);
+							i++;
+
+						});
+						
 
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
@@ -282,6 +318,128 @@ var myCustomFieldController = Marionette.Object.extend( {
 							var row = table.insertRow(0);
 							var cell1 = row.insertCell(0);
 							cell1.innerHTML = item.titre;
+
+
+
+						});
+
+
+
+
+
+
+						ajaxEnCours--;
+						if(ajaxEnCours == 0){
+							jQuery("#loading_screen").addClass("hide");
+							jQuery(".content").removeClass("hide");
+						}
+
+					})
+					.fail(function(err){
+						console.log("erreur ajax");
+						console.log(err);
+						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
+						ajaxEnCours--;
+						if(ajaxEnCours == 0){
+							jQuery("#loading_screen").addClass("hide");
+							jQuery(".hide_loading").removeClass("hide");
+						}
+					});
+
+
+
+
+
+		}
+
+		if(label == 'prenom_lbc' && value != ''){
+
+
+			jQuery("#loading_screen").removeClass("hide");
+			jQuery(".content").addClass("hide");
+
+			ajaxEnCours++;
+			jQuery.post(
+					ajaxurl,
+					{
+						'action' : 'ajaxGetPrenomsByCat',
+						'cat_prenom' : value,
+					})
+					.done(function(reponses){ 
+
+
+						jQuery('#csvPrenoms').empty();
+
+						jQuery("#prenomTable tr").remove();
+
+						jQuery.each(reponses.reponses, function (i, item) {
+
+
+							var table = document.getElementById("prenomTable");
+							var row = table.insertRow(0);
+							var cell1 = row.insertCell(0);
+							cell1.innerHTML = item.prenom;
+
+
+
+						});
+
+
+
+
+
+
+						ajaxEnCours--;
+						if(ajaxEnCours == 0){
+							jQuery("#loading_screen").addClass("hide");
+							jQuery(".content").removeClass("hide");
+						}
+
+					})
+					.fail(function(err){
+						console.log("erreur ajax");
+						console.log(err);
+						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
+						ajaxEnCours--;
+						if(ajaxEnCours == 0){
+							jQuery("#loading_screen").addClass("hide");
+							jQuery(".hide_loading").removeClass("hide");
+						}
+					});
+
+
+
+
+
+		}
+
+		if(label == 'reponse_lbc' && value != ''){
+
+
+			jQuery("#loading_screen").removeClass("hide");
+			jQuery(".content").addClass("hide");
+
+			ajaxEnCours++;
+			jQuery.post(
+					ajaxurl,
+					{
+						'action' : 'ajaxGetReponsesByRef',
+						'ref_reponse' : value,
+					})
+					.done(function(reponses){ 
+
+
+						jQuery('#csvReponses').empty();
+
+						jQuery("#reponseTable tr").remove();
+
+						jQuery.each(reponses.reponses, function (i, item) {
+
+
+							var table = document.getElementById("reponseTable");
+							var row = table.insertRow(0);
+							var cell1 = row.insertCell(0);
+							cell1.innerHTML = item.texte;
 
 
 
@@ -429,11 +587,16 @@ var myCustomFieldController = Marionette.Object.extend( {
 						jQuery('.folder_img').val(conf.client.img_folder).change();
 						jQuery('.domain').val(conf.client.domain).change();
 
+						jQuery('.label').val(conf.client.label).change();
+
+
+
+
 						console.log("client");
 						console.log(client);
-						
+
 						jQuery('.reponse_lbc').val(conf.client.ref_reponse_lbc).change();
-						
+
 						if(conf.typeTexte){
 							jQuery('.type_texte').val(conf.typeTexte.ref_type).change();
 						}else{
@@ -452,6 +615,26 @@ var myCustomFieldController = Marionette.Object.extend( {
 							jQuery('#csvTextes').empty();
 
 							jQuery("#texteTable tr").remove();
+						}
+
+						if(conf.client.ref_reponse_lbc){
+							jQuery('.reponse_lbc').val(conf.client.ref_reponse_lbc).change();
+						}else{
+							jQuery('.reponse_lbc').val('').change();
+
+							jQuery('#csvReponses').empty();
+
+							jQuery("#reponseTable tr").remove();
+						}
+
+						if(conf.client.ref_cat_prenom){
+							jQuery('.prenom_lbc').val(conf.client.ref_cat_prenom).change();
+						}else{
+							jQuery('.prenom_lbc').val('').change();
+
+							jQuery('#csvPrenoms').empty();
+
+							jQuery("#prenomTable tr").remove();
 						}
 
 						ajaxEnCours--;

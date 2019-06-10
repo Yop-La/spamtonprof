@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.8.3.3
+ * Version: 1.1.8.3.4
  *
  *
  * Author: yopla
@@ -407,6 +407,25 @@ function my_pre_population_callback($options, $settings)
 
     }
 
+    // target "prenom_lbc" du formulaire "conf client leboncoin"
+    if (($settings['key'] == 'listselect_1560173067982' && LOCAL)  || $settings['key'] == 'listselect_1560177320096'  && !LOCAL) {
+        
+        
+        $niveauMg = new \spamtonprof\stp_api\PrenomLbcManager();
+        
+        $cats = $niveauMg->getAllCat();
+        
+        
+        foreach ($cats as $cat) {
+            
+            $options[] = array(
+                'value' => $cat,
+                'label' => $cat
+            );
+        }
+        
+    }
+    
 
     return $options;
 }
