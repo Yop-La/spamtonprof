@@ -102,8 +102,9 @@ $ret = new \stdClass();
 $ret->ret = "false";
 if (array_key_exists("cookies", $_POST) && array_key_exists("ref_compte", $_POST)) {
 
-    $cookies = $_POST["cookies"];
-    $ref_compte = $_POST["ref_compte"];
+
+    $cookies = base64_decode($cookies);
+
 
     $cookies = http_parse_cookie($cookies);
 
