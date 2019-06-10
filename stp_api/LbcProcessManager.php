@@ -34,7 +34,7 @@ class LbcProcessManager
         ));
 
         $labelId = $this->gmailManager->getLabelsIds(array(
-            $client->get_label_client()
+            $client->getLabel()
         ));
 
         $this->gmailManager->modifyMessage($msg_id, $labelId, array());
