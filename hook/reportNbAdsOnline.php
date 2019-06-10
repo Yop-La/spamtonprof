@@ -57,10 +57,10 @@ foreach ($msgs as $msg) {
             '>'
         ), "", $to)
     ));
-
+    $key_client = "aucun";
     foreach ($clients as $client) {
         if ($client->getRef_client() == $lbcAct->getRef_client()) {
-            $key_client = $client->get_label_client();
+            $key_client = $client->getLabel();
             break;
         }
     }
