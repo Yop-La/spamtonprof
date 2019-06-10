@@ -11,7 +11,8 @@ class LbcProcessManager
     public function __construct()
     {
         $this->slack = new \spamtonprof\slack\Slack();
-        
+
+        $this->clientMg = new \spamtonprof\stp_api\LbcClientManager();
         $this->gmailManager = new \spamtonprof\googleMg\GoogleManager("mailsfromlbc@gmail.com");
         $this->prospectLbcMg = new \spamtonprof\stp_api\ProspectLbcManager();
         $this->messProspectMg = new \spamtonprof\stp_api\MessageProspectLbcManager();
@@ -19,11 +20,24 @@ class LbcProcessManager
         $this->gmailAccountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
         $this->messageTypeMg = new \spamtonprof\stp_api\LeadMessageTypeManager();
         $this->renewalUrlMg = new \spamtonprof\stp_api\LbcRenewalUrlManager();
-        
+
         $this->gmailAccount = $this->gmailAccountMg->get("mailsfromlbc@gmail.com");
-        
+
         $this->msgs = [];
         $this->errors = [];
+    }
+
+    public function addLabelClient($ref_client, $msg_id)
+    {
+        $client = $this->clientMg->get(array(
+            'ref_client' => $ref_client
+        ));
+
+        $labelId = $this->gmailManager->getLabelsIds(array(
+            $client->get_label_client()
+        ));
+
+        $this->gmailManager->modifyMessage($msg_id, $labelId, array());
     }
 
     /*
@@ -47,106 +61,108 @@ class LbcProcessManager
     public function readNewLeadMessages()
     {
         $lastHistoryId = $this->gmailAccount->getLast_history_id();
-        
+
         echo ("Dernier history id ( avant process ) : " . $lastHistoryId . '<br>');
-        
+
         $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-        
+
         $now->sub(new \DateInterval("PT2H"));
-        
+
         $timestamp = $now->getTimestamp();
-        
+
         $now = $now->format('Y/m/d');
-        
+
         $retour = $this->gmailManager->getNewMessages($lastHistoryId);
-        
+
         $messages = $retour["messages"];
-        
+
         $lastHistoryId = $retour["lastHistoryId"];
-        
+
         $this->gmailAccount->setLast_history_id($lastHistoryId);
         $this->gmailAccountMg->updateHistoryId($this->gmailAccount);
-        
+
         echo ("------  nb messages : " . count($messages) . " ----- <br>");
-        
+
         $nbMessageToProcess = 100;
         $indexMessageProcessed = 0;
-        
+
         foreach ($messages as $message) {
-            
+
             $gmailId = $message->id;
             $historyId = $message->historyId;
-            
+
             $from = $this->gmailManager->getHeader($message, "From");
             $snippet = $message->snippet;
             $subject = $this->gmailManager->getHeader($message, "Subject");
             $to = $this->gmailManager->getHeader($message, "To");
             $messageId = $this->gmailManager->getHeader($message, "Message-Id");
             $body = $this->gmailManager->getBody($message);
-            
+
             $timeStamp = $message->internalDate / 1000;
             $dateReception = new \DateTime();
             $dateReception->setTimestamp($timeStamp);
             $dateReception->setTimezone(new \DateTimeZone('Europe/Paris'));
-            
+
             $messageType = 0;
-            
+
             // if a faire en premier car le premier if est inclus dans le deuxieme if
             if (strpos($from, 'sender@mailer1.33mail.com') !== false) { // message du bon coin a priori via 33mail
-                
+
                 if (strpos($body, 'https://www.leboncoin.fr/phishing.htm') !== false) {
-                    
+
                     $messageType = $this->messageTypeMg::MESSAGE_DIRECT;
                 } elseif (strpos($body, 'via leboncoin a ') !== false) {
-                    
+
                     $messageType = $this->messageTypeMg::CONVERSATION_MESSAGERIE_LEBONCOIN;
                 } elseif (strpos($subject, "Nouveau message concernant l'annonce") !== false) {
-                    
+
                     $messageType = $this->messageTypeMg::DEBUT_MESSAGERIE_LEBONCOIN;
                 }
-                
+
                 if ($messageType != 0) {
-                    
+
                     $emails = [];
-                    
+
                     $pattern = "/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i";
                     preg_match_all($pattern, $snippet, $emails);
-                    
+
                     $lbcProfil = $emails[0][0];
                     $leadEmail = $emails[0][1];
-                    
+
                     echo ($body . "<br>");
                     echo ("lbcProfil : " . $lbcProfil . " -- leadEmail : " . $leadEmail . " -- messageId : " . $messageId . " -- dateReception : " . $dateReception->format(PG_DATETIME_FORMAT) . "  --  type : " . $messageType . "<br>" . "<br>");
-                    
+
                     // on ajoute a table lead messages
-                    
-                    $this->addNewLeadMessage($lbcProfil, $leadEmail, $dateReception, $gmailId, $subject, $messageType);
-                    
+                    $ref_client = $this->addNewLeadMessage($lbcProfil, $leadEmail, $dateReception, $gmailId, $subject, $messageType);
+
+                    // on attribue le libelle client
+                    $this->addLabelClient($ref_client, $gmailId);
+
                     // on attribue le libelle coresspondant a la categorie
-                    
+
                     $type = $this->messageTypeMg->get($messageType);
-                    
+
                     $labelId = $this->gmailManager->getLabelsIds(array(
                         $type->getType()
                     ));
-                    
+
                     $this->gmailManager->modifyMessage($gmailId, $labelId, array());
-                    
+
                     // on envoie un message dans slacks
-                    
+
                     $this->msgs[] = "------------------------";
                     $this->msgs[] = "Nouveau message ! gmailId : " . $gmailId;
                     $this->msgs[] = "date de reception : " . $dateReception->format(PG_DATETIME_FORMAT);
                     $this->msgs[] = "   ------   ";
                     $this->msgs[] = strip_tags($body);
-                    
+
                     if (count($this->msgs) != 0) {
                         // $this->slack->sendMessages($this->slack::LogLbc, $this->msgs);
                         $this->msgs = [];
                     }
-                    
+
                     if (count($this->errors) != 0) {
-                        
+
                         $this->errors = array_merge(array(
                             "--------- debut des erreurs ---------"
                         ), $this->errors);
@@ -155,70 +171,72 @@ class LbcProcessManager
                         $this->errors = [];
                     }
                 }
-                
+
                 // if a faire en deuxieme car ce deuxieme inclus le premier
             } elseif (strpos($from, 'messagerie.leboncoin.fr') !== false) { // message du bon coin a priori via mailgun ou via gmx
-                
+
                 if (strpos($body, 'https://www.leboncoin.fr/phishing.htm') !== false) {
-                    
+
                     $messageType = $this->messageTypeMg::MESSAGE_DIRECT;
                 } elseif (strpos($body, 'via leboncoin a ') !== false) {
-                    
+
                     $messageType = $this->messageTypeMg::CONVERSATION_MESSAGERIE_LEBONCOIN;
                 } elseif (strpos($subject, "Nouveau message concernant l'annonce") !== false) {
-                    
+
                     $messageType = $this->messageTypeMg::DEBUT_MESSAGERIE_LEBONCOIN;
                 }
-                
+
                 // Extraction de l'adresse mail du champ to
                 $matches = [];
                 $pattern = "/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i";
                 preg_match_all($pattern, $to, $matches);
                 $to = $matches[0][0];
-                
+
                 // Extraction de l'adresse mail du champ from
                 $matches = [];
                 $pattern = "/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i";
                 preg_match_all($pattern, $from, $matches);
                 $from = $matches[0][0];
-                
+
                 if ($messageType != 0) {
-                    
+
                     $emails = [];
-                    
+
                     $pattern = "/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i";
                     preg_match_all($pattern, $snippet, $emails);
-                    
+
                     $lbcProfil = $to;
                     $leadEmail = $from;
-                    
+
                     echo ($body . "<br>");
                     echo ("lbcProfil : " . $lbcProfil . " -- leadEmail : " . $leadEmail . " -- messageId : " . $messageId . " -- dateReception : " . $dateReception->format(PG_DATETIME_FORMAT) . "  --  type : " . $messageType . "<br>" . "<br>");
-                    
+
                     // on ajoute a table lead messages
-                    
-                    $this->addNewLeadMessage($lbcProfil, $leadEmail, $dateReception, $gmailId, $subject, $messageType);
-                    
+                    $ref_client = $this->addNewLeadMessage($lbcProfil, $leadEmail, $dateReception, $gmailId, $subject, $messageType);
+
+                    // on attribue le libelle client
+                    $this->addLabelClient($ref_client, $gmailId);
+
                     // on attribue le libelle coresspondant a la categorie
-                    
+
                     $type = $this->messageTypeMg->get($messageType);
-                    
+
                     $labelNames = array(
                         $type->getType()
                     );
-                    
+
                     $mailBox = 'mailgun';
                     if (strpos($lbcProfil, 'gmx') !== false) {
                         $mailBox = 'gmx';
                     }
                     $labelNames[] = $mailBox;
-                    
+
                     $labelId = $this->gmailManager->getLabelsIds($labelNames);
-                    
+
                     $this->gmailManager->modifyMessage($gmailId, $labelId, array());
-                    
+
                     if (count($this->errors) != 0) {
-                        
+
                         $this->errors = array_merge(array(
                             "--------- debut des erreurs ---------"
                         ), $this->errors);
@@ -228,79 +246,79 @@ class LbcProcessManager
                     }
                 }
             } elseif (strpos($from, 'le.bureau.des.profs@gmail.com') !== false) {
-                
+
                 if (strpos($subject, "|--|") !== false) {
-                    
+
                     preg_match('/\|--\|(\d*)\|--\|/', $subject, $matches);
-                    
+
                     $refMessage = $matches[1];
-                    
+
                     $stpMessage = $this->messProspectMg->get(array(
                         "ref_message" => $refMessage
                     ));
-                    
+
                     if ($stpMessage) {
-                        
+
                         $body = $this->gmailManager->getBody($message);
-                        
+
                         $stpMessage->setReply($body);
-                        
+
                         $this->messProspectMg->updateReply($stpMessage);
-                        
+
                         $stpMessage->setAnswer_gmail_id($gmailId);
-                        
+
                         $this->messProspectMg->updateAnswerGmailId($stpMessage);
-                        
+
                         // attribuer un libelle pour dire que le message a ete lu
                         $labelId = $this->gmailManager->getLabelsIds(array(
                             "bot_read_it"
                         ));
-                        
+
                         $this->gmailManager->modifyMessage($gmailId, $labelId, array());
                     }
                 }
             } elseif (strpos(strtolower($subject), "renouvelez gratuitement") !== false) {
-                
+
                 try {
-                    
+
                     $to = extractFirstMail($to);
-                    
+
                     $urls = extract_url($body);
                     $url = $urls[0][2];
-                    
+
                     $url = htmlspecialchars_decode($url);
-                    
+
                     $act = $this->lbcAccountMg->get(array(
                         "mail" => $to
                     ));
-                    
+
                     $renewalUrl = $this->renewalUrlMg->add(new \spamtonprof\stp_api\LbcRenewalUrl(array(
                         "url" => $url,
                         "statut" => $this->renewalUrlMg::TO_RENEW,
                         "ref_compte_lbc" => $act->getRef_compte(),
                         "date_reception" => $dateReception->format(PG_DATETIME_FORMAT)
                     )));
-                    
+
                     // attribuer un libelle pour dire que le message a ete lu
                     $labelId = $this->gmailManager->getLabelsIds(array(
                         "bot_read_it"
                     ));
-                    
+
                     $this->gmailManager->modifyMessage($gmailId, $labelId, array());
-                    
+
                     $this->slack->sendMessages('log-lbc', array(
                         "Récupération du lien de renouvellement d'annonce :" . $url,
                         "Avec pour compte : " . $act->getMail()
                     ));
                 } catch (\Exception $e) {
-                    
+
                     $this->slack->sendMessages('log-lbc', array(
                         "Erreur lors de la récupération du lien de renouvellement d'annonce :" . $url,
                         "Avec pour compte : " . $act->getMail()
                     ));
                 }
             }
-            
+
             $indexMessageProcessed ++;
             if ($nbMessageToProcess == $indexMessageProcessed) {
                 break;
@@ -310,17 +328,17 @@ class LbcProcessManager
 
     public function processNewMessages()
     {
-        
+
         // pour traiter les messages de leads si il y en a et les transferer au bureau des profs
         for ($i = 0; $i < 5; $i ++) {
-            
+
             $this->processLeadMessage();
         }
-        
+
         // pour envoyer au prospect les messages envoyes par le service prospection
-        
+
         for ($i = 0; $i < 1; $i ++) {
-            
+
             $this->replyToLeadMessages();
         }
     }
@@ -330,59 +348,59 @@ class LbcProcessManager
         $gmailId = $message->getGmail_id();
         $subject = $message->getSubject();
         $refMessage = $message->getRef_message();
-        
+
         $gMessage = $this->gmailManager->getMessage($gmailId, [
             "format" => "full"
         ]);
-        
+
         $body = $this->gmailManager->getBody($gMessage);
-        
+
         $subject = "|--|" . $refMessage . "|--| " . $subject;
         $replyTo = "mailsfromlbc@gmail.com";
         if ($message->getType() == $this->messageTypeMg::MESSAGE_DIRECT) {
-            
+
             $lead = $this->prospectLbcMg->get(array(
                 "ref_prospect_lbc" => $message->getRef_prospect_lbc()
             ));
-            
+
             $replyTo = $lead->getAdresse_mail();
             $subject = $message->getSubject();
         }
-        
+
         $this->gmailManager->sendMessage($body, $subject, "le.bureau.des.profs@gmail.com", $replyTo, "mailsfromlbc@gmail.com", "lbcBot");
-        
+
         $message->setProcessed(true);
         $this->messProspectMg->updateProcessed($message);
     }
 
     private function addNewLeadMessage($emailAccountLbc, $contactLbc, $dateReception, $gmailId, $subject, $messageType)
     {
-        
+
         // determination du compte leboncoin associe au messsage
         $compteLbc = $this->lbcAccountMg->get(array(
             'mail' => $emailAccountLbc
         ));
-        
+
         if (! $compteLbc) {
             $this->errors[] = "Impossible de trouver ce compte lbc dans la base : " . $emailAccountLbc;
             $this->errors[] = " ---- ";
             return;
         }
-        
+
         // enregistrement du prospect si il n'existe pas
         $prospectLbc = $this->prospectLbcMg->get(array(
             "adresse_mail" => $contactLbc
         ));
         if (! $prospectLbc) {
-            
+
             $prospectLbc = new \spamtonprof\stp_api\ProspectLbc();
             $prospectLbc->setAdresse_mail($contactLbc);
             $prospectLbc = $this->prospectLbcMg->add($prospectLbc);
         }
-        
+
         // enregistrement du messge du prospect
         $mess = new \spamtonprof\stp_api\MessageProspectLbc();
-        
+
         $mess->setDate_reception($dateReception);
         $mess->setRef_compte_lbc($compteLbc->getRef_compte());
         $mess->setProcessed(false);
@@ -391,44 +409,46 @@ class LbcProcessManager
         $mess->setSubject($subject);
         $mess->setType($messageType);
         $mess->setAnswered(false);
-        
+
         // return;
-        
+
         $mess = $this->messProspectMg->add($mess);
+
+        return ($compteLbc->getRef_client());
     }
 
     public function replyToLeadMessages()
     {
         $message = $this->messProspectMg->getMessageToSend();
-        
+
         if ($message) {
-            
+
             $compteLbc = $this->lbcAccountMg->get(array(
                 "ref_compte" => $message->getRef_compte_lbc()
             ));
-            
+
             $lead = $this->prospectLbcMg->get(array(
                 "ref_prospect_lbc" => $message->getRef_prospect_lbc()
             ));
-            
+
             $subject = 'Re: ' . str_replace('leboncoin', 'lebonc...', $message->getSubject());
             $body = $message->getReply();
-            
+
             $to = $lead->getAdresse_mail(); // 'alex.guillemine@gmail.com'
-                                            
+
             // on supprime la partie ecrite par 33mail.
             $pattern = '/(<div align="center">.*?<\/div><\/div>)|(This email was sent to the alias(.*?)[\r\n])/';
             $body = preg_replace_callback($pattern, function ($m) {
                 return ("");
             }, $body);
-            
+
             $send = $this->sendLeadReply($compteLbc, $subject, $to, $body, $message);
-            
+
             if ($send) {
-                
+
                 $message->setAnswered(true);
                 $this->messProspectMg->updateAnswered($message);
-                
+
                 $msgs = array();
                 $msgs[] = " ------------------------ ";
                 $msgs[] = "Reponse automatique au mail : " . $message->getRef_message();
@@ -438,11 +458,11 @@ class LbcProcessManager
                 $msgs[] = $subject;
                 $msgs[] = strip_tags($body);
                 // $this->slack->sendMessages($this->slack::LogLbc, $msgs);
-                
+
                 $labelId = $this->gmailManager->getLabelsIds(array(
                     "Repondu"
                 ));
-                
+
                 $this->gmailManager->modifyMessage($message->getGmail_id(), $labelId, array());
                 $this->gmailManager->modifyMessage($message->getAnswer_gmail_id(), $labelId, array());
             } else {
@@ -460,14 +480,14 @@ class LbcProcessManager
         $client = $clientMg->get(array(
             "ref_client" => $compteLbc->getRef_client()
         ));
-        
+
         if (strpos($compteLbc->getMail(), 'gmx') !== false) {
-            
+
             $gmxActMg = new \spamtonprof\stp_api\GmxActManager();
             $gmxAct = $gmxActMg->get(array(
                 'ref_compte_lbc' => $compteLbc->getRef_compte()
             ));
-            
+
             $smtpServer = new \spamtonprof\stp_api\SmtpServer(array(
                 'host' => 'mail.gmx.com',
                 'port' => 587,
@@ -480,32 +500,32 @@ class LbcProcessManager
                 "ref_smtp_server" => $smtpServerMg::smtp2Go
             ));
         }
-        
+
         $send1 = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), $compteLbc->getPrenom(), false);
         $send2 = $smtpServer->sendEmail("Stp Reply : |--|" . $message->getRef_message() . "|--|" . $subject, "lebureaudesprofs@gmail.com", $body, $compteLbc->getMail(), $compteLbc->getPrenom(), false);
-        
+
         return ($send1 && $send2);
     }
 
     public function processLeadMessage()
     {
         $message = $this->messProspectMg->getLastLeadMessage();
-        
+
         if ($message) {
-            
+
             $slack = new \spamtonprof\slack\Slack();
             $slack->sendMessages('message-lbc', array(
                 "Nouveau message du bon coin"
             ));
-            
+
             $this->forwadLeadMessages($message);
-            
+
             // on attribue le libelle pour dire que le message a ete transfere
-            
+
             $labelId = $this->gmailManager->getLabelsIds(array(
                 "forwarded"
             ));
-            
+
             $this->gmailManager->modifyMessage($message->getGmail_id(), $labelId, array());
         }
     }
@@ -514,7 +534,7 @@ class LbcProcessManager
     // --- step 1 : recuperation des nb derniers comptes actifs ( on pourrait specifier un autre critere de recuperation des comptes )
     // --- step 2 : on supprime toutes les annonces dans la table adds_tempo comme le compte va de nouveau etre controle
     // --- step 3 : on recupere les potentiels annonces en ligne de ces comptes avec l'api du bon coin
-    
+
     // --- step 4-1 (si il y a des annonces en ligne)
     // --- step 4-1-1 : on les ajoute a la table adds_tempo
     // --- step 4-1-2 : on met a jour la ref_commune des annonces ajoutes a adds_tempo
@@ -527,29 +547,28 @@ class LbcProcessManager
         $lbcApi = new \spamtonprof\stp_api\LbcApi();
         $adTempoMg = new \spamtonprof\stp_api\AddsTempoManager();
         $slack = new \spamtonprof\slack\Slack();
-        
+
         // step 1 :recuperer les comptes ages d'au moins 2h.
         $lbcAccounts = $lbcAccountMg->getAccountToScrap($nbCompte);
-        
+
         $i = 0;
         $msgs = [];
         foreach ($lbcAccounts as $lbcAccount) {
-            
-            
+
             $msgs[] = "Controle de " . $lbcAccount->getRef_compte();
-            
+
             $codePromo = $lbcAccount->getCode_promo();
             $user_id = $lbcAccount->getUser_id();
-            
+
             // step 2 : suppression des annonces dans la base
             $adTempoMg->deleteAll(array(
                 "ref_compte" => $lbcAccount->getRef_compte()
             ));
-            
+
             // step 3 : recuperation des annonces via api leboncoin
-            
+
             $ads = false;
-            
+
             if ($user_id) {
                 $ads = $lbcApi->getAdds(array(
                     'user_id' => $user_id
@@ -561,22 +580,22 @@ class LbcProcessManager
                 ));
                 $msgs[] = "Pas de user_id : ";
             }
-            
+
             // step 4-1 : si il y a des annonces en ligne sur leboncoin
             $disabled = false;
             $nbAnnonce = 0;
             if ($ads) {
-                
+
                 $ads = $ads->ads;
-                
+
                 foreach ($ads as $ad) {
-                    
+
                     $firstPublicationDate = $ad->first_publication_date;
                     $zipcode = $ad->location->zipcode;
                     $city = $ad->location->city;
                     $id = $ad->list_id;
                     $hasPhone = $ad->has_phone;
-                    
+
                     // 4-1-1 : on ajoute ces annonces a adds_tempo
                     $adTempo = new \spamtonprof\stp_api\AddsTempo(array(
                         "first_publication_date" => $firstPublicationDate,
@@ -589,12 +608,12 @@ class LbcProcessManager
                     $adTempoMg->add($adTempo);
                     $nbAnnonce ++;
                 }
-                
+
                 // 4-1-2 : on va mettre a jour la ref_commune de adds_tempo
                 $adsTemp = $adTempoMg->getAll(array(
                     "ref_compte" => $lbcAccount->getRef_compte()
                 ));
-                
+
                 $adTempoMg->updateAllRefCommune($adsTemp);
             } else {
                 $disabled = true;
@@ -603,23 +622,21 @@ class LbcProcessManager
             // --- step 5 : on desactive ou on active le compte
             $lbcAccount->setDisabled($disabled);
             $lbcAccountMg->updateDisabled($lbcAccount);
-            
+
             // --- step 6 : on met a jour le nb d'annonce du compte lbc
             $lbcAccount->setNb_annonces_online($nbAnnonce);
             $lbcAccountMg->updateNbAnnonceOnline($lbcAccount);
-            
+
             // --- step 7 : on met a jour la date de controle
             $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
             $lbcAccount->setControle_date($now);
             $lbcAccountMg->updateControleDate($lbcAccount);
-            
-            
+
             $msgs[] = $nbAnnonce . "en ligne";
-            
-            
-            if($i % 10 == 0){
+
+            if ($i % 10 == 0) {
                 $slack->sendMessages("log-lbc", $msgs);
-                $msgs=[];
+                $msgs = [];
             }
             $i ++;
         }
@@ -628,34 +645,30 @@ class LbcProcessManager
     // pour generer et retourner les annonces avant publication par zenno
     public function generateAds($refClient, $nbAds, $phone, $lock = false, $ref_compte = false)
     {
-        
         $clientMg = new \spamtonprof\stp_api\LbcClientManager();
         // on recupere le client
         $client = $clientMg->get(array(
             'ref_client' => $refClient
         ));
-        
+
         // si il y a une seule annonce c'est que c'est une premire annonce sur un compte vierge. On doit mettre une annonce qui passe ( celle de Valentin )
         $ref_client_content = $refClient;
         $client_content = $client;
         if (false && $nbAds == 1) {
-            
+
             $ref_client_content = 25;
             $client_content = $clientMg->get(array(
                 'ref_client' => $ref_client_content
             ));
-            
         }
-        
-        
-        
+
         // on recupere les titres
         $hasTypeTitleMg = new \spamtonprof\stp_api\HasTitleTypeManager();
         $lbcTitleMg = new \spamtonprof\stp_api\LbcTitleManager();
         $communeMg = new \spamtonprof\stp_api\LbcCommuneManager();
         $adMg = new \spamtonprof\stp_api\AddsTempoManager();
         $actMg = new \spamtonprof\stp_api\LbcAccountManager();
-        
+
         $hasTypeTitle = $hasTypeTitleMg->get(array(
             "ref_client_defaut" => $ref_client_content
         ));
@@ -663,17 +676,17 @@ class LbcProcessManager
             "ref_type_titre" => $hasTypeTitle->getRef_type_titre()
         ));
         shuffle($titles);
-        
+
         // on recupere les textes
         $hasTypeTexteMg = new \spamtonprof\stp_api\HasTextTypeManager();
         $hasTypeTexte = $hasTypeTexteMg->get_next($ref_client_content);
-        
+
         $lbcTexteMg = new \spamtonprof\stp_api\LbcTexteManager();
         $textes = $lbcTexteMg->getAll(array(
             "ref_type_texte.valid" => $hasTypeTexte->getRef_type()
         ));
         shuffle($textes);
-        
+
         // on recupere le compte lbc pour avoir le prenom a mettre dans les annonces
         $prenom = '[prenom]';
         if ($ref_compte) {
@@ -681,64 +694,64 @@ class LbcProcessManager
                 'ref_compte' => $ref_compte
             ));
             $prenom = $act->getPrenom();
-            
+
             $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-            
+
             $act->setDate_publication($now);
             $actMg->update_date_publication($act);
         }
-        
+
         // on ajoute le num tel aux textes si demande
         if ($phone != 'pas-de-num') {
             $textes = $lbcTexteMg->addPhoneLine($textes, $phone);
         }
-        
+
         // on recupere les communes
         $communes = $communeMg->getAll(array(
             "ref_client" => $refClient
         ));
-        
+
         // on constitue les annonces ( en verouillant les communes de ces annonces)
         $nbTitles = count($titles);
         $nbTextes = count($textes);
         $nbCommunes = count($communes);
-        
+
         // recuperation des images
         $images = scandir(ABSPATH . 'wp-content/uploads/lbc_images/' . $client_content->getImg_folder());
-        
+
         unset($images[0]);
         unset($images[1]);
-        
+
         shuffle($images);
-        
+
         $nbImages = count($images);
-        
+
         $ads = [];
         for ($i = 0; $i < $nbAds; $i ++) {
-            
+
             // recuperation du titre
             $title = $titles[$i % $nbTitles];
             $title = $title->getTitre();
-            
+
             // recuperation du texte
             $texte = $textes[$i % $nbTextes];
-            
+
             serializeTemp($texte);
-            
+
             $texte->setTexte(str_replace(array(
                 'Alexandre',
                 'alexandre',
                 'Anahyse',
                 'anahyse'
             ), $prenom, $texte->getTexte()));
-            
+
             // recuperation de l'image
             $image = 'https://spamtonprof.com/wp-content/uploads/lbc_images/' . $client_content->getImg_folder() . '/' . $images[($i % $nbImages) + 2];
-            
+
             // recuperation de la commune
             $commune = $communes[$i % $nbCommunes];
             $nomCommune = $commune->getLibelle() . " " . $commune->getCode_postal();
-            
+
             if ($lock) {
                 // verouillage des communes prises dans les annonces
                 $adTempo = new \spamtonprof\stp_api\AddsTempo(array(
@@ -747,7 +760,7 @@ class LbcProcessManager
                 ));
                 $adMg->add($adTempo);
             }
-            
+
             $symbols = [
                 '-',
                 '_',
@@ -759,7 +772,7 @@ class LbcProcessManager
             $symbol = $symbols[rand(0, count($symbols) - 1)];
             $symbols_line = str_repeat($symbol, rand(10, 50));
             $texte->setTexte($symbols_line . PHP_EOL . PHP_EOL . $texte->getTexte() . PHP_EOL . PHP_EOL . $symbols_line);
-            
+
             $ad = new \stdClass();
             $ad->title = $title;
             $ad->text = $texte;
@@ -774,19 +787,19 @@ class LbcProcessManager
     // pour retouner la configuration d'un client leboncoin (le type de texte par defaut et le type de titre par defaut d'un client)
     public function getDefaultConf($refClient)
     {
-        
+
         // on recupere le type titre
         $hasTypeTitleMg = new \spamtonprof\stp_api\HasTitleTypeManager();
         $typeTitreMg = new \spamtonprof\stp_api\TypeTitreManager();
-        
+
         $hasTypeTitle = $hasTypeTitleMg->get(array(
             "ref_client_defaut" => $refClient
         ));
-        
+
         $typeTitre = false;
         $messageTypeTitre = 'pas de ref type titre par defaut pour ce client (voir has_title_type)';
         if ($hasTypeTitle) {
-            
+
             $typeTitre = $typeTitreMg->get(array(
                 'ref_type' => $hasTypeTitle->getRef_type_titre()
             ));
@@ -794,20 +807,20 @@ class LbcProcessManager
                 $messageTypeTitre = 'pas type titre definie type_titre pour ce client (a ajouter)';
             }
         }
-        
+
         // on recupere le type texte
         $hasTypeTexteMg = new \spamtonprof\stp_api\HasTextTypeManager();
-        
+
         $typeTexteMg = new \spamtonprof\stp_api\TypeTexteManager();
-        
+
         $hasTypeTexte = $hasTypeTexteMg->get(array(
             "ref_client_defaut" => $refClient
         ));
-        
+
         $typeTexte = false;
         $messageTypeTexte = 'pas de ref type texte par defaut pour ce client (voir has_texte_type)';
         if ($hasTypeTexte) {
-            
+
             $typeTexte = $typeTexteMg->get(array(
                 'ref_type' => $hasTypeTexte->getRef_type()
             ));
@@ -815,30 +828,30 @@ class LbcProcessManager
                 $messageTypeTexte = 'pas type texte definie type_texte pour ce client (a ajouter)';
             }
         }
-        
+
         // on recupere le client
         $clientMg = new \spamtonprof\stp_api\LbcClientManager();
-        
+
         $client = $clientMg->get(array(
             'ref_client' => $refClient
         ));
-        
+
         if ($typeTexte) {
             $messageTypeTexte = 'tout est ok pour le texte';
         }
-        
+
         if ($typeTitre) {
             $messageTypeTitre = 'tout est ok pour le titre';
         }
-        
+
         $conf = new \stdClass();
         $conf->typeTexte = $typeTexte;
         $conf->typeTitre = $typeTitre;
         $conf->messagetypeTexte = $messageTypeTexte;
         $conf->messagetypeTitre = $messageTypeTitre;
-        
+
         $conf->client = $client;
-        
+
         return ($conf);
     }
 
@@ -848,28 +861,28 @@ class LbcProcessManager
     function addLbcTitle($fileName = 'titles.csv', $type)
     {
         $csv_path = ABSPATH . $fileName;
-        
+
         // ajout du type titre si il existe pas
         $typeTitreMg = new \spamtonprof\stp_api\TypeTitreManager();
-        
+
         $typeTitre = $typeTitreMg->get(array(
             "type" => $type
         ));
-        
+
         if (! $typeTitre) {
-            
+
             $typeTitre = $typeTitreMg->add(new \spamtonprof\stp_api\TypeTitre(array(
                 'type' => $type
             )));
         }
-        
+
         // ajout des titres
         $titleMg = new \spamtonprof\stp_api\LbcTitleManager();
-        
+
         $rows = readCsv($csv_path);
-        
+
         foreach ($rows as $row) {
-            
+
             $titleMg->add(new \spamtonprof\stp_api\LbcTitle(array(
                 "titre" => $row[0],
                 "type_titre" => $typeTitre->getType(),
@@ -881,21 +894,21 @@ class LbcProcessManager
     function addLbcEmails($ref_client, $fileName = 'emails.csv')
     {
         $csv_path = ABSPATH . $fileName;
-        
+
         // ajout des titres
         $actMg = new \spamtonprof\stp_api\LbcAccountManager();
-        
+
         $rows = readCsv($csv_path);
-        
+
         foreach ($rows as $row) {
-            
+
             echo ($row[0] . '<br>');
-            
+
             $newAccount = new \spamtonprof\stp_api\LbcAccount();
-            
+
             $newAccount->setRef_client($ref_client);
             $newAccount->setMail($row[0]);
-            
+
             $newAccount = $actMg->add($newAccount);
         }
     }
@@ -904,69 +917,55 @@ class LbcProcessManager
     function sendAutomaticAnswer()
     {
         $gmailMg = new \spamtonprof\googleMg\GoogleManager('le.bureau.des.profs@gmail.com');
-        
+
         $clientMg = new \spamtonprof\stp_api\LbcClientManager();
         $mailForLeadMg = new \spamtonprof\stp_api\MailForLeadManager();
-        
+
         $gmailAccount = $this->gmailAccountMg->get("le.bureau.des.profs@gmail.com");
-        
+
         $lastHistoryId = $gmailAccount->getLast_history_id();
-        
+
         $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-        
+
         $now->sub(new \DateInterval("PT2H"));
-        
+
         $now = $now->format('Y/m/d');
-        
+
         $retour = $gmailMg->getNewMessages($lastHistoryId);
-        
+
         $messages = $retour["messages"];
-        
+
         $lastHistoryId = $retour["lastHistoryId"];
-        
+
         $gmailAccount->setLast_history_id($lastHistoryId);
         $this->gmailAccountMg->updateHistoryId($gmailAccount);
-        
+
         echo ("------ nb messages : " . count($messages) . " ----- <br><br><br>");
-        
+
         foreach ($messages as $message) {
-            
+
             // on regarde le titre du message si il commence par |--|ref_|--| c'est bon
             $subject = $gmailMg->getHeader($message, "Subject");
             $threadId = $message->threadId;
             $gmailId = $message->id;
-            
+
             echo ($subject . ' -- ' . $threadId . '<br>');
             $matches = [];
             preg_match('/^\|--\|(\d*)\|--\|/', $subject, $matches);
-            
+
             if (count($matches) != 2) {
-                
+
                 continue;
             }
-            
+
             // on extrait la ref_message
             $refMessage = $matches[1];
-            
+
             // on recupere le message dans la table message_prospect_lbc
             $messProspectMg = new \spamtonprof\stp_api\MessageProspectLbcManager();
             $msg = $messProspectMg->get(array(
                 "ref_message" => $refMessage
             ));
-            
-            // on ne repond pas aux messages si il a deja eu une reponse
-            if ($msg->getAnswered()) {
-                
-                // on attribue un libelle 'first_contact_done'
-                $labelId = $gmailMg->getLabelsIds(array(
-                    "first_contact_done"
-                ));
-                
-                $gmailMg->modifyMessage($gmailId, $labelId, array());
-                
-                echo (utf8_encode('deja repondu <br>'));
-                continue;
-            }
             
             // a partir du message, on recupere ref_prospect_lbc
             $refProspect = $msg->getRef_prospect_lbc();
@@ -976,20 +975,6 @@ class LbcProcessManager
                 'ref_prospect_lbc' => $refProspect,
                 'answered' => true
             ));
-            
-            // si il n'y a pas de messages avec ref_prospect_lbc deja repondu alors on repond
-            echo ("nb msg : " . count($msgs) . '<br>');
-            if (count($msgs) > 0) {
-                
-                // on attribue un libelle 'first_contact_done'
-                $labelId = $gmailMg->getLabelsIds(array(
-                    "first_contact_done"
-                ));
-                
-                $gmailMg->modifyMessage($gmailId, $labelId, array());
-                
-                continue;
-            }
             
             // on recupere ref_compte_lbc a partir du message
             $refCompte = $msg->getRef_compte_lbc();
@@ -1006,22 +991,63 @@ class LbcProcessManager
                 'ref_client' => $refClient
             ));
             
+            // on attribue un libelle 'answer'
+            $labelId = $gmailMg->getLabelsIds(array(
+                $client->get_label_client()
+            ));
+            
+            $gmailMg->modifyMessage($gmailId, $labelId, array());
+
+            // on ne repond pas aux messages si il a deja eu une reponse
+            if ($msg->getAnswered()) {
+
+                // on attribue un libelle 'first_contact_done'
+                $labelId = $gmailMg->getLabelsIds(array(
+                    "first_contact_done"
+                ));
+
+                $gmailMg->modifyMessage($gmailId, $labelId, array());
+
+                echo (utf8_encode('deja repondu <br>'));
+                continue;
+            }
+
+
+            
+            
+
+            // si il n'y a pas de messages avec ref_prospect_lbc deja repondu alors on repond
+            echo ("nb msg : " . count($msgs) . '<br>');
+            if (count($msgs) > 0) {
+
+                // on attribue un libelle 'first_contact_done'
+                $labelId = $gmailMg->getLabelsIds(array(
+                    "first_contact_done"
+                ));
+
+                $gmailMg->modifyMessage($gmailId, $labelId, array());
+
+                continue;
+            }
+
+
+
             // recuperation du message a envoyer
             $txtMg = new spamtonprof\stp_api\LbcTexteManager();
-            
+
             $typeTxtMg = new \spamtonprof\stp_api\TypeTexteManager();
             $typeTxt = $typeTxtMg->get(array(
                 'ref_type' => $client->getRef_reponse_lbc()
             ));
-            
+
             $typeTxt = $typeTxt->getType();
-            
+
             $txt = $txtMg->get(array(
                 'type_random' => $typeTxt
             ));
-            
+
             $txt = $txt->getTexte();
-            
+
             $spamtonprofs = array(
                 'sppamtonprof',
                 'spaamtonprof',
@@ -1040,25 +1066,25 @@ class LbcProcessManager
                 'spamtoprof',
                 'spamtonrof'
             );
-            
+
             $spamtonprof = $spamtonprofs[array_rand($spamtonprofs, 1)];
-            
+
             $txt = str_replace(array(
                 'spamtonprof',
                 'sppamtonprof',
                 'spamtonpprof'
             ), $spamtonprof, $txt);
-            
+
             $body = str_replace('[prof_name]', $act->getPrenom(), $txt);
-            
+
             // on envoie le message
             $gmailMg->sendMessage($body, 'Re: ' . $subject, 'mailsfromlbc@gmail.com', 'mailsfromlbc@gmail.com', 'le.bureau.des.profs@gmail.com', 'Cannelle Gaucher', $threadId);
-            
+
             // on attribue un libelle 'answer'
             $labelId = $gmailMg->getLabelsIds(array(
                 "bot_has_made_first_contact"
             ));
-            
+
             $gmailMg->modifyMessage($gmailId, $labelId, array());
         }
     }
