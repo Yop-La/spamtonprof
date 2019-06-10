@@ -18,10 +18,11 @@ class GmailLabelManager
 
     public function add(GmailLabel $gmailLabel)
     {
-        $q = $this->_db->prepare('INSERT INTO gmail_label(nom_label, color_label, action) VALUES(:nom_label, :color_label, :action)');
+        $q = $this->_db->prepare('INSERT INTO gmail_label(nom_label, color_label, action,type) VALUES(:nom_label, :color_label, :action, :type)');
         $q->bindValue(':nom_label', $gmailLabel->getNom_label());
         $q->bindValue(':color_label', $gmailLabel->getColor_label());
         $q->bindValue(':action', $gmailLabel->getAction());
+        $q->bindValue(':type', $gmailLabel->getType());
         $q->execute();
 
         $gmailLabel->setRef_label($this->_db->lastInsertId());
@@ -45,6 +46,10 @@ class GmailLabelManager
                 $action = $info['action'];
                 $q = $this->_db->prepare("SELECT * FROM gmail_label where action = :action");
                 $q->bindValue(":action", $action);
+            } else if (array_key_exists('type', $info)) {
+                $type = $info['type'];
+                $q = $this->_db->prepare("SELECT * FROM gmail_label where type = :type");
+                $q->bindValue(":type", $type);
             }
         }
 
@@ -102,7 +107,7 @@ class GmailLabelManager
         $q->execute();
     }
 
-    // pour ajouter à la table gmail_label les nouveaux niveaux ajoutés à la table stp_niveau
+    // pour ajouter ï¿½ la table gmail_label les nouveaux niveaux ajoutï¿½s ï¿½ la table stp_niveau
     function addNewNiveaux()
     {
         $niveauMg = new \spamtonprof\stp_api\StpNiveauManager();
@@ -111,7 +116,7 @@ class GmailLabelManager
             'all'
         ));
 
-        // pour ajouter les nouveaux niveaux à la table
+        // pour ajouter les nouveaux niveaux ï¿½ la table
         foreach ($niveaux as $niveau) {
 
             $label = $this->get(array(
