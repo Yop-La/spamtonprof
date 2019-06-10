@@ -993,7 +993,7 @@ class LbcProcessManager
             
             // on attribue un libelle 'answer'
             $labelId = $gmailMg->getLabelsIds(array(
-                $client->get_label_client()
+                $client->getLabel()
             ));
             
             $gmailMg->modifyMessage($gmailId, $labelId, array());
