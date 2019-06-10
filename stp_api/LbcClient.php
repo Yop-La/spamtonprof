@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class LbcClient implements \JsonSerializable
 {
 
-    protected $ref_client, $nom_client, $prenom_client, $domain, $img_folder, $ref_reponse_lbc, $ref_cat_prenom;
+    protected $ref_client, $nom_client, $prenom_client, $domain, $img_folder, $ref_reponse_lbc, $ref_cat_prenom, $label_client;
 
     public function __construct(array $donnees = array())
     {
@@ -27,6 +27,11 @@ class LbcClient implements \JsonSerializable
     public function getRef_cat_prenom()
     {
         return $this->ref_cat_prenom;
+    }
+
+    public function get_label_client()
+    {
+        return ($this->getPrenom_client() . '_' . $this->getNom_client());
     }
 
     /**
