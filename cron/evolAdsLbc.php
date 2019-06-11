@@ -23,13 +23,49 @@ header("Pragma: no-cache");
  * tourne tous les 5 minutes
  */
 
-$lbcProcessMg = new \spamtonprof\stp_api\LbcApi();
-$now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
 
-$ads = $lbcProcessMg->get_maths_ads();
+$now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+$before = clone $now;
+$before->sub(new \DateInterval('PT5M'));
+
+$nb_new_ads = 0;
+$total = 0;
+$continue = true;
+$offset = 0;
+do {
+    
+    $lbcProcessMg = new \spamtonprof\stp_api\LbcApi();
+    $ads = $lbcProcessMg->get_maths_ads($offset);
+    $total = $ads->total;
+    $ads = $ads->ads;
+    
+    foreach ($ads as $ad) {
+        
+        $first_publication_date = $ad->index_date;
+        $first_publication_date = DateTime::createFromFormat(LBC_DATETIME_FORMAT, $first_publication_date, new \DateTimeZone("Europe/Paris"));
+        
+        echo ($before->format(FR_DATETIME_FORMAT) . '<br>');
+        
+        echo ($now->format(FR_DATETIME_FORMAT) . '<br>'. '<br>'. '<br>');
+        
+        
+        echo ($first_publication_date->format(FR_DATETIME_FORMAT) . '<br>');
+        
+        
+        if ($first_publication_date >= $before && $first_publication_date <= $now) {
+            $nb_new_ads = $nb_new_ads + 1;
+            echo('dedans <br>');
+        } else {
+            $continue = false;
+            break;
+        }
+    }
+    $offset = $offset + 35;
+} while ($continue);
 
 $slack = new \spamtonprof\slack\Slack();
 $slack->sendMessages('evolution-ads-lbc', array(
     $now->format(FR_DATETIME_FORMAT) . ":",
-    $ads->total
+    'total: ' . $total,
+    'Nb nouvelles annonces des 5 dernières minutes: ' . $nb_new_ads
 ));
