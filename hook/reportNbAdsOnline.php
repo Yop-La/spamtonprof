@@ -28,7 +28,7 @@ $tomorrow = clone $today;
 $tomorrow->add(new \DateInterval('P1D'));
 
 $gmailManager = new \spamtonprof\googleMg\GoogleManager("mailsfromlbc@gmail.com");
-$msgs = $gmailManager->listMessages("subject:ligne after:" . $today->format(GMAIL_DATE_FORMAT) . "before:" . $tomorrow->format(GMAIL_DATE_FORMAT), 20, 20);
+$msgs = $gmailManager->listMessages("subject:ligne after:" . $today->format(GMAIL_DATE_FORMAT) . "before:" . $tomorrow->format(GMAIL_DATE_FORMAT), 4, 100);
 
 $clientMg = new \spamtonprof\stp_api\LbcClientManager();
 
@@ -75,7 +75,7 @@ foreach ($msgs as $msg) {
 $slack = new \spamtonprof\slack\Slack();
 $slack->sendMessages('reporting-lbc', array(
     "----------",
-    "Reporting sur le nombre d'annonces publiés le " . $tomorrow->format(FR_DATE_FORMAT)
+    "Reporting sur le nombre d'annonces publiés le " . $today->format(FR_DATE_FORMAT)
 ));
 
 foreach ($res_publication as $key => $value) {

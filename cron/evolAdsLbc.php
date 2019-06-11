@@ -24,10 +24,12 @@ header("Pragma: no-cache");
  */
 
 $lbcProcessMg = new \spamtonprof\stp_api\LbcApi();
+$now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
 
 $ads = $lbcProcessMg->get_maths_ads();
 
 $slack = new \spamtonprof\slack\Slack();
 $slack->sendMessages('evolution-ads-lbc', array(
+    $now->format(FR_DATETIME_FORMAT) . ":",
     $ads->total
 ));
