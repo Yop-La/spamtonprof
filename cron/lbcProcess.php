@@ -31,32 +31,17 @@ header("Pragma: no-cache");
 $lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
 
 $automatic_answer = true;
-$nb_step = 3;
 if (array_key_exists('automatic_answer', $_GET) && $_GET['automatic_answer'] == "false") {
 
     $automatic_answer = false;
-    $nb_step = 2;
+
 }
 
-$lbcReaderInt = unserializeTemp("/tempo/lbcReaderInt");
+$lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
+$lbcProcessMg->read_messages_mailfromlbc();
+$lbcProcessMg->process_new_lead_messages();
+$lbcProcessMg->send_reply_to_lead();
 
-if (! $lbcReaderInt) {
-    $lbcReaderInt = 0;
-    serializeTemp($lbcReaderInt, "/tempo/lbcReaderInt");
-}
-
-if ($lbcReaderInt == 0) {
-    echo ("process 1 : lecture des emails de mailsfromlbc@gmail.com" . "<br>");
-    $lbcProcessMg->readNewLeadMessages();
-} elseif ($lbcReaderInt == 1) {
-    echo ("process 2 : redirection des emails vers lebureaudesprofs + envoi des emails aux prospects depuis mailsfromlbc@gmail.com" . "<br>");
-    $lbcProcessMg->processNewMessages();
-} elseif ($automatic_answer && $lbcReaderInt == 2) {
-    echo ("process 3 : réponse automatique aux premiers messages des prospects" . "<br>");
-    $lbcProcessMg->sendAutomaticAnswer();
-}
-
-$lbcReaderInt = $lbcReaderInt + 1;
-$lbcReaderInt = $lbcReaderInt % $nb_step;
-
-serializeTemp($lbcReaderInt, "/tempo/lbcReaderInt");
+$lbcProcessMg2 = new \spamtonprof\stp_api\LbcProcessManager("le.bureau.des.profs@gmail.com");
+$lbcProcessMg2->read_messages_lebureaudesprofs();
+$lbcProcessMg2->label_forwarded_messages();

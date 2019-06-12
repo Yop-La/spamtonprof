@@ -636,6 +636,17 @@ function serializeTemp($object, $file = "/tempo/tempoObject", $rel = true)
     file_put_contents($file, $s);
 }
 
+function extract_text_from_node($classname, $body){
+    
+    $dom = new DomDocument();
+    $dom->loadHTML($body);
+    $finder = new DomXPath($dom);
+    $nodes = $finder->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
+    $text = $nodes[0]->textContent;
+    return($text);
+    
+}
+
 function unserializeTemp($file = "/tempo/tempoObject", $rel = true)
 {
     if ($rel) {
