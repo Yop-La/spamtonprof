@@ -11,7 +11,7 @@ use Exception;
 class MessageProspectLbc implements \JsonSerializable
 {
 
-    protected $ref_message, $date_reception, $ref_prospect_lbc, $processed, $type, $ref_compte_lbc, $subject, $gmail_id, $answered, $reply, $answer_gmail_id, $ancien_prospect, $message_reconnnu, $pseudo_reconnu, $pseudo, $body, $labelled, $forwarded, $in_agent_box, $ready_to_answer, $gmail_id_bureau_prof, $to_send;
+    protected $ref_message, $date_reception, $ref_prospect_lbc, $type, $ref_compte_lbc, $subject, $gmail_id, $answered, $reply, $answer_gmail_id, $ancien_prospect, $message_reconnu, $pseudo_reconnu, $pseudo, $body, $labelled, $forwarded, $in_agent_box, $ready_to_answer, $gmail_id_bureau_prof, $to_send;
 
     /**
      *
@@ -20,6 +20,12 @@ class MessageProspectLbc implements \JsonSerializable
     public function getTo_send()
     {
         return $this->to_send;
+    }
+    
+    
+    public static function cast(\spamtonprof\stp_api\MessageProspectLbc $mess)
+    {
+        return ($mess);
     }
 
     /**
@@ -130,14 +136,6 @@ class MessageProspectLbc implements \JsonSerializable
         return $this->ancien_prospect;
     }
 
-    /**
-     *
-     * @return mixed
-     */
-    public function getMessage_reconnnu()
-    {
-        return $this->message_reconnnu;
-    }
 
     /**
      *
@@ -175,13 +173,21 @@ class MessageProspectLbc implements \JsonSerializable
         $this->ancien_prospect = $ancien_prospect;
     }
 
+
     /**
-     *
-     * @param mixed $message_reconnnu
+     * @return mixed
      */
-    public function setMessage_reconnnu($message_reconnnu)
+    public function getMessage_reconnu()
     {
-        $this->message_reconnnu = $message_reconnnu;
+        return $this->message_reconnu;
+    }
+
+    /**
+     * @param mixed $message_reconnu
+     */
+    public function setMessage_reconnu($message_reconnu)
+    {
+        $this->message_reconnu = $message_reconnu;
     }
 
     /**
@@ -249,14 +255,6 @@ class MessageProspectLbc implements \JsonSerializable
         return $this->date_reception;
     }
 
-    /**
-     *
-     * @return mixed
-     */
-    public function getProcessed()
-    {
-        return $this->processed;
-    }
 
     /**
      *
@@ -281,10 +279,6 @@ class MessageProspectLbc implements \JsonSerializable
         $this->date_reception = $date_reception;
     }
 
-    public function setProcessed($processed)
-    {
-        $this->processed = $processed;
-    }
 
     public function jsonSerialize()
     {
@@ -383,23 +377,7 @@ class MessageProspectLbc implements \JsonSerializable
         $this->type = $type;
     }
 
-    /**
-     *
-     * @return mixed
-     */
-    public function getAnswered()
-    {
-        return $this->answered;
-    }
 
-    /**
-     *
-     * @param mixed $answered
-     */
-    public function setAnswered($answered)
-    {
-        $this->answered = $answered;
-    }
 
     /**
      *

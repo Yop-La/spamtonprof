@@ -17,20 +17,6 @@ class MessageProspectLbcManager
         // todostp faire pareil pour getresponse_api
     }
 
-    public function getLastLeadMessage()
-    {
-        $q = $this->_db->prepare("select * from message_prospect_lbc where processed = false order by date_reception  limit 1");
-
-        $q->execute();
-
-        $data = $q->fetch(PDO::FETCH_ASSOC);
-
-        if (! $data) {
-            return false;
-        }
-        return new \spamtonprof\stp_api\MessageProspectLbc($data);
-    }
-
     public function getMessageToForward()
     {
         $q = $this->_db->prepare("select * from message_prospect_lbc where forwarded = false and labelled = true order by date_reception  limit 1");
@@ -77,14 +63,7 @@ class MessageProspectLbcManager
     {
         $data = false;
         $prospects = [];
-        if (array_key_exists("ref_prospect_lbc", $info) && array_key_exists("answered", $info)) {
-            $refProspect = $info["ref_prospect_lbc"];
-            $answered = $info["answered"];
-            $q = $this->_db->prepare("select * from message_prospect_lbc where ref_prospect_lbc =:ref_prospect_lbc and answered = :answered");
-            $q->bindValue(":ref_prospect_lbc", $refProspect);
-            $q->bindValue(":answered", $answered);
-            $q->execute();
-        }
+
         if (in_array("forwarded_messages", $info)) {
             $q = $this->_db->prepare("select * from message_prospect_lbc where ready_to_answer = false and in_agent_box = true limit 10");
             $q->execute();
@@ -171,7 +150,7 @@ class MessageProspectLbcManager
     public function update_message_reconnu(\spamtonprof\stp_api\MessageProspectLbc $messageProspectLbc)
     {
         $q = $this->_db->prepare("update message_prospect_lbc set message_reconnu = :message_reconnu where ref_message = :ref_message ");
-        $q->bindValue(":message_reconnu", $messageProspectLbc->getMessage_reconnnu(), PDO::PARAM_BOOL);
+        $q->bindValue(":message_reconnu", $messageProspectLbc->getMessage_reconnu(), PDO::PARAM_BOOL);
         $q->bindValue(":ref_message", $messageProspectLbc->getRef_message());
         $q->execute();
     }
@@ -200,14 +179,6 @@ class MessageProspectLbcManager
         $q->execute();
     }
 
-    public function updateAnswered(\spamtonprof\stp_api\MessageProspectLbc $messageProspectLbc)
-    {
-        $q = $this->_db->prepare("update message_prospect_lbc set answered = :answered where ref_message = :ref_message ");
-        $q->bindValue(":answered", $messageProspectLbc->getAnswered(), PDO::PARAM_BOOL);
-        $q->bindValue(":ref_message", $messageProspectLbc->getRef_message());
-        $q->execute();
-    }
-
     public function update_ready_to_answer(\spamtonprof\stp_api\MessageProspectLbc $messageProspectLbc)
     {
         $q = $this->_db->prepare("update message_prospect_lbc set ready_to_answer = :ready_to_answer where ref_message = :ref_message ");
@@ -228,14 +199,6 @@ class MessageProspectLbcManager
     {
         $q = $this->_db->prepare("update message_prospect_lbc set forwarded = :forwarded where ref_message = :ref_message ");
         $q->bindValue(":forwarded", $messageProspectLbc->getForwarded(), PDO::PARAM_BOOL);
-        $q->bindValue(":ref_message", $messageProspectLbc->getRef_message());
-        $q->execute();
-    }
-
-    public function updateProcessed(\spamtonprof\stp_api\MessageProspectLbc $messageProspectLbc)
-    {
-        $q = $this->_db->prepare("update message_prospect_lbc set processed = :processed where ref_message = :ref_message ");
-        $q->bindValue(":processed", $messageProspectLbc->getProcessed(), PDO::PARAM_BOOL);
         $q->bindValue(":ref_message", $messageProspectLbc->getRef_message());
         $q->execute();
     }
@@ -266,7 +229,7 @@ class MessageProspectLbcManager
 
     public function add(MessageProspectLbc $message)
     {
-        $q = $this->_db->prepare('INSERT INTO message_prospect_lbc(date_reception, ref_compte_lbc, ref_prospect_lbc, gmail_id, subject, type, answered,ancien_prospect, message_reconnu, pseudo_reconnu, pseudo,body,forwarded, in_agent_box, ready_to_answer, to_send) VALUES(:date_reception, :ref_compte_lbc, :ref_prospect_lbc, :gmail_id, :subject, :type, :answered, false, false, false, :pseudo,:body,false,false,false,false,false)');
+        $q = $this->_db->prepare('INSERT INTO message_prospect_lbc(date_reception, ref_compte_lbc, ref_prospect_lbc, gmail_id, subject, type, ancien_prospect, message_reconnu, pseudo_reconnu, pseudo,body,labelled, forwarded, in_agent_box, ready_to_answer, to_send) VALUES(:date_reception, :ref_compte_lbc, :ref_prospect_lbc, :gmail_id, :subject, :type, false, false, false, :pseudo,:body,false,false,false,false,false)');
         $q->bindValue(':date_reception', $message->getDate_reception()
             ->format(PG_DATETIME_FORMAT));
         $q->bindValue(':ref_compte_lbc', $message->getRef_compte_lbc());
@@ -274,7 +237,6 @@ class MessageProspectLbcManager
         $q->bindValue(':gmail_id', $message->getGmail_id());
         $q->bindValue(':subject', $message->getSubject());
         $q->bindValue(':type', $message->getType(), PDO::PARAM_INT);
-        $q->bindValue(':answered', $message->getAnswered(), PDO::PARAM_BOOL);
 
         $q->bindValue(':body', $message->getBody());
         $q->bindValue(':pseudo', $message->getPseudo());

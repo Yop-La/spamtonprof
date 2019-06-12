@@ -127,7 +127,6 @@ class LbcProcessManager
                     $mess->setGmail_id($gmailId);
                     $mess->setSubject($subject);
                     $mess->setType($messageType);
-                    $mess->setAnswered(false);
                     $mess->setPseudo($pseudo);
                     $mess->setBody($txt_msg);
                     $mess = $this->messProspectMg->add($mess);
@@ -139,7 +138,6 @@ class LbcProcessManager
                 }
             } elseif (strpos($from, 'le.bureau.des.profs@gmail.com') !== false) {
 
-                echo('laaaaaaaaaaa<br>');
                 
                 
                 if (strpos($subject, "|--|") !== false) {
@@ -155,8 +153,6 @@ class LbcProcessManager
                     ));
 
                     if ($stpMessage) {
-                        
-                        echo('dedans <br>');
                         
 
                         $body = $this->gmailManager->getBody($message);
@@ -345,8 +341,8 @@ class LbcProcessManager
             if ($msg) {
                 $labels[] = 'body_reconnu';
                 $body_reconnu = true;
-                $message->setMessage_reconnnu($body_reconnu);
-                $this->messProspectMg->update_message_reconnu($body_reconnu);
+                $message->setMessage_reconnu($body_reconnu);
+                $this->messProspectMg->update_message_reconnu($message);
                 $msg = false;
             }
 
@@ -412,7 +408,7 @@ class LbcProcessManager
                 $labels[] = 'pseudo_reconnu';
             }
 
-            if ($message->getMessage_reconnnu()) {
+            if ($message->getMessage_reconnu()) {
                 $labels[] = 'body_reconnu';
             }
 
@@ -434,7 +430,7 @@ class LbcProcessManager
             ));
 
             $labels[] = $client->getLabel();
-
+            
             if (count($labels) > 0) {
                 $labelIds = $this->gmailManager->getLabelsIds($labels);
                 $this->gmailManager->modifyMessage($message->getGmail_id_bureau_prof(), $labelIds, array());
@@ -546,28 +542,6 @@ class LbcProcessManager
         return ($send1 && $send2);
     }
 
-    public function processLeadMessage()
-    {
-        $message = $this->messProspectMg->getLastLeadMessage();
-
-        if ($message) {
-
-            $slack = new \spamtonprof\slack\Slack();
-            $slack->sendMessages('message-lbc', array(
-                "Nouveau message du bon coin"
-            ));
-
-            $this->forwadLeadMessages($message);
-
-            // on attribue le libelle pour dire que le message a ete transfere
-
-            $labelId = $this->gmailManager->getLabelsIds(array(
-                "forwarded"
-            ));
-
-            $this->gmailManager->modifyMessage($message->getGmail_id(), $labelId, array());
-        }
-    }
 
     // cette fonction permet de controler les annonces en ligne des nbCompte derniers comptes actifs (ie qui n'a pas desactive par leboncoin)
     // --- step 1 : recuperation des nb derniers comptes actifs ( on pourrait specifier un autre critere de recuperation des comptes )
