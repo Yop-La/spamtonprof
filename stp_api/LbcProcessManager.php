@@ -66,8 +66,8 @@ class LbcProcessManager
             $dateReception->setTimestamp($timeStamp);
             $dateReception->setTimezone(new \DateTimeZone('Europe/Paris'));
 
-            echo($subject.'   --- date reception : ' . $dateReception->format(PG_DATETIME_FORMAT) . '<br>');
-            
+            echo ($subject . '   --- date reception : ' . $dateReception->format(PG_DATETIME_FORMAT) . '<br>');
+
             $messageType = 0;
 
             if (strpos($from, 'messagerie.leboncoin.fr') !== false) { // message du bon coin a priori via mailgun ou via gmx
@@ -138,10 +138,7 @@ class LbcProcessManager
                 }
             } elseif (strpos($from, 'le.bureau.des.profs@gmail.com') !== false) {
 
-                
-                
                 if (strpos($subject, "|--|") !== false) {
-                    
 
                     $matches = [];
                     preg_match('/\|--\|(\d*)\|--\|/', $subject, $matches);
@@ -153,7 +150,6 @@ class LbcProcessManager
                     ));
 
                     if ($stpMessage) {
-                        
 
                         $body = $this->gmailManager->getBody($message);
 
@@ -166,12 +162,12 @@ class LbcProcessManager
                         $stpMessage->setTo_send(true);
                         $this->messProspectMg->update_to_send($stpMessage);
 
-//                         // attribuer un libelle pour dire que le message a ete lu
-//                         $labelId = $this->gmailManager->getLabelsIds(array(
-//                             "bot_read_it"
-//                         ));
+                        // // attribuer un libelle pour dire que le message a ete lu
+                        // $labelId = $this->gmailManager->getLabelsIds(array(
+                        // "bot_read_it"
+                        // ));
 
-//                         $this->gmailManager->modifyMessage($gmailId, $labelId, array());
+                        // $this->gmailManager->modifyMessage($gmailId, $labelId, array());
                     }
                 }
             } elseif (strpos(strtolower($subject), "renouvelez gratuitement") !== false && false) {
@@ -415,6 +411,10 @@ class LbcProcessManager
             // attribution des labels
             if ($message->getType() == LeadMessageTypeManager::DEBUT_MESSAGERIE_LEBONCOIN) {
                 $labels[] = "debut-messagerie-leboncoin";
+
+                $this->slack->sendMessages('log-lbc', array(
+                    "Nouvelle conversation sur leboncoin"
+                ));
             } else if ($message->getType() == LeadMessageTypeManager::CONVERSATION_MESSAGERIE_LEBONCOIN) {
                 $labels[] = "conversation-messagerie-leboncoin";
             }
@@ -430,7 +430,7 @@ class LbcProcessManager
             ));
 
             $labels[] = $client->getLabel();
-            
+
             if (count($labels) > 0) {
                 $labelIds = $this->gmailManager->getLabelsIds($labels);
                 $this->gmailManager->modifyMessage($message->getGmail_id_bureau_prof(), $labelIds, array());
@@ -470,52 +470,59 @@ class LbcProcessManager
             $this->messProspectMg->update_forwarded($message);
         }
     }
-    
-    public function send_reply_to_lead(){
-        
+
+    public function label_message($gmail_id, array $labels)
+    {
+        $labelId = $this->gmailManager->getLabelsIds($labels);
+        $this->gmailManager->modifyMessage($gmail_id, $labelId, array());
+    }
+
+    public function send_reply_to_lead()
+    {
         $message = $this->messProspectMg->get_message_to_send();
-        
+
         if ($message) {
-            
+
             $compteLbc = $this->lbcAccountMg->get(array(
                 "ref_compte" => $message->getRef_compte_lbc()
             ));
-            
+
             $lead = $this->prospectLbcMg->get(array(
                 "ref_prospect_lbc" => $message->getRef_prospect_lbc()
             ));
-            
+
             $subject = 'Re: ' . str_replace('leboncoin', 'lebonc...', $message->getSubject());
             $body = $message->getReply();
-            
+
             $to = $lead->getAdresse_mail();
-            
+
             $send = $this->sendLeadReply($compteLbc, $subject, $to, $body, $message);
-            
+
             if ($send) {
-                
+
                 $message->setTo_send(false);
                 $this->messProspectMg->update_to_send($message);
+
+                // on attribue le libellé répondu au message du prospect
+                label_message($message->getGmail_id(),array("Repondu"));
                 
+                // on attribue le libellé envoyé à la réponse envoyé par l'agent depuis le bureaudesprofs
+                label_message($message->getAnswer_gmail_id(),array("envoyé"));
                 
-                $labelId = $this->gmailManager->getLabelsIds(array(
-                    "Repondu"
-                ));
-                $this->gmailManager->modifyMessage($message->getGmail_id(), $labelId, array());
-                $this->gmailManager->modifyMessage($message->getAnswer_gmail_id(), $labelId, array());
+                return ($message->getGmail_id_bureau_prof());
             } else {
                 $slack = new \spamtonprof\slack\Slack();
                 $slack->sendMessages("log-lbc", array(
                     "La reponse au lead de ref " . $message->getRef_message() . " n'a pas pu etre envoye ... "
                 ));
+                
             }
+            return (false);
         }
-        
     }
 
     public function sendLeadReply(\spamtonprof\stp_api\LbcAccount $compteLbc, $subject, $to, $body, $message)
     {
-
         if (strpos($compteLbc->getMail(), 'gmx') !== false) {
 
             $gmxActMg = new \spamtonprof\stp_api\GmxActManager();
@@ -538,10 +545,9 @@ class LbcProcessManager
 
         $send1 = $smtpServer->sendEmail($subject, $to, $body, $compteLbc->getMail(), $compteLbc->getPrenom(), false);
         $send2 = $smtpServer->sendEmail("Stp Reply : |--|" . $message->getRef_message() . "|--|" . $subject, "lebureaudesprofs@gmail.com", $body, $compteLbc->getMail(), $compteLbc->getPrenom(), false);
-        
+
         return ($send1 && $send2);
     }
-
 
     // cette fonction permet de controler les annonces en ligne des nbCompte derniers comptes actifs (ie qui n'a pas desactive par leboncoin)
     // --- step 1 : recuperation des nb derniers comptes actifs ( on pourrait specifier un autre critere de recuperation des comptes )

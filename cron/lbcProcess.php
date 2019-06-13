@@ -34,14 +34,19 @@ $automatic_answer = true;
 if (array_key_exists('automatic_answer', $_GET) && $_GET['automatic_answer'] == "false") {
 
     $automatic_answer = false;
-
 }
 
 $lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
 $lbcProcessMg->read_messages_mailfromlbc();
 $lbcProcessMg->process_new_lead_messages();
-$lbcProcessMg->send_reply_to_lead();
+$message_id = $lbcProcessMg->send_reply_to_lead();
 
 $lbcProcessMg2 = new \spamtonprof\stp_api\LbcProcessManager("le.bureau.des.profs@gmail.com");
 $lbcProcessMg2->read_messages_lebureaudesprofs();
 $lbcProcessMg2->label_forwarded_messages();
+
+if ($message_id) {
+    $lbcProcessMg2->label_message($message_id, array(
+        "repondu"
+    )); // on attribue le label repondu au message du lead se trouvant dans le bureau des profs
+}
