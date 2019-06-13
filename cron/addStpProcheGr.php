@@ -25,9 +25,9 @@ header("Pragma: no-cache");
  */
 
 /*
- * première étape : récupérer les élèves tq add_to_gr = true
+ * première étape : récupérer les proches tq add_to_gr = true
  *
- * deuxième étape : ajouter l'élève à liste ( prenom + email )
+ * deuxième étape : ajouter les proches à liste ( prenom + email )
  *
  * troisième étape : mettre à jour gr_id + add_to_gr = false
  *
@@ -35,20 +35,20 @@ header("Pragma: no-cache");
 
 $gr = new \GetResponse();
 
-$eleveMg = new \spamtonprof\stp_api\StpEleveManager();
+$procheMg = new \spamtonprof\stp_api\StpProcheManager();
 
-$eleves = $eleveMg->getAll(array(
-    'eleve_to_ad_in_gr'
+$proches = $procheMg->getAll(array(
+    'proche_to_ad_in_gr'
 ));
 
-foreach ($eleves as $eleve) {
+foreach ($proches as $proche) {
 
-    $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
+    $proche = \spamtonprof\stp_api\StpProche::cast($proche);
 
     // ajouter le contact à la liste getresponse
-    $gr->add_to_stp_eleve($eleve);
+    $gr->add_to_stp_proche($proche);
 
-    $contacts = $gr->retrieve_from_stp_eleve($eleve->getEmail());
+    $contacts = $gr->retrieve_from_stp_proche($proche->getEmail());
 
     if (count($contacts) == 0) {
         continue;
@@ -57,9 +57,9 @@ foreach ($eleves as $eleve) {
     $contact = $contacts[0];
     $contactId = $contact->contactId;
 
-    $eleve->setGr_id($contactId);
-    $eleveMg->updateGrId($eleve);
+    $proche->setGr_id($contactId);
+    $procheMg->update_gr_id($proche);
 
-    $eleve->setAdd_to_gr(false);
-    $eleveMg->update_add_to_gr($eleve);
+    $proche->setAdd_to_gr(false);
+    $procheMg->update_add_to_gr($proche);
 }
