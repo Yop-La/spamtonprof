@@ -15,7 +15,8 @@ class StpEleveManager
 
     public function add(StpEleve $StpEleve)
     {
-        $q = $this->_db->prepare('insert into stp_eleve(email, prenom, ref_niveau, nom, telephone, same_email, parent_required,ref_compte) values(:email, :prenom, :ref_niveau, :nom, :telephone, :same_email, :parent_required,:ref_compte)');
+        $q = $this->_db->prepare('insert into stp_eleve(email, prenom, ref_niveau, nom, telephone, same_email, parent_required,ref_compte, add_to_gr, update_gr) 
+            values(:email, :prenom, :ref_niveau, :nom, :telephone, :same_email, :parent_required,:ref_compte,true,false)');
         $q->bindValue(':email', $StpEleve->getEmail());
         $q->bindValue(':prenom', $StpEleve->getPrenom());
         $q->bindValue(':ref_niveau', $StpEleve->getRef_niveau());
@@ -26,6 +27,8 @@ class StpEleveManager
         $q->bindValue(':ref_compte', $StpEleve->getRef_compte());
 
         $q->execute();
+        
+        
         $StpEleve->setRef_eleve($this->_db->lastInsertId());
         return ($StpEleve);
     }
@@ -60,6 +63,16 @@ class StpEleveManager
     {
         $q = $this->_db->prepare('update stp_eleve set ref_niveau = :ref_niveau where ref_eleve = :ref_eleve');
         $q->bindValue(':ref_niveau', $eleve->getRef_niveau());
+        $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
+        $q->execute();
+
+        return ($eleve);
+    }
+
+    public function update_add_to_gr(StpEleve $eleve)
+    {
+        $q = $this->_db->prepare('update stp_eleve set add_to_gr = :add_to_gr where ref_eleve = :ref_eleve');
+        $q->bindValue(':add_to_gr', $eleve->getAdd_to_gr(), PDO::PARAM_BOOL);
         $q->bindValue(':ref_eleve', $eleve->getRef_eleve());
         $q->execute();
 
@@ -131,7 +144,6 @@ class StpEleveManager
             $q->execute();
         } else if (array_key_exists("ref_compte_wp", $info)) {
             $refCompteWp = $info["ref_compte_wp"];
-
 
             if (! $data) {
                 $q = $this->_db->prepare('select * from stp_eleve where ref_compte_wp = :ref_compte_wp');
@@ -277,10 +289,7 @@ class StpEleveManager
             $q->execute();
         } else if (in_array('eleve_to_ad_in_gr', $info)) {
 
-            $q = $this->_db->prepare("select * from stp_eleve where ref_eleve in (
-                select ref_eleve from stp_abonnement 
-                    where ref_prof is not null and ((ref_statut_abonnement = 2 and extract(day from now() - date_creation) <= 10) 
-                        or ref_statut_abonnement = 1)) and same_email is false and gr_id is null limit 25");
+            $q = $this->_db->prepare("select * from stp_eleve where add_to_gr = true");
             $q->execute();
         }
 

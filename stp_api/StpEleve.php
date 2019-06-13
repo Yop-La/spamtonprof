@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class StpEleve implements \JsonSerializable
 {
 
-    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil, $ref_compte, $seq_email_parent_essai, $hasToSendToEleve, $hasToSendToParent, $ref_niveau, $parent_required, $niveau, $gr_id, $formules, $abos;
+    protected $email, $prenom, $ref_classe, $nom, $telephone, $ref_eleve, $ref_compte_wp, $same_email, $ref_profil, $classe, $profil, $ref_compte, $seq_email_parent_essai, $hasToSendToEleve, $hasToSendToParent, $ref_niveau, $parent_required, $niveau, $gr_id, $formules, $abos, $update_gr, $add_to_gr;
 
     /**
      *
@@ -49,6 +49,38 @@ class StpEleve implements \JsonSerializable
     public function setClasse($classe)
     {
         $this->classe = $classe;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUpdate_gr()
+    {
+        return $this->update_gr;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAdd_to_gr()
+    {
+        return $this->add_to_gr;
+    }
+
+    /**
+     * @param mixed $update_gr
+     */
+    public function setUpdate_gr($update_gr)
+    {
+        $this->update_gr = $update_gr;
+    }
+
+    /**
+     * @param mixed $add_to_gr
+     */
+    public function setAdd_to_gr($add_to_gr)
+    {
+        $this->add_to_gr = $add_to_gr;
     }
 
     /**
