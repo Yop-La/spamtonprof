@@ -17,11 +17,19 @@ class MessageProspectLbc implements \JsonSerializable
      *
      * @return mixed
      */
+    public function getAutomatic_answer_done()
+    {
+        return $this->automatic_answer_done;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
     public function getAnswered()
     {
         return $this->answered;
     }
-
 
     /**
      *
