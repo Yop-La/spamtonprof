@@ -45,6 +45,22 @@ class MessageProspectLbcManager
         return new \spamtonprof\stp_api\MessageProspectLbc($data);
     }
 
+    // retourne les messages à qui on doit répondre
+    public function get_message_to_reply()
+    {
+        $q = $this->_db->prepare("select * from message_prospect_lbc where ready_to_answer = true and ancien_prospect = false and message_reconnu = false and pseudo_reconnu = false and automatic_answer_done = false order by date_reception limit 1;");
+
+        $q->execute();
+
+        $data = $q->fetch(PDO::FETCH_ASSOC);
+
+        if (! $data) {
+            return false;
+        }
+        return new \spamtonprof\stp_api\MessageProspectLbc($data);
+    }
+
+    // retourne les messages à envoyés avec le serveur smtp ( la décision de répondre a déjà été prise )
     public function get_message_to_send()
     {
         $q = $this->_db->prepare("select * from message_prospect_lbc where to_send = true order by date_reception limit 1;");
@@ -203,6 +219,14 @@ class MessageProspectLbcManager
         $q->execute();
     }
 
+    public function update_automatic_answer_done(\spamtonprof\stp_api\MessageProspectLbc $messageProspectLbc)
+    {
+        $q = $this->_db->prepare("update message_prospect_lbc set automatic_answer_done = :automatic_answer_done where ref_message = :ref_message ");
+        $q->bindValue(":automatic_answer_done", $messageProspectLbc->getAutomatic_answer_done(), PDO::PARAM_BOOL);
+        $q->bindValue(":ref_message", $messageProspectLbc->getRef_message());
+        $q->execute();
+    }
+
     public function update_to_send(\spamtonprof\stp_api\MessageProspectLbc $messageProspectLbc)
     {
         $q = $this->_db->prepare("update message_prospect_lbc set to_send = :to_send where ref_message = :ref_message ");
@@ -229,7 +253,7 @@ class MessageProspectLbcManager
 
     public function add(MessageProspectLbc $message)
     {
-        $q = $this->_db->prepare('INSERT INTO message_prospect_lbc(date_reception, ref_compte_lbc, ref_prospect_lbc, gmail_id, subject, type, ancien_prospect, message_reconnu, pseudo_reconnu, pseudo,body,labelled, forwarded, in_agent_box, ready_to_answer, to_send) VALUES(:date_reception, :ref_compte_lbc, :ref_prospect_lbc, :gmail_id, :subject, :type, false, false, false, :pseudo,:body,false,false,false,false,false)');
+        $q = $this->_db->prepare('INSERT INTO message_prospect_lbc(date_reception, ref_compte_lbc, ref_prospect_lbc, gmail_id, subject, type, ancien_prospect, message_reconnu, pseudo_reconnu, pseudo,body,labelled, forwarded, in_agent_box, ready_to_answer, to_send, automatic_answer_done) VALUES(:date_reception, :ref_compte_lbc, :ref_prospect_lbc, :gmail_id, :subject, :type, false, false, false, :pseudo,:body,false,false,false,false,false,false)');
         $q->bindValue(':date_reception', $message->getDate_reception()
             ->format(PG_DATETIME_FORMAT));
         $q->bindValue(':ref_compte_lbc', $message->getRef_compte_lbc());

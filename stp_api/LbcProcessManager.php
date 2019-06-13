@@ -504,18 +504,21 @@ class LbcProcessManager
                 $this->messProspectMg->update_to_send($message);
 
                 // on attribue le libellé répondu au message du prospect
-                label_message($message->getGmail_id(),array("Repondu"));
-                
+                $this->label_message($message->getGmail_id(), array(
+                    "Repondu"
+                ));
+
                 // on attribue le libellé envoyé à la réponse envoyé par l'agent depuis le bureaudesprofs
-                label_message($message->getAnswer_gmail_id(),array("envoyé"));
-                
+                $this->label_message($message->getAnswer_gmail_id(), array(
+                    "envoyé"
+                ));
+
                 return ($message->getGmail_id_bureau_prof());
             } else {
                 $slack = new \spamtonprof\slack\Slack();
                 $slack->sendMessages("log-lbc", array(
                     "La reponse au lead de ref " . $message->getRef_message() . " n'a pas pu etre envoye ... "
                 ));
-                
             }
             return (false);
         }
@@ -932,68 +935,21 @@ class LbcProcessManager
         }
     }
 
-    // pour repondre automatiquement aux premiers messages des prospects
-    function sendAutomaticAnswer()
+    function send_automatic_reply()
     {
-        $gmailMg = new \spamtonprof\googleMg\GoogleManager('le.bureau.des.profs@gmail.com');
+        $msg = $this->messProspectMg->get_message_to_reply();
 
-        $clientMg = new \spamtonprof\stp_api\LbcClientManager();
-        $mailForLeadMg = new \spamtonprof\stp_api\MailForLeadManager();
+        if ($msg) {
 
-        $gmailAccount = $this->gmailAccountMg->get("le.bureau.des.profs@gmail.com");
+            // on récupère le message du lead transmis dans le bureau des profs
+            $message = $this->gmailManager->getMessage($msg->getGmail_id_bureau_prof(), [
+                'format' => 'full'
+            ]);
 
-        $lastHistoryId = $gmailAccount->getLast_history_id();
-
-        $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-
-        $now->sub(new \DateInterval("PT2H"));
-
-        $now = $now->format('Y/m/d');
-
-        $retour = $gmailMg->getNewMessages($lastHistoryId);
-
-        $messages = $retour["messages"];
-
-        $lastHistoryId = $retour["lastHistoryId"];
-
-        $gmailAccount->setLast_history_id($lastHistoryId);
-        $this->gmailAccountMg->updateHistoryId($gmailAccount);
-
-        echo ("------ nb messages : " . count($messages) . " ----- <br><br><br>");
-
-        foreach ($messages as $message) {
-
-            // on regarde le titre du message si il commence par |--|ref_|--| c'est bon
-            $subject = $gmailMg->getHeader($message, "Subject");
+            // on récupère le titre, le threadID et le gmailId du message dans le bureau des profs
+            $subject = $this->gmailManager->getHeader($message, "Subject");
             $threadId = $message->threadId;
             $gmailId = $message->id;
-
-            echo ($subject . ' -- ' . $threadId . '<br>');
-            $matches = [];
-            preg_match('/^\|--\|(\d*)\|--\|/', $subject, $matches);
-
-            if (count($matches) != 2) {
-
-                continue;
-            }
-
-            // on extrait la ref_message
-            $refMessage = $matches[1];
-
-            // on recupere le message dans la table message_prospect_lbc
-            $messProspectMg = new \spamtonprof\stp_api\MessageProspectLbcManager();
-            $msg = $messProspectMg->get(array(
-                "ref_message" => $refMessage
-            ));
-
-            // a partir du message, on recupere ref_prospect_lbc
-            $refProspect = $msg->getRef_prospect_lbc();
-
-            // on fait une recherche de messages avec ref_prospect_lbc
-            $msgs = $messProspectMg->getAll(array(
-                'ref_prospect_lbc' => $refProspect,
-                'answered' => true
-            ));
 
             // on recupere ref_compte_lbc a partir du message
             $refCompte = $msg->getRef_compte_lbc();
@@ -1006,99 +962,66 @@ class LbcProcessManager
             // puis on recupere le client, puis le message a envoyer
             $refClient = $act->getRef_client();
 
-            $client = $clientMg->get(array(
+            $client = $this->clientMg->get(array(
                 'ref_client' => $refClient
             ));
 
-            // on attribue un libelle 'answer'
-            $labelId = $gmailMg->getLabelsIds(array(
-                $client->getLabel()
+            // recuperation du message a envoyer
+            $txtMg = new spamtonprof\stp_api\LbcTexteManager();
+
+            $typeTxtMg = new \spamtonprof\stp_api\TypeTexteManager();
+            $typeTxt = $typeTxtMg->get(array(
+                'ref_type' => $client->getRef_reponse_lbc()
             ));
 
-            $gmailMg->modifyMessage($gmailId, $labelId, array());
+            $typeTxt = $typeTxt->getType();
 
-            // on ne repond pas aux messages si il a deja eu une reponse
-            if ($msg->getAnswered()) {
+            $txt = $txtMg->get(array(
+                'type_random' => $typeTxt
+            ));
 
-                // on attribue un libelle 'first_contact_done'
-                $labelId = $gmailMg->getLabelsIds(array(
-                    "first_contact_done"
-                ));
+            $txt = $txt->getTexte();
 
-                $gmailMg->modifyMessage($gmailId, $labelId, array());
+            $spamtonprofs = array(
+                'sppamtonprof',
+                'spaamtonprof',
+                'spammtonprof',
+                'spamttonprof',
+                'spamtoonprof',
+                'spamtonnprof',
+                'spamtonpprof',
+                'spamtonprrof',
+                'spamtonproof',
+                'pamtonprof',
+                'spmtonprof',
+                'spatonprof',
+                'spamonprof',
+                'spamtnprof',
+                'spamtoprof',
+                'spamtonrof'
+            );
 
-                echo (utf8_encode('deja repondu <br>'));
-                continue;
-            }
+            $spamtonprof = $spamtonprofs[array_rand($spamtonprofs, 1)];
 
-            // si il n'y a pas de messages avec ref_prospect_lbc deja repondu alors on repond
-            echo ("nb msg : " . count($msgs) . '<br>');
-            if (count($msgs) > 0) {
+            $txt = str_replace(array(
+                'spamtonprof',
+                'sppamtonprof',
+                'spamtonpprof'
+            ), $spamtonprof, $txt);
 
-                // on attribue un libelle 'first_contact_done'
-                $labelId = $gmailMg->getLabelsIds(array(
-                    "first_contact_done"
-                ));
+            $body = str_replace('[prof_name]', $act->getPrenom(), $txt);
 
-                $gmailMg->modifyMessage($gmailId, $labelId, array());
+            // on envoie le message
+            $this->gmailManager->sendMessage($body, 'Re: ' . $subject, 'mailsfromlbc@gmail.com', 'mailsfromlbc@gmail.com', 'le.bureau.des.profs@gmail.com', 'Cannelle Gaucher', $threadId);
 
-                continue;
-            }
+            // on attribue les libellés automatic_reply_done
+            $this->label_message($gmailId, array(
+                'reponse_auto_faite'
+            ));
 
-            // // recuperation du message a envoyer
-            // $txtMg = new spamtonprof\stp_api\LbcTexteManager();
-
-            // $typeTxtMg = new \spamtonprof\stp_api\TypeTexteManager();
-            // $typeTxt = $typeTxtMg->get(array(
-            // 'ref_type' => $client->getRef_reponse_lbc()
-            // ));
-
-            // $typeTxt = $typeTxt->getType();
-
-            // $txt = $txtMg->get(array(
-            // 'type_random' => $typeTxt
-            // ));
-
-            // $txt = $txt->getTexte();
-
-            // $spamtonprofs = array(
-            // 'sppamtonprof',
-            // 'spaamtonprof',
-            // 'spammtonprof',
-            // 'spamttonprof',
-            // 'spamtoonprof',
-            // 'spamtonnprof',
-            // 'spamtonpprof',
-            // 'spamtonprrof',
-            // 'spamtonproof',
-            // 'pamtonprof',
-            // 'spmtonprof',
-            // 'spatonprof',
-            // 'spamonprof',
-            // 'spamtnprof',
-            // 'spamtoprof',
-            // 'spamtonrof'
-            // );
-
-            // $spamtonprof = $spamtonprofs[array_rand($spamtonprofs, 1)];
-
-            // $txt = str_replace(array(
-            // 'spamtonprof',
-            // 'sppamtonprof',
-            // 'spamtonpprof'
-            // ), $spamtonprof, $txt);
-
-            // $body = str_replace('[prof_name]', $act->getPrenom(), $txt);
-
-            // // on envoie le message
-            // $gmailMg->sendMessage($body, 'Re: ' . $subject, 'mailsfromlbc@gmail.com', 'mailsfromlbc@gmail.com', 'le.bureau.des.profs@gmail.com', 'Cannelle Gaucher', $threadId);
-
-            // // on attribue un libelle 'answer'
-            // $labelId = $gmailMg->getLabelsIds(array(
-            // "bot_has_made_first_contact"
-            // ));
-
-            // $gmailMg->modifyMessage($gmailId, $labelId, array());
+            // on fait les enregistrements pour éviter de refaire la même réponse automatique
+            $msg->setAutomatic_answer_done(true);
+            $this->messProspectMg->update_automatic_answer_done($msg);
         }
     }
 }

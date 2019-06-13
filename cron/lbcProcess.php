@@ -50,3 +50,7 @@ if ($message_id) {
         "repondu"
     )); // on attribue le label repondu au message du lead se trouvant dans le bureau des profs
 }
+
+if ($automatic_answer) {
+    $lbcProcessMg2->send_automatic_reply();
+}
