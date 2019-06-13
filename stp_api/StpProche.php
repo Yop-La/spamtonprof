@@ -4,8 +4,57 @@ namespace spamtonprof\stp_api;
 class StpProche implements \JsonSerializable
 {
 
-    protected $email, $prenom, $nom, $telephone, $ref_proche, $ref_compte_wp, $statut_proche;
+    protected $email, $prenom, $nom, $telephone, $ref_proche, $ref_compte_wp, $statut_proche, $gr_id, $update_gr, $add_to_gr;
 
+
+    
+    /**
+     * @return mixed
+     */
+    public function getGr_id()
+    {
+        return $this->gr_id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUpdate_gr()
+    {
+        return $this->update_gr;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAdd_to_gr()
+    {
+        return $this->add_to_gr;
+    }
+
+    /**
+     * @param mixed $gr_id
+     */
+    public function setGr_id($gr_id)
+    {
+        $this->gr_id = $gr_id;
+    }
+
+    /**
+     * @param mixed $update_gr
+     */
+    public function setUpdate_gr($update_gr)
+    {
+        $this->update_gr = $update_gr;
+    }
+
+    /**
+     * @param mixed $add_to_gr
+     */
+    public function setAdd_to_gr($add_to_gr)
+    {
+        $this->add_to_gr = $add_to_gr;
+    }
 
     /**
      *

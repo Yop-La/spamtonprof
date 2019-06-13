@@ -15,7 +15,8 @@ class StpProcheManager
 
     public function add(StpProche $StpProche)
     {
-        $q = $this->_db->prepare('insert into stp_proche(email, prenom, nom, telephone, statut_proche) values( :email,:prenom,:nom,:telephone, :statut_proche)');
+        $q = $this->_db->prepare('insert into stp_proche(email, prenom, nom, telephone, statut_proche,add_to_gr, update_gr) 
+            values( :email,:prenom,:nom,:telephone, :statut_proche,true,false)');
         $q->bindValue(':email', $StpProche->getEmail());
         $q->bindValue(':prenom', $StpProche->getPrenom());
         $q->bindValue(':nom', $StpProche->getNom());
@@ -26,6 +27,26 @@ class StpProcheManager
         $StpProche->setRef_proche($this->_db->lastInsertId());
 
         return ($StpProche);
+    }
+
+    public function update_gr_id(StpProche $proche)
+    {
+        $q = $this->_db->prepare('update stp_proche set gr_id = :gr_id where ref_proche = :ref_proche');
+        $q->bindValue(':gr_id', $proche->getGr_id());
+        $q->bindValue(':ref_proche', $proche->getRef_proche());
+        $q->execute();
+
+        return ($proche);
+    }
+
+    public function update_add_to_gr(StpProche $proche)
+    {
+        $q = $this->_db->prepare('update stp_proche set add_to_gr = :add_to_gr where ref_proche = :ref_proche');
+        $q->bindValue(':add_to_gr', $proche->getAdd_to_gr(), PDO::PARAM_BOOL);
+        $q->bindValue(':ref_proche', $proche->getRef_proche());
+        $q->execute();
+
+        return ($proche);
     }
 
     public function updateRefCompteWp(StpProche $proche)
@@ -48,7 +69,7 @@ class StpProcheManager
         $q->execute();
         return ($proche);
     }
-    
+
     public function delete(StpProche $proche)
     {
         $q = $this->_db->prepare('delete from stp_proche where ref_proche = :ref_proche');
@@ -77,7 +98,6 @@ class StpProcheManager
             $q->execute();
         } else if (array_key_exists("ref_compte_wp", $info)) {
             $refCompteWp = $info["ref_compte_wp"];
-
 
             if (! $data) {
                 $q = $this->_db->prepare('select * from stp_proche where ref_compte_wp = :ref_compte_wp');
@@ -126,6 +146,10 @@ class StpProcheManager
                 $nums = toSimilarTo($nums);
 
                 $q = $this->_db->prepare("select * from stp_proche where regexp_replace(telephone, '[^01234536789]', '','g') SIMILAR TO '" . $nums . "'");
+                $q->execute();
+            } else if (in_array('proche_to_ad_in_gr', $info)) {
+
+                $q = $this->_db->prepare("select * from stp_proche where add_to_gr = true");
                 $q->execute();
             }
         }
