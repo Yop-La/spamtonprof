@@ -23,7 +23,7 @@ $planMg = new \spamtonprof\stp_api\StpPlanManager();
 $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
 
 $formules = $formuleMg->getAll(array(
-    'custom' => " where ref_formule > 84 and lower(formule) not like '%termi%' order by ref_formule desc limit 50;"
+    'custom' => " where ref_formule > 84 and lower(formule) like '%termi%' order by ref_formule desc limit 50;" // pour cibler les terminales
 ));
 
 foreach ($formules as $formule) {
