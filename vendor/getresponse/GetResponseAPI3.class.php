@@ -22,7 +22,7 @@ class GetResponse
 
     private $customFields = null;
 
-    private $profNameId, $mailProfId, $sexeProfId, $matieresId, $nameProcheId, $nameProche2Id, $StpEleveEssaiId, $stpParentEssaiId1, $stpParentEssaiId2, $profName2Id, $sexeProf2Id, $mailProf2Id, $matieres2Id;
+    public $profNameId, $mailProfId, $sexeProfId, $matieresId, $nameProcheId, $nameProche2Id, $StpEleveEssaiId, $stpParentEssaiId1, $stpParentEssaiId2, $profName2Id, $sexeProf2Id, $mailProf2Id, $matieres2Id, $stpParent, $stpEleve;
 
     public $http_status;
 
@@ -68,6 +68,8 @@ class GetResponse
         $this->StpEleveEssaiId = $this->getCampagnId('stp_eleve_essai');
         $this->stpParentEssaiId1 = $this->getCampagnId('stp_parent_essai');
         $this->stpParentEssaiId2 = $this->getCampagnId('stp_parent_essai_2');
+        $this->stpParent = $this->getCampagnId('stp_parent');
+        $this->stpEleve = $this->getCampagnId('stp_eleve');
     }
 
     /**
@@ -212,6 +214,68 @@ class GetResponse
      *            $params
      * @return mixed
      */
+    public function add_to_stp_eleve(\spamtonprof\stp_api\StpEleve $eleve)
+    {
+        $params = '{
+            "name": "' . $eleve->getPrenom() . '",
+            "email": "' . $eleve->getEmail() . '",
+            "campaign": {
+                "campaignId": "' . $this->stpEleve . '"
+            }
+        }';
+
+        $params = json_decode($params);
+
+        $rep = $this->addContact($params);
+
+        return ($rep);
+    }
+
+    public function add_to_stp_proche(\spamtonprof\stp_api\StpProche $proche)
+    {
+        $params = '{
+            "name": "' . $proche->getPrenom() . '",
+            "email": "' . $proche->getEmail() . '",
+            "campaign": {
+                "campaignId": "' . $this->stpParent . '"
+            }
+        }';
+
+        $params = json_decode($params);
+
+        $rep = $this->addContact($params);
+
+        return ($rep);
+    }
+
+    public function retrieve_from_stp_proche($email_proche)
+    {
+        $params = array(
+            "query" => array(
+                "email" => $email_proche,
+                "campaignId" => $this->stpParent
+            )
+        );
+
+        $contacts = (array) $this->getContacts($params);
+
+        return ($contacts);
+    }
+
+    public function retrieve_from_stp_eleve($email_eleve)
+    {
+        $params = array(
+            "query" => array(
+                "email" => $email_eleve,
+                "campaignId" => $this->stpEleve
+            )
+        );
+
+        $contacts = (array) $this->getContacts($params);
+
+        return ($contacts);
+    }
+
     public function addContact($params)
     {
         return $this->call('contacts', 'POST', $params);
