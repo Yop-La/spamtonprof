@@ -36,6 +36,8 @@ function inscriptionEssai()
     $email_eleve = trim($fields->email_eleve);
     $telephone_eleve = $fields->telephone_eleve;
     $nb_matiere = $fields->nb_matiere;
+    $date_debut = $fields->date_debut;
+    
     $prospect = boolval($fields->prospect);
     $remarques_matiere1 = $fields->remarques_matiere1;
     $matiere1 = $fields->matiere1;
@@ -57,6 +59,8 @@ function inscriptionEssai()
     $source_traffic = $fields->source_traffic;
     $parent_required = boolval($fields->parent_required);
 
+    
+    
     $matiere = json_decode(stripslashes($fields->matiere));
     $niveau = json_decode(stripslashes($fields->niveau));
     $formule = json_decode(stripslashes($fields->formule));
@@ -443,6 +447,27 @@ function inscriptionEssai()
     ));
 
     $abonnement = $abonnementMg->add($abonnement);
+
+    // etape 6-1 : définir les dates de début et de fin d'essai
+    $begin = \DateTime::createFromFormat(FR_DATE_FORMAT, $date_debut,new \DateTimeZone("Europe/Paris"));
+    $abonnement->setDebut_essai($begin->format(PG_DATE_FORMAT));
+    $end = $begin->add(new DateInterval('P7D'));
+    $abonnement->setFin_essai($end->format(PG_DATE_FORMAT));
+    
+    $abonnementMg->updateDebutEssai($abonnement);
+    $abonnementMg->updateFinEssai($abonnement);
+    
+    
+    
+    
+    // etape 6-1 : définir les dates de début et de fin d'essai
+    $begin = \DateTime::createFromFormat(FR_DATE_FORMAT, $date_debut,new \DateTimeZone("Europe/Paris"));
+    $abonnement->setDebut_essai($begin->format(PG_DATE_FORMAT));
+    $end = $begin->add(new DateInterval('P7D'));
+    $abonnement->setFin_essai($end->format(PG_DATE_FORMAT));
+    
+    $abonnementMg->updateDebutEssai($abonnement);
+    $abonnementMg->updateFinEssai($abonnement);
     
     
 
