@@ -1,8 +1,6 @@
 <?php
 
 /* pour donner le nombre d'ads par client publiés chaque jour dans le channel reporting-lbc */
-
-
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
 $wp->init();
 $wp->parse_request();
@@ -40,7 +38,6 @@ $clients = $clientMg->getAll(array(
     'all'
 ));
 
-
 foreach ($msgs as $msg) {
 
     $msg_id = $msg->id;
@@ -57,18 +54,22 @@ foreach ($msgs as $msg) {
             '>'
         ), "", $to)
     ));
-    $key_client = "aucun";
-    foreach ($clients as $client) {
-        if ($client->getRef_client() == $lbcAct->getRef_client()) {
-            $key_client = $client->getLabel();
-            break;
-        }
-    }
 
-    if (array_key_exists($key_client, $res_publication)) {
-        $res_publication[$key_client] = $res_publication[$key_client] + 1;
-    } else {
-        $res_publication[$key_client] = 1;
+    if ($lbcAct) {
+
+        $key_client = "aucun";
+        foreach ($clients as $client) {
+            if ($client->getRef_client() == $lbcAct->getRef_client()) {
+                $key_client = $client->getLabel();
+                break;
+            }
+        }
+
+        if (array_key_exists($key_client, $res_publication)) {
+            $res_publication[$key_client] = $res_publication[$key_client] + 1;
+        } else {
+            $res_publication[$key_client] = 1;
+        }
     }
 }
 
