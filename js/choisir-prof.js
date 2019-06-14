@@ -166,11 +166,18 @@ function fillAttribution(attributionCourante){
 		console.log(attributionCourante);
 
 		jQuery(".row-choix-prof").find("#email-eleve").html(attributionCourante.eleve.email);
+
+		jQuery(".row-choix-prof").find("#ref-abonnement").html(attributionCourante.ref_abonnement);
+		jQuery(".row-choix-prof").find("#date-inscription").html(attributionCourante.date_creation);
+
+		
 		if(attributionCourante.proche){
 			jQuery(".row-choix-prof").find("#email-parent").html(attributionCourante.proche.email);
 		}
+		
 		jQuery(".row-choix-prof").find("#date-demarrage").html(attributionCourante.debut_essai);
 
+		
 
 		jQuery(".row-choix-prof").find("#prenom-nom").html(attributionCourante.eleve.prenom.concat(' ',attributionCourante.eleve.nom));
 		jQuery(".row-choix-prof").find("#matieres").html(attributionCourante.formule.formule);
