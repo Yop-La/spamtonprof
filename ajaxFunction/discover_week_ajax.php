@@ -451,23 +451,16 @@ function inscriptionEssai()
     // etape 6-1 : définir les dates de début et de fin d'essai
     $begin = \DateTime::createFromFormat(FR_DATE_FORMAT, $date_debut,new \DateTimeZone("Europe/Paris"));
     $abonnement->setDebut_essai($begin->format(PG_DATE_FORMAT));
-    $end = $begin->add(new DateInterval('P7D'));
+    
+    $end = clone $begin;
+    
+    $end = $end->add(new DateInterval('P7D'));
     $abonnement->setFin_essai($end->format(PG_DATE_FORMAT));
     
     $abonnementMg->updateDebutEssai($abonnement);
     $abonnementMg->updateFinEssai($abonnement);
     
     
-    
-    
-    // etape 6-1 : définir les dates de début et de fin d'essai
-    $begin = \DateTime::createFromFormat(FR_DATE_FORMAT, $date_debut,new \DateTimeZone("Europe/Paris"));
-    $abonnement->setDebut_essai($begin->format(PG_DATE_FORMAT));
-    $end = $begin->add(new DateInterval('P7D'));
-    $abonnement->setFin_essai($end->format(PG_DATE_FORMAT));
-    
-    $abonnementMg->updateDebutEssai($abonnement);
-    $abonnementMg->updateFinEssai($abonnement);
     
     
 
@@ -568,7 +561,8 @@ function inscriptionEssai()
             "Téléphone parent :" . $proche->getTelephone(),
             "Remarque :" . $abonnement->getRemarque_inscription(),
             "Source traffic : " . $source_traffic,
-            "Coupon : " . $code_promo
+            "Coupon : " . $code_promo,
+            "Date de démarrage : " . $begin->format(FR_DATE_FORMAT)
         );
     } else {
         $messages = array(
@@ -582,7 +576,8 @@ function inscriptionEssai()
             "Formule : " . $formule->getFormule(),
             "Remarque :" . $abonnement->getRemarque_inscription(),
             "Source traffic : " . $source_traffic,
-            "Coupon : " . $code_promo
+            "Coupon : " . $code_promo,
+            "Date de démarrage : " . $begin->format(FR_DATE_FORMAT)
         );
     }
     $messages[] = " ---------- ";
