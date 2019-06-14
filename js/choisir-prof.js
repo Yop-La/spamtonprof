@@ -163,9 +163,16 @@ function fillAttribution(attributionCourante){
 
 	waitForEl(".row-choix-prof", function() {
 
+		console.log(attributionCourante);
+
+		jQuery(".row-choix-prof").find("#email-eleve").html(attributionCourante.eleve.email);
+		if(attributionCourante.proche){
+			jQuery(".row-choix-prof").find("#email-parent").html(attributionCourante.proche.email);
+		}
+		jQuery(".row-choix-prof").find("#date-demarrage").html(attributionCourante.debut_essai);
+
 
 		jQuery(".row-choix-prof").find("#prenom-nom").html(attributionCourante.eleve.prenom.concat(' ',attributionCourante.eleve.nom));
-		jQuery(".row-choix-prof").find("#date-creation").html(attributionCourante.date_creation);
 		jQuery(".row-choix-prof").find("#matieres").html(attributionCourante.formule.formule);
 		jQuery(".row-choix-prof").find("#classe").html(attributionCourante.eleve.niveau.niveau);
 		jQuery(".row-choix-prof").find("#remarques").html(attributionCourante.remarque_inscription);
