@@ -17,9 +17,8 @@ function paiement_inscription()
     $slack = new \spamtonprof\slack\Slack();
 
     // $_POST = unserializeTemp('/tempo/prospect');
-    serializeTemp($_POST,'/tempo/prospect');
-    
-    
+    serializeTemp($_POST, '/tempo/prospect');
+
     $fields = $_POST['fields'];
     $token = $_POST['token_stripe'];
     $test_mode = $_POST['test_mode'];
@@ -129,7 +128,9 @@ function paiement_inscription()
         'ref_formule' => $ref_formule
     ));
 
-    $plan = $planMg->get(array('ref_plan' => $ref_plan));
+    $plan = $planMg->get(array(
+        'ref_plan' => $ref_plan
+    ));
 
     // étape -1 : récupération du prof
 
@@ -142,6 +143,8 @@ function paiement_inscription()
 
     // etape 0 : recuperer le proche (on l'ajoute si prospect sinon on le recupere)
 
+    $compteMg = new \spamtonprof\stp_api\StpCompteManager();
+    $compte = null;
     if ($prospect) {
 
         if ($parent_saisi) {
@@ -155,8 +158,27 @@ function paiement_inscription()
             ));
 
             $proche = $procheMg->add($proche);
+
+            if ($proche) {
+
+                $compte = new \spamtonprof\stp_api\StpCompte(array(
+                    'date_creation' => $now,
+                    'ref_proche' => $proche->getRef_proche()
+                ));
+            } else {
+
+                $compte = new \spamtonprof\stp_api\StpCompte(array(
+                    'date_creation' => $now
+                ));
+            }
+
+            $compte = $compteMg->add($compte);
         }
     } else {
+
+        $compte = $compteMg->get(array(
+            'ref_compte_wp' => $current_user->ID
+        ));
 
         // etape 1 : on recupere le proche
         $current_user = wp_get_current_user();
@@ -168,33 +190,6 @@ function paiement_inscription()
 
         $proche = $procheMg->get(array(
             'ref_proche' => $compte->getRef_proche()
-        ));
-    }
-
-    // etape 2 : creation du compte famille si prospect sinon on le recupere
-
-    $compte = null;
-    $compteMg = new \spamtonprof\stp_api\StpCompteManager();
-    if ($prospect) {
-
-        if ($proche) {
-
-            $compte = new \spamtonprof\stp_api\StpCompte(array(
-                'date_creation' => $now,
-                'ref_proche' => $proche->getRef_proche()
-            ));
-        } else {
-
-            $compte = new \spamtonprof\stp_api\StpCompte(array(
-                'date_creation' => $now
-            ));
-        }
-
-        $compte = $compteMg->add($compte);
-    } else {
-
-        $compte = $compteMg->get(array(
-            'ref_compte_wp' => $current_user->ID
         ));
     }
 
@@ -364,7 +359,6 @@ function paiement_inscription()
 
     // etape 7 - inserer le stage ( ou l'abonnement dans le futur peut être )
 
-
     $test = false;
     if (strpos($email_eleve, 'yopla.33mail') !== false || strpos($email_eleve, 'test') !== false || LOCAL) {
         $test = true;
@@ -442,9 +436,11 @@ function paiement_inscription()
     $smtp = $smtpMg->get(array(
         "ref_smtp_server" => $smtpMg::smtp2Go
     ));
-    
+
     $dateFormuleManager = new \spamtonprof\stp_api\StpDateFormuleManager();
-    $dateFormule = $dateFormuleManager -> get(array("ref_date_formule" => $ref_date_stage));
+    $dateFormule = $dateFormuleManager->get(array(
+        "ref_date_formule" => $ref_date_stage
+    ));
 
     if ($envoiEleve) {
         $slack->sendMessages('log', array(
