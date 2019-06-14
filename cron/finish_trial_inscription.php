@@ -1,6 +1,6 @@
 <?php
 /**
- * pour terminer inscription � l'essai apr�s attribution prof manuelle
+ * pour terminer inscription a l'essai apres attribution prof manuelle
  * tourne toutes les heures
  * 
  * 
@@ -25,7 +25,6 @@ $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
 $compteMg = new \spamtonprof\stp_api\StpCompteManager();
 $statutEssai = new \spamtonprof\stp_api\StpStatutEssai();
 $getresponse = new \GetResponse();
-
 
 $abonnements = $abonnementMg->getHasNotFirstProfAssignement();
 
@@ -95,21 +94,25 @@ foreach ($abonnements as $abonnement) {
         $eleveMg->updateSeqEmailParentEssai($eleve);
     }
 
-    // d�finir les dates de d�but et de fin d'essai
-    $begin = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+    // définir les dates de début et de fin d'essai ( à supprimer quand transition plus abonnement sans date de début essai ) 
 
-    $abonnement->setDebut_essai($begin->format(PG_DATE_FORMAT));
-    $end = $begin->add(new DateInterval('P7D'));
-    $abonnement->setFin_essai($end->format(PG_DATE_FORMAT));
+    if (! $abonnement->getDebut_essai()) {
 
-    $abonnementMg->updateDebutEssai($abonnement);
-    $abonnementMg->updateFinEssai($abonnement);
+        $begin = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+
+        $abonnement->setDebut_essai($begin->format(PG_DATE_FORMAT));
+        $end = $begin->add(new DateInterval('P7D'));
+        $abonnement->setFin_essai($end->format(PG_DATE_FORMAT));
+
+        $abonnementMg->updateDebutEssai($abonnement);
+        $abonnementMg->updateFinEssai($abonnement);
+    }
 
     // envoyer le mail recap au prof choisi
 
     $emailRecap = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/mail_recap_prof.html");
-    
-    // ajout des infos �l�ves aux mails r�cap
+
+    // ajout des infos eleves aux mails recap
     $emailRecap = str_replace(array(
         "prenom_eleve",
         "nom_eleve",
@@ -128,7 +131,7 @@ foreach ($abonnements as $abonnement) {
         $abonnement->getRemarque_inscription()
     ), $emailRecap);
 
-    // ajout des infos du bilan scolaire au mail r�cap
+    // ajout des infos du bilan scolaire au mail recap
 
     $constructor = array(
         "construct" => array(
@@ -156,7 +159,7 @@ foreach ($abonnements as $abonnement) {
         $i ++;
     }
 
-    // ajout des infos parents aux mails r�cap
+    // ajout des infos parents aux mails recap
     if ($eleve->getParent_required()) {
         $emailRecap = str_replace(array(
             "prenom_parent",
@@ -216,8 +219,6 @@ foreach ($abonnements as $abonnement) {
 
     $abonnement->setFirst_prof_assigned(true);
     $abonnementMg->updateFirstProfAssigned($abonnement);
-
-    // mise � jour de l'index
 
     $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
 
