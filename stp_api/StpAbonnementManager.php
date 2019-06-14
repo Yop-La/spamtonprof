@@ -130,11 +130,15 @@ class StpAbonnementManager
     /*
      * pour remonter les abonnements sans prof dans le dashboard choisir prof
      */
-    public function getAbonnementsSansProf()
+    public function getAbonnementsToAssign()
     {
         $abonnements = [];
 
-        $q = $this->_db->prepare("select * from stp_abonnement where ref_prof is null and ref_statut_abonnement not in (4,3) order by date_creation ");
+        $q = $this->_db->prepare("select * from stp_abonnement 
+                where ref_prof is null 
+                    and ref_statut_abonnement not in (4,3) 
+                    and (debut_essai is null or debut_essai >= date(now()))
+                    order by date_creation ");
 
         $q->execute();
 
