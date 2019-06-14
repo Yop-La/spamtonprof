@@ -22,6 +22,20 @@ class AddsTempoManager
                 $q->bindValue(":ref_compte", $refCompte);
                 $q->execute();
             }
+            if (array_key_exists("high_potential_city", $info)) {
+
+                $ref_client = $info["high_potential_city"];
+
+                $q = $this->_db->prepare("
+                    delete from adds_tempo where
+                    ref_commune in (select ref_commune from lbc_commune where population >= 20 and population <= 40)
+                    and 
+                    ref_compte in (select ref_compte from compte_lbc where date_publication <= (now() - interval '7 days') and ref_client = :ref_client);");
+                $q->bindValue(":ref_client", $ref_client);
+
+                $q->execute();
+
+            }
         }
     }
 
@@ -68,7 +82,7 @@ class AddsTempoManager
         return ($ads);
     }
 
-    // pour mettre à jour les ref communes des ads tempo en cherchant la commune correspondante la base de communes open data soft
+    // pour mettre ï¿½ jour les ref communes des ads tempo en cherchant la commune correspondante la base de communes open data soft
     public function updateAllRefCommune($ads)
     {
         $lbcCommuneMg = new \spamtonprof\stp_api\LbcCommuneManager();
@@ -119,10 +133,8 @@ class AddsTempoManager
                 } else {
                     $winner = $communes[0];
                 }
-                
+
                 $winner = $lbcCommuneMg->findClosest($communes, $ad->getCity());
-                
-                
 
                 $slack->sendMessages("log", array(
                     "!!!!!!!!! trop de match : " . $param,
