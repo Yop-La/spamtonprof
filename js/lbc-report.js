@@ -177,14 +177,15 @@ jQuery( document ).ready( function( jQuery ) {
 					table5 = jQuery('#table_5').DataTable( {
 						data: data.tab5,
 						columns: [
-							{ title: "Ref_compte" },
-							{ title: "mail" },
+							{ title: "Ref_compte" ,"searchable": false },
+							{ title: "mail" ,"searchable": false },
 							{ title: "nb_online","searchable": false },
-							{ title: "date_creation"},
-							{ title: "date_publication"},
-							{ title: "user_id"},
-							{ title: "prenom"},
-							{ title: "disabled"}
+							{ title: "date_creation","searchable": false },
+							{ title: "date_publication","searchable": false },
+							{ title: "user_id","searchable": false },
+							{ title: "prenom","searchable": false },
+							{ title: "disabled","searchable": false },
+							{ title: "Ref client"},
 							],
 							"order": [[ 4, "desc" ]],
 							"autoWidth": false

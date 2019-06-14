@@ -193,7 +193,7 @@ class LbcAccountManager
             if (array_key_exists("acts_details", $info)) {
 
                 $q = $this->_db->prepare("
-                    select ref_compte, mail, nb_annonces_online, date_creation, date_publication, user_id, prenom, disabled 
+                    select ref_compte, mail, nb_annonces_online, date_creation, date_publication, user_id, prenom, disabled, ref_client
                             from compte_lbc 
                             order by date_publication desc");
             }
