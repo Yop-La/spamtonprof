@@ -629,7 +629,7 @@ class PageManager
 
         $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
 
-        $abonnementsSansProf = $abonnementMg->getAbonnementsSansProf();
+        $abonnementsSansProf = $abonnementMg->getAbonnementsToAssign();
 
         wp_localize_script('choisir_prof', 'abonnementsSansProf', $abonnementsSansProf);
     }
