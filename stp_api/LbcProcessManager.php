@@ -575,6 +575,7 @@ class LbcProcessManager
 
         $i = 0;
         $msgs = [];
+        $nb_acts = count($lbcAccounts);
         foreach ($lbcAccounts as $lbcAccount) {
 
             $msgs[] = "Controle de " . $lbcAccount->getRef_compte();
@@ -656,7 +657,7 @@ class LbcProcessManager
 
             $msgs[] = $nbAnnonce . "en ligne";
 
-            if ($i % 10 == 0) {
+            if ($i % 20 == 0 || $i == ($nb_acts - 1)) {
                 $slack->sendMessages("log-lbc", $msgs);
                 $msgs = [];
             }
