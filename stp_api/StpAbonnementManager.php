@@ -136,7 +136,7 @@ class StpAbonnementManager
 
         $q = $this->_db->prepare("select * from stp_abonnement 
                 where ref_prof is null 
-                    and ref_statut_abonnement not in (4,3) 
+                    and ref_statut_abonnement = 2 
                     and (debut_essai is null or date(now()) >= debut_essai)
                     order by date_creation ");
 
@@ -152,7 +152,8 @@ class StpAbonnementManager
                     'ref_eleve',
                     'ref_parent',
                     'ref_formule',
-                    'ref_prof'
+                    'ref_prof',
+                    'ref_statut_abonnement'
                 ),
                 "ref_eleve" => array(
                     "construct" => array(
