@@ -31,11 +31,18 @@ var mySubmitController = Marionette.Object.extend( {
 			jQuery("#loading_screen").removeClass("hide");
 			jQuery(".hide_loading").addClass("hide");
 
+			//récupération des variables du form
+			fields = response.data.fields;
+			champs = {};
+			Object.values(fields).forEach(function(field){
 
-			//récupérationdes variables du form
+				champs[field.label] = field.submitted_value;
+				if(typeof field.submitted_value =='undefined' || field.submitted_value == ""){
+					champs[field.label] = field.value;
+				}
 
-			refAbonnement = response.data.fields[idRefAbonnement].value;
-			refProf = response.data.fields[idChoixProf].value;
+
+			})
 
 			// soumission ajax des champs du form pour création inscription
 			ajaxEnCours++;
@@ -43,18 +50,33 @@ var mySubmitController = Marionette.Object.extend( {
 					ajaxurl,
 					{
 						'action' : 'ajaxAttribuerProf',
-						'refAbonnement' : refAbonnement,
-						'refProf' : refProf,
+						'fields' : JSON.stringify(champs)
 
 					})
 					.done(function(retour){ 
 
+
 						error = retour.error;
 
 						if(!error){
-							profChoisi = retour.prof;
-							showMessage("Le prof ( ".concat(profChoisi.prenom," ",profChoisi.nom," )" ," est bien attribué. C'est encore possible de le changer si besoin"));
-							attributionCourante.prof = profChoisi;
+							statut = retour.statut;
+							action = retour.action;
+
+							message = "Rien à dire. Bizarre ... Prévenez un dev !!";
+							if(action == 'refuser-la-demande'){
+								message = "La demande vient d'être refusé ! Ce n'est plus possible de changer. Les emails sont partis.";
+								redirectTo('back-office/choisir-prof',message);
+								
+							}else if(action == "compte-test"){
+								message = "Le compte de test vient d'être désactivé. C'est encore possible de changer si besoin";
+							}else if(action == 'attribuer-un-prof'){
+								profChoisi = retour.prof;
+								message = "Le prof ( ".concat(profChoisi.prenom," ",profChoisi.nom," )" ," est bien attribué. C'est encore possible de le changer si besoin");
+								attributionCourante.prof = profChoisi;
+							}
+							showMessage(message);
+
+							attributionCourante.statut = statut;
 							fillAttribution(attributionCourante);
 						}
 
@@ -170,14 +192,16 @@ function fillAttribution(attributionCourante){
 		jQuery(".row-choix-prof").find("#ref-abonnement").html(attributionCourante.ref_abonnement);
 		jQuery(".row-choix-prof").find("#date-inscription").html(attributionCourante.date_creation);
 
-		
+
 		if(attributionCourante.proche){
 			jQuery(".row-choix-prof").find("#email-parent").html(attributionCourante.proche.email);
+		}else{
+			jQuery(".row-choix-prof").find("#email-parent").html('...');
 		}
-		
+
 		jQuery(".row-choix-prof").find("#date-demarrage").html(attributionCourante.debut_essai);
 
-		
+		jQuery(".row-choix-prof").find("#statut-abo").html(attributionCourante.statut.statut_abonnement);
 
 		jQuery(".row-choix-prof").find("#prenom-nom").html(attributionCourante.eleve.prenom.concat(' ',attributionCourante.eleve.nom));
 		jQuery(".row-choix-prof").find("#matieres").html(attributionCourante.formule.formule);
