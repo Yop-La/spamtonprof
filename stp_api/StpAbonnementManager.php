@@ -135,7 +135,7 @@ class StpAbonnementManager
         $abonnements = [];
 
         $q = $this->_db->prepare("select * from stp_abonnement 
-                where ref_prof is null 
+                where first_prof_assigned = false
                     and ref_statut_abonnement = 2 
                     and (debut_essai is null or date(now()) >= debut_essai)
                     order by date_creation ");
