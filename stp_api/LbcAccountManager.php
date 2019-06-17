@@ -65,7 +65,7 @@ class LbcAccountManager
 
             if ($act_type == 'stp') {
                 $query = "select * from compte_lbc 
-                            where now() >= ( date_publication +  interval '1 day')
+                            where (now() >= ( date_publication +  interval '1 day') or ( date_publication is null and controle_date is not null))
                                 and nb_annonces_online != 0
                                  and disabled is false
 						         and ref_client = :ref_client
