@@ -4,7 +4,7 @@ namespace spamtonprof\stp_api;
 class LbcAdValidationEmail implements \JsonSerializable
 {
 
-    protected $ref_message, $gmail_id, $date_reception, $destinataire;
+    protected $ref_message, $gmail_id, $date_reception, $ref_compte_lbc;
 
     public function __construct(array $donnees = array())
     {
@@ -51,14 +51,22 @@ class LbcAdValidationEmail implements \JsonSerializable
         $this->date_reception = $date_reception;
     }
 
-    public function getDestinataire()
+    /**
+     *
+     * @return mixed
+     */
+    public function getRef_compte_lbc()
     {
-        return $this->destinataire;
+        return $this->ref_compte_lbc;
     }
 
-    public function setDestinataire($destinataire)
+    /**
+     *
+     * @param mixed $ref_compte_lbc
+     */
+    public function setRef_compte_lbc($ref_compte_lbc)
     {
-        $this->destinataire = $destinataire;
+        $this->ref_compte_lbc = $ref_compte_lbc;
     }
 
     public function jsonSerialize()
