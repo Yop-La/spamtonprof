@@ -2,6 +2,7 @@
 namespace spamtonprof\stp_api;
 
 use PDO;
+use PHPMailer\PHPMailer\Exception;
 
 class StpAbonnementManager
 {
@@ -135,9 +136,9 @@ class StpAbonnementManager
         $abonnements = [];
 
         $q = $this->_db->prepare("select * from stp_abonnement 
-                where first_prof_assigned = false
+                where (first_prof_assigned = false or first_prof_assigned is null)
                     and ref_statut_abonnement = 2 
-                    and (debut_essai is null or date(now()) >= debut_essai)
+                    and (debut_essai is null or date(now())  + interval '1 days' >= debut_essai)
                     order by date_creation ");
 
         $q->execute();
@@ -308,6 +309,73 @@ class StpAbonnementManager
     {
         $q = $this->_db->prepare("update stp_abonnement set nb_message = 0 where nb_message != 0 OR nb_message is null");
         $q->execute();
+    }
+
+    /*
+     *
+     * pour remettre l'abonnement dans l'état qu'il était avant de passer par le script finish_trial_inscription
+     * c'est à dire dans l'état qu'il était après soumission du formulaire ( avant choix-prof )
+     *
+     */
+    public function reverve_finish_trial_inscription($ref_abo, $debut_essai)
+    {
+        
+
+        $constructor = array(
+            "construct" => array(
+                'ref_eleve'
+            )
+        );
+        
+        $abo = $this->get(array(
+            'ref_abonnement' => $ref_abo
+        ), $constructor);
+        
+        $ref_statut = $abo->getRef_statut_abonnement();
+        
+        
+        if ($ref_statut != $abo::ESSAI && $ref_statut != $abo::TERMINE && $ref_statut != $abo::ATTENTE_DEMARRAGE) {
+            throw new Exception("Pas possible d'appliquer cette fonction à des abos pas en essai ou pas terminé");
+        }
+        
+        $abo->setRef_statut_abonnement($abo::ESSAI);
+        $this->updateRefStatutAbonnement($abo);
+
+    
+        $begin = \DateTime::createFromFormat(FR_DATE_FORMAT, $debut_essai, new \DateTimeZone("Europe/Paris"));
+        $abo->setDebut_essai($begin->format(PG_DATE_FORMAT));
+
+        $end = clone $begin;
+
+        $end = $end->add(new \DateInterval('P7D'));
+        $abo->setFin_essai($end->format(PG_DATE_FORMAT));
+
+        $this->updateDebutEssai($abo);
+        $this->updateFinEssai($abo);
+
+
+
+        $abo->setFirst_prof_assigned(false);
+        $this->updateFirstProfAssigned($abo);
+
+        $abo->setRef_prof(null);
+        $this->updateRefProf($abo);
+
+        $abo->setDate_attribution_prof(null);
+        $this->updateDateAttributionProf($abo);
+        
+        $eleve = $abo->getEleve();
+        $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
+
+        $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
+        $eleve->setSeq_email_parent_essai(0);
+        $eleveMg->updateSeqEmailParentEssai($eleve);
+        
+        $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+        
+        $algoliaMg->deleteAbo($abo->getObjectID());
+        $algoliaMg->addAbonnement($abo->getRef_abonnement());
+        
     }
 
     // pour remonter les abonnements qui viennent de se voir attribuer un prof pour la premiere fois apres l'inscription
@@ -864,9 +932,10 @@ class StpAbonnementManager
 
                 $limit = $info["limit"];
 
-                $q = $this->_db->prepare("select *  from stp_abonnement
+                $q = $this->_db->prepare("select * from stp_abonnement
 	               where fin_essai is not null and now() > fin_essai + interval '15' day
 				   	and ref_statut_abonnement = 2  
+                    and first_prof_assigned = true
                         limit :limit");
                 $q->bindValue(":limit", $limit);
                 $q->execute();
