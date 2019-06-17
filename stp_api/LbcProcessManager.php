@@ -967,6 +967,10 @@ class LbcProcessManager
                 'ref_client' => $refClient
             ));
 
+            if (! $client->getAuto_reply()) {
+                return;
+            }
+
             // recuperation du message a envoyer
             $txtMg = new spamtonprof\stp_api\LbcTexteManager();
 
