@@ -22,6 +22,7 @@ class LbcProcessManager
 
         $this->gmailManager = new \spamtonprof\googleMg\GoogleManager($email);
         $this->gmailAccount = $this->gmailAccountMg->get($email);
+        $this->lbcAdValidationEmailMg = new \spamtonprof\stp_api\LbcAdValidationEmailManager();
 
         $this->msgs = [];
         $this->errors = [];
@@ -170,7 +171,7 @@ class LbcProcessManager
                         // $this->gmailManager->modifyMessage($gmailId, $labelId, array());
                     }
                 }
-            } elseif (strpos(strtolower($subject), "renouvelez gratuitement") !== false && false) {
+            } elseif (strpos(strtolower($subject), "renouvelez gratuitement") !== false) {
 
                 try {
 
@@ -209,6 +210,31 @@ class LbcProcessManager
                         "Erreur lors de la récupération du lien de renouvellement d'annonce :" . $url,
                         "Avec pour compte : " . $act->getMail()
                     ));
+                }
+            } elseif (strpos(strtolower($subject), "est en ligne") !== false) {
+
+                $to = extractFirstMail($to);
+
+                $act = $this->lbcAccountMg->get(array(
+                    "mail" => $to
+                ));
+
+                $this->lbcAdValidationEmailMg->add(new \spamtonprof\stp_api\LbcAdValidationEmail(array(
+                    'gmail_id' => $gmailId,
+                    'date_reception' => $dateReception->format(PG_DATETIME_FORMAT),
+                    'ref_compte_lbc' => $act->getRef_compte()
+                )));
+
+                $client = $this->clientMg->get(array(
+                    'ref_client' => $act->getRef_client()
+                ));
+
+                $labels = [];
+                $labels[] = $client->getLabel();
+
+                if (count($labels) > 0) {
+                    $labelIds = $this->gmailManager->getLabelsIds($labels);
+                    $this->gmailManager->modifyMessage($gmailId, $labelIds, array());
                 }
             }
 
@@ -968,6 +994,8 @@ class LbcProcessManager
             ));
 
             if (! $client->getAuto_reply()) {
+                $msg->setAutomatic_answer_done(true);
+                $this->messProspectMg->update_automatic_answer_done($msg);
                 return;
             }
 
