@@ -208,6 +208,13 @@ class AlgoliaManager
         $index->partialUpdateObject($abonnement);
     }
 
+    public function deleteAbo($objectID){
+
+        $index = $this->client->initIndex('support_client');
+        $index->deleteObject($objectID);
+        
+    }
+    
     public function updateAbonnements($refAbos, $constructor = false)
     {
         $index = $this->client->initIndex('support_client');
@@ -257,11 +264,11 @@ class AlgoliaManager
         $index->saveObjects($comptes);
     }
 
-    /* ------------------ début index abonnements -------------- */
+    /* ------------------ dï¿½but index abonnements -------------- */
     public function resetAbonnement()
     {
 
-        // ajout à l'index
+        // ajout ï¿½ l'index
         $index = $this->client->initIndex('abonnement');
         $index->clearIndex();
 
@@ -313,11 +320,11 @@ class AlgoliaManager
 
     /* ------------------ fin index abonnements -------------- */
 
-    /* ------------------ début index transferts -------------- */
+    /* ------------------ dï¿½but index transferts -------------- */
     public function resetTransfert()
     {
 
-        // ajout à l'index
+        // ajout ï¿½ l'index
         $index = $this->client->initIndex('transfert');
         $index->clearIndex();
 
