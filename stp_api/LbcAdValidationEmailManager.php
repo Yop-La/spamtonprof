@@ -23,4 +23,28 @@ class LbcAdValidationEmailManager
 
         return ($lbcAdValidationEmail);
     }
+    
+    public function getAll($info)
+    {
+        $email_validations = [];
+        $q = null;
+        if (array_key_exists('day', $info)) {
+            
+            $day = $info['day'];
+            
+            $q = $this->_db->prepare("select * from lbc_ad_validation_email where date(date_reception) = :day ");
+            $q->bindValue(':day', $day);
+        }
+        
+        $q->execute();
+        
+        while ($donnees = $q->fetch(\PDO::FETCH_ASSOC)) {
+            
+            $email_validation = new \spamtonprof\stp_api\LbcAdValidationEmail($donnees);
+            $email_validations[] = $email_validation;
+        }
+        return ($email_validations);
+    }
+    
+    
 }

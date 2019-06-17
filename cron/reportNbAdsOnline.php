@@ -16,6 +16,8 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
+
+
 define('PROBLEME_CLIENT', true);
 
 $today = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
@@ -25,8 +27,6 @@ $tomorrow = clone $today;
 
 $tomorrow->add(new \DateInterval('P1D'));
 
-$gmailManager = new \spamtonprof\googleMg\GoogleManager("mailsfromlbc@gmail.com");
-$msgs = $gmailManager->listMessages("subject:ligne after:" . $today->format(GMAIL_DATE_FORMAT) . "before:" . $tomorrow->format(GMAIL_DATE_FORMAT), 4, 100);
 
 $clientMg = new \spamtonprof\stp_api\LbcClientManager();
 
@@ -34,29 +34,23 @@ $lbcActMg = new \spamtonprof\stp_api\LbcAccountManager();
 
 $res_publication = array();
 
+$lbcAdValidationMg = new \spamtonprof\stp_api\LbcAdValidationEmailManager();
+
+$msgs = $lbcAdValidationMg->getAll(array('day' => $today->format(PG_DATE_FORMAT)));
+
 $clients = $clientMg->getAll(array(
     'all'
 ));
 
 foreach ($msgs as $msg) {
-
-    $msg_id = $msg->id;
-
-    $message = $gmailManager->getMessage($msg_id, [
-        'format' => 'full'
-    ]);
-
-    $to = $gmailManager->getHeader($message, "To");
-
+    
+    
     $lbcAct = $lbcActMg->get(array(
-        "mail" => str_replace(array(
-            '<',
-            '>'
-        ), "", $to)
+        "ref_compte" => $msg->getRef_compte_lbc()
     ));
-
+    
     if ($lbcAct) {
-
+        
         $key_client = "aucun";
         foreach ($clients as $client) {
             if ($client->getRef_client() == $lbcAct->getRef_client()) {
@@ -64,7 +58,7 @@ foreach ($msgs as $msg) {
                 break;
             }
         }
-
+        
         if (array_key_exists($key_client, $res_publication)) {
             $res_publication[$key_client] = $res_publication[$key_client] + 1;
         } else {
@@ -74,18 +68,19 @@ foreach ($msgs as $msg) {
 }
 
 $slack = new \spamtonprof\slack\Slack();
-$slack->sendMessages('reporting-lbc', array(
-    "----------",
-    "Reporting sur le nombre d'annonces publiés le " . $today->format(FR_DATE_FORMAT)
-));
+
+$msgs = [];
+
+$msgs[] ="----------";
+$msgs[] ="Reporting sur le nombre d'annonces publiés le " . $today->format(FR_DATE_FORMAT);
 
 foreach ($res_publication as $key => $value) {
-    $slack->sendMessages('reporting-lbc', array(
-        "Pour le client " . $key . ": " . $value . " publiées."
-    ));
+    $msgs[] = "Pour le client " . $key . ": " . $value . " publiées.";
+    
 }
-$slack->sendMessages('reporting-lbc', array(
-    "Fin reporting"
-));
+
+$msgs[] = "Fin reporting";
+
+$slack->sendMessages('reporting-lbc', $msgs);
 
 prettyPrint($res_publication);
