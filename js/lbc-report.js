@@ -178,7 +178,7 @@ jQuery( document ).ready( function( jQuery ) {
 						data: data.tab5,
 						columns: [
 							{ title: "Ref_compte" ,"searchable": false },
-							{ title: "mail" ,"searchable": false },
+							{ title: "mail"  },
 							{ title: "nb_online","searchable": false },
 							{ title: "date_creation","searchable": false },
 							{ title: "date_publication","searchable": false },
