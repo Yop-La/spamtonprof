@@ -355,10 +355,11 @@ class PageManager
             PageManager::lbcReport();
         }
 
-        if ($this->pageSlug == 'payer-prof') {
-
-            PageManager::payerProf();
+        if ($this->pageSlug == 'facturation-prof') {
+            
+            PageManager::facturation_prof();
         }
+
     }
 
     public static function abonnementApresEssaiLoader()
@@ -777,19 +778,17 @@ class PageManager
         wp_enqueue_style('css_espace-presse', get_home_url() . '/wp-content/themes/salient-child/css/pages/espace-presse.css');
     }
 
-    public static function payerProf()
 
+    public static function facturation_prof()
+    
     {
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
-
-        wp_enqueue_script('formule_js', plugins_url() . '/spamtonprof/js/payer-prof.js', array(
-
+        
+        wp_enqueue_script('formule_js', plugins_url() . '/spamtonprof/js/facturation-prof.js', array(
+            
             'nf-front-end'
         ), time());
-
-        wp_enqueue_script('stripe_checkout_js', 'https://checkout.stripe.com/checkout.js');
-
-        wp_enqueue_script('stripe_main_js', 'https://js.stripe.com/v3/');
+        
     }
 
     public static function lbcReport()

@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.8.5.0
+ * Version: 1.1.8.5.1
  *
  *
  * Author: yopla
@@ -36,64 +36,64 @@
  *
  *
  */
-require_once(dirname(__FILE__) . '/inc/autoloader_stp.php'); // autoloader des classes stp
+require_once (dirname(__FILE__) . '/inc/autoloader_stp.php'); // autoloader des classes stp
 
-require_once(dirname(__FILE__) . '/inc/autoloader_stripe.php'); // autoloader des classes stripe
+require_once (dirname(__FILE__) . '/inc/autoloader_stripe.php'); // autoloader des classes stripe
 
-require_once(dirname(__FILE__) . '/inc/autoloader_getresponse.php'); // autoloader les custom classes de getresponse
+require_once (dirname(__FILE__) . '/inc/autoloader_getresponse.php'); // autoloader les custom classes de getresponse
 
-require_once(dirname(__FILE__) . '/inc/autoloader_google.php'); // autoloader les custom classes de google
+require_once (dirname(__FILE__) . '/inc/autoloader_google.php'); // autoloader les custom classes de google
 
-require_once(dirname(__FILE__) . '/inc/autoloader_cnl.php'); // autoloader les custom classes de cnl
+require_once (dirname(__FILE__) . '/inc/autoloader_cnl.php'); // autoloader les custom classes de cnl
 
-require_once(dirname(__FILE__) . '/inc/autoloader_lbc.php'); // autoloader les custom classes de lbc
+require_once (dirname(__FILE__) . '/inc/autoloader_lbc.php'); // autoloader les custom classes de lbc
 
-require_once(dirname(__FILE__) . '/vendor/autoload.php'); // autoload strip, paypal , gmail
+require_once (dirname(__FILE__) . '/vendor/autoload.php'); // autoload strip, paypal , gmail
 
-require_once(dirname(__FILE__) . '/vendor/getresponse/GetResponseAPI3.class.php');
+require_once (dirname(__FILE__) . '/vendor/getresponse/GetResponseAPI3.class.php');
 
-require_once(dirname(__FILE__) . '/vendor/mxforward/mx_forward.php');
+require_once (dirname(__FILE__) . '/vendor/mxforward/mx_forward.php');
 
-require_once(dirname(__FILE__) . '/slack/Slack.php'); // pour communiquer avec slack
+require_once (dirname(__FILE__) . '/slack/Slack.php'); // pour communiquer avec slack
 
-require_once(dirname(__FILE__) . '/dev-tools.php');
+require_once (dirname(__FILE__) . '/dev-tools.php');
 
 /* require tous les fichiers contenant des fonctions ajax */
 
-require_once(dirname(__FILE__) . '/ajaxFunction/page-inscription-essai_eleve-ajax.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/page-inscription-essai_eleve-ajax.php');
 
-require_once(dirname(__FILE__) . '/ajaxFunction/adds_back_office_ajax.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/adds_back_office_ajax.php');
 
-require_once(dirname(__FILE__) . '/ajaxFunction/discover_week_ajax.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/discover_week_ajax.php');
 
-require_once(dirname(__FILE__) . '/ajaxFunction/log_in_and_out.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/log_in_and_out.php');
 
-require_once(dirname(__FILE__) . '/ajaxFunction/inscription_prof_ajax.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/inscription_prof_ajax.php');
 
-require_once(dirname(__FILE__) . '/ajaxFunction/onboarding_prof_ajax.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/onboarding_prof_ajax.php');
 
-require_once(dirname(__FILE__) . '/ajaxFunction/choisir-prof.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/choisir-prof.php');
 
-require_once(dirname(__FILE__) . '/ajaxFunction/ajax_dashboard_eleve.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/ajax_dashboard_eleve.php');
 
-require_once(dirname(__FILE__) . '/ajaxFunction/ajax_bo.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/ajax_bo.php');
 
-require_once(dirname(__FILE__) . '/ajaxFunction/gestion_formule_ajax.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/gestion_formule_ajax.php');
 
-require_once(dirname(__FILE__) . '/ajaxFunction/ads_review.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/ads_review.php');
 
-require_once(dirname(__FILE__) . '/ajaxFunction/edit_lbc_text.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/edit_lbc_text.php');
 
-require_once(dirname(__FILE__) . '/ajaxFunction/lbc-report.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/lbc-report.php');
 
-require_once(dirname(__FILE__) . '/ajaxFunction/paiement_ajax.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/paiement_ajax.php');
 
+require_once (dirname(__FILE__) . '/ajaxFunction/facturation-prof.php');
 
 add_action('template_redirect', 'handleRedirections');
 
 function is_test_user()
 {
-
     $user = wp_get_current_user();
     if ($user) {
         if (strpos($user->user_email, 'yopla.33mail') !== false) {
@@ -101,7 +101,6 @@ function is_test_user()
         }
     }
     return (false);
-
 }
 
 function handleRedirections()
@@ -118,7 +117,7 @@ function handleRedirections()
                 'user_id_wp' => $current_user->ID
             ));
 
-            if (!$prof->getOnboarding() && !is_page('onboarding-prof')) {
+            if (! $prof->getOnboarding() && ! is_page('onboarding-prof')) {
 
                 $_SESSION['message'] = utf8_encode("Terminez l 'inscription pour donner des cours ! ");
 
@@ -174,7 +173,7 @@ add_action('init', 'stp_session_start', 1);
 
 function stp_session_start()
 {
-    if (!session_id()) {
+    if (! session_id()) {
 
         session_start();
     }
@@ -391,11 +390,11 @@ function my_pre_population_callback($options, $settings)
     // target "choix domain" du formulaire "conf client leboncoin"
     if ($settings['key'] == 'choix-niveau_1559321703046') {
 
-
         $niveauMg = new \spamtonprof\stp_api\StpNiveauManager();
 
-        $niveaux = $niveauMg->getAll(array('all'));
-
+        $niveaux = $niveauMg->getAll(array(
+            'all'
+        ));
 
         foreach ($niveaux as $niveau) {
 
@@ -404,28 +403,23 @@ function my_pre_population_callback($options, $settings)
                 'value' => $niveau->getRef_niveau()
             );
         }
-
     }
 
     // target "prenom_lbc" du formulaire "conf client leboncoin"
-    if (($settings['key'] == 'listselect_1560173067982' && LOCAL)  || $settings['key'] == 'listselect_1560177320096'  && !LOCAL) {
-        
-        
+    if (($settings['key'] == 'listselect_1560173067982' && LOCAL) || $settings['key'] == 'listselect_1560177320096' && ! LOCAL) {
+
         $niveauMg = new \spamtonprof\stp_api\PrenomLbcManager();
-        
+
         $cats = $niveauMg->getAllCat();
-        
-        
+
         foreach ($cats as $cat) {
-            
+
             $options[] = array(
                 'value' => $cat,
                 'label' => $cat
             );
         }
-        
     }
-    
 
     return $options;
 }
