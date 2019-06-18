@@ -4,18 +4,12 @@ namespace spamtonprof\stp_api;
 use PDO;
 use DateTime;
 use Exception;
+
 /*
  *
  * Cette classe sert Ã  gÃ©rÃ©r ( CRUD ) les plans de paiement stripe
  *
  * Elle sert aussi Ã  crÃ©er des abonnements, des clients, des paiements, etc
- *
- *
- *
- *
- *
- *
- *
  *
  *
  *
@@ -51,6 +45,51 @@ class StripeManager
         $sub->metadata["stripe_prof_id"] = $stripeProdId;
 
         $sub->save();
+    }
+
+    public function new_prof_invoice($email_client, $email_prof = 'sebastien@spamtonprof.com', $amount = '2000', $description = 'test')
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $customers = \Stripe\Customer::all([
+            "limit" => 3,
+            "email" => $email_client
+        ]);
+
+        $customers = $customers->data;
+        $customer_id = false;
+
+        // récupération - création du customer
+        if ($customers) {
+            $customer_id = $customers[0]->id;
+        } else {
+            $customer = \Stripe\Customer::create([
+                "email" => $email_client
+            ]);
+            $customer_id = $customer->id;
+        }
+
+        \Stripe\InvoiceItem::create([
+            "customer" => $customer_id,
+            "amount" => $amount,
+            "currency" => "eur",
+            "description" => $description
+        ]);
+
+        $invoice = \Stripe\Invoice::create([
+            "customer" => $customer_id,
+            "billing" => "send_invoice",
+            "custom_fields" => array(
+                array(
+                    'name' => 'email_prof',
+                    'value' => $email_prof
+                )
+            ),
+            "days_until_due" => 2
+        ]);
+
+        $invoice->sendInvoice();
+
     }
 
     /*
@@ -93,6 +132,106 @@ class StripeManager
         }
     }
 
+    public function transfert_custom_facture($event_json, $email_prof)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $slack = new \spamtonprof\slack\Slack();
+
+        $messages = [];
+
+        $chargeId = $event_json->data->object->charge;
+        $lines = $event_json->data->object->lines->data;
+        $customer_email = $event_json->data->object->customer_email;
+
+        try {
+
+            $messages[] = "Nouveau paiement réussi";
+            foreach ($lines as $line) {
+                $description = $line->description;
+                $messages[] = "Description facture : " . $description;
+            }
+
+            $messages[] = "chargeId : " . $chargeId;
+            $messages[] = "client : " . $customer_email;
+
+            $charge = \Stripe\Charge::retrieve($chargeId);
+            $charge_amt = $charge->amount;
+
+            $profMg = new \spamtonprof\stp_api\StpProfManager();
+            $prof = $profMg->get(array(
+                "email_stp" => $email_prof
+            ));
+
+            $profId = $prof->getStripe_id();
+            if ($this->testMode) {
+                $profId = $prof->getStripe_id_test();
+            }
+
+            $commission = 25;
+            if ($profId == "acct_1D0z7ZI85S4kxqgW") {
+                $commission = 20;
+            }
+
+            $part_prof = round($charge_amt * (1 - ($commission / 100)));
+
+            if ($part_prof > 0) {
+
+                $charge->transfer_group = $chargeId;
+                $charge->save();
+
+                // on transfère au prof
+                \Stripe\Transfer::create(array(
+                    "amount" => $part_prof,
+                    "currency" => "eur",
+                    "destination" => $profId,
+                    "transfer_group" => $chargeId,
+                    "source_transaction" => $chargeId
+                ));
+            }
+
+            $messages[] = "Montant : " . $charge_amt / 100 . "€";
+
+            $charge->metadata['part_prof'] = $part_prof;
+            $charge->save();
+
+            $messages[] = "Transfert vers : " . $profId . " (" . $prof->getEmail_stp() . ")  de " . $part_prof / 100 . " € à " . (100 - $commission) . "% réussi";
+
+            if ($this->testMode) {
+                $messages[] = 'PS : ceci est un test. Désolé :p :p ';
+            }
+        } catch (\Exception $e) {
+            $messages[] = $e->getMessage();
+        } finally {
+
+            $slack->sendMessages("stripe", $messages);
+
+            if ($prof) {
+
+                $body = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/info-paiement-prof.html");
+                $body = str_replace("[[prof-name]]", $prof->getPrenom(), $body);
+                $body = str_replace("[[details-paiement]]", nl2br(implode("\n", $messages)), $body);
+
+                $smtpMg = new \spamtonprof\stp_api\SmtpServerManager();
+                $smtp = $smtpMg->get(array(
+                    "ref_smtp_server" => $smtpMg::smtp2Go
+                ));
+                $smtp->sendEmail("Un paiement vient d'être réalisé", $prof->getEmail_stp(), $body, "alexandre@spamtonprof.com", "Alex de SpamTonProf", true, array(
+                    "alexandre@spamtonprof.com"
+                ));
+            }
+        }
+    }
+
+    /*
+     *
+     * 2 cas d'utilisation :
+     * - transfert suite à facturation d'abonnement auto
+     * - transfert manuel avec abonnement associé à la charge : $event_json = false, $chargeIdMan
+     *
+     *
+     *
+     */
     public function transfertSubscriptionCharge($event_json, $chargeIdMan = false)
     {
         serializeTemp($event_json);
@@ -125,6 +264,7 @@ class StripeManager
                 }
 
                 if (! $subId) {
+
                     $messages[] = "Facture sans abonnement. Faire transfert manuellement si nécessaire";
                     return;
                 }
@@ -134,7 +274,6 @@ class StripeManager
 
             $charge = \Stripe\Charge::retrieve($chargeId);
             $charge_amt = $charge->amount;
-            $transfert_group = $charge->transfer_group;
 
             $messages[] = "Nouveau paiement réussi";
             $messages[] = "chargeId : " . $chargeId;
@@ -183,14 +322,6 @@ class StripeManager
                 $prof = $profMg->get(array(
                     "stripe_id" => $profId
                 ));
-
-                if ($transfert_group) {
-
-                    try {
-                        $transfert = \Stripe\Transfer::retrieve($transfert_group);
-                        $messages[] = "Transfert déjà fait pour ce paiement";
-                    } catch (\Exception $e) {}
-                }
 
                 $messages[] = "Montant : " . $charge_amt / 100 . "€";
 
@@ -242,9 +373,6 @@ class StripeManager
 
                 $new_solde = $solde - $part_solde / 100;
 
-                $act->metadata["solde"] = $new_solde;
-                $act->save();
-
                 if ($part_prof > 0) {
 
                     // on rÃ©cupÃ¨re le payement intent pour mettre Ã  jour son transfer group
@@ -266,6 +394,8 @@ class StripeManager
                         "source_transaction" => $chargeId
                     ));
                 }
+                $act->metadata["solde"] = $new_solde;
+                $act->save();
                 $charge->metadata['part_prof'] = $part_prof;
                 $charge->save();
 
@@ -286,7 +416,6 @@ class StripeManager
         } catch (\Exception $e) {
 
             $messages[] = $e->getMessage();
-            return;
         } finally {
             $slack->sendMessages("stripe", $messages);
 
@@ -502,7 +631,7 @@ class StripeManager
         $slack = new \spamtonprof\slack\Slack();
 
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-        
+
         $plan_stripe = \Stripe\Plan::retrieve($planStripeId);
 
         // création du customer si il n'existe pas déjà
@@ -543,7 +672,7 @@ class StripeManager
                 "metadata" => array(
 
                     "stripe_prof_id" => $stripeProfId,
-                    
+
                     "installments" => 1
                 )
             );
@@ -557,7 +686,7 @@ class StripeManager
                 "ref compte : " . $compte->getRef_compte(),
 
                 "email client : " . $emailClient,
-                
+
                 "Paiement en " . $plan_stripe->metadata['installments'] . " fois.",
 
                 "Ref abonnement stripe : " . $subscription->id
@@ -1061,7 +1190,7 @@ class StripeManager
 
     // pour creer tous les produits et les plans definis dans la base stp
     // attention les formules et plans doivent déjà existés dans la base stp
-    /*     $query = array('custom' => ' where ref_formule >= 150' ) */
+    /* $query = array('custom' => ' where ref_formule >= 150' ) */
     public function createProductsAndPlans($query)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());

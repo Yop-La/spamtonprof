@@ -2,7 +2,7 @@
 /**
  * 
  *  pour recevoir les hooks de stripe en mode test
- *  Voilà les hooks reçus :
+ *  Voilï¿½ les hooks reï¿½us :
  *  - invoice.payment_succeeded pour envoyer les fonds au prof
  *  
  */
@@ -38,11 +38,22 @@ $slack->sendMessages('log', array(
 
 if ($event_json->type == "invoice.payment_succeeded") {
 
-    serializeTemp($event_json);
-
     $stripeMg = new \spamtonprof\stp_api\StripeManager(true);
 
-    $stripeMg->transfertSubscriptionCharge($event_json);
+    $custom_fields = $event_json->data->object->custom_fields;
+    $email_prof = false;
+    foreach ($custom_fields as $custom_field) {
+        if ($custom_field->name == 'email_prof') {
+            $email_prof = $custom_field->value;
+        }
+    }
+
+    if ($email_prof) {
+        
+        $stripeMg->transfert_custom_facture($event_json, $email_prof);
+    } else {
+        $stripeMg->transfertSubscriptionCharge($event_json);
+    }
 }
 
 

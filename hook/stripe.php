@@ -2,8 +2,8 @@
 /**
  * 
  *  pour recevoir les hooks de stripe en mode prof
- *  Voilà les hooks reçus :
- *  - invoice.payment_succeeded pour transférer les fonds au prof
+ *  Voilï¿½ les hooks reï¿½us :
+ *  - invoice.payment_succeeded pour transfï¿½rer les fonds au prof
  *  
  */
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
@@ -28,10 +28,25 @@ $input = @file_get_contents("php://input");
 $event_json = json_decode($input);
 
 if ($event_json->type == "invoice.payment_succeeded") {
-    
+
+
     $stripeMg = new \spamtonprof\stp_api\StripeManager(false);
     
-    $stripeMg->transfertSubscriptionCharge($event_json);
+    $custom_fields = $event_json->data->object->custom_fields;
+    $email_prof = false;
+    foreach ($custom_fields as $custom_field) {
+        if ($custom_field->name == 'email_prof') {
+            $email_prof = $custom_field->value;
+        }
+    }
+    
+    if ($email_prof) {
+        
+        $stripeMg->transfert_custom_facture($event_json, $email_prof);
+    } else {
+        $stripeMg->transfertSubscriptionCharge($event_json);
+    }
+    
     
 }
 
