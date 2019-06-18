@@ -69,7 +69,7 @@ jQuery( document ).ready( function( $ ) {
 			jQuery(rowEssai).find("#montant").text(montantAbo);
 
 
-			if(abo.debut_essai != null){
+			if(abo.first_prof_assigned != null && abo.first_prof_assigned != false){
 
 				jQuery(".essai-off").addClass("hide");
 				debut = new Date(abo.debut_essai);
