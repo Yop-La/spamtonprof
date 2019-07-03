@@ -435,14 +435,13 @@ class StripeManager
         }
     }
 
-    
     public function retrieve_customer($stripe_id)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $cus = \Stripe\Customer::retrieve($stripe_id);
         return ($cus);
     }
-    
+
     public function retrieve_act($stripe_id)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
@@ -495,27 +494,26 @@ class StripeManager
 
         return ($all_invoices);
     }
-    
-    public function get_best_customers(){
-        
-        
+
+    public function get_best_customers()
+    {
         $slack = new \spamtonprof\slack\Slack();
         $last_id = false;
         $res = [];
         $nb_tour = 1;
         do {
-            
+
             $invoices = $this->list_invoices(100, $last_id);
-            
+
             foreach ($invoices as $invoice) {
-                
+
                 $cus_id = $invoice->customer;
                 $amount_paid = $invoice->amount_paid;
-                
+
                 $status = $invoice->status;
-                
+
                 if ($status == 'paid') {
-                    
+
                     if (array_key_exists($cus_id, $res)) {
                         $res[$cus_id] = $res[$cus_id] + $amount_paid;
                     } else {
@@ -524,41 +522,39 @@ class StripeManager
                     $last_id = $invoice->id;
                 }
             }
-            
+
             $slack->sendMessages('log', array(
                 "last id : " . $last_id,
                 "nb de tour : " . $nb_tour,
                 "nb invoice : " . count($invoices)
             ));
-            
+
             $nb_tour = $nb_tour + 1;
         } while (count($invoices) != 0);
-        
+
         serializeTemp($res, "/tempo/res");
-        
+
         $customers = unserializeTemp("/tempo/res");
-        
+
         arsort($customers);
-        
+
         $best_cus = [];
         $limit = 30;
         $counter = 0;
         foreach ($customers as $cus_id => $amnt) {
-            
+
             $cus = $this->retrieve_customer($cus_id);
             $email = $cus->email;
-            
+
             $best_cus[$email] = $amnt;
-            
+
             $counter = $counter + 1;
             if ($counter > $limit) {
                 break;
             }
         }
-        
+
         prettyPrint($best_cus);
-        
-        
     }
 
     public function __construct($testMode = true)
@@ -1290,7 +1286,7 @@ class StripeManager
     // pour creer tous les produits et les plans definis dans la base stp
     // attention les formules et plans doivent déjà existés dans la base stp
     /* $query = array('custom' => ' where ref_formule >= 150' ) */
-    public function createProductsAndPlans($query)
+    public function createProductsAndPlans($query, $formules_exits = true)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
 
@@ -1307,18 +1303,31 @@ class StripeManager
 
         foreach ($formules as $formule) {
 
-            // crér la formule dans stripe
-            $strProduct = \Stripe\Product::create(array(
-                "name" => "Ref " . $formule->getRef_formule() . ": " . $formule->getFormule(),
-                "type" => "service"
-            ));
+            $strProduct = false;
+            $ref_formule_stripe = false;
 
-            if ($this->testMode) {
-                $formule->setRef_product_stripe_test($strProduct->id);
-                $formuleMg->updateRefProductStripeTest($formule);
+            // si les formules n'existent pas . Sinon ça veut dire qu'on ajoute des plans à cette formule
+            if (! $formules_exits) {
+                // crér la formule dans stripe
+                $strProduct = \Stripe\Product::create(array(
+                    "name" => "Ref " . $formule->getRef_formule() . ": " . $formule->getFormule(),
+                    "type" => "service"
+                ));
+
+                if ($this->testMode) {
+                    $formule->setRef_product_stripe_test($strProduct->id);
+                    $formuleMg->updateRefProductStripeTest($formule);
+                } else {
+                    $formule->setRef_product_stripe($strProduct->id);
+                    $formuleMg->updateRefProductStripe($formule);
+                }
             } else {
-                $formule->setRef_product_stripe($strProduct->id);
-                $formuleMg->updateRefProductStripe($formule);
+
+                $ref_formule_stripe = $formule->getRef_product_stripe();
+                if ($this->testMode) {
+                    $ref_formule_stripe = $formule->getRef_product_stripe_test();
+                }
+                $strProduct = \Stripe\Product::retrieve($ref_formule_stripe);
             }
 
             // crér les plans dans stripe
@@ -1327,19 +1336,27 @@ class StripeManager
 
                 $plan = \spamtonprof\stp_api\StpPlan::cast($plan);
 
-                $strPlan = \Stripe\Plan::create(array(
-                    "amount" => $plan->getTarif() * 100,
-                    "interval" => "week",
-                    "product" => $strProduct->id,
-                    "currency" => "eur"
-                ));
-
+                $ref_plan_stripe = $plan->getRef_plan_stripe();
                 if ($this->testMode) {
-                    $plan->setRef_plan_stripe_test($strPlan->id);
-                    $planMg->updateRefPlanStripeTest($plan);
-                } else {
-                    $plan->setRef_plan_stripe($strPlan->id);
-                    $planMg->updateRefPlanStripe($plan);
+                    $$ref_plan_stripe = $plan->getRef_plan_stripe_test();
+                }
+
+                if (! $ref_plan_stripe) {
+
+                    $strPlan = \Stripe\Plan::create(array(
+                        "amount" => $plan->getTarif() * 100,
+                        "interval" => "week",
+                        "product" => $strProduct->id,
+                        "currency" => "eur"
+                    ));
+
+                    if ($this->testMode) {
+                        $plan->setRef_plan_stripe_test($strPlan->id);
+                        $planMg->updateRefPlanStripeTest($plan);
+                    } else {
+                        $plan->setRef_plan_stripe($strPlan->id);
+                        $planMg->updateRefPlanStripe($plan);
+                    }
                 }
             }
         }
