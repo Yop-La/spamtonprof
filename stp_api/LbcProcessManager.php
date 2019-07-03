@@ -692,7 +692,7 @@ class LbcProcessManager
     }
 
     // pour generer et retourner les annonces avant publication par zenno
-    public function generateAds($refClient, $nbAds, $phone, $lock = false, $ref_compte = false)
+    public function generateAds($refClient, $nbAds, $phone, $lock = false, $ref_compte = 0)
     {
         $clientMg = new \spamtonprof\stp_api\LbcClientManager();
         // on recupere le client
@@ -705,13 +705,13 @@ class LbcProcessManager
         $client_content = $client;
         if (false && $nbAds == 1) {
 
-            $ref_client_content = 25;
+            $ref_client_content = 12;
             $client_content = $clientMg->get(array(
                 'ref_client' => $ref_client_content
             ));
         }
 
-        // on recupere les titres
+        // on recupere les titres non déjà utilisés sur ce compte
         $hasTypeTitleMg = new \spamtonprof\stp_api\HasTitleTypeManager();
         $lbcTitleMg = new \spamtonprof\stp_api\LbcTitleManager();
         $communeMg = new \spamtonprof\stp_api\LbcCommuneManager();
@@ -722,17 +722,21 @@ class LbcProcessManager
             "ref_client_defaut" => $ref_client_content
         ));
         $titles = $lbcTitleMg->getAll(array(
-            "ref_type_titre" => $hasTypeTitle->getRef_type_titre()
+            "ref_type_titre" => $hasTypeTitle->getRef_type_titre(),
+            "not_that_title" => $ref_compte
         ));
         shuffle($titles);
+        
 
-        // on recupere les textes
+        // on recupere les textes non déjà potentiellement en ligne ou en ligne sur ce compte
         $hasTypeTexteMg = new \spamtonprof\stp_api\HasTextTypeManager();
         $hasTypeTexte = $hasTypeTexteMg->get_next($ref_client_content);
 
         $lbcTexteMg = new \spamtonprof\stp_api\LbcTexteManager();
         $textes = $lbcTexteMg->getAll(array(
-            "ref_type_texte.valid" => $hasTypeTexte->getRef_type()
+            "key" => $lbcTexteMg::texte_not_in_that_act,
+            "ref_type_texte" => $hasTypeTexte->getRef_type(),
+            "ref_compte" => $ref_compte
         ));
         shuffle($textes);
 
@@ -780,12 +784,11 @@ class LbcProcessManager
 
             // recuperation du titre
             $title = $titles[$i % $nbTitles];
-            $title = $title->getTitre();
+            $title_str = $title->getTitre();
 
             // recuperation du texte
             $texte = $textes[$i % $nbTextes];
 
-            serializeTemp($texte);
 
             $texte->setTexte(str_replace(array(
                 'Alexandre',
@@ -805,7 +808,10 @@ class LbcProcessManager
                 // verouillage des communes prises dans les annonces
                 $adTempo = new \spamtonprof\stp_api\AddsTempo(array(
                     "ref_compte" => $ref_compte,
-                    "ref_commune" => $commune->getRef_commune()
+                    "ref_commune" => $commune->getRef_commune(),
+                    "ref_titre" => $title->getRef_titre(),
+                    "ref_texte" => $texte->getRef_texte(),
+                    "statut" => $adMg::publie
                 ));
                 $adMg->add($adTempo);
             }
@@ -823,7 +829,7 @@ class LbcProcessManager
             $texte->setTexte($symbols_line . PHP_EOL . PHP_EOL . $texte->getTexte() . PHP_EOL . PHP_EOL . $symbols_line);
 
             $ad = new \stdClass();
-            $ad->title = $title;
+            $ad->title = $title_str;
             $ad->text = $texte;
             $ad->image = $image;
             $ad->commune = $nomCommune;
