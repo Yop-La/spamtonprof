@@ -1,7 +1,7 @@
 <?php
 /**
  * 
- *  pour générer un compte lbc avant publication d'annonces par zenno avec un compte gmx associé( en prod ) 
+ *  pour gï¿½nï¿½rer un compte lbc avant publication d'annonces par zenno avec un compte gmx associï¿½( en prod ) 
  *  
  */
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
@@ -24,34 +24,53 @@ $slack->sendMessages('log', [
     json_encode($_POST)
 ]);
 
-// récupération des entrées
+// rÃ©cupÃ©ration des entrÃ©es
 $ref_client = $_POST["ref_client"];
 $telephone = $_POST["telephone"];
 $ref_gmx_act = $_POST["ref_gmx_act"];
 
-// étape 1 : on récupère le client
+$lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
+
+// Ã©tape 1 : on rÃ©cupÃ¨re le client
 $clientMg = new \spamtonprof\stp_api\LbcClientManager();
 $client = $clientMg->get(array(
     "ref_client" => $ref_client
 ));
 
-// étape 2 : on récupère le gmx act
+// Ã©tape 2 : on rÃ©cupÃ¨re le gmx act
 $gmxActMg = new \spamtonprof\stp_api\GmxActManager();
 $gmxAct = $gmxActMg->get(array(
     'ref_gmx_act' => $ref_gmx_act
 ));
 
-// étape 3 : on récupère un prénom
+$lbcAct = $lbcAccountMg->get(array(
+    "ref_compte" => $gmxAct->getRef_compte_lbc()
+));
+if ($lbcAct) {
+    $ret = new \stdClass();
+    $ret->client = $client;
+    $ret->lbcAct = $lbcAct;
+
+    $slack = new \spamtonprof\slack\Slack();
+    $slack->sendMessages('log-lbc', array(
+        "Ce compte leboncoin " . $lbcAct->getMail() . " existe dÃ©jÃ . Pas besoin de le crÃ©er Ã  nouveau"
+    ));
+
+    prettyPrint($ret);
+}
+
+// Ã©tape 3 : on rÃ©cupÃ¨re un prÃ©nom
 
 $prenomLbcMg = new \spamtonprof\stp_api\PrenomLbcManager();
 $prenom = $prenomLbcMg->get(array(
-    'moins_utilise' => 'moins_utilise'
+    'moins_utilise' => 'moins_utilise',
+    "ref_cat_prenom" => $client->getRef_cat_prenom()
 ));
 
 $prenom->inc_nb_use();
 $prenomLbcMg->updateNbUse($prenom);
 
-// étape 4 : on créé un compte lbc dans compte_lbc (adresse mail, password,
+// Ã©tape 4 : on crÃ©Ã© un compte lbc dans compte_lbc (adresse mail, password,
 $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
 $lbcAct = new \spamtonprof\stp_api\LbcAccount();
 $lbcAct->setMail($gmxAct->getMail());
@@ -63,12 +82,17 @@ $lbcAct = $lbcAccountMg->add($lbcAct);
 
 $lbcAccountMg->updatePrenom($lbcAct);
 
-// étape 5 : on associe au compte gmx le compte lbc créé
+// Ã©tape 5 : on associe au compte gmx le compte lbc crÃ©Ã©
 $gmxAct->setRef_compte_lbc($lbcAct->getRef_compte());
 $gmxActMg->update_ref_compte_lbc($gmxAct);
 
 $ret = new \stdClass();
 $ret->client = $client;
 $ret->lbcAct = $lbcAct;
+
+$slack = new \spamtonprof\slack\Slack();
+$slack->sendMessages('log-lbc', array(
+    "Ajout Ã  la bdd du compte leboncoin " . $lbcAct->getMail()
+));
 
 prettyPrint($ret);
