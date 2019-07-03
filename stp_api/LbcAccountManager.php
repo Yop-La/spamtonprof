@@ -57,7 +57,7 @@ class LbcAccountManager
             $act_type = $info["act_type"];
 
             $query = "select * from compte_lbc 
-                            where now() >= ( date_publication +  interval '1 day')
+                            where now() >= ( date_publication +  interval '1 hour')
                                 and nb_annonces_online != 0
 						         and ref_client = :ref_client
 						         and ref_compte in (select ref_compte_lbc from gmx_act where smtp_enabled is true)
@@ -193,7 +193,7 @@ class LbcAccountManager
             if (array_key_exists("acts_details", $info)) {
 
                 $q = $this->_db->prepare("
-                    select ref_compte, mail, nb_annonces_online, date_creation, date_publication, user_id, prenom, disabled, ref_client
+                    select ref_compte, mail, nb_annonces_online, date_creation, date_publication, controle_date, user_id, prenom, disabled, ref_client
                             from compte_lbc 
                             order by date_publication desc");
             }
@@ -350,7 +350,7 @@ class LbcAccountManager
         $accounts = [];
 
         $q = $this->_db->prepare("select * from compte_lbc 
-        where now() - interval '48 hour' > date_creation and (disabled = false or disabled is null) and (uncheckable = false or uncheckable is null)
+        where now() - interval '2 hour' > date_creation and (disabled = false or disabled is null) and (uncheckable = false or uncheckable is null)
             and ( now() - interval '48 hour' > controle_date or controle_date is null)
             order by date_publication desc, nb_annonces_online limit :nb_compte");
         $q->bindValue(":nb_compte", $nbCompte);

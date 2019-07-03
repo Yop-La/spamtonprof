@@ -182,6 +182,7 @@ jQuery( document ).ready( function( jQuery ) {
 							{ title: "nb_online","searchable": false },
 							{ title: "date_creation","searchable": false },
 							{ title: "date_publication","searchable": false },
+							{ title: "controle_date","searchable": false },
 							{ title: "user_id","searchable": false },
 							{ title: "prenom","searchable": false },
 							{ title: "disabled","searchable": false },
@@ -201,7 +202,7 @@ jQuery( document ).ready( function( jQuery ) {
 						var data = table5.rows( rowIdx ).data()[0];
 
 
-						var user_id = data[5];
+						var user_id = data[6];
 
 						$link = 'https://www.leboncoin.fr/profil/'.concat(user_id,'/offres');
 
