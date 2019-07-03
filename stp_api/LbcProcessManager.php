@@ -726,7 +726,6 @@ class LbcProcessManager
             "not_that_title" => $ref_compte
         ));
         shuffle($titles);
-        
 
         // on recupere les textes non déjà potentiellement en ligne ou en ligne sur ce compte
         $hasTypeTexteMg = new \spamtonprof\stp_api\HasTextTypeManager();
@@ -765,9 +764,23 @@ class LbcProcessManager
         ));
 
         // on constitue les annonces ( en verouillant les communes de ces annonces)
+
         $nbTitles = count($titles);
         $nbTextes = count($textes);
         $nbCommunes = count($communes);
+
+        $nbAds = min(array(
+            $nbTitles,
+            $nbTextes,
+            $nbCommunes,
+            $nbAds
+        ));
+
+        if ($nbAds == 0) {
+            $ret = new \stdClass();
+            $ret->msg = 'annonces_epuises';
+            prettyPrint($ret);
+        }
 
         // recuperation des images
         $images = scandir(ABSPATH . 'wp-content/uploads/lbc_images/' . $client_content->getImg_folder());
@@ -788,7 +801,6 @@ class LbcProcessManager
 
             // recuperation du texte
             $texte = $textes[$i % $nbTextes];
-
 
             $texte->setTexte(str_replace(array(
                 'Alexandre',
