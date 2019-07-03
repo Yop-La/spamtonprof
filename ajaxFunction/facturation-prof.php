@@ -56,7 +56,7 @@ function ajax_facturation_par_prof()
         $test_mode = false;
     }
 
-    $stripe = new \spamtonprof\stp_api\StripeManager();
+    $stripe = new \spamtonprof\stp_api\StripeManager($test_mode);
     $stripe->new_prof_invoice($email_client, $email_prof, $montant * 100, $objet_facture);
 
     $retour->fields = $fields;
