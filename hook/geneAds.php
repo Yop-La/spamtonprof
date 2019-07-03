@@ -35,7 +35,16 @@ if (array_key_exists("code_promo", $_POST)) {
 
 $lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
 
+
+$clientMg = new \spamtonprof\stp_api\LbcClientManager();
+// on recupere le client
+$client = $clientMg->get(array(
+    'ref_client' => $refClient
+));
+
+$category = $client->getCategory();
 $ads = $lbcProcessMg->generateAds($refClient, $nbAds, $phone, true, $refCompte);
+
 
 $slack = new \spamtonprof\slack\Slack();
 $slack->sendMessages('log-lbc', array(
@@ -46,4 +55,5 @@ $slack->sendMessages('log-lbc', array(
 
 $retour = new stdClass();
 $retour->ads = $ads;
+$retour->category = $category;
 prettyPrint($retour);
