@@ -33,22 +33,22 @@ class LbcTitleManager
         return ($titleTypes);
     }
 
-    
-    /* utiliser après insertion des titres dans la table titres pour raccoder titres à type_titre
+    /*
+     * utiliser aprï¿½s insertion des titres dans la table titres pour raccoder titres ï¿½ type_titre
      */
     public function getDistinctTypeWithoutRefType()
     {
         $types = [];
         $q = $this->_db->prepare("select distinct(type_titre) as type from titres where ref_type_titre is null;");
         $q->execute();
-        
+
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
-            
+
             $types[] = $data['type'];
         }
         return ($types);
     }
-    
+
     public function add(LbcTitle $titre)
     {
         $q = $this->_db->prepare('insert into titres(titre, type_titre, ref_type_titre) values(:titre, :type_titre, :ref_type_titre)');
@@ -57,26 +57,45 @@ class LbcTitleManager
         $q->bindValue(':ref_type_titre', $titre->getRef_type_titre());
         $q->execute();
         $titre->setRef_titre($this->_db->lastInsertId());
-        
+
         return ($titre);
     }
-    
+
     public function getAll($info)
     {
         $titles = [];
         $q = null;
         if (is_array($info)) {
-            if (array_key_exists("type_titre", $info)) {
-                $titleType = $info["type_titre"];
-                $q = $this->_db->prepare("select * from titres where type_titre = :type_titre");
 
-                $q->bindValue(":type_titre", $titleType);
+            if (count($info) == 1) {
+
+                if (array_key_exists("type_titre", $info)) {
+                    $titleType = $info["type_titre"];
+                    $q = $this->_db->prepare("select * from titres where type_titre = :type_titre");
+
+                    $q->bindValue(":type_titre", $titleType);
+                }
+                if (array_key_exists("ref_type_titre", $info)) {
+                    $refType = $info["ref_type_titre"];
+                    $q = $this->_db->prepare("select * from titres where ref_type_titre = :ref_type_titre");
+                    $q->bindValue(":ref_type_titre", $refType);
+                }
             }
-            if (array_key_exists("ref_type_titre", $info)) {
-;
-                $refType = $info["ref_type_titre"];
-                $q = $this->_db->prepare("select * from titres where ref_type_titre = :ref_type_titre");
-                $q->bindValue(":ref_type_titre", $refType);
+            
+            if(count($info) == 2){
+                
+                if (array_key_exists("ref_type_titre", $info) & array_key_exists("not_that_title", $info)) {
+                    
+                    $ref_type_titre = $info["ref_type_titre"];
+                    $ref_compte = $info["not_that_title"];
+                    
+                    $q = $this->_db->prepare("select * from titres where ref_type_titre = :ref_type_titre 
+                        and ref_titre not in (select ref_titre from adds_tempo where statut in ('online','publie') and ref_compte = :ref_compte)");
+                    
+                    $q->bindValue(":ref_type_titre", $ref_type_titre);
+                    $q->bindValue(":ref_compte", $ref_compte);
+                }
+                
             }
         }
         $q->execute();
@@ -85,7 +104,6 @@ class LbcTitleManager
 
             $titles[] = new \spamtonprof\stp_api\LbcTitle($data);
         }
-
 
         return ($titles);
     }
