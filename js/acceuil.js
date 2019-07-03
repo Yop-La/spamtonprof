@@ -2,7 +2,7 @@ jQuery( document ).ready( function( jQuery ) {
 
 	
 	
-	showMessage("Psss, si tu as envie de gérer ton bac : <a class = 'link_msg' href = 'http://spamtonprof.com/stage-bac/' > c'est là que ça ce passe !</a>")
+	showMessage("Psss, pour attaquer la rentrée sans stress: <a class = 'link_msg' href = 'http://spamtonprof.com/stage-ete/' > c'est là que ça ce passe !</a>")
 
 //	//debut timer essai	
 //
