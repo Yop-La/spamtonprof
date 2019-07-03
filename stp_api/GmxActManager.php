@@ -13,7 +13,7 @@ class GmxActManager
 
     public function add(GmxAct $gmxAct)
     {
-        $q = $this->_db->prepare('insert into gmx_act(password, mail) values( :password,:mail)');
+        $q = $this->_db->prepare('insert into gmx_act(password, mail, has_redirection, smtp_enabled) values( :password,:mail, false, false)');
         $q->bindValue(':password', $gmxAct->getPassword());
         $q->bindValue(':mail', $gmxAct->getMail());
         $q->execute();
@@ -38,6 +38,7 @@ class GmxActManager
         $q = $this->_db->prepare('update gmx_act set smtp_enabled = :smtp_enabled where ref_gmx_act = :ref_gmx_act');
         $q->bindValue(':smtp_enabled', $gmxAct->getSmtp_enabled(), \PDO::PARAM_BOOL);
         $q->bindValue(':ref_gmx_act', $gmxAct->getRef_gmx_act());
+
         $q->execute();
 
         return ($gmxAct);
@@ -51,6 +52,13 @@ class GmxActManager
         $q->execute();
 
         return ($gmxAct);
+    }
+
+    public function delete(GmxAct $gmxAct)
+    {
+        $q = $this->_db->prepare('delete from gmx_act where ref_gmx_act = :ref_gmx_act');
+        $q->bindValue(':ref_gmx_act', $gmxAct->getRef_gmx_act());
+        $q->execute();
     }
 
     public function get($info)
@@ -77,7 +85,7 @@ class GmxActManager
 
         if (in_array('virgin', $info)) {
 
-            $q = $this->_db->prepare('select * from gmx_act where ref_compte_lbc is null and smtp_enabled is true');
+            $q = $this->_db->prepare('select * from gmx_act where ref_compte_lbc is null');
         }
 
         if (in_array('valid', $info)) {
