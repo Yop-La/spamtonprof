@@ -121,7 +121,7 @@ jQuery(document).ready(function ($) {
 	});
 
 
-	if(loggedProf !== 'undefined'){
+	if(typeof loggedProf !== 'undefined'){
 
 		waitForEl('.email_prof', function() {
 			$('.email_prof').val(loggedProf.email_stp).change()
