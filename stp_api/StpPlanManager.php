@@ -19,8 +19,8 @@ class StpPlanManager
 
     public function add(\spamtonprof\stp_api\StpPlan $plan)
     {
-        $q = $this->_db->prepare("insert into stp_plan_paiement( nom, tarif, ref_formule) 
-                        values( :nom, :tarif, :ref_formule);");
+        $q = $this->_db->prepare("insert into stp_plan_paiement( nom, tarif, ref_formule, defaut) 
+                        values( :nom, :tarif, :ref_formule, false);");
 
         $q->bindValue(":nom", $plan->getNom());
         $q->bindValue(":tarif", $plan->getTarif());
