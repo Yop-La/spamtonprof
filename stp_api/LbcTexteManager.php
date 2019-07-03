@@ -119,7 +119,7 @@ class LbcTexteManager
     }
 
     /*
-     * utiliser après génération automatique des textes pour raccoder textesà type_texte
+     * utiliser aprï¿½s gï¿½nï¿½ration automatique des textes pour raccoder textesï¿½ type_texte
      */
     public function getDistinctTypeWithoutRefType()
     {
