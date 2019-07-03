@@ -21,7 +21,7 @@ class StripeManager
 
 {
 
-    private $testMode = true;
+    private $testMode = true, $slack;
 
     public function stopSubscription($subscriptionId)
     {
@@ -89,7 +89,6 @@ class StripeManager
         ]);
 
         $invoice->sendInvoice();
-
     }
 
     /*
@@ -436,6 +435,14 @@ class StripeManager
         }
     }
 
+    
+    public function retrieve_customer($stripe_id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        $cus = \Stripe\Customer::retrieve($stripe_id);
+        return ($cus);
+    }
+    
     public function retrieve_act($stripe_id)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
@@ -464,9 +471,101 @@ class StripeManager
         return ($invoice);
     }
 
+    public function list_invoices(int $limit = 100, $starting_after = false)
+    {
+        $all_invoices = [];
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $params = [
+            'limit' => $limit,
+            'status' => 'paid'
+        ];
+
+        if ($starting_after) {
+            $params['starting_after'] = $starting_after;
+        }
+
+        $invoices = \Stripe\Invoice::all($params);
+
+        try {
+            $all_invoices = $invoices->data;
+        } catch (\Exception $e) {
+            return ($all_invoices);
+        }
+
+        return ($all_invoices);
+    }
+    
+    public function get_best_customers(){
+        
+        
+        $slack = new \spamtonprof\slack\Slack();
+        $last_id = false;
+        $res = [];
+        $nb_tour = 1;
+        do {
+            
+            $invoices = $this->list_invoices(100, $last_id);
+            
+            foreach ($invoices as $invoice) {
+                
+                $cus_id = $invoice->customer;
+                $amount_paid = $invoice->amount_paid;
+                
+                $status = $invoice->status;
+                
+                if ($status == 'paid') {
+                    
+                    if (array_key_exists($cus_id, $res)) {
+                        $res[$cus_id] = $res[$cus_id] + $amount_paid;
+                    } else {
+                        $res[$cus_id] = $amount_paid;
+                    }
+                    $last_id = $invoice->id;
+                }
+            }
+            
+            $slack->sendMessages('log', array(
+                "last id : " . $last_id,
+                "nb de tour : " . $nb_tour,
+                "nb invoice : " . count($invoices)
+            ));
+            
+            $nb_tour = $nb_tour + 1;
+        } while (count($invoices) != 0);
+        
+        serializeTemp($res, "/tempo/res");
+        
+        $customers = unserializeTemp("/tempo/res");
+        
+        arsort($customers);
+        
+        $best_cus = [];
+        $limit = 30;
+        $counter = 0;
+        foreach ($customers as $cus_id => $amnt) {
+            
+            $cus = $this->retrieve_customer($cus_id);
+            $email = $cus->email;
+            
+            $best_cus[$email] = $amnt;
+            
+            $counter = $counter + 1;
+            if ($counter > $limit) {
+                break;
+            }
+        }
+        
+        prettyPrint($best_cus);
+        
+        
+    }
+
     public function __construct($testMode = true)
 
     {
+        $this->slack = new \spamtonprof\slack\Slack();
+
         if (gettype($testMode) == "string") {
 
             $testMode = ($testMode === 'true');
