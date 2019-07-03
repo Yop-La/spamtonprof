@@ -6,6 +6,8 @@ class AddsTempoManager
 
     private $_db;
 
+    const online = "online", publie = "publie" , bloque = "bloque";
+    
     public function __construct()
     {
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
@@ -34,18 +36,20 @@ class AddsTempoManager
                 $q->bindValue(":ref_client", $ref_client);
 
                 $q->execute();
-
             }
         }
     }
 
     public function add(AddsTempo $addsTempo)
     {
-        $q = $this->_db->prepare('insert into adds_tempo(first_publication_date, zipcode, city, id, ref_compte, has_phone, ref_commune) values( :first_publication_date,:zipcode,:city,:id,:ref_compte,:has_phone, :ref_commune)');
+        $q = $this->_db->prepare('insert into adds_tempo(first_publication_date, zipcode, city, id, ref_compte, has_phone, ref_commune, ref_texte, ref_titre, statut) values( :first_publication_date,:zipcode,:city,:id,:ref_compte,:has_phone, :ref_commune, :ref_texte, :ref_titre, :statut)');
         $q->bindValue(':first_publication_date', $addsTempo->getFirst_publication_date());
         $q->bindValue(':zipcode', $addsTempo->getZipcode());
         $q->bindValue(':city', $addsTempo->getCity());
         $q->bindValue(':id', $addsTempo->getId());
+        $q->bindValue(':ref_texte', $addsTempo->getRef_texte());
+        $q->bindValue(':ref_titre', $addsTempo->getRef_titre());
+        $q->bindValue(':statut', $addsTempo->getStatut());
         $q->bindValue(':ref_compte', $addsTempo->getRef_compte());
         $q->bindValue(':has_phone', $addsTempo->getHas_phone(), \PDO::PARAM_BOOL);
         $q->bindValue(':ref_commune', $addsTempo->getRef_commune());

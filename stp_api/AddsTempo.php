@@ -4,7 +4,61 @@ namespace spamtonprof\stp_api;
 class AddsTempo implements \JsonSerializable
 {
 
-    protected $first_publication_date, $zipcode, $city, $id, $ref_compte, $has_phone, $ref_commune;
+    protected $first_publication_date, $zipcode, $city, $id, $ref_compte, $has_phone, $ref_commune, $ref_titre, $ref_texte, $statut;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getRef_titre()
+    {
+        return $this->ref_titre;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getRef_texte()
+    {
+        return $this->ref_texte;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getStatut()
+    {
+        return $this->statut;
+    }
+
+    /**
+     *
+     * @param mixed $ref_titre
+     */
+    public function setRef_titre($ref_titre)
+    {
+        $this->ref_titre = $ref_titre;
+    }
+
+    /**
+     *
+     * @param mixed $ref_texte
+     */
+    public function setRef_texte($ref_texte)
+    {
+        $this->ref_texte = $ref_texte;
+    }
+
+    /**
+     *
+     * @param mixed $statut
+     */
+    public function setStatut($statut)
+    {
+        $this->statut = $statut;
+    }
 
     public function __construct(array $donnees = array())
     {
