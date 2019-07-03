@@ -41,7 +41,6 @@ $indexTry = 0;
 do {
     $msgs = $gmail->listMessages($email . ' "Confirmez la demande"');
     
-    if (count($msgs) == 1) {
         
         $msg = $msgs[0];
         
@@ -60,7 +59,7 @@ do {
         
         $ret->url = $confirmationUrl;
         prettyPrint($ret);
-    }
+    
     $indexTry = $indexTry + 1;
     $slack->sendMessages('log-lbc', array(
         'Echec' . $indexTry . ' de recuperation du mail de confirmation pour l\'email : ' . $email
