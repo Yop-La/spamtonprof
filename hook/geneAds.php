@@ -48,7 +48,7 @@ $lbc_campaign = $lbc_campaign_mg->add(new \spamtonprof\stp_api\LbcCampaign(array
     "date" => $now->format(PG_DATETIME_FORMAT),
     "ref_compte" => $refCompte,
     "nb_ad_online" => 0,
-    "nb_ad_publie" => 0
+    "nb_ad_publie" => $nbAds
 )));
 
 
