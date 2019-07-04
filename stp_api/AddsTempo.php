@@ -4,7 +4,25 @@ namespace spamtonprof\stp_api;
 class AddsTempo implements \JsonSerializable
 {
 
-    protected $first_publication_date, $zipcode, $city, $id, $ref_compte, $has_phone, $ref_commune, $ref_titre, $ref_texte, $statut;
+    protected $first_publication_date, $zipcode, $city, $id, $ref_compte, $has_phone, $ref_commune, $ref_titre, $ref_texte, $statut, $ref_campaign;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getRef_campaign()
+    {
+        return $this->ref_campaign;
+    }
+
+    /**
+     *
+     * @param mixed $ref_campaign
+     */
+    public function setRef_campaign($ref_campaign)
+    {
+        $this->ref_campaign = $ref_campaign;
+    }
 
     /**
      *

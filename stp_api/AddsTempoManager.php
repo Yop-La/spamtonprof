@@ -42,7 +42,8 @@ class AddsTempoManager
 
     public function add(AddsTempo $addsTempo)
     {
-        $q = $this->_db->prepare('insert into adds_tempo(first_publication_date, zipcode, city, id, ref_compte, has_phone, ref_commune, ref_texte, ref_titre, statut) values( :first_publication_date,:zipcode,:city,:id,:ref_compte,:has_phone, :ref_commune, :ref_texte, :ref_titre, :statut)');
+        $q = $this->_db->prepare('insert into adds_tempo(first_publication_date, zipcode, city, id, ref_compte, has_phone, ref_commune, ref_texte, ref_titre, statut, ref_campaign) 
+            values( :first_publication_date,:zipcode,:city,:id,:ref_compte,:has_phone, :ref_commune, :ref_texte, :ref_titre, :statut, :ref_campaign)');
         $q->bindValue(':first_publication_date', $addsTempo->getFirst_publication_date());
         $q->bindValue(':zipcode', $addsTempo->getZipcode());
         $q->bindValue(':city', $addsTempo->getCity());
@@ -53,6 +54,7 @@ class AddsTempoManager
         $q->bindValue(':ref_compte', $addsTempo->getRef_compte());
         $q->bindValue(':has_phone', $addsTempo->getHas_phone(), \PDO::PARAM_BOOL);
         $q->bindValue(':ref_commune', $addsTempo->getRef_commune());
+        $q->bindValue(':ref_campaign', $addsTempo->getRef_campaign());
         $q->execute();
 
         return ($addsTempo);
