@@ -6,8 +6,14 @@ class AddsTempoManager
 
     private $_db;
 
-    const online = "online", publie = "publie" , bloque = "bloque";
-    
+    const online = "online", publie = "publie", bloque = "bloque";
+
+    const no_ref_texte_or_no_ref_titre = "no_ref_texte_or_no_ref_titre", nearest_title_ad = "nearest_title_ad";
+
+    const update_statut_ad_refuse = 'update_statut_ad_refuse';
+
+    const get_ads_online = "get_ads_online";
+
     public function __construct()
     {
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
@@ -16,26 +22,42 @@ class AddsTempoManager
     public function deleteAll($info)
     {
         if (is_array($info)) {
-            if (array_key_exists("ref_compte", $info)) {
 
-                $refCompte = $info["ref_compte"];
+            if (array_key_exists('key', $info)) {
 
-                $q = $this->_db->prepare("delete from adds_tempo where ref_compte = :ref_compte");
-                $q->bindValue(":ref_compte", $refCompte);
-                $q->execute();
-            }
-            if (array_key_exists("high_potential_city", $info)) {
+                $key = $info['key'];
 
-                $ref_client = $info["high_potential_city"];
+                if ($key == $this::no_ref_texte_or_no_ref_titre) {
 
-                $q = $this->_db->prepare("
+                    $refCompte = $info["ref_compte"];
+
+                    $q = $this->_db->prepare("delete from adds_tempo where ref_compte = :ref_compte and (ref_titre is null or ref_texte is null)");
+                    $q->bindValue(":ref_compte", $refCompte);
+                    $q->execute();
+                }
+            } else {
+
+                if (array_key_exists("ref_compte", $info)) {
+
+                    $refCompte = $info["ref_compte"];
+
+                    $q = $this->_db->prepare("delete from adds_tempo where ref_compte = :ref_compte");
+                    $q->bindValue(":ref_compte", $refCompte);
+                    $q->execute();
+                }
+                if (array_key_exists("high_potential_city", $info)) {
+
+                    $ref_client = $info["high_potential_city"];
+
+                    $q = $this->_db->prepare("
                     delete from adds_tempo where
                     ref_commune in (select ref_commune from lbc_commune where population >= 20 and population <= 40)
                     and 
                     ref_compte in (select ref_compte from compte_lbc where date_publication <= (now() - interval '7 days') and ref_client = :ref_client);");
-                $q->bindValue(":ref_client", $ref_client);
+                    $q->bindValue(":ref_client", $ref_client);
 
-                $q->execute();
+                    $q->execute();
+                }
             }
         }
     }
@@ -60,19 +82,66 @@ class AddsTempoManager
         return ($addsTempo);
     }
 
-    public function getAll($info)
+    public function get($info)
     {
         $q = null;
         if (is_array($info)) {
-            if (array_key_exists("no_ref_commune", $info)) {
-                $limit = $info["toMatch"];
-                $q = $this->_db->prepare('select * from adds_tempo where ref_commune is null limit :limit');
-                $q->bindValue(":limit", $limit);
+
+            if (array_key_exists('key', $info)) {
+
+                $key = $info['key'];
+
+                if ($key == $this::nearest_title_ad) {
+
+                    $refCompte = $info["ref_compte"];
+                    $title = $info["title"];
+
+                    $q = $this->_db->prepare("select titre, ref_ad, ref_compte, levenshtein(titre, :title) as dist 
+                            , first_publication_date, zipcode, city, ref_compte, has_phone, ref_commune, adds_tempo.ref_titre, ref_texte, statut, ref_campaign
+                        from adds_tempo, titres where 
+                        adds_tempo.ref_titre = titres.ref_titre
+                        and ref_compte = :ref_compte
+                        and levenshtein(titre, :title) <= 2
+                        order by dist
+                        limit 1;");
+                    $q->bindValue(":ref_compte", $refCompte);
+                    $q->bindValue(":title", $title);
+
+                    $q->execute();
+                }
             }
-            if (array_key_exists("ref_compte", $info)) {
+        }
+
+        $q->execute();
+
+        $data = $q->fetch(\PDO::FETCH_ASSOC);
+
+        $ad = false;
+        if ($data) {
+
+            $ad = new \spamtonprof\stp_api\AddsTempo($data);
+        }
+
+        return ($ad);
+    }
+
+    public function update_all($info)
+    {
+        $q = null;
+        if (array_key_exists('key', $info)) {
+
+            $key = $info['key'];
+
+            if ($key == $this::update_statut_ad_refuse) {
+
                 $refCompte = $info["ref_compte"];
-                $q = $this->_db->prepare('select * from adds_tempo where ref_compte = :ref_compte');
+
+                
+                $req = "update adds_tempo set statut = '" . $this::bloque . "' where statut = '" . $this::publie . "' and ref_compte = :ref_compte";
+                $q = $this->_db->prepare($req);
                 $q->bindValue(":ref_compte", $refCompte);
+                $q->execute();
+                
             }
         }
 
@@ -88,7 +157,51 @@ class AddsTempoManager
         return ($ads);
     }
 
-    // pour mettre � jour les ref communes des ads tempo en cherchant la commune correspondante la base de communes open data soft
+    public function getAll($info)
+    {
+        $q = null;
+        if (is_array($info)) {
+
+            if (array_key_exists('key', $info)) {
+
+                $key = $info['key'];
+
+                if ($key == $this::get_ads_online) {
+
+                    $refCompte = $info["ref_compte"];
+
+                    $q = $this->_db->prepare('select * from adds_tempo where ref_compte = :ref_compte and statut = ' . $this::online);
+                    $q->bindValue(":ref_compte", $refCompte);
+                    $q->execute();
+                }
+            } else {
+
+                if (array_key_exists("no_ref_commune", $info)) {
+                    $limit = $info["toMatch"];
+                    $q = $this->_db->prepare('select * from adds_tempo where ref_commune is null limit :limit');
+                    $q->bindValue(":limit", $limit);
+                }
+                if (array_key_exists("ref_compte", $info)) {
+                    $refCompte = $info["ref_compte"];
+                    $q = $this->_db->prepare('select * from adds_tempo where ref_compte = :ref_compte');
+                    $q->bindValue(":ref_compte", $refCompte);
+                }
+            }
+        }
+
+        $q->execute();
+
+        $ads = [];
+        while ($data = $q->fetch(\PDO::FETCH_ASSOC)) {
+
+            $ad = new \spamtonprof\stp_api\AddsTempo($data);
+            $ads[] = $ad;
+        }
+
+        return ($ads);
+    }
+
+    // pour mettre à jour les ref communes des ads tempo en cherchant la commune correspondante la base de communes open data soft
     public function updateAllRefCommune($ads)
     {
         $lbcCommuneMg = new \spamtonprof\stp_api\LbcCommuneManager();
@@ -156,6 +269,54 @@ class AddsTempoManager
             $ad->setRef_commune($ref_commune);
             $this->updateRefCommune($ad);
         }
+    }
+
+    public function update_first_publication_date(\spamtonprof\stp_api\AddsTempo $ad)
+    {
+        $q = $this->_db->prepare('update adds_tempo set first_publication_date = :first_publication_date where ref_ad = :ref_ad');
+        $q->bindValue(":first_publication_date", $ad->getFirst_publication_date());
+        $q->bindValue(":ref_ad", $ad->getRef_ad());
+        $q->execute();
+    }
+
+    public function update_zipcode(\spamtonprof\stp_api\AddsTempo $ad)
+    {
+        $q = $this->_db->prepare('update adds_tempo set zipcode = :zipcode where ref_ad = :ref_ad');
+        $q->bindValue(":zipcode", $ad->getZipcode());
+        $q->bindValue(":ref_ad", $ad->getRef_ad());
+        $q->execute();
+    }
+
+    public function update_city(\spamtonprof\stp_api\AddsTempo $ad)
+    {
+        $q = $this->_db->prepare('update adds_tempo set city = :city where ref_ad = :ref_ad');
+        $q->bindValue(":city", $ad->getCity());
+        $q->bindValue(":ref_ad", $ad->getRef_ad());
+        $q->execute();
+    }
+
+    public function update_id(\spamtonprof\stp_api\AddsTempo $ad)
+    {
+        $q = $this->_db->prepare('update adds_tempo set id = :id where ref_ad = :ref_ad');
+        $q->bindValue(":id", $ad->getId());
+        $q->bindValue(":ref_ad", $ad->getRef_ad());
+        $q->execute();
+    }
+
+    public function update_has_phone(\spamtonprof\stp_api\AddsTempo $ad)
+    {
+        $q = $this->_db->prepare('update adds_tempo set has_phone = :has_phone where ref_ad = :ref_ad');
+        $q->bindValue(":has_phone", $ad->getHas_phone());
+        $q->bindValue(":ref_ad", $ad->getRef_ad());
+        $q->execute();
+    }
+
+    public function update_statut(\spamtonprof\stp_api\AddsTempo $ad)
+    {
+        $q = $this->_db->prepare('update adds_tempo set statut = :statut where ref_ad = :ref_ad');
+        $q->bindValue(":statut", $ad->getStatut());
+        $q->bindValue(":ref_ad", $ad->getRef_ad());
+        $q->execute();
     }
 
     public function updateRefCommune(\spamtonprof\stp_api\AddsTempo $ad)

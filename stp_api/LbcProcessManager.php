@@ -589,12 +589,148 @@ class LbcProcessManager
     // --- step 5 : on desactive ou on active le compte
     // --- step 6 : on met a jour le nb d'annonce du compte lbc
     // --- step 7 : on met a jour la de controle
-    public function checkAds($nbCompte)
+    public function check_account(\spamtonprof\stp_api\LbcAccount $lbcAccount, $send_msg = false)
     {
+        $msgs = [];
+
         $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
         $lbcApi = new \spamtonprof\stp_api\LbcApi();
         $adTempoMg = new \spamtonprof\stp_api\AddsTempoManager();
+
+        $msgs[] = "Controle de " . $lbcAccount->getRef_compte();
+
+        $codePromo = $lbcAccount->getCode_promo();
+        $user_id = $lbcAccount->getUser_id();
+
+        // step 2 : suppression des annonces dans la base sans ref_titre et ref_texte ( vestige du robot qui ne mémoriser pas les textes et les titres d'annonces )
+        $adTempoMg->deleteAll(array(
+            "key" => $adTempoMg::no_ref_texte_or_no_ref_titre,
+            "ref_compte" => $lbcAccount->getRef_compte()
+        ));
+        // on ne supprime pas les annonces avec ref_texte et ref_titre (elles seront mise à jour grâce à une jointure sur le titre)
+
+        // step 3 : recuperation des annonces via api leboncoin
+        $ads = false;
+
+        if ($user_id) {
+            $ads = $lbcApi->getAdds(array(
+                'user_id' => $user_id
+            ));
+            $msgs[] = "User_id : " . $user_id;
+        } else if (! is_null($codePromo)) {
+            $ads = $lbcApi->getAdds(array(
+                "code_promo" => $codePromo
+            ));
+            $msgs[] = "Pas de user_id : ";
+        }
+
+        // step 4-1 : si il y a des annonces en ligne sur leboncoin
+        $disabled = false;
+        $nbAnnonce = 0;
+        if ($ads) {
+
+            $ads = $ads->ads;
+
+            foreach ($ads as $ad_lbc) {
+
+                $firstPublicationDate = $ad_lbc->first_publication_date;
+                $zipcode = $ad_lbc->location->zipcode;
+                $city = $ad_lbc->location->city;
+                $id = $ad_lbc->list_id;
+                $hasPhone = $ad_lbc->has_phone;
+                $subject = $ad_lbc->subject;
+
+                // on essaye de trouver une correspondance entre l'annonce en ligne et les annonces en lignes grâce au titre
+                // si il y a correspondance, on met à jour l'annonce en base
+                $ad = $adTempoMg->get(array(
+                    "key" => $adTempoMg::nearest_title_ad,
+                    'ref_compte' => $lbcAccount->getRef_compte(),
+                    'title' => $subject
+                ));
+
+                if ($ad) {
+                    $ad->setFirst_publication_date($firstPublicationDate);
+                    $adTempoMg->update_first_publication_date($ad);
+
+                    $ad->setZipcode($zipcode);
+                    $adTempoMg->update_zipcode($ad);
+
+                    $ad->setCity($city);
+                    $adTempoMg->update_city($ad);
+
+                    $ad->setId($id);
+                    $adTempoMg->update_id($ad);
+
+                    $ad->setHas_phone($hasPhone);
+                    $adTempoMg->update_has_phone($ad);
+
+                    $ad->setStatut($adTempoMg::online);
+                    $adTempoMg->update_statut($ad);
+                } else {
+                    // si il n'y a pas de correspondance alors on ajoute cette annonce à la base
+                    // c'est le cas des annonces publiés avec la version qui ne mémorisait pas les textes et les titres
+                    $adTempo = new \spamtonprof\stp_api\AddsTempo(array(
+                        "first_publication_date" => $firstPublicationDate,
+                        "zipcode" => $zipcode,
+                        "city" => $city,
+                        "id" => $id,
+                        "has_phone" => $hasPhone,
+                        "statut" => $adTempoMg::online,
+                        "ref_compte" => $lbcAccount->getRef_compte()
+                    ));
+                    $adTempoMg->add($adTempo);
+                }
+
+                $nbAnnonce ++;
+            }
+
+
+            // 4-1-2 : on va mettre a jour la ref_commune de adds_tempo car la commune saisi ne correspond pas forcément à la commune en ligne
+            $adsTemp = $adTempoMg->getAll(array(
+                "key" => $adTempoMg::get_ads_online,
+                "ref_compte" => $lbcAccount->getRef_compte()
+            ));
+
+            $adTempoMg->updateAllRefCommune($adsTemp);
+        } else {
+            $disabled = true;
+            $nbAnnonce = 0;
+        }
+        
+        // les annonces avec le statut publié se voit attribuer le statut refusé
+        $adTempoMg->update_all(array(
+            'key' => $adTempoMg::update_statut_ad_refuse,
+            'ref_compte' => $lbcAccount->getRef_compte()
+        ));
+        
+        // --- step 5 : on desactive ou on active le compte
+        $lbcAccount->setDisabled($disabled);
+        $lbcAccountMg->updateDisabled($lbcAccount);
+
+        // --- step 6 : on met a jour le nb d'annonce du compte lbc
+        $lbcAccount->setNb_annonces_online($nbAnnonce);
+        $lbcAccountMg->updateNbAnnonceOnline($lbcAccount);
+
+        // --- step 7 : on met a jour la date de controle
+        $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+        $lbcAccount->setControle_date($now);
+        $lbcAccountMg->updateControleDate($lbcAccount);
+
+        $msgs[] = $nbAnnonce . "en ligne";
+
+        if ($send_msg) {
+            $slack = new \spamtonprof\slack\Slack();
+            $slack->sendMessages("log-lbc", $msgs);
+        }
+
+        return ($msgs);
+    }
+
+    public function checkAds($nbCompte)
+    {
         $slack = new \spamtonprof\slack\Slack();
+        $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
+        $msgs = [];
 
         // step 1 :recuperer les comptes ages d'au moins 2h.
         $lbcAccounts = $lbcAccountMg->getAccountToScrap($nbCompte);
@@ -604,84 +740,12 @@ class LbcProcessManager
         $nb_acts = count($lbcAccounts);
         foreach ($lbcAccounts as $lbcAccount) {
 
-            $msgs[] = "Controle de " . $lbcAccount->getRef_compte();
-
-            $codePromo = $lbcAccount->getCode_promo();
-            $user_id = $lbcAccount->getUser_id();
-
-            // step 2 : suppression des annonces dans la base sans ref_titre et ref_texte
-            $adTempoMg->deleteAll(array(
-                "ref_compte" => $lbcAccount->getRef_compte()
-            ));
-
-            // step 3 : recuperation des annonces via api leboncoin
-
-            $ads = false;
-
-            if ($user_id) {
-                $ads = $lbcApi->getAdds(array(
-                    'user_id' => $user_id
-                ));
-                $msgs[] = "User_id : " . $user_id;
-            } else if (! is_null($codePromo)) {
-                $ads = $lbcApi->getAdds(array(
-                    "code_promo" => $codePromo
-                ));
-                $msgs[] = "Pas de user_id : ";
+            try {
+                $msgs_inter = $this->check_account($lbcAccount);
+            } catch (\Exception $e) {
+                echo ($e->getMessage());
             }
-
-            // step 4-1 : si il y a des annonces en ligne sur leboncoin
-            $disabled = false;
-            $nbAnnonce = 0;
-            if ($ads) {
-
-                $ads = $ads->ads;
-
-                foreach ($ads as $ad) {
-
-                    $firstPublicationDate = $ad->first_publication_date;
-                    $zipcode = $ad->location->zipcode;
-                    $city = $ad->location->city;
-                    $id = $ad->list_id;
-                    $hasPhone = $ad->has_phone;
-
-                    // 4-1-1 : on ajoute ces annonces a adds_tempo
-                    $adTempo = new \spamtonprof\stp_api\AddsTempo(array(
-                        "first_publication_date" => $firstPublicationDate,
-                        "zipcode" => $zipcode,
-                        "city" => $city,
-                        "id" => $id,
-                        "has_phone" => $hasPhone,
-                        "ref_compte" => $lbcAccount->getRef_compte()
-                    ));
-                    $adTempoMg->add($adTempo);
-                    $nbAnnonce ++;
-                }
-
-                // 4-1-2 : on va mettre a jour la ref_commune de adds_tempo
-                $adsTemp = $adTempoMg->getAll(array(
-                    "ref_compte" => $lbcAccount->getRef_compte()
-                ));
-
-                $adTempoMg->updateAllRefCommune($adsTemp);
-            } else {
-                $disabled = true;
-                $nbAnnonce = 0;
-            }
-            // --- step 5 : on desactive ou on active le compte
-            $lbcAccount->setDisabled($disabled);
-            $lbcAccountMg->updateDisabled($lbcAccount);
-
-            // --- step 6 : on met a jour le nb d'annonce du compte lbc
-            $lbcAccount->setNb_annonces_online($nbAnnonce);
-            $lbcAccountMg->updateNbAnnonceOnline($lbcAccount);
-
-            // --- step 7 : on met a jour la date de controle
-            $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-            $lbcAccount->setControle_date($now);
-            $lbcAccountMg->updateControleDate($lbcAccount);
-
-            $msgs[] = $nbAnnonce . "en ligne";
+            $msgs = array_merge($msgs_inter, $msgs);
 
             if ($i % 20 == 0 || $i == ($nb_acts - 1)) {
                 $slack->sendMessages("log-lbc", $msgs);
@@ -692,7 +756,7 @@ class LbcProcessManager
     }
 
     // pour generer et retourner les annonces avant publication par zenno
-    public function generateAds($refClient, $nbAds, $phone, $lock = false, $ref_compte = 0, \spamtonprof\stp_api\LbcCampaign $campaign=null)
+    public function generateAds($refClient, $nbAds, $phone, $lock = false, $ref_compte = 0, \spamtonprof\stp_api\LbcCampaign $campaign = null)
     {
         $clientMg = new \spamtonprof\stp_api\LbcClientManager();
         // on recupere le client
@@ -817,12 +881,12 @@ class LbcProcessManager
             $nomCommune = $commune->getLibelle() . " " . $commune->getCode_postal();
 
             if ($lock) {
-                
+
                 $ref_campaign = null;
-                if($campaign){
+                if ($campaign) {
                     $ref_campaign = $campaign->getRef_campaign();
                 }
-                
+
                 // verouillage des communes prises dans les annonces
                 $adTempo = new \spamtonprof\stp_api\AddsTempo(array(
                     "ref_compte" => $ref_compte,
@@ -831,7 +895,6 @@ class LbcProcessManager
                     "ref_texte" => $texte->getRef_texte(),
                     "statut" => $adMg::publie,
                     "ref_campaign" => $ref_campaign
-                    
                 ));
                 $adMg->add($adTempo);
             }
