@@ -204,7 +204,7 @@ class LbcTexteManager
                     $ref_type_texte = $info["ref_type_texte"];
                     $ref_compte = $info["ref_compte"];
                     $q = $this->_db->prepare("select * from textes where ref_type_texte = :ref_type_texte
-                        and ref_texte not in (select ref_texte from adds_tempo where statut in ('online','publie') and ref_compte = :ref_compte)
+                        and ref_texte not in (select ref_texte from adds_tempo where ref_compte = :ref_compte)
                         order by ref_texte desc");
                     
                     $q->bindValue(":ref_type_texte", $ref_type_texte);
