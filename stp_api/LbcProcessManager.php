@@ -609,7 +609,7 @@ class LbcProcessManager
             $codePromo = $lbcAccount->getCode_promo();
             $user_id = $lbcAccount->getUser_id();
 
-            // step 2 : suppression des annonces dans la base
+            // step 2 : suppression des annonces dans la base sans ref_titre et ref_texte
             $adTempoMg->deleteAll(array(
                 "ref_compte" => $lbcAccount->getRef_compte()
             ));
@@ -692,7 +692,7 @@ class LbcProcessManager
     }
 
     // pour generer et retourner les annonces avant publication par zenno
-    public function generateAds($refClient, $nbAds, $phone, $lock = false, $ref_compte = 0)
+    public function generateAds($refClient, $nbAds, $phone, $lock = false, $ref_compte = 0, \spamtonprof\stp_api\LbcCampaign $campaign=null)
     {
         $clientMg = new \spamtonprof\stp_api\LbcClientManager();
         // on recupere le client
@@ -817,13 +817,21 @@ class LbcProcessManager
             $nomCommune = $commune->getLibelle() . " " . $commune->getCode_postal();
 
             if ($lock) {
+                
+                $ref_campaign = null;
+                if($campaign){
+                    $ref_campaign = $campaign->getRef_campaign();
+                }
+                
                 // verouillage des communes prises dans les annonces
                 $adTempo = new \spamtonprof\stp_api\AddsTempo(array(
                     "ref_compte" => $ref_compte,
                     "ref_commune" => $commune->getRef_commune(),
                     "ref_titre" => $title->getRef_titre(),
                     "ref_texte" => $texte->getRef_texte(),
-                    "statut" => $adMg::publie
+                    "statut" => $adMg::publie,
+                    "ref_campaign" => $ref_campaign
+                    
                 ));
                 $adMg->add($adTempo);
             }

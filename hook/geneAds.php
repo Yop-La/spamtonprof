@@ -35,15 +35,25 @@ if (array_key_exists("code_promo", $_POST)) {
 
 $lbcProcessMg = new \spamtonprof\stp_api\LbcProcessManager();
 
-
 $clientMg = new \spamtonprof\stp_api\LbcClientManager();
 // on recupere le client
 $client = $clientMg->get(array(
     'ref_client' => $refClient
 ));
 
+$now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+
+$lbc_campaign_mg = new \spamtonprof\stp_api\LbcCampaignManager();
+$lbc_campaign = $lbc_campaign_mg->add(new \spamtonprof\stp_api\LbcCampaign(array(
+    "date" => $now->format(PG_DATETIME_FORMAT),
+    "ref_compte" => $refCompte,
+    "nb_ad_online" => 0,
+    "nb_ad_publie" => 0
+)));
+
+
 $category = $client->getCategory();
-$ads = $lbcProcessMg->generateAds($refClient, $nbAds, $phone, true, $refCompte);
+$ads = $lbcProcessMg->generateAds($refClient, $nbAds, $phone, true, $refCompte, $lbc_campaign);
 
 
 $slack = new \spamtonprof\slack\Slack();
