@@ -54,24 +54,14 @@ class LbcAccountManager
 
         if (array_key_exists("valid_lbc_act", $info) && array_key_exists("act_type", $info)) {
             $ref_client = $info["valid_lbc_act"];
-            $act_type = $info["act_type"];
 
             $query = "select * from compte_lbc 
-                            where now() >= ( date_publication +  interval '1 hour')
-                                and nb_annonces_online != 0
-						         and ref_client = :ref_client
-						         and ref_compte in (select ref_compte_lbc from gmx_act where smtp_enabled is true)
-                            order by nb_annonces_online limit 1";
-
-            if ($act_type == 'stp') {
-                $query = "select * from compte_lbc 
-                            where (now() >= ( date_publication +  interval '1 day') or ( date_publication is null and controle_date is not null))
-                                and nb_annonces_online != 0
+                            where (now() >= ( date_publication +  interval '12 hour') or ( date_publication is null and controle_date is not null))
+                                 and nb_annonces_online != 0
                                  and disabled is false
 						         and ref_client = :ref_client
-						         and mail not like '%gmx%'
-                            order by nb_annonces_online, date_creation desc limit 1";
-            }
+                                 and mail like '%gmx.com%'
+                            order by nb_annonces_online, date_publication desc limit 1";
 
             $q = $this->_db->prepare($query);
             $q->execute(array(
@@ -97,14 +87,13 @@ class LbcAccountManager
             ));
         }
 
-        if (array_key_exists("refClient", $info) && array_key_exists("query", $info)) {
+        if (array_key_exists("query", $info)) {
 
-            $refClient = $info["refClient"];
             $query = $info["query"];
 
             if ($query == "shortestEmail") {
-                $q = $this->_db->prepare("select * from compte_lbc where ref_client = :refClient order by length(mail)*random()");
-                $q->bindValue(":refClient", $refClient);
+                $q = $this->_db->prepare("select * from compte_lbc where mail like '%gmx%' and length(mail) <= 19 order by length(mail)*random()limit 1");
+
                 $q->execute();
             }
         }
@@ -147,6 +136,13 @@ class LbcAccountManager
 
                 $q = $this->_db->prepare("select * from compte_lbc where ref_compte >= :ref_compte and cookie is null");
                 $q->bindValue(":ref_compte", $ref_compte);
+                $q->execute();
+            } else if (array_key_exists("like_mail", $info)) {
+
+                $mail = $info["like_mail"];
+                $mail = trim($mail);
+                $q = $this->_db->prepare("select * from compte_lbc where mail like :mail");
+                $q->bindValue(":mail", '%' . $mail . '%');
                 $q->execute();
             }
         } else {
@@ -351,7 +347,7 @@ class LbcAccountManager
 
         $q = $this->_db->prepare("select * from compte_lbc 
         where now() - interval '2 hour' > date_creation and (disabled = false or disabled is null) and (uncheckable = false or uncheckable is null)
-            and ( now() - interval '48 hour' > controle_date or controle_date is null)
+            and ( now() - interval '5 hour' > controle_date or controle_date is null)
             order by date_publication desc, nb_annonces_online limit :nb_compte");
         $q->bindValue(":nb_compte", $nbCompte);
         $q->execute();
