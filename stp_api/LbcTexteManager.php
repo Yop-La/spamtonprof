@@ -8,9 +8,8 @@ class LbcTexteManager
 {
 
     private $_db;
-    
+
     const texte_not_in_that_act = 1;
-    
 
     // Instance de PDO
     public function __construct()
@@ -196,23 +195,22 @@ class LbcTexteManager
         if (is_array($info)) {
 
             if (array_key_exists('key', $info)) {
-                
+
                 $key = $info["key"];
-                
-                if($key == $this::texte_not_in_that_act){
-                    
+
+                if ($key == $this::texte_not_in_that_act) {
+
                     $ref_type_texte = $info["ref_type_texte"];
                     $ref_compte = $info["ref_compte"];
-                    $q = $this->_db->prepare("select * from textes where ref_type_texte = :ref_type_texte
-                        and ref_texte not in (select ref_texte from adds_tempo where ref_compte = :ref_compte)
+
+                    $q = $this->_db->prepare("select * from textes where ref_type_texte = :ref_type_texte 
+                        and ref_texte not in (select ref_texte from adds_tempo where ref_compte = :ref_compte and ref_texte is not null)
                         order by ref_texte desc");
-                    
+
                     $q->bindValue(":ref_type_texte", $ref_type_texte);
                     $q->bindValue(":ref_compte", $ref_compte);
-                    
+                    $q->execute();
                 }
-                
-                
             } else {
 
                 if (array_key_exists("type_texte", $info) && ! array_key_exists("limit", $info)) {
