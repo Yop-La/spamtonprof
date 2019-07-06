@@ -25,29 +25,33 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 /**
- * 
- *  � utiliser quand ajout d'un client pour lui attribuer des emails
+ * à utiliser quand ajout d'un client pour lui attribuer des emails
  */
 
-
-$ref_client_to_copy = 11;
-$new_ref_client = 27;
+$new_ref_client = 29;
 
 $compteMg = new \spamtonprof\stp_api\LbcAccountManager();
 
-$comptes = $compteMg->getAll(array(
-    'ref_client' => $ref_client_to_copy
+$actMg = new \spamtonprof\stp_api\LbcAccountManager();
+$comptes = $actMg->getAll(array(
+    'like_mail' => 'gmx'
 ));
 
 foreach ($comptes as $compte) {
     $mail = $compte->getMail();
     $mail = strtolower($mail);
-    $mail = str_replace('thomas', 'sebastien', $mail);
-    
-    $pattern = '/\d+/i';
-    $replacement = '';
-    $mail = preg_replace($pattern, $replacement, $mail);
-    $compteMg->add(new \spamtonprof\stp_api\LbcAccount(array('mail' => $mail,'ref_client' => $new_ref_client)));
+
+    $email = explode('@', $compte->getMail())[0];
+
+    if (strlen($email) <= 10) {
+        $pattern = '/\d+/i';
+        $replacement = '';
+        $mail = preg_replace($pattern, $replacement, $mail);
+        $compteMg->add(new \spamtonprof\stp_api\LbcAccount(array(
+            'mail' => $mail,
+            'ref_client' => $new_ref_client
+        )));
+    }
 }
 
 prettyPrint($comptes);
