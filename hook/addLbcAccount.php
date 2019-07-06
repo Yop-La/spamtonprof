@@ -35,7 +35,6 @@ $client = $clientMg->get(array(
 $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
 
 $lbcAccount = $lbcAccountMg->get(array(
-    "refClient" => $refClient,
     "query" => "shortestEmail"
 ));
 
@@ -84,9 +83,9 @@ if ($client->getRef_cat_prenom()) {
         'moins_utilise' => 'moins_utilise',
         "ref_cat_prenom" => $client->getRef_cat_prenom()
     ));
-    
+
     $prenom->inc_nb_use();
-    
+
     $prenomLbcMg->updateNbUse($prenom);
     $prenom = $prenom->getPrenom();
 }
