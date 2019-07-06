@@ -170,7 +170,7 @@ class AddsTempoManager
 
                     $refCompte = $info["ref_compte"];
 
-                    $q = $this->_db->prepare('select * from adds_tempo where ref_compte = :ref_compte and statut = ' . $this::online);
+                    $q = $this->_db->prepare("select * from adds_tempo where ref_compte = :ref_compte and statut = '" . $this::online . "'");
                     $q->bindValue(":ref_compte", $refCompte);
                     $q->execute();
                 }
@@ -212,6 +212,7 @@ class AddsTempoManager
 
             $param = $ad->getCity() . " " . $ad->getZipcode();
 
+            
             $records = $lbcCommuneMg->getAllFromODS($param);
 
             $nits = $records->nhits;
