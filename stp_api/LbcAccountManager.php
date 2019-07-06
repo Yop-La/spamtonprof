@@ -92,7 +92,7 @@ class LbcAccountManager
             $query = $info["query"];
 
             if ($query == "shortestEmail") {
-                $q = $this->_db->prepare("select * from compte_lbc where mail like '%gmx%' and length(mail) <= 19 order by length(mail)*random()limit 1");
+                $q = $this->_db->prepare("select * from compte_lbc where mail like '%gmx%' and length(mail) <= 19 order by length(mail)*random() limit 1");
 
                 $q->execute();
             }
