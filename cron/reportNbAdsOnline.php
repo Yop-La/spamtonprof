@@ -1,6 +1,10 @@
 <?php
 
-/* pour donner le nombre d'ads par client publiés chaque jour dans le channel reporting-lbc */
+/* pour donner le nombre d'ads par client publiés chaque jour dans le channel reporting-lbc 
+ * 
+ *   donne aussi le nombre d'annonces à renouveller
+ * 
+ * */
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
 $wp->init();
 $wp->parse_request();
@@ -78,6 +82,11 @@ foreach ($res_publication as $key => $value) {
     $msgs[] = "Pour le client " . $key . ": " . $value . " publiées.";
     
 }
+
+$renewal_url_mg = new \spamtonprof\stp_api\LbcRenewalUrlManager();
+$renewal_urls = $renewal_url_mg ->getAll(array("key" => $renewal_url_mg::all_url_to_renew));
+
+$msgs[] = count($renewal_urls) . ' annonces à renouveller';
 
 $msgs[] = "Fin reporting";
 
