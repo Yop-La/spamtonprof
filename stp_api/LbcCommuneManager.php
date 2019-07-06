@@ -30,7 +30,7 @@ class LbcCommuneManager
         return ($lbcCommune);
     }
 
-    // pour chercher dans la base de données code-insee-postaux-geoflar de OpenDataSoft
+    // pour chercher dans la base de donnï¿½es code-insee-postaux-geoflar de OpenDataSoft
     public function getAllFromODS($text)
     {
         $params = urlencode($text);
@@ -65,8 +65,8 @@ class LbcCommuneManager
     }
 
     // pour trouver la commune dans une liste de commune ayat le nom de commune le plus proche de $nomCommune
-    // $communes est un records retourné par getAllFromODS
-    // Elle sert à lier un nom de commune du bon coin à une commune de la base open data soft
+    // $communes est un records retournï¿½ par getAllFromODS
+    // Elle sert ï¿½ lier un nom de commune du bon coin ï¿½ une commune de la base open data soft
     public function findClosest($communes, $nomCommune)
     {
         $nbRecord = count($communes);
@@ -90,7 +90,7 @@ class LbcCommuneManager
         return ($winner);
     }
 
-    // pour retourner les communes qui ont le même code postal que celui passé en argument
+    // pour retourner les communes qui ont le mï¿½me code postal que celui passï¿½ en argument
     public function matchByZipCode($communes, $zipCode)
     {
         $matched = [];
@@ -113,7 +113,7 @@ class LbcCommuneManager
             if (array_key_exists('ref_client', $info)) {
                 $refClient = $info['ref_client'];
 
-                $q = $this->_db->prepare('
+                $q = $this->_db->prepare("
                 select * from (
   select ref_commune,
 		libelle,
@@ -124,10 +124,10 @@ class LbcCommuneManager
 		       from lbc_commune
                     where ref_commune not in(
                         select ref_commune from adds_tempo 
-                            where ref_compte in (select ref_compte from compte_lbc where ref_client = :ref_client)
+                            where ref_compte in (select ref_compte from compte_lbc where ref_client = :ref_client)  and statut = 'online' and ref_commune is not null
                     )
                 and (lbc is not true ) order by population  desc limit 500) t 
-				where row_num = 1 limit 150;');
+				where row_num = 1 limit 150;");
                 $q->bindValue(":ref_client", $refClient);
             }
         }
