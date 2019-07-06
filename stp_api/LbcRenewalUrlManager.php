@@ -7,8 +7,10 @@ class LbcRenewalUrlManager
 {
 
     private $_db;
+    
+    const all_url_to_renew = 'all_url_to_renew';
 
-    const TO_RENEW = 1,FAIL = 2,DONE = 3;
+    const TO_RENEW = 1, FAIL = 2, DONE = 3;
 
     public function __construct()
     {
@@ -23,7 +25,7 @@ class LbcRenewalUrlManager
         $q->bindValue(':ref_compte_lbc', $lbcRenewalUrl->getRef_compte_lbc());
         $q->bindValue(':date_reception', $lbcRenewalUrl->getDate_reception());
         $q->execute();
-        
+
         $lbcRenewalUrl->setRef_url($this->_db->lastInsertId());
         return ($lbcRenewalUrl);
     }
@@ -32,19 +34,32 @@ class LbcRenewalUrlManager
     {
         $q = false;
         $urls = [];
-        
-        if (array_key_exists('to_renew', $info)) {
-            $ref_compte = $info['to_renew'];
-            $q = $this->_db->prepare("select * from lbc_renewal_url where statut = 1 and ref_compte_lbc in
+
+        if (array_key_exists('key', $info)) {
+
+            $key = $info["key"];
+
+            if ($key == $this::all_url_to_renew) {
+
+                $q = $this->_db->prepare("select * from lbc_renewal_url where statut = 1;");
+                
+                
+            }
+        } else {
+
+            if (array_key_exists('to_renew', $info)) {
+                $ref_compte = $info['to_renew'];
+                $q = $this->_db->prepare("select * from lbc_renewal_url where statut = 1 and ref_compte_lbc in
                 (select ref_compte_lbc from lbc_renewal_url where statut = 1 and ref_compte_lbc not in (:ref_compte) order by date_reception limit 1);");
-            $q->bindValue(':ref_compte', $ref_compte);
+                $q->bindValue(':ref_compte', $ref_compte);
+            }
         }
         if ($q) {
-            
+
             $q->execute();
-            
+
             while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
-                
+
                 $urls[] = new \spamtonprof\stp_api\LbcRenewalUrl($data);
             }
         }
@@ -54,36 +69,34 @@ class LbcRenewalUrlManager
     public function get($info)
     {
         $q = false;
-        
+
         if (array_key_exists('ref_url', $info)) {
             $ref_url = $info['ref_url'];
             $q = $this->_db->prepare("select * from lbc_renewal_url where ref_url = :ref_url;");
             $q->bindValue(':ref_url', $ref_url);
         }
         if ($q) {
-            
+
             $q->execute();
             $data = $q->fetch(PDO::FETCH_ASSOC);
-            
+
             if ($data) {
                 return (new \spamtonprof\stp_api\LbcRenewalUrl($data));
             }
         }
         return (false);
     }
-    
-    
+
     public function updateStatut(\spamtonprof\stp_api\LbcRenewalUrl $url)
     {
         $q = $this->_db->prepare('update lbc_renewal_url set statut = :statut where ref_url = :ref_url');
-        
+
         $q->bindValue(':statut', $url->getStatut());
-        
+
         $q->bindValue(':ref_url', $url->getRef_url());
-        
+
         $q->execute();
-        
+
         return ($url);
     }
-    
 }
