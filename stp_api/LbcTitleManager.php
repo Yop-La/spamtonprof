@@ -89,11 +89,14 @@ class LbcTitleManager
                     $ref_type_titre = $info["ref_type_titre"];
                     $ref_compte = $info["not_that_title"];
                     
+                    
+                    
                     $q = $this->_db->prepare("select * from titres where ref_type_titre = :ref_type_titre 
-                        and ref_titre not in (select ref_titre from adds_tempo where ref_compte = :ref_compte)");
+                        and ref_titre not in (select ref_titre from adds_tempo where ref_compte = :ref_compte and ref_titre is not null)");
                     
                     $q->bindValue(":ref_type_titre", $ref_type_titre);
                     $q->bindValue(":ref_compte", $ref_compte);
+                    
                 }
                 
             }
