@@ -12,7 +12,7 @@ class AddsTempoManager
 
     const update_statut_ad_refuse = 'update_statut_ad_refuse';
 
-    const get_ads_online = "get_ads_online";
+    const get_ads_online = "get_ads_online", get_ads_online_in_campaign = "get_ads_online_in_campaign";
 
     public function __construct()
     {
@@ -136,12 +136,10 @@ class AddsTempoManager
 
                 $refCompte = $info["ref_compte"];
 
-                
                 $req = "update adds_tempo set statut = '" . $this::bloque . "' where statut = '" . $this::publie . "' and ref_compte = :ref_compte";
                 $q = $this->_db->prepare($req);
                 $q->bindValue(":ref_compte", $refCompte);
                 $q->execute();
-                
             }
         }
 
@@ -173,6 +171,16 @@ class AddsTempoManager
                     $q = $this->_db->prepare("select * from adds_tempo where ref_compte = :ref_compte and statut = '" . $this::online . "'");
                     $q->bindValue(":ref_compte", $refCompte);
                     $q->execute();
+                }
+
+                if ($key == $this::get_ads_online_in_campaign) {
+
+                    $ref_campaign = $info["ref_campaign"];
+
+                    $q = $this->_db->prepare("select * from adds_tempo where ref_campaign = :ref_campaign and statut = '" . $this::online . "'");
+                    $q->bindValue(":ref_campaign", $ref_campaign);
+                    $q->execute();
+                    
                 }
             } else {
 
@@ -212,7 +220,6 @@ class AddsTempoManager
 
             $param = $ad->getCity() . " " . $ad->getZipcode();
 
-            
             $records = $lbcCommuneMg->getAllFromODS($param);
 
             $nits = $records->nhits;
