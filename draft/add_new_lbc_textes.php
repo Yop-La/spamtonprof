@@ -5,8 +5,6 @@
  * pour ajouter des nouveaux textes ( réponses auto leboncoin, textes d'annonces , etc )
  *
  */
-
-
 define('PROBLEME_CLIENT', true);
 
 $type_txt_str = "rep_get_phone";
@@ -37,18 +35,20 @@ $type_txt = $typeTxtMg->get(array(
 ));
 
 if (! $type_txt) {
-    
+
     $type_txt = $typeTxtMg->add(new \spamtonprof\stp_api\TypeTexte(array(
         "type" => $type_txt_str
     )));
 }
 
-
 // on ajoute ensuite les textes
 
-foreach ($textes_str as $texte_str){
-    
-    $textMg->add(new \spamtonprof\stp_api\LbcTexte(array("texte" => $texte_str, "type" => $type_txt->getType(),"ref_type_texte" => $type_txt->getRef_type())));
-    
+foreach ($textes_str as $texte_str) {
+
+    $textMg->add(new \spamtonprof\stp_api\LbcTexte(array(
+        "texte" => $texte_str,
+        "type" => $type_txt->getType(),
+        "ref_type_texte" => $type_txt->getRef_type()
+    )));
 }
 
