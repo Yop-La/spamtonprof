@@ -11,7 +11,62 @@ use Exception;
 class LbcAccount implements \JsonSerializable
 {
 
-    protected $ref_compte, $mail, $password, $nb_annonces_online, $date_derniere_activite, $disabled, $date_of_disabling, $ref_client, $ref_expe, $expe, $code_promo, $prenom_client, $nom_client, $controle_date, $objectID, $date_creation, $telephone, $cookie, $user_id, $prenom, $date_publication;
+    protected $ref_compte, $mail, $password, $nb_annonces_online, $date_derniere_activite, $disabled, $date_of_disabling, $ref_client, $ref_expe, $expe, $code_promo, $prenom_client, $nom_client, $controle_date, $objectID, $date_creation, $telephone, $cookie, $user_id, $prenom, $date_publication, $open, $nb_successful_campaigns, $nb_failed_campaigns;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getNb_successful_campaigns()
+    {
+        return $this->nb_successful_campaigns;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getNb_failed_campaigns()
+    {
+        return $this->nb_failed_campaigns;
+    }
+
+    /**
+     *
+     * @param mixed $nb_successful_campaigns
+     */
+    public function setNb_successful_campaigns($nb_successful_campaigns)
+    {
+        $this->nb_successful_campaigns = $nb_successful_campaigns;
+    }
+
+    /**
+     *
+     * @param mixed $nb_failed_campaigns
+     */
+    public function setNb_failed_campaigns($nb_failed_campaigns)
+    {
+        $this->nb_failed_campaigns = $nb_failed_campaigns;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getOpen()
+    {
+        return $this->open;
+    }
+
+    /**
+     *
+     * @param mixed $open
+     */
+    public function setOpen($open)
+    {
+        $this->open = $open;
+    }
+
 
     public function __construct(array $donnees = array())
 
