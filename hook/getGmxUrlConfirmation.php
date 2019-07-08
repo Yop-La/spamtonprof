@@ -25,33 +25,40 @@ $slack = new \spamtonprof\slack\Slack();
 $timeBreak = $_POST['timeBreak'];
 $nbTry = $_POST['nbTry'];
 
+$gmail_adress = str_replace(" ", "+", trim($_POST['gmail']));
 
 $ret = new \stdClass();
-
 
 $indexTry = 0;
 
 do {
-    $msgs = $gmail->listMessages('"Confirm e-mail forwarding to your inbox"');
-    
+
+    $slack->sendMessages('log-lbc', array(
+        'Email de redirection : ' . $gmail_adress
+    ));
+
+    $msgs = $gmail->listMessages('"Confirm e-mail forwarding to your inbox" ' . $gmail_adress);
+
     $msg = $msgs[0];
-    
+
     $msg = $gmail->getMessage($msg->id, [
         'format' => 'full'
     ]);
-    
+
     $body = $gmail->getBody($msg);
-    
+
     $matches = array();
-    
+
     $pattern = '#\bhttps://forwarding.gmx.com/.*#';
     preg_match_all($pattern, $body, $matches);
-    
+
     $confirmationUrl = $matches[0][0];
-    
+
+    // $confirmationUrl = str_replace('confirm', 'confirm/success', $confirmationUrl);
+
     $ret->url = $confirmationUrl;
     prettyPrint($ret);
-    
+
     $indexTry = $indexTry + 1;
     $slack->sendMessages('log-lbc', array(
         'Echec' . $indexTry . ' de recuperation du mail de confirmation pour l\'email : ' . $email
