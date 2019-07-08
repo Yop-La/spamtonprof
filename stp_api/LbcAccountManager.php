@@ -9,6 +9,8 @@ class LbcAccountManager
 
     private $_db;
 
+    const act_with_fail_campaigns = 'act_with_fail_campaigns';
+
     // Instance de PDO
     public function __construct()
 
@@ -56,12 +58,13 @@ class LbcAccountManager
             $ref_client = $info["valid_lbc_act"];
 
             $query = "select * from compte_lbc 
-                            where (now() >= ( date_publication +  interval '12 hour') or ( date_publication is null and controle_date is not null))
+                            where (now() >= ( date_publication +  interval '4 hour') or ( date_publication is null and controle_date is not null))
                                  and nb_annonces_online != 0
                                  and disabled is false
 						         and ref_client = :ref_client
                                  and mail like '%gmx.com%'
-                            order by nb_annonces_online, date_publication desc limit 1";
+                                 and open is true
+                            order by nb_annonces_online, nb_failed_campaigns, date_publication desc limit 1";
 
             $q = $this->_db->prepare($query);
             $q->execute(array(
@@ -115,35 +118,46 @@ class LbcAccountManager
 
         if (is_array($info)) {
 
-            if (array_key_exists("refComptes", $info)) {
-                $refComptes = $info["refComptes"];
+            if (array_key_exists('key', $info)) {
 
-                $in = "(" . str_repeat('?,', count($refComptes) - 1) . '?' . ")";
+                $key = $info['key'];
 
-                $q = $this->_db->prepare("select prenom_client, nom_client, ref_compte, code_promo, controle_date, nb_annonces_online
+                if ($key == $this::act_with_fail_campaigns) {
+                    $q = $this->_db->prepare("select * from compte_lbc where disabled is false and open is true and nb_failed_campaigns != 0 order by nb_failed_campaigns desc");
+                    $q->execute();
+                }
+            } else {
+
+                if (array_key_exists("refComptes", $info)) {
+                    $refComptes = $info["refComptes"];
+
+                    $in = "(" . str_repeat('?,', count($refComptes) - 1) . '?' . ")";
+
+                    $q = $this->_db->prepare("select prenom_client, nom_client, ref_compte, code_promo, controle_date, nb_annonces_online
                 from compte_lbc, client where compte_lbc.ref_client = client.ref_client and compte_lbc.ref_compte in " . $in);
-                $q->execute($refComptes);
-            } else if (array_key_exists("ref_client", $info)) {
+                    $q->execute($refComptes);
+                } else if (array_key_exists("ref_client", $info)) {
 
-                $refClient = $info["ref_client"];
+                    $refClient = $info["ref_client"];
 
-                $q = $this->_db->prepare("select * from compte_lbc where ref_client = :ref_client");
-                $q->bindValue(":ref_client", $refClient);
-                $q->execute();
-            } else if (array_key_exists("no_cookies", $info)) {
+                    $q = $this->_db->prepare("select * from compte_lbc where ref_client = :ref_client");
+                    $q->bindValue(":ref_client", $refClient);
+                    $q->execute();
+                } else if (array_key_exists("no_cookies", $info)) {
 
-                $ref_compte = $info["no_cookies"];
+                    $ref_compte = $info["no_cookies"];
 
-                $q = $this->_db->prepare("select * from compte_lbc where ref_compte >= :ref_compte and cookie is null");
-                $q->bindValue(":ref_compte", $ref_compte);
-                $q->execute();
-            } else if (array_key_exists("like_mail", $info)) {
+                    $q = $this->_db->prepare("select * from compte_lbc where ref_compte >= :ref_compte and cookie is null");
+                    $q->bindValue(":ref_compte", $ref_compte);
+                    $q->execute();
+                } else if (array_key_exists("like_mail", $info)) {
 
-                $mail = $info["like_mail"];
-                $mail = trim($mail);
-                $q = $this->_db->prepare("select * from compte_lbc where mail like :mail");
-                $q->bindValue(":mail", '%' . $mail . '%');
-                $q->execute();
+                    $mail = $info["like_mail"];
+                    $mail = trim($mail);
+                    $q = $this->_db->prepare("select * from compte_lbc where mail like :mail");
+                    $q->bindValue(":mail", '%' . $mail . '%');
+                    $q->execute();
+                }
             }
         } else {
 
@@ -241,6 +255,14 @@ class LbcAccountManager
         $q->execute();
     }
 
+    public function update_open(\spamtonprof\stp_api\LbcAccount $lbcAccount)
+    {
+        $q = $this->_db->prepare("update compte_lbc set open = :open where ref_compte = :ref_compte");
+        $q->bindValue(":open", $lbcAccount->getOpen(), PDO::PARAM_BOOL);
+        $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
+        $q->execute();
+    }
+
     public function update_date_publication(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
         $q = $this->_db->prepare("update compte_lbc set date_publication = :date_publication where ref_compte = :ref_compte");
@@ -259,6 +281,22 @@ class LbcAccountManager
         $q->execute();
     }
 
+    public function update_nb_failed_campaigns(\spamtonprof\stp_api\LbcAccount $lbcAccount)
+    {
+        $q = $this->_db->prepare("update compte_lbc set nb_failed_campaigns = :nb_failed_campaigns where ref_compte = :ref_compte");
+        $q->bindValue(":nb_failed_campaigns", $lbcAccount->getNb_failed_campaigns());
+        $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
+        $q->execute();
+    }
+
+    public function update_nb_successful_campaigns(\spamtonprof\stp_api\LbcAccount $lbcAccount)
+    {
+        $q = $this->_db->prepare("update compte_lbc set nb_successful_campaigns = :nb_successful_campaigns where ref_compte = :ref_compte");
+        $q->bindValue(":nb_successful_campaigns", $lbcAccount->getNb_successful_campaigns());
+        $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
+        $q->execute();
+    }
+
     public function updateNbAnnonceOnline(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
         $q = $this->_db->prepare("update compte_lbc set nb_annonces_online = :nb_annonces_online where ref_compte = :ref_compte");
@@ -270,8 +308,8 @@ class LbcAccountManager
     public function add(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
         $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
-        $q = $this->_db->prepare("insert into compte_lbc(mail, password, nb_annonces_online, disabled, ref_client, telephone, date_creation) 
-            values(:mail, :password, 0, false, :ref_client, :telephone, :date_creation)");
+        $q = $this->_db->prepare("insert into compte_lbc(mail, password, nb_annonces_online, disabled, ref_client, telephone, date_creation, open, nb_successful_campaigns, nb_failed_campaigns) 
+            values(:mail, :password, 0, false, :ref_client, :telephone, :date_creation,true, 0, 0)");
         $q->bindValue(":mail", $lbcAccount->getMail());
         $q->bindValue(":password", $lbcAccount->getPassword());
         $q->bindValue(":ref_client", $lbcAccount->getRef_client());
