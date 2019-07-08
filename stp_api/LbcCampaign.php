@@ -4,7 +4,43 @@ namespace spamtonprof\stp_api;
 class LbcCampaign implements \JsonSerializable
 {
 
-    protected $ref_campaign, $date, $ref_compte, $nb_ad_online, $nb_ad_publie;
+    protected $ref_campaign, $date, $ref_compte, $nb_ad_online, $nb_ad_publie, $fail, $checked;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getFail()
+    {
+        return $this->fail;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getChecked()
+    {
+        return $this->checked;
+    }
+
+    /**
+     *
+     * @param mixed $fail
+     */
+    public function setFail($fail)
+    {
+        $this->fail = $fail;
+    }
+
+    /**
+     *
+     * @param mixed $checked
+     */
+    public function setChecked($checked)
+    {
+        $this->checked = $checked;
+    }
 
     public function __construct(array $donnees = array())
     {
