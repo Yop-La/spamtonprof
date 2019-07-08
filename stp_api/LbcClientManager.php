@@ -8,6 +8,8 @@ class LbcClientManager
 
     const CANNELLE = 19, LUCAS = 20, THOMAS = 12, CAMILLA = 17, SEB = 11;
 
+    const client_last_5_days_campaigns = 'client_last_5_days_campaigns';
+
     public function __construct()
     {
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
@@ -53,12 +55,28 @@ class LbcClientManager
     {
         $clients = [];
         $q = null;
-        if (in_array('all', $info)) {
 
-            $q = $this->_db->prepare("select * from client");
-        } else if (in_array('with_ref_cat_prenom', $info)) {
+        if (array_key_exists('key', $info)) {
 
-            $q = $this->_db->prepare("select * from client where ref_cat_prenom is not null");
+            $key = $info['key'];
+
+            if ($key == $this::client_last_5_days_campaigns) {
+
+                $q = $this->_db->prepare("select * from client where ref_client in (
+                        select distinct(ref_client) from compte_lbc where ref_compte in ( 
+                            select ref_compte from lbc_campaign where (now() - interval '5 days' ) <= date and checked is true))");
+
+                $q->execute();
+            }
+        } else {
+
+            if (in_array('all', $info)) {
+
+                $q = $this->_db->prepare("select * from client");
+            } else if (in_array('with_ref_cat_prenom', $info)) {
+
+                $q = $this->_db->prepare("select * from client where ref_cat_prenom is not null");
+            }
         }
 
         $q->execute();
@@ -101,7 +119,7 @@ class LbcClientManager
         $q->bindValue(":ref_client", $client->getRef_client());
         $q->execute();
     }
-    
+
     public function updateNom(\spamtonprof\stp_api\LbcClient $client)
     {
         $q = $this->_db->prepare("update client set nom_client = :nom_client where ref_client = :ref_client");
@@ -133,8 +151,7 @@ class LbcClientManager
         $q->bindValue(":ref_client", $client->getRef_client());
         $q->execute();
     }
-    
-    
+
     public function updateRefReponseLbc(\spamtonprof\stp_api\LbcClient $client)
     {
         $q = $this->_db->prepare("update client set ref_reponse_lbc = :ref_reponse_lbc where ref_client = :ref_client");
