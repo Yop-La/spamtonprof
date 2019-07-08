@@ -684,7 +684,6 @@ class LbcProcessManager
                 $nbAnnonce ++;
             }
 
-
             // 4-1-2 : on va mettre a jour la ref_commune de adds_tempo car la commune saisi ne correspond pas forcément à la commune en ligne
             $adsTemp = $adTempoMg->getAll(array(
                 "key" => $adTempoMg::get_ads_online,
@@ -696,13 +695,13 @@ class LbcProcessManager
             $disabled = true;
             $nbAnnonce = 0;
         }
-        
+
         // les annonces avec le statut publié se voit attribuer le statut refusé
         $adTempoMg->update_all(array(
             'key' => $adTempoMg::update_statut_ad_refuse,
             'ref_compte' => $lbcAccount->getRef_compte()
         ));
-        
+
         // --- step 5 : on desactive ou on active le compte
         $lbcAccount->setDisabled($disabled);
         $lbcAccountMg->updateDisabled($lbcAccount);
@@ -725,7 +724,254 @@ class LbcProcessManager
 
         return ($msgs);
     }
+    
+    // à faire tourner après check_ads
+    // se charge de mesurer les performances des camapagnes . Elle récole les résultats de campagne
+    // elle complète le nb d'annonces en ligne d'une campagne
+    // une campagne ne peut être analysé qu'une fois par cette méthode
 
+    public function analyse_campaigns()
+    {
+        $ads_mg = new \spamtonprof\stp_api\AddsTempoManager();
+
+        $lbc_campaign_mg = new \spamtonprof\stp_api\LbcCampaignManager();
+
+        $lbc_campaigns = $lbc_campaign_mg->getAll(array(
+            'key' => $lbc_campaign_mg::campaign_to_analyse
+        ));
+
+        $slack = new \spamtonprof\slack\Slack();
+
+        $i = 0;
+        $msgs = [];
+        $nb_campaigns = count($lbc_campaigns);
+
+        foreach ($lbc_campaigns as $campaign) {
+
+            $ads = $ads_mg->getAll(array(
+                'key' => $ads_mg::get_ads_online_in_campaign,
+                'ref_campaign' => $campaign->getRef_campaign()
+            ));
+
+            $nb_ads = count($ads);
+
+            $campaign->setNb_ad_online($nb_ads);
+            $lbc_campaign_mg->update_nb_ad_online($campaign);
+
+            $msgs_inter = array(
+                '----',
+                'Analyse de la campagne ' . $campaign->getRef_campaign(),
+                $campaign->getNb_ad_online() . '/' . $campaign->getNb_ad_publie() . ' en ligne(s)'
+            );
+
+            $msgs = array_merge($msgs, $msgs_inter);
+
+            $lbc_act_mg = new \spamtonprof\stp_api\LbcAccountManager();
+            $lbc_act = $lbc_act_mg->get(array(
+                'ref_compte' => $campaign->getRef_compte()
+            ));
+
+            if ($nb_ads == 0) {
+                $campaign->setFail(true);
+                $lbc_campaign_mg->update_fail($campaign);
+
+                $nb_fail = $lbc_act->getNb_failed_campaigns();
+                $nb_fail = $nb_fail + 1;
+                $lbc_act->setNb_failed_campaigns($nb_fail);
+                $lbc_act_mg->update_nb_failed_campaigns($lbc_act);
+            } else {
+                $nb_success = $lbc_act->getNb_successful_campaigns();
+                $nb_success = $nb_success + 1;
+                $lbc_act->setNb_successful_campaigns($nb_success);
+                $lbc_act_mg->update_nb_successful_campaigns($lbc_act);
+            }
+
+            $campaign->setChecked(true);
+            $lbc_campaign_mg->update_checked($campaign);
+
+            if ($i % 20 == 0 || $i == ($nb_campaigns - 1)) {
+                $slack->sendMessages("log-lbc", $msgs);
+                $msgs = [];
+            }
+            $i ++;
+        }
+
+        prettyPrint($lbc_campaigns);
+    }
+
+    // elle donne les résultats des campagnes des 7 derniers jours des clients des 5 derniers jours
+    // dans le channel campaign_lbc
+    
+    public function publish_campaigns_reporting()
+    {
+        $campaign_lbc = new \spamtonprof\stp_api\LbcCampaignManager();
+
+        $client_mg = new \spamtonprof\stp_api\LbcClientManager();
+
+        $clients = $client_mg->getAll(array(
+            'key' => $client_mg::client_last_5_days_campaigns
+        ));
+
+        $slack = new \spamtonprof\slack\Slack();
+
+        // $campaigns = [];
+
+        $key = "";
+        $reportings = [];
+
+        foreach ($clients as $client) {
+
+            $campaigns = $campaign_lbc->getAll(array(
+                'key' => $campaign_lbc::clients_campaigns_to_analyse,
+                'ref_client' => $client->getRef_client()
+            ));
+
+            foreach ($campaigns as $campaign) {
+
+                $campaign_datetime = \DateTime::createFromFormat(PG_DATETIME_FORMAT, $campaign->getDate(), new \DateTimeZone("Europe/Paris"));
+
+                $campaign_date = $campaign_datetime->format(FR_DATE_FORMAT);
+                $campaign_hour = intval($campaign_datetime->format('G'));
+
+                $period = 'moitie_1';
+                if ($campaign_hour <= 12) {
+                    $period = 'moitie_2';
+                }
+
+                $campaign_type = 'cultivable';
+                if ($campaign->getNb_ad_publie() == 1) {
+                    $campaign_type = 'vierge';
+                }
+
+                $key = $campaign_date . '__' . $period . '__' . $campaign_type . '__' . $client->getPrenom_client() . '_' . $client->getNom_client();
+
+                if (! array_key_exists($key, $reportings)) {
+                    $reportings[$key] = [];
+                }
+                $reportings[$key][] = $campaign;
+            }
+        }
+
+        ksort($reportings);
+
+        $campaign_date = "";
+        $period = "";
+        $campaign_type = "";
+
+        foreach ($reportings as $key => $reporting) {
+
+            $nb_campaign = count($reporting);
+            $nb_fail = 0;
+            $nb_sucess = 0;
+            $nb_total_sucess = 0;
+
+            foreach ($reporting as $campaign) {
+
+                if ($campaign->getNb_ad_online() == $campaign->getNb_ad_publie()) {
+                    $nb_total_sucess = $nb_total_sucess + 1;
+                } else if ($campaign->getNb_ad_online() == 0) {
+                    $nb_fail = $nb_fail + 1;
+                } else {
+                    $nb_sucess = $nb_sucess + 1;
+                }
+            }
+
+            $key = explode('__', $key);
+
+            $new_campaign_date = $key[0];
+            $new_period = $key[1];
+            $new_campaing_type = $key[2];
+            $client = $key[3];
+
+            $msgs = [];
+
+            $date_changed = false;
+            $period_changed = false;
+
+            if ($campaign_date != $new_campaign_date) {
+                $date_changed = true;
+                $campaign_date = $new_campaign_date;
+                $msgs[] = "----------------      Campagne du $campaign_date      ----------------";
+            }
+
+            if ($period != $new_period || $date_changed) {
+                $period = $new_period;
+                $period_changed = true;
+                if ($period == "moitie_2") {
+                    $msgs[] = "------------      Dans l'après midi      ------------";
+                } else {
+                    $msgs[] = "------------      Dans la matinée      ------------";
+                }
+            }
+
+            if ($campaign_type != $new_campaing_type || $period_changed) {
+
+                $campaign_type = $new_campaing_type;
+                if ($campaign_type == "vierge") {
+                    $msgs[] = "---------      Nouveau compte      ---------";
+                } else {
+                    $msgs[] = "---------      Compte existant      ---------";
+                }
+            }
+
+            $msg = array(
+                "------      $client      ------",
+                "                nb campaign : $nb_campaign",
+                "                % total sucess : " . (round($nb_total_sucess / $nb_campaign * 100, 2) . "% ($nb_total_sucess)"),
+                "                % sucess : " . (round($nb_sucess / $nb_campaign * 100, 2) . "% ($nb_sucess)"),
+                "                % fail : " . (round($nb_fail / $nb_campaign * 100, 2) . "% ($nb_fail)")
+            );
+
+            $msgs = array_merge($msgs, $msg);
+
+            $slack->sendMessages('campaign_lbc', $msgs);
+        }
+        
+        
+
+        prettyPrint($reportings);
+    }
+
+    // elle donne les comptes ouverts à publication avec plus de deux campagnes échoués
+    public function publish_failed_campaigns(){
+        
+        
+        $slack = new \spamtonprof\slack\Slack();
+        
+        $lbc_act_mg = new \spamtonprof\stp_api\LbcAccountManager();
+        
+        $acts = $lbc_act_mg->getAll(array(
+            'key' => $lbc_act_mg::act_with_fail_campaigns
+        ));
+        
+        $msgs = [];
+        
+        $msgs[] = "----------    Rapport des campagnes échouées    ----------";
+        
+        $i = 0;
+        $nb_acts = count($acts);
+        
+        foreach ($acts as $act) {
+            
+            if ($act->getNb_failed_campaigns() >= 2) {
+                
+                $msgs[] = "---- Compte: " . $act->getMail() . " ----";
+                $msgs[] = "Nb campagnes échouées : " . $act->getNb_failed_campaigns();
+                $msgs[] = "Nb campagnes réussies : " . $act->getNb_successful_campaigns();
+            }
+            
+            if ($i % 20 == 0 || $i == ($nb_acts - 1)) {
+                $slack->sendMessages("campaign_lbc", $msgs);
+                $msgs = [];
+            }
+            $i ++;
+        }
+        
+        prettyPrint($acts);
+        
+        
+    }
+    
     public function checkAds($nbCompte)
     {
         $slack = new \spamtonprof\slack\Slack();
@@ -789,6 +1035,7 @@ class LbcProcessManager
             "ref_type_titre" => $hasTypeTitle->getRef_type_titre(),
             "not_that_title" => $ref_compte
         ));
+
         shuffle($titles);
 
         // on recupere les textes non déjà potentiellement en ligne ou en ligne sur ce compte
@@ -870,7 +1117,9 @@ class LbcProcessManager
                 'Alexandre',
                 'alexandre',
                 'Anahyse',
-                'anahyse'
+                'anahyse',
+                'Martin',
+                'martin'
             ), $prenom, $texte->getTexte()));
 
             // recuperation de l'image
@@ -888,14 +1137,16 @@ class LbcProcessManager
                 }
 
                 // verouillage des communes prises dans les annonces
-                $adTempo = new \spamtonprof\stp_api\AddsTempo(array(
+                $params = array(
                     "ref_compte" => $ref_compte,
                     "ref_commune" => $commune->getRef_commune(),
                     "ref_titre" => $title->getRef_titre(),
                     "ref_texte" => $texte->getRef_texte(),
                     "statut" => $adMg::publie,
                     "ref_campaign" => $ref_campaign
-                ));
+                );
+
+                $adTempo = new \spamtonprof\stp_api\AddsTempo($params);
                 $adMg->add($adTempo);
             }
 
