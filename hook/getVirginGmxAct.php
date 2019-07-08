@@ -19,6 +19,11 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
+$slack = new \spamtonprof\slack\Slack();
+$slack->sendMessages('log-lbc', array(
+    'Choix du compte gmx'
+));
+
 if ($_POST['password'] == HOOK_SECRET) {
 
     $gmxActMg = new \spamtonprof\stp_api\GmxActManager();
@@ -29,6 +34,10 @@ if ($_POST['password'] == HOOK_SECRET) {
 
     $ret = new \stdClass();
     $ret->gmx_act = $gmxAct;
+
+    $slack->sendMessages('log-lbc', array(
+        'Compte gmx choisi : ' . $gmxAct->getMail()
+    ));
 
     prettyPrint($ret);
 }
