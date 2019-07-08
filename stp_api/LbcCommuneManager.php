@@ -124,9 +124,9 @@ class LbcCommuneManager
 		       from lbc_commune
                     where ref_commune not in(
                         select ref_commune from adds_tempo 
-                            where ref_compte in (select ref_compte from compte_lbc where ref_client = :ref_client)  and statut = 'online' and ref_commune is not null
+                            where ref_compte in (select ref_compte from compte_lbc where ref_client = :ref_client)  and statut in ('online','publie') and ref_commune is not null
                     )
-                and (lbc is not true ) order by population  desc limit 500) t 
+                and (lbc is not true ) and population <= 40 order by population  desc limit 500) t 
 				where row_num = 1 limit 150;");
                 $q->bindValue(":ref_client", $refClient);
             }
