@@ -178,8 +178,32 @@ class LbcProcessManager
                     $to = extractFirstMail($to);
 
                     $urls = extract_url($body);
-                    $url = $urls[0][2];
 
+                    
+                    
+                    $urls = $urls[0];
+                    
+                    $renewal_url = $urls[2];
+                    
+                    foreach ($urls as $url){
+                        
+                        $url = htmlspecialchars_decode($url);
+                        
+                        if (strpos($url, 'https://www.leboncoin.fr/ai') !== false) {
+                            $renewal_url = $url;
+                            break;
+                        }
+                        
+                        
+                    }
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
                     $url = htmlspecialchars_decode($url);
 
                     $act = $this->lbcAccountMg->get(array(
@@ -187,7 +211,7 @@ class LbcProcessManager
                     ));
 
                     $renewalUrl = $this->renewalUrlMg->add(new \spamtonprof\stp_api\LbcRenewalUrl(array(
-                        "url" => $url,
+                        "url" => $renewal_url,
                         "statut" => $this->renewalUrlMg::TO_RENEW,
                         "ref_compte_lbc" => $act->getRef_compte(),
                         "date_reception" => $dateReception->format(PG_DATETIME_FORMAT)
@@ -724,12 +748,11 @@ class LbcProcessManager
 
         return ($msgs);
     }
-    
+
     // à faire tourner après check_ads
     // se charge de mesurer les performances des camapagnes . Elle récole les résultats de campagne
     // elle complète le nb d'annonces en ligne d'une campagne
     // une campagne ne peut être analysé qu'une fois par cette méthode
-
     public function analyse_campaigns()
     {
         $ads_mg = new \spamtonprof\stp_api\AddsTempoManager();
@@ -801,7 +824,6 @@ class LbcProcessManager
 
     // elle donne les résultats des campagnes des 7 derniers jours des clients des 5 derniers jours
     // dans le channel campaign_lbc
-    
     public function publish_campaigns_reporting()
     {
         $campaign_lbc = new \spamtonprof\stp_api\LbcCampaignManager();
@@ -834,7 +856,7 @@ class LbcProcessManager
                 $campaign_hour = intval($campaign_datetime->format('G'));
 
                 $period = 'moitie_1';
-                if ($campaign_hour <= 12) {
+                if ($campaign_hour > 12) {
                     $period = 'moitie_2';
                 }
 
@@ -926,52 +948,47 @@ class LbcProcessManager
 
             $slack->sendMessages('campaign_lbc', $msgs);
         }
-        
-        
 
         prettyPrint($reportings);
     }
 
     // elle donne les comptes ouverts à publication avec plus de deux campagnes échoués
-    public function publish_failed_campaigns(){
-        
-        
+    public function publish_failed_campaigns()
+    {
         $slack = new \spamtonprof\slack\Slack();
-        
+
         $lbc_act_mg = new \spamtonprof\stp_api\LbcAccountManager();
-        
+
         $acts = $lbc_act_mg->getAll(array(
             'key' => $lbc_act_mg::act_with_fail_campaigns
         ));
-        
+
         $msgs = [];
-        
+
         $msgs[] = "----------    Rapport des campagnes échouées    ----------";
-        
+
         $i = 0;
         $nb_acts = count($acts);
-        
+
         foreach ($acts as $act) {
-            
+
             if ($act->getNb_failed_campaigns() >= 2) {
-                
+
                 $msgs[] = "---- Compte: " . $act->getMail() . " ----";
                 $msgs[] = "Nb campagnes échouées : " . $act->getNb_failed_campaigns();
                 $msgs[] = "Nb campagnes réussies : " . $act->getNb_successful_campaigns();
             }
-            
+
             if ($i % 20 == 0 || $i == ($nb_acts - 1)) {
                 $slack->sendMessages("campaign_lbc", $msgs);
                 $msgs = [];
             }
             $i ++;
         }
-        
+
         prettyPrint($acts);
-        
-        
     }
-    
+
     public function checkAds($nbCompte)
     {
         $slack = new \spamtonprof\slack\Slack();
@@ -1002,7 +1019,7 @@ class LbcProcessManager
     }
 
     // pour generer et retourner les annonces avant publication par zenno
-    public function generateAds($refClient, $nbAds, $phone, $lock = false, $ref_compte = 0, \spamtonprof\stp_api\LbcCampaign $campaign = null)
+    public function generateAds($refClient, $nbAds, $phone, $lock = false, $ref_compte = 0, \spamtonprof\stp_api\LbcCampaign $campaign = null, $category = false)
     {
         $clientMg = new \spamtonprof\stp_api\LbcClientManager();
         // on recupere le client
@@ -1013,12 +1030,16 @@ class LbcProcessManager
         // si il y a une seule annonce c'est que c'est une premire annonce sur un compte vierge. On doit mettre une annonce qui passe ( celle de Valentin )
         $ref_client_content = $refClient;
         $client_content = $client;
+
+        $random_ad = false;
+
         if (false && $nbAds == 1) {
 
-            $ref_client_content = 12;
-            $client_content = $clientMg->get(array(
-                'ref_client' => $ref_client_content
-            ));
+            // $ref_client_content = 12;
+            // $client_content = $clientMg->get(array(
+            // 'ref_client' => $ref_client_content
+            // ));
+            $random_ad = true;
         }
 
         // on recupere les titres non déjà utilisés sur ce compte
@@ -1163,11 +1184,23 @@ class LbcProcessManager
             $texte->setTexte($symbols_line . PHP_EOL . PHP_EOL . $texte->getTexte() . PHP_EOL . PHP_EOL . $symbols_line);
 
             $ad = new \stdClass();
+
+            if ($random_ad) {
+                $lbcApi = new \spamtonprof\stp_api\LbcApi();
+                $rd_ad = $lbcApi->get_random_ad();
+
+                $title_str = $rd_ad->subject;
+                $texte->setTexte($rd_ad->body);
+                $image = $rd_ad->image;
+                $category = $rd_ad->category;
+            }
+
             $ad->title = $title_str;
             $ad->text = $texte;
             $ad->image = $image;
+            $ad->category = unaccent($category);
             $ad->commune = $nomCommune;
-            $ad->commune = $nomCommune;
+            
             $ads[] = $ad;
         }
         return ($ads);
