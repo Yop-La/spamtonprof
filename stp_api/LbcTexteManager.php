@@ -205,6 +205,7 @@ class LbcTexteManager
 
                     $q = $this->_db->prepare("select * from textes where ref_type_texte = :ref_type_texte 
                         and ref_texte not in (select ref_texte from adds_tempo where ref_compte = :ref_compte and ref_texte is not null)
+                        and texte not like '%not_valid%'
                         order by ref_texte desc");
 
                     $q->bindValue(":ref_type_texte", $ref_type_texte);
