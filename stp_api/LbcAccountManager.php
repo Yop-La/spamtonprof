@@ -58,11 +58,10 @@ class LbcAccountManager
             $ref_client = $info["valid_lbc_act"];
 
             $query = "select * from compte_lbc 
-                            where (now() >= ( date_publication +  interval '4 hour') or ( date_publication is null and controle_date is not null))
+                            where (now() >= ( date_publication +  interval '10 hour') or ( date_publication is null and controle_date is not null))
                                  and nb_annonces_online != 0
                                  and disabled is false
 						         and ref_client = :ref_client
-                                 and mail like '%gmx.com%'
                                  and open is true
                             order by nb_annonces_online, nb_failed_campaigns, date_publication desc limit 1";
 
@@ -289,6 +288,14 @@ class LbcAccountManager
         $q->execute();
     }
 
+    public function update_ref_client(\spamtonprof\stp_api\LbcAccount $lbcAccount)
+    {
+        $q = $this->_db->prepare("update compte_lbc set ref_client = :ref_client where ref_compte = :ref_compte");
+        $q->bindValue(":ref_client", $lbcAccount->getRef_client());
+        $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
+        $q->execute();
+    }
+
     public function update_nb_successful_campaigns(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
         $q = $this->_db->prepare("update compte_lbc set nb_successful_campaigns = :nb_successful_campaigns where ref_compte = :ref_compte");
@@ -386,6 +393,7 @@ class LbcAccountManager
         $q = $this->_db->prepare("select * from compte_lbc 
         where now() - interval '2 hour' > date_creation and (disabled = false or disabled is null) and (uncheckable = false or uncheckable is null)
             and ( now() - interval '5 hour' > controle_date or controle_date is null)
+            and ref_compte not in (select ref_compte_lbc from lbc_renewal_url where statut = 1)
             order by date_publication desc, nb_annonces_online limit :nb_compte");
         $q->bindValue(":nb_compte", $nbCompte);
         $q->execute();
