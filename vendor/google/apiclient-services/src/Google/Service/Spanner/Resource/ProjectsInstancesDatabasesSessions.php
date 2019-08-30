@@ -73,11 +73,10 @@ class Google_Service_Spanner_Resource_ProjectsInstancesDatabasesSessions extends
    * that standalone reads and queries use a transaction internally, and count
    * toward the one transaction limit.
    *
-   * Cloud Spanner limits the number of sessions that can exist at any given time;
-   * thus, it is a good idea to delete idle and/or unneeded sessions. Aside from
-   * explicit deletes, Cloud Spanner can delete sessions for which no operations
-   * are sent for more than an hour. If a session is deleted, requests to it
-   * return `NOT_FOUND`.
+   * Active sessions use additional server resources, so it is a good idea to
+   * delete idle and unneeded sessions. Aside from explicit deletes, Cloud Spanner
+   * can delete sessions for which no operations are sent for more than an hour.
+   * If a session is deleted, requests to it return `NOT_FOUND`.
    *
    * Idle sessions can be kept alive by sending a trivial SQL query periodically,
    * e.g., `"SELECT 1"`. (sessions.create)
@@ -113,19 +112,13 @@ class Google_Service_Spanner_Resource_ProjectsInstancesDatabasesSessions extends
    * Executes a batch of SQL DML statements. This method allows many statements to
    * be run with lower latency than submitting them sequentially with ExecuteSql.
    *
-   * Statements are executed in order, sequentially. ExecuteBatchDmlResponse will
-   * contain a ResultSet for each DML statement that has successfully executed. If
-   * a statement fails, its error status will be returned as part of the
-   * ExecuteBatchDmlResponse. Execution will stop at the first failed statement;
-   * the remaining statements will not run.
+   * Statements are executed in sequential order. A request can succeed even if a
+   * statement fails. The ExecuteBatchDmlResponse.status field in the response
+   * provides information about the statement that failed. Clients must inspect
+   * this field to determine whether an error occurred.
    *
-   * ExecuteBatchDml is expected to return an OK status with a response even if
-   * there was an error while processing one of the DML statements. Clients must
-   * inspect response.status to determine if there were any errors while
-   * processing the request.
-   *
-   * See more details in ExecuteBatchDmlRequest and ExecuteBatchDmlResponse.
-   * (sessions.executeBatchDml)
+   * Execution stops after the first failed statement; the remaining statements
+   * are not executed. (sessions.executeBatchDml)
    *
    * @param string $session Required. The session in which the DML statements
    * should be performed.
@@ -204,8 +197,6 @@ class Google_Service_Spanner_Resource_ProjectsInstancesDatabasesSessions extends
    * @param string $database Required. The database in which to list sessions.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param int pageSize Number of sessions to be returned in the response. If
-   * 0 or less, defaults to the server's maximum allowed page size.
    * @opt_param string filter An expression for filtering the results of the
    * request. Filter rules are case insensitive. The fields eligible for filtering
    * are:
@@ -219,6 +210,8 @@ class Google_Service_Spanner_Resource_ProjectsInstancesDatabasesSessions extends
    * the label contains the string "dev".
    * @opt_param string pageToken If non-empty, `page_token` should contain a
    * next_page_token from a previous ListSessionsResponse.
+   * @opt_param int pageSize Number of sessions to be returned in the response. If
+   * 0 or less, defaults to the server's maximum allowed page size.
    * @return Google_Service_Spanner_ListSessionsResponse
    */
   public function listProjectsInstancesDatabasesSessions($database, $optParams = array())

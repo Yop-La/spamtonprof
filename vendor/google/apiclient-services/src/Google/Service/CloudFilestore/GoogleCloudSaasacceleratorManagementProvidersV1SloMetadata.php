@@ -17,9 +17,11 @@
 
 class Google_Service_CloudFilestore_GoogleCloudSaasacceleratorManagementProvidersV1SloMetadata extends Google_Collection
 {
-  protected $collection_key = 'exclusions';
+  protected $collection_key = 'nodes';
   protected $exclusionsType = 'Google_Service_CloudFilestore_GoogleCloudSaasacceleratorManagementProvidersV1SloExclusion';
   protected $exclusionsDataType = 'array';
+  protected $nodesType = 'Google_Service_CloudFilestore_GoogleCloudSaasacceleratorManagementProvidersV1NodeSloMetadata';
+  protected $nodesDataType = 'array';
   public $tier;
 
   /**
@@ -35,6 +37,20 @@ class Google_Service_CloudFilestore_GoogleCloudSaasacceleratorManagementProvider
   public function getExclusions()
   {
     return $this->exclusions;
+  }
+  /**
+   * @param Google_Service_CloudFilestore_GoogleCloudSaasacceleratorManagementProvidersV1NodeSloMetadata
+   */
+  public function setNodes($nodes)
+  {
+    $this->nodes = $nodes;
+  }
+  /**
+   * @return Google_Service_CloudFilestore_GoogleCloudSaasacceleratorManagementProvidersV1NodeSloMetadata
+   */
+  public function getNodes()
+  {
+    return $this->nodes;
   }
   public function setTier($tier)
   {

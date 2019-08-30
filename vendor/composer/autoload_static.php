@@ -125,7 +125,8 @@ class ComposerStaticInit0ed64792fce90d099800fc7a244567d8
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Cache\\' => 
         array (

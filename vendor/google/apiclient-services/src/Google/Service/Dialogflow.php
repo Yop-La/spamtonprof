@@ -24,7 +24,7 @@
  *
  * <p>
  * For more information about this service, see the API
- * <a href="https://cloud.google.com/dialogflow-enterprise/" target="_blank">Documentation</a>
+ * <a href="https://cloud.google.com/dialogflow/" target="_blank">Documentation</a>
  * </p>
  *
  * @author Google, Inc.
@@ -46,17 +46,19 @@ class Google_Service_Dialogflow extends Google_Service
   public $projects_agent_sessions;
   public $projects_agent_sessions_contexts;
   public $projects_agent_sessions_entityTypes;
+  public $projects_locations_operations;
   public $projects_operations;
   
   /**
    * Constructs the internal representation of the Dialogflow service.
    *
-   * @param Google_Client $client
+   * @param Google_Client $client The client used to deliver requests.
+   * @param string $rootUrl The root URL used for requests to the service.
    */
-  public function __construct(Google_Client $client)
+  public function __construct(Google_Client $client, $rootUrl = null)
   {
     parent::__construct($client);
-    $this->rootUrl = 'https://dialogflow.googleapis.com/';
+    $this->rootUrl = $rootUrl ?: 'https://dialogflow.googleapis.com/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v2';
@@ -68,7 +70,31 @@ class Google_Service_Dialogflow extends Google_Service
         'projects',
         array(
           'methods' => array(
-            'getAgent' => array(
+            'agent' => array(
+              'path' => 'v2/{+parent}/agent',
+              'httpMethod' => 'POST',
+              'parameters' => array(
+                'parent' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'updateMask' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+              ),
+            ),'deleteAgent' => array(
+              'path' => 'v2/{+parent}/agent',
+              'httpMethod' => 'DELETE',
+              'parameters' => array(
+                'parent' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'getAgent' => array(
               'path' => 'v2/{+parent}/agent',
               'httpMethod' => 'GET',
               'parameters' => array(
@@ -127,13 +153,13 @@ class Google_Service_Dialogflow extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageSize' => array(
-                  'location' => 'query',
-                  'type' => 'integer',
-                ),
                 'pageToken' => array(
                   'location' => 'query',
                   'type' => 'string',
+                ),
+                'pageSize' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
                 ),
               ),
             ),'train' => array(
@@ -223,10 +249,6 @@ class Google_Service_Dialogflow extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'languageCode' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'pageToken' => array(
                   'location' => 'query',
                   'type' => 'string',
@@ -234,6 +256,10 @@ class Google_Service_Dialogflow extends Google_Service
                 'pageSize' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'languageCode' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),'patch' => array(
@@ -379,6 +405,10 @@ class Google_Service_Dialogflow extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
+                'intentView' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
                 'languageCode' => array(
                   'location' => 'query',
                   'type' => 'string',
@@ -391,10 +421,6 @@ class Google_Service_Dialogflow extends Google_Service
                   'location' => 'query',
                   'type' => 'integer',
                 ),
-                'intentView' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
               ),
             ),'patch' => array(
               'path' => 'v2/{+name}',
@@ -405,15 +431,15 @@ class Google_Service_Dialogflow extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
+                'intentView' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
                 'languageCode' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
                 'updateMask' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
-                'intentView' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
@@ -569,13 +595,13 @@ class Google_Service_Dialogflow extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'pageSize' => array(
-                  'location' => 'query',
-                  'type' => 'integer',
-                ),
                 'pageToken' => array(
                   'location' => 'query',
                   'type' => 'string',
+                ),
+                'pageSize' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
                 ),
               ),
             ),'patch' => array(
@@ -588,6 +614,48 @@ class Google_Service_Dialogflow extends Google_Service
                   'required' => true,
                 ),
                 'updateMask' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+              ),
+            ),
+          )
+        )
+    );
+    $this->projects_locations_operations = new Google_Service_Dialogflow_Resource_ProjectsLocationsOperations(
+        $this,
+        $this->serviceName,
+        'operations',
+        array(
+          'methods' => array(
+            'get' => array(
+              'path' => 'v2/{+name}',
+              'httpMethod' => 'GET',
+              'parameters' => array(
+                'name' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+              ),
+            ),'list' => array(
+              'path' => 'v2/{+name}/operations',
+              'httpMethod' => 'GET',
+              'parameters' => array(
+                'name' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'pageSize' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
+                ),
+                'filter' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
@@ -610,6 +678,28 @@ class Google_Service_Dialogflow extends Google_Service
                   'location' => 'path',
                   'type' => 'string',
                   'required' => true,
+                ),
+              ),
+            ),'list' => array(
+              'path' => 'v2/{+name}/operations',
+              'httpMethod' => 'GET',
+              'parameters' => array(
+                'name' => array(
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ),
+                'pageToken' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'pageSize' => array(
+                  'location' => 'query',
+                  'type' => 'integer',
+                ),
+                'filter' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),

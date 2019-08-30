@@ -78,7 +78,7 @@ class Google_Service_Monitoring_Resource_ProjectsTimeSeries extends Google_Servi
    * should be returned. The filter must specify a single metric type, and can
    * additionally specify metric labels and other information. For example:
    * metric.type = "compute.googleapis.com/instance/cpu/usage_time" AND
-   * metric.label.instance_name = "my-instance-name"
+   * metric.labels.instance_name = "my-instance-name"
    * @opt_param string pageToken If this field is not empty then it must contain
    * the nextPageToken value returned by a previous call to this method. Using
    * this field causes the method to return additional results from the previous

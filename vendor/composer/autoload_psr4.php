@@ -15,7 +15,7 @@ return array(
     'Stripe\\' => array($vendorDir . '/stripe/stripe-php/lib'),
     'Sabre\\Uri\\' => array($vendorDir . '/sabre/uri/lib'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
-    'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-message/src'),
+    'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-factory/src', $vendorDir . '/psr/http-message/src'),
     'Psr\\Cache\\' => array($vendorDir . '/psr/cache/src'),
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
     'Ovh\\' => array($vendorDir . '/ovh/ovh/src'),

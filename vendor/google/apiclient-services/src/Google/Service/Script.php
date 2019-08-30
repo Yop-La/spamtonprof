@@ -94,12 +94,13 @@ class Google_Service_Script extends Google_Service
   /**
    * Constructs the internal representation of the Script service.
    *
-   * @param Google_Client $client
+   * @param Google_Client $client The client used to deliver requests.
+   * @param string $rootUrl The root URL used for requests to the service.
    */
-  public function __construct(Google_Client $client)
+  public function __construct(Google_Client $client, $rootUrl = null)
   {
     parent::__construct($client);
-    $this->rootUrl = 'https://script.googleapis.com/';
+    $this->rootUrl = $rootUrl ?: 'https://script.googleapis.com/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1';
@@ -119,11 +120,11 @@ class Google_Service_Script extends Google_Service
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'userProcessFilter.endTime' => array(
+                'pageToken' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'pageToken' => array(
+                'userProcessFilter.endTime' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
@@ -135,14 +136,14 @@ class Google_Service_Script extends Google_Service
                   'location' => 'query',
                   'type' => 'string',
                 ),
+                'userProcessFilter.projectName' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
                 'userProcessFilter.userAccessLevels' => array(
                   'location' => 'query',
                   'type' => 'string',
                   'repeated' => true,
-                ),
-                'userProcessFilter.projectName' => array(
-                  'location' => 'query',
-                  'type' => 'string',
                 ),
                 'userProcessFilter.functionName' => array(
                   'location' => 'query',
@@ -167,14 +168,6 @@ class Google_Service_Script extends Google_Service
               'path' => 'v1/processes:listScriptProcesses',
               'httpMethod' => 'GET',
               'parameters' => array(
-                'pageToken' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
-                'pageSize' => array(
-                  'location' => 'query',
-                  'type' => 'integer',
-                ),
                 'scriptProcessFilter.endTime' => array(
                   'location' => 'query',
                   'type' => 'string',
@@ -189,11 +182,19 @@ class Google_Service_Script extends Google_Service
                   'type' => 'string',
                   'repeated' => true,
                 ),
+                'scriptProcessFilter.functionName' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
                 'scriptProcessFilter.startTime' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'scriptProcessFilter.functionName' => array(
+                'scriptProcessFilter.deploymentId' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'scriptId' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
@@ -202,13 +203,13 @@ class Google_Service_Script extends Google_Service
                   'type' => 'string',
                   'repeated' => true,
                 ),
-                'scriptId' => array(
+                'pageToken' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'scriptProcessFilter.deploymentId' => array(
+                'pageSize' => array(
                   'location' => 'query',
-                  'type' => 'string',
+                  'type' => 'integer',
                 ),
               ),
             ),
@@ -258,11 +259,11 @@ class Google_Service_Script extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
-                'metricsGranularity' => array(
+                'metricsFilter.deploymentId' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
-                'metricsFilter.deploymentId' => array(
+                'metricsGranularity' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),

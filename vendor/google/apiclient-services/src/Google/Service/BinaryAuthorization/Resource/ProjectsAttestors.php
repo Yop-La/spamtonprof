@@ -81,6 +81,10 @@ class Google_Service_BinaryAuthorization_Resource_ProjectsAttestors extends Goog
    * requested. See the operation documentation for the appropriate value for this
    * field.
    * @param array $optParams Optional parameters.
+   *
+   * @opt_param int options.requestedPolicyVersion Optional. The policy format
+   * version to be returned. Acceptable values are 0, 1, and 3. If the value is 0,
+   * or the field is omitted, policy format version 1 will be returned.
    * @return Google_Service_BinaryAuthorization_IamPolicy
    */
   public function getIamPolicy($resource, $optParams = array())
@@ -97,13 +101,13 @@ class Google_Service_BinaryAuthorization_Resource_ProjectsAttestors extends Goog
    * with the attestors, in the format `projects`.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param int pageSize Requested page size. The server may return fewer
-   * results than requested. If unspecified, the server will pick an appropriate
-   * default.
    * @opt_param string pageToken A token identifying a page of results the server
    * should return. Typically, this is the value of
    * ListAttestorsResponse.next_page_token returned from the previous call to the
    * `ListAttestors` method.
+   * @opt_param int pageSize Requested page size. The server may return fewer
+   * results than requested. If unspecified, the server will pick an appropriate
+   * default.
    * @return Google_Service_BinaryAuthorization_ListAttestorsResponse
    */
   public function listProjectsAttestors($parent, $optParams = array())

@@ -25,6 +25,8 @@ class Google_Service_Bigquery_TrainingOptions extends Google_Collection
   public $earlyStop;
   public $initialLearnRate;
   public $inputLabelColumns;
+  public $kmeansInitializationColumn;
+  public $kmeansInitializationMethod;
   public $l1Regularization;
   public $l2Regularization;
   public $labelClassWeights;
@@ -33,7 +35,9 @@ class Google_Service_Bigquery_TrainingOptions extends Google_Collection
   public $lossType;
   public $maxIterations;
   public $minRelativeProgress;
+  public $modelUri;
   public $numClusters;
+  public $optimizationStrategy;
   public $warmStart;
 
   public function setDataSplitColumn($dataSplitColumn)
@@ -91,6 +95,22 @@ class Google_Service_Bigquery_TrainingOptions extends Google_Collection
   public function getInputLabelColumns()
   {
     return $this->inputLabelColumns;
+  }
+  public function setKmeansInitializationColumn($kmeansInitializationColumn)
+  {
+    $this->kmeansInitializationColumn = $kmeansInitializationColumn;
+  }
+  public function getKmeansInitializationColumn()
+  {
+    return $this->kmeansInitializationColumn;
+  }
+  public function setKmeansInitializationMethod($kmeansInitializationMethod)
+  {
+    $this->kmeansInitializationMethod = $kmeansInitializationMethod;
+  }
+  public function getKmeansInitializationMethod()
+  {
+    return $this->kmeansInitializationMethod;
   }
   public function setL1Regularization($l1Regularization)
   {
@@ -156,6 +176,14 @@ class Google_Service_Bigquery_TrainingOptions extends Google_Collection
   {
     return $this->minRelativeProgress;
   }
+  public function setModelUri($modelUri)
+  {
+    $this->modelUri = $modelUri;
+  }
+  public function getModelUri()
+  {
+    return $this->modelUri;
+  }
   public function setNumClusters($numClusters)
   {
     $this->numClusters = $numClusters;
@@ -163,6 +191,14 @@ class Google_Service_Bigquery_TrainingOptions extends Google_Collection
   public function getNumClusters()
   {
     return $this->numClusters;
+  }
+  public function setOptimizationStrategy($optimizationStrategy)
+  {
+    $this->optimizationStrategy = $optimizationStrategy;
+  }
+  public function getOptimizationStrategy()
+  {
+    return $this->optimizationStrategy;
   }
   public function setWarmStart($warmStart)
   {

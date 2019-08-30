@@ -58,7 +58,23 @@ class Google_Service_Iam_Resource_ProjectsServiceAccounts extends Google_Service
     return $this->call('delete', array($params), "Google_Service_Iam_IamEmpty");
   }
   /**
-   * Disables a ServiceAccount. The API is currently in alpha phase.
+   * DisableServiceAccount is currently in the alpha launch stage.
+   *
+   * Disables a ServiceAccount, which immediately prevents the service account
+   * from authenticating and gaining access to APIs.
+   *
+   * Disabled service accounts can be safely restored by using
+   * EnableServiceAccount at any point. Deleted service accounts cannot be
+   * restored using this method.
+   *
+   * Disabling a service account that is bound to VMs, Apps, Functions, or other
+   * jobs will cause those jobs to lose access to resources if they are using the
+   * disabled service account.
+   *
+   * To improve reliability of your services and avoid unexpected outages, it is
+   * recommended to first disable a service account rather than delete it. After
+   * disabling the service account, wait at least 24 hours to verify there are no
+   * unintended consequences, and then delete the service account.
    * (serviceAccounts.disable)
    *
    * @param string $name The resource name of the service account in the following
@@ -77,12 +93,21 @@ class Google_Service_Iam_Resource_ProjectsServiceAccounts extends Google_Service
     return $this->call('disable', array($params), "Google_Service_Iam_IamEmpty");
   }
   /**
-   * Enables a ServiceAccount.  The API is currently in alpha phase.
+   * EnableServiceAccount is currently in the alpha launch stage.
+   *
+   *  Restores a disabled ServiceAccount  that has been manually disabled by using
+   * DisableServiceAccount. Service  accounts that have been disabled by other
+   * means or for other reasons,  such as abuse, cannot be restored using this
+   * method.
+   *
+   *  EnableServiceAccount will have no effect on a service account that is  not
+   * disabled.  Enabling an already enabled service account will have no  effect.
    * (serviceAccounts.enable)
    *
    * @param string $name The resource name of the service account in the following
-   * format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}'. Using
-   * `-` as a wildcard for the `PROJECT_ID` will infer the project from the
+   * format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`. Using `-` as a
+   * wildcard for the `PROJECT_ID` will infer the project from the account. The
+   * `ACCOUNT` value can be the `email` address or the `unique_id` of the service
    * account.
    * @param Google_Service_Iam_EnableServiceAccountRequest $postBody
    * @param array $optParams Optional parameters.
@@ -130,6 +155,10 @@ class Google_Service_Iam_Resource_ProjectsServiceAccounts extends Google_Service
    * requested. See the operation documentation for the appropriate value for this
    * field.
    * @param array $optParams Optional parameters.
+   *
+   * @opt_param int options.requestedPolicyVersion Optional. The policy format
+   * version to be returned. Acceptable values are 0, 1, and 3. If the value is 0,
+   * or the field is omitted, policy format version 1 will be returned.
    * @return Google_Service_Iam_Policy
    */
   public function getIamPolicy($resource, $optParams = array())
@@ -291,7 +320,7 @@ class Google_Service_Iam_Resource_ProjectsServiceAccounts extends Google_Service
    * (serviceAccounts.undelete)
    *
    * @param string $name The resource name of the service account in the following
-   * format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}'. Using
+   * format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}`. Using
    * `-` as a wildcard for the `PROJECT_ID` will infer the project from the
    * account.
    * @param Google_Service_Iam_UndeleteServiceAccountRequest $postBody
@@ -310,8 +339,8 @@ class Google_Service_Iam_Resource_ProjectsServiceAccounts extends Google_Service
    *
    * Updates a ServiceAccount.
    *
-   * Currently, only the following fields are updatable: `display_name` . The
-   * `etag` is mandatory. (serviceAccounts.update)
+   * Currently, only the following fields are updatable: `display_name` and
+   * `description`. (serviceAccounts.update)
    *
    * @param string $name The resource name of the service account in the following
    * format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.

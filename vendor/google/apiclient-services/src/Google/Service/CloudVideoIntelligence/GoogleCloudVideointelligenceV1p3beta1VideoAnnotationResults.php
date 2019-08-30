@@ -25,8 +25,12 @@ class Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta
   protected $frameLabelAnnotationsType = 'Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta1LabelAnnotation';
   protected $frameLabelAnnotationsDataType = 'array';
   public $inputUri;
+  protected $logoRecognitionAnnotationsType = 'Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta1LogoRecognitionAnnotation';
+  protected $logoRecognitionAnnotationsDataType = 'array';
   protected $objectAnnotationsType = 'Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta1ObjectTrackingAnnotation';
   protected $objectAnnotationsDataType = 'array';
+  protected $segmentType = 'Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta1VideoSegment';
+  protected $segmentDataType = '';
   protected $segmentLabelAnnotationsType = 'Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta1LabelAnnotation';
   protected $segmentLabelAnnotationsDataType = 'array';
   protected $shotAnnotationsType = 'Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta1VideoSegment';
@@ -89,6 +93,20 @@ class Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta
     return $this->inputUri;
   }
   /**
+   * @param Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta1LogoRecognitionAnnotation
+   */
+  public function setLogoRecognitionAnnotations($logoRecognitionAnnotations)
+  {
+    $this->logoRecognitionAnnotations = $logoRecognitionAnnotations;
+  }
+  /**
+   * @return Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta1LogoRecognitionAnnotation
+   */
+  public function getLogoRecognitionAnnotations()
+  {
+    return $this->logoRecognitionAnnotations;
+  }
+  /**
    * @param Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta1ObjectTrackingAnnotation
    */
   public function setObjectAnnotations($objectAnnotations)
@@ -101,6 +119,20 @@ class Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta
   public function getObjectAnnotations()
   {
     return $this->objectAnnotations;
+  }
+  /**
+   * @param Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta1VideoSegment
+   */
+  public function setSegment(Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta1VideoSegment $segment)
+  {
+    $this->segment = $segment;
+  }
+  /**
+   * @return Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta1VideoSegment
+   */
+  public function getSegment()
+  {
+    return $this->segment;
   }
   /**
    * @param Google_Service_CloudVideoIntelligence_GoogleCloudVideointelligenceV1p3beta1LabelAnnotation
