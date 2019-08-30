@@ -53,7 +53,7 @@ $lbc_campaign = $lbc_campaign_mg->add(new \spamtonprof\stp_api\LbcCampaign(array
 
 
 $category = $client->getCategory();
-$ads = $lbcProcessMg->generateAds($refClient, $nbAds, $phone, true, $refCompte, $lbc_campaign);
+$ads = $lbcProcessMg->generateAds($refClient, $nbAds, $phone, true, $refCompte, $lbc_campaign, $category);
 
 
 $slack = new \spamtonprof\slack\Slack();
@@ -65,5 +65,5 @@ $slack->sendMessages('log-lbc', array(
 
 $retour = new stdClass();
 $retour->ads = $ads;
-$retour->category = $category;
+
 prettyPrint($retour);
