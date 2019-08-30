@@ -578,7 +578,28 @@ class StripeManager
 
         return ($ret);
     }
-
+    
+    public function retrieveAllInvoice($email)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        
+        $customers = \Stripe\Customer::all(["email" => $email]);
+        
+        $cus = $customers->data[0];
+        
+        
+        
+        $invoices = \Stripe\Invoice::all(array("customer" => $cus->id));
+        
+        $invoices = $invoices -> data;
+        
+        foreach ($invoices as $invoice){
+            
+            echo($invoice->invoice_pdf . '<br>');
+            
+        }
+        
+    }
     public function retrieveInvoice()
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
