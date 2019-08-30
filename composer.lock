@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "44f512a19b8bcb14fa5664576d65a145",
+    "content-hash": "85870f654b23ca44e18e21551a1d93b4",
     "packages": [
         {
             "name": "algolia/algoliasearch-client-php",
@@ -61,6 +61,53 @@
             "description": "Algolia Search API Client for PHP",
             "homepage": "https://github.com/algolia/algoliasearch-client-php",
             "time": "2018-11-06T10:48:00+00:00"
+        },
+        {
+            "name": "cba85/content-spinning",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cba85/content-spinning.git",
+                "reference": "5eca54928ca6b800b221432cd22cf04a44174535"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cba85/content-spinning/zipball/5eca54928ca6b800b221432cd22cf04a44174535",
+                "reference": "5eca54928ca6b800b221432cd22cf04a44174535",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ContentSpinning\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Clément Barbaza",
+                    "email": "bonjour@clementbarbaza.com",
+                    "homepage": "https://github.com/cba85",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A simple PHP content spinning for SEO",
+            "homepage": "https://github.com/cba85/content-spinning",
+            "keywords": [
+                "content",
+                "php",
+                "spinning"
+            ],
+            "time": "2016-12-16T15:46:55+00:00"
         },
         {
             "name": "clue/stream-filter",
@@ -590,12 +637,12 @@
             "version": "1.0.5",
             "source": {
                 "type": "git",
-                "url": "https://github.com/ivanakimov/hashids.php.git",
+                "url": "https://github.com/vinkla/hashids.git",
                 "reference": "991a88b01b01b053fbd39a56780a66e572f1dc1a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ivanakimov/hashids.php/zipball/991a88b01b01b053fbd39a56780a66e572f1dc1a",
+                "url": "https://api.github.com/repos/vinkla/hashids/zipball/991a88b01b01b053fbd39a56780a66e572f1dc1a",
                 "reference": "991a88b01b01b053fbd39a56780a66e572f1dc1a",
                 "shasum": ""
             },

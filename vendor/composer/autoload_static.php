@@ -81,6 +81,7 @@ class ComposerStaticInit0ed64792fce90d099800fc7a244567d8
         ),
         'C' => 
         array (
+            'ContentSpinning\\' => 16,
             'Clue\\StreamFilter\\' => 18,
         ),
     );
@@ -194,6 +195,10 @@ class ComposerStaticInit0ed64792fce90d099800fc7a244567d8
         'Firebase\\JWT\\' => 
         array (
             0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
+        ),
+        'ContentSpinning\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cba85/content-spinning/src',
         ),
         'Clue\\StreamFilter\\' => 
         array (
