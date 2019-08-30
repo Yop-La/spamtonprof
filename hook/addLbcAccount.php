@@ -73,6 +73,7 @@ $newAccount->setCode_promo(null);
 $newAccount->setControle_date(null);
 $newAccount->setTelephone($numTel);
 $newAccount->setPassword(wp_generate_password() . rand(12, 100));
+$newAccount->setRef_client($client->getRef_client());
 $newAccount = $lbcAccountMg->add($newAccount);
 
 $prenom = $client->getPrenom_client();
