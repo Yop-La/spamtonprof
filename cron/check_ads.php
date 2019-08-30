@@ -1,6 +1,6 @@
 <?php
 /*
- * pour contrôler les annonces en ligne sur leboncoin ( en prod )
+ * pour contrï¿½ler les annonces en ligne sur leboncoin ( en prod )
  *
  * tourne tous les jours pendant la nuit
  *
@@ -24,3 +24,7 @@ header("Pragma: no-cache");
 $lbc = new \spamtonprof\stp_api\LbcProcessManager();
 
 $lbc->checkAds(100);
+
+// $lbc->analyse_campaigns();
+
+// $lbc->publish_campaigns_reporting();
