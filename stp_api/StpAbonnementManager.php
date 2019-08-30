@@ -9,6 +9,8 @@ class StpAbonnementManager
 
     private $_db, $eleveMg;
 
+    const abos_en_cours_dun_prof = 'abos_en_cours_dun_prof';
+
     public function __construct()
     {
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
@@ -319,29 +321,25 @@ class StpAbonnementManager
      */
     public function reverve_finish_trial_inscription($ref_abo, $debut_essai)
     {
-        
-
         $constructor = array(
             "construct" => array(
                 'ref_eleve'
             )
         );
-        
+
         $abo = $this->get(array(
             'ref_abonnement' => $ref_abo
         ), $constructor);
-        
+
         $ref_statut = $abo->getRef_statut_abonnement();
-        
-        
+
         if ($ref_statut != $abo::ESSAI && $ref_statut != $abo::TERMINE && $ref_statut != $abo::ATTENTE_DEMARRAGE) {
             throw new Exception("Pas possible d'appliquer cette fonction à des abos pas en essai ou pas terminé");
         }
-        
+
         $abo->setRef_statut_abonnement($abo::ESSAI);
         $this->updateRefStatutAbonnement($abo);
 
-    
         $begin = \DateTime::createFromFormat(FR_DATE_FORMAT, $debut_essai, new \DateTimeZone("Europe/Paris"));
         $abo->setDebut_essai($begin->format(PG_DATE_FORMAT));
 
@@ -353,8 +351,6 @@ class StpAbonnementManager
         $this->updateDebutEssai($abo);
         $this->updateFinEssai($abo);
 
-
-
         $abo->setFirst_prof_assigned(false);
         $this->updateFirstProfAssigned($abo);
 
@@ -363,19 +359,18 @@ class StpAbonnementManager
 
         $abo->setDate_attribution_prof(null);
         $this->updateDateAttributionProf($abo);
-        
+
         $eleve = $abo->getEleve();
         $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
 
         $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
         $eleve->setSeq_email_parent_essai(0);
         $eleveMg->updateSeqEmailParentEssai($eleve);
-        
+
         $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
-        
+
         $algoliaMg->deleteAbo($abo->getObjectID());
         $algoliaMg->addAbonnement($abo->getRef_abonnement());
-        
     }
 
     // pour remonter les abonnements qui viennent de se voir attribuer un prof pour la premiere fois apres l'inscription
@@ -728,222 +723,237 @@ class StpAbonnementManager
         $q = null;
 
         if (is_array($info)) {
-            if (array_key_exists("ref_abonnement_lower_with_prof", $info)) {
 
-                $refAbonnement = $info["ref_abonnement_lower_with_prof"];
-                $q = $this->_db->prepare('select * from stp_abonnement where ref_abonnement >= :ref_abonnement and first_prof_assigned is true');
-                $q->bindValue(":ref_abonnement", $refAbonnement);
-                $q->execute();
-            } else if (array_key_exists("ref_eleve", $info) && array_key_exists("ref_prof", $info)) {
+            if (array_key_exists('key', $info)) {
 
-                $refEleve = $info["ref_eleve"];
-                $refProf = $info["ref_prof"];
+                $key = $info['key'];
 
-                $q = $this->_db->prepare('select * from stp_abonnement where ref_prof = :ref_prof and ref_eleve =:ref_eleve');
-                $q->bindValue(":ref_prof", $refProf);
-                $q->bindValue(":ref_eleve", $refEleve);
-                $q->execute();
-            } else if (array_key_exists("ref_statut_abonnement", $info) != false && array_key_exists("ref_compte", $info)) {
+                if ($key == $this::abos_en_cours_dun_prof) {
 
-                $refCompte = $info["ref_compte"];
-                $refStatut = $info["ref_statut_abonnement"];
-                $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte and ref_statut_abonnement = :ref_statut_abonnement');
-                $q->bindValue(":ref_compte", $refCompte);
-                $q->bindValue(":ref_statut_abonnement", $refStatut);
-                $q->execute();
-            } else if (array_key_exists("ref_statut_abonnement", $info) && array_key_exists("ref_eleve", $info)) {
+                    $ref_prof = $info['ref_prof'];
 
-                $refStatut = $info["ref_statut_abonnement"];
-                $refEleve = $info["ref_eleve"];
+                    $q = $this->_db->prepare('select * from stp_abonnement where ref_statut_abonnement in (1,2) and ref_prof = :ref_prof');
+                    $q->bindValue(":ref_prof", $ref_prof);
+                    $q->execute();
+                }
+            } else {
 
-                $q = $this->_db->prepare('select * from stp_abonnement where ref_eleve = :ref_eleve and ref_statut_abonnement = :ref_statut_abonnement');
-                $q->bindValue(":ref_eleve", $refEleve);
-                $q->bindValue(":ref_statut_abonnement", $refStatut);
-                $q->execute();
-            } else if (array_key_exists("ref_eleve", $info)) {
+                if (array_key_exists("ref_abonnement_lower_with_prof", $info)) {
 
-                $refEleve = $info["ref_eleve"];
-                $q = $this->_db->prepare('select * from stp_abonnement where ref_eleve = :ref_eleve');
-                $q->bindValue(":ref_eleve", $refEleve);
-                $q->execute();
-            } else if (array_key_exists("ref_proche", $info)) {
+                    $refAbonnement = $info["ref_abonnement_lower_with_prof"];
+                    $q = $this->_db->prepare('select * from stp_abonnement where ref_abonnement >= :ref_abonnement and first_prof_assigned is true');
+                    $q->bindValue(":ref_abonnement", $refAbonnement);
+                    $q->execute();
+                } else if (array_key_exists("ref_eleve", $info) && array_key_exists("ref_prof", $info)) {
 
-                $refProche = $info["ref_proche"];
-                $q = $this->_db->prepare('select * from stp_abonnement where ref_proche = :ref_proche');
-                $q->bindValue(":ref_proche", $refProche);
-                $q->execute();
-            } else if (array_key_exists("ref_coupon", $info) && array_key_exists("ref_compte", $info)) {
+                    $refEleve = $info["ref_eleve"];
+                    $refProf = $info["ref_prof"];
 
-                $refCoupon = $info["ref_coupon"];
-                $refCompte = $info["ref_compte"];
-                $q = $this->_db->prepare('select * from stp_abonnement where ref_coupon = :ref_coupon and ref_compte = :ref_compte');
-                $q->bindValue(":ref_coupon", $refCoupon);
-                $q->bindValue(":ref_compte", $refCompte);
-                $q->execute();
-            } else if (array_key_exists("ref_compte", $info)) {
+                    $q = $this->_db->prepare('select * from stp_abonnement where ref_prof = :ref_prof and ref_eleve =:ref_eleve');
+                    $q->bindValue(":ref_prof", $refProf);
+                    $q->bindValue(":ref_eleve", $refEleve);
+                    $q->execute();
+                } else if (array_key_exists("ref_statut_abonnement", $info) != false && array_key_exists("ref_compte", $info)) {
 
-                $refCompte = $info["ref_compte"];
-                $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte');
-                $q->bindValue(":ref_compte", $refCompte);
-                $q->execute();
-            } else if (array_search("abo_vivant", $info, true) !== false && array_key_exists('offset', $info) && array_key_exists('ref_prof', $info) && array_key_exists('limit', $info)) {
+                    $refCompte = $info["ref_compte"];
+                    $refStatut = $info["ref_statut_abonnement"];
+                    $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte and ref_statut_abonnement = :ref_statut_abonnement');
+                    $q->bindValue(":ref_compte", $refCompte);
+                    $q->bindValue(":ref_statut_abonnement", $refStatut);
+                    $q->execute();
+                } else if (array_key_exists("ref_statut_abonnement", $info) && array_key_exists("ref_eleve", $info)) {
 
-                $offset = $info['offset'];
-                $ref_prof = $info['ref_prof'];
-                $limit = $info['limit'];
+                    $refStatut = $info["ref_statut_abonnement"];
+                    $refEleve = $info["ref_eleve"];
 
-                $q = $this->_db->prepare('select * from stp_abonnement 
+                    $q = $this->_db->prepare('select * from stp_abonnement where ref_eleve = :ref_eleve and ref_statut_abonnement = :ref_statut_abonnement');
+                    $q->bindValue(":ref_eleve", $refEleve);
+                    $q->bindValue(":ref_statut_abonnement", $refStatut);
+                    $q->execute();
+                } else if (array_key_exists("ref_eleve", $info)) {
+
+                    $refEleve = $info["ref_eleve"];
+                    $q = $this->_db->prepare('select * from stp_abonnement where ref_eleve = :ref_eleve');
+                    $q->bindValue(":ref_eleve", $refEleve);
+                    $q->execute();
+                } else if (array_key_exists("ref_proche", $info)) {
+
+                    $refProche = $info["ref_proche"];
+                    $q = $this->_db->prepare('select * from stp_abonnement where ref_proche = :ref_proche');
+                    $q->bindValue(":ref_proche", $refProche);
+                    $q->execute();
+                } else if (array_key_exists("ref_coupon", $info) && array_key_exists("ref_compte", $info)) {
+
+                    $refCoupon = $info["ref_coupon"];
+                    $refCompte = $info["ref_compte"];
+                    $q = $this->_db->prepare('select * from stp_abonnement where ref_coupon = :ref_coupon and ref_compte = :ref_compte');
+                    $q->bindValue(":ref_coupon", $refCoupon);
+                    $q->bindValue(":ref_compte", $refCompte);
+                    $q->execute();
+                } else if (array_key_exists("ref_compte", $info)) {
+
+                    $refCompte = $info["ref_compte"];
+                    $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte');
+                    $q->bindValue(":ref_compte", $refCompte);
+                    $q->execute();
+                } else if (array_search("abo_vivant", $info, true) !== false && array_key_exists('offset', $info) && array_key_exists('ref_prof', $info) && array_key_exists('limit', $info)) {
+
+                    $offset = $info['offset'];
+                    $ref_prof = $info['ref_prof'];
+                    $limit = $info['limit'];
+
+                    $q = $this->_db->prepare('select * from stp_abonnement 
                     where (ref_statut_abonnement = 1 or (ref_statut_abonnement = 2 and extract(day from NOW() - date_creation)<=10))
                         and ref_prof = :ref_prof   
                     limit :limit offset :offset');
-                $q->bindValue(':offset', $offset);
-                $q->bindValue(':limit', $limit);
-                $q->bindValue(':ref_prof', $ref_prof);
-                $q->execute();
-            } else if (array_key_exists("ref_prof", $info)) {
+                    $q->bindValue(':offset', $offset);
+                    $q->bindValue(':limit', $limit);
+                    $q->bindValue(':ref_prof', $ref_prof);
+                    $q->execute();
+                } else if (array_key_exists("ref_prof", $info)) {
 
-                $refProf = $info["ref_prof"];
+                    $refProf = $info["ref_prof"];
 
-                $q = $this->_db->prepare('select * from stp_abonnement where ref_prof = :ref_prof');
-                $q->bindValue(":ref_prof", $refProf);
-                $q->execute();
-            } else if (array_key_exists("email", $info)) {
+                    $q = $this->_db->prepare('select * from stp_abonnement where ref_prof = :ref_prof');
+                    $q->bindValue(":ref_prof", $refProf);
+                    $q->execute();
+                } else if (array_key_exists("email", $info)) {
 
-                $email = $info["email"];
+                    $email = $info["email"];
 
-                $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
-                $procheMg = new \spamtonprof\stp_api\StpProcheManager();
+                    $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
+                    $procheMg = new \spamtonprof\stp_api\StpProcheManager();
 
-                $proches = $procheMg->getAll(array(
-                    "email" => "yopla"
-                ));
-                $eleves = $eleveMg->getAll(array(
-                    "email" => "yopla"
-                ));
+                    $proches = $procheMg->getAll(array(
+                        "email" => "yopla"
+                    ));
+                    $eleves = $eleveMg->getAll(array(
+                        "email" => "yopla"
+                    ));
 
-                $refEleves = extractAttribute($eleves, "ref_eleve");
+                    $refEleves = extractAttribute($eleves, "ref_eleve");
 
-                $refProches = extractAttribute($proches, "ref_proche");
+                    $refProches = extractAttribute($proches, "ref_proche");
 
-                $refEleves = toPgArray($refEleves, true);
-                $refProches = toPgArray($refProches, true);
+                    $refEleves = toPgArray($refEleves, true);
+                    $refProches = toPgArray($refProches, true);
 
-                $q = $this->_db->prepare('select * from stp_abonnement where ref_proche in ' . $refProches . ' or ref_eleve in ' . $refEleves);
-                $q->execute();
-            } else if (array_key_exists("telephones", $info) && array_key_exists("teleprospection", $info) && array_key_exists("remarques", $info)) {
+                    $q = $this->_db->prepare('select * from stp_abonnement where ref_proche in ' . $refProches . ' or ref_eleve in ' . $refEleves);
+                    $q->execute();
+                } else if (array_key_exists("telephones", $info) && array_key_exists("teleprospection", $info) && array_key_exists("remarques", $info)) {
 
-                $nums = $info["telephones"];
-                $tele = $info["teleprospection"];
-                $remarques = $info["remarques"];
+                    $nums = $info["telephones"];
+                    $tele = $info["teleprospection"];
+                    $remarques = $info["remarques"];
 
-                $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
-                $procheMg = new \spamtonprof\stp_api\StpProcheManager();
+                    $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
+                    $procheMg = new \spamtonprof\stp_api\StpProcheManager();
 
-                $eleves = $eleveMg->getAll(array(
-                    "telephones" => $nums
-                ));
-                $proches = $procheMg->getAll(array(
-                    "telephones" => $nums
-                ));
+                    $eleves = $eleveMg->getAll(array(
+                        "telephones" => $nums
+                    ));
+                    $proches = $procheMg->getAll(array(
+                        "telephones" => $nums
+                    ));
 
-                $refEleves = [];
-                $refProches = [];
+                    $refEleves = [];
+                    $refProches = [];
 
-                foreach ($eleves as $eleve) {
-                    $refEleves[] = $eleve->getRef_eleve();
-                }
+                    foreach ($eleves as $eleve) {
+                        $refEleves[] = $eleve->getRef_eleve();
+                    }
 
-                foreach ($proches as $proche) {
-                    $refProches[] = $proche->getRef_proche();
-                }
-                $refProches = toPgArray($refProches, true);
-                $refEleves = toPgArray($refEleves, true);
+                    foreach ($proches as $proche) {
+                        $refProches[] = $proche->getRef_proche();
+                    }
+                    $refProches = toPgArray($refProches, true);
+                    $refEleves = toPgArray($refEleves, true);
 
-                $q = $this->_db->prepare('select * from stp_abonnement where ref_proche in ' . $refProches . ' or ref_eleve in ' . $refEleves . ' 
+                    $q = $this->_db->prepare('select * from stp_abonnement where ref_proche in ' . $refProches . ' or ref_eleve in ' . $refEleves . ' 
                     or teleprospection = :teleprospection 
                     or lower(remarque_inscription) like unaccent(:remarques) order by ref_proche,date_creation');
-                $q->bindValue(":teleprospection", $tele);
-                $q->bindValue(":remarques", "%" . $remarques . "%");
-                $q->execute();
-            } else if (array_key_exists("ref_abonnements", $info)) {
+                    $q->bindValue(":teleprospection", $tele);
+                    $q->bindValue(":remarques", "%" . $remarques . "%");
+                    $q->execute();
+                } else if (array_key_exists("ref_abonnements", $info)) {
 
-                $refAbos = $info["ref_abonnements"];
-                $refAbos = toPgArray($refAbos, true);
-                $q = $this->_db->prepare('select * from stp_abonnement where ref_abonnement in ' . $refAbos);
-                $q->execute();
-            } else if (array_key_exists("limit", $info) && array_search("all", $info, true) !== false && array_key_exists("offset", $info)) {
+                    $refAbos = $info["ref_abonnements"];
+                    $refAbos = toPgArray($refAbos, true);
+                    $q = $this->_db->prepare('select * from stp_abonnement where ref_abonnement in ' . $refAbos);
+                    $q->execute();
+                } else if (array_key_exists("limit", $info) && array_search("all", $info, true) !== false && array_key_exists("offset", $info)) {
 
-                $offset = $info["offset"];
-                $limit = $info["limit"];
+                    $offset = $info["offset"];
+                    $limit = $info["limit"];
 
-                $q = $this->_db->prepare('select * from stp_abonnement limit :limit offset :offset');
-                $q->bindValue(':offset', $offset);
-                $q->bindValue(':limit', $limit);
-                $q->execute();
-            } else if (array_key_exists("ref_statut_abonnement", $info) && array_search("nb_inactif_day", $info, true) !== false) {
+                    $q = $this->_db->prepare('select * from stp_abonnement limit :limit offset :offset');
+                    $q->bindValue(':offset', $offset);
+                    $q->bindValue(':limit', $limit);
+                    $q->execute();
+                } else if (array_key_exists("ref_statut_abonnement", $info) && array_search("nb_inactif_day", $info, true) !== false) {
 
-                $ref_statut_abonnement = $info["ref_statut_abonnement"];
-                $nb_inactif_day = $info["nb_inactif_day"];
+                    $ref_statut_abonnement = $info["ref_statut_abonnement"];
+                    $nb_inactif_day = $info["nb_inactif_day"];
 
-                $q = $this->_db->prepare('select extract(day from now() - dernier_contact)  from stp_abonnement 
+                    $q = $this->_db->prepare('select extract(day from now() - dernier_contact)  from stp_abonnement 
 	               where extract(day from now() - dernier_contact) > :nb_inactif_day and ref_statut_abonnement = :ref_statut_abonnement');
-                $q->bindValue(':ref_statut_abonnement', $ref_statut_abonnement);
-                $q->bindValue(':nb_inactif_day', $nb_inactif_day);
-                $q->execute();
-            } else if (array_key_exists("ref_statut_abonnement", $info) && array_search("nb_inactif_day", $info, true) !== false && array_key_exists("age", $info)) {
+                    $q->bindValue(':ref_statut_abonnement', $ref_statut_abonnement);
+                    $q->bindValue(':nb_inactif_day', $nb_inactif_day);
+                    $q->execute();
+                } else if (array_key_exists("ref_statut_abonnement", $info) && array_search("nb_inactif_day", $info, true) !== false && array_key_exists("age", $info)) {
 
-                $ref_statut_abonnement = $info["ref_statut_abonnement"];
-                $nb_inactif_day = $info["nb_inactif_day"];
-                $age = $info["age"];
+                    $ref_statut_abonnement = $info["ref_statut_abonnement"];
+                    $nb_inactif_day = $info["nb_inactif_day"];
+                    $age = $info["age"];
 
-                $q = $this->_db->prepare('select extract(day from now() - dernier_contact)  from stp_abonnement
+                    $q = $this->_db->prepare('select extract(day from now() - dernier_contact)  from stp_abonnement
 	               where extract(day from now() - dernier_contact) < :nb_inactif_day 
                     and ref_statut_abonnement = :ref_statut_abonnement
                     and extract(day from now() - date_creation) < :age');
-                $q->bindValue(':ref_statut_abonnement', $ref_statut_abonnement);
-                $q->bindValue(':nb_inactif_day', $nb_inactif_day);
-                $q->execute();
-            } else if (array_key_exists("ref_statut_abonnement", $info) && array_key_exists("nb_inactif_day", $info) && array_key_exists("limit", $info) && array_key_exists("days_since_relance", $info)) {
+                    $q->bindValue(':ref_statut_abonnement', $ref_statut_abonnement);
+                    $q->bindValue(':nb_inactif_day', $nb_inactif_day);
+                    $q->execute();
+                } else if (array_key_exists("ref_statut_abonnement", $info) && array_key_exists("nb_inactif_day", $info) && array_key_exists("limit", $info) && array_key_exists("days_since_relance", $info)) {
 
-                $ref_statut_abonnement = $info["ref_statut_abonnement"];
-                $days_since_relance = $info["days_since_relance"];
-                $limit = $info["limit"];
-                $nb_inactif_day = $info["nb_inactif_day"];
+                    $ref_statut_abonnement = $info["ref_statut_abonnement"];
+                    $days_since_relance = $info["days_since_relance"];
+                    $limit = $info["limit"];
+                    $nb_inactif_day = $info["nb_inactif_day"];
 
-                $q = $this->_db->prepare("select *  from stp_abonnement
+                    $q = $this->_db->prepare("select *  from stp_abonnement
 	               where (extract(day from now() - dernier_contact) > :nb_inactif_day or dernier_contact is null) and ref_statut_abonnement = :ref_statut_abonnement
                         and (relance_date is null or now() > relance_date + interval '" . $days_since_relance . " days')
                         limit :limit");
-                $q->bindValue(':ref_statut_abonnement', $ref_statut_abonnement);
-                $q->bindValue(':nb_inactif_day', $nb_inactif_day);
-                $q->bindValue(':limit', $limit);
-                $q->execute();
-            } else if (array_key_exists("ref_interruption", $info)) {
+                    $q->bindValue(':ref_statut_abonnement', $ref_statut_abonnement);
+                    $q->bindValue(':nb_inactif_day', $nb_inactif_day);
+                    $q->bindValue(':limit', $limit);
+                    $q->execute();
+                } else if (array_key_exists("ref_interruption", $info)) {
 
-                $ref_interruption = $info["ref_interruption"];
+                    $ref_interruption = $info["ref_interruption"];
 
-                $q = $this->_db->prepare('select * from stp_abonnement
+                    $q = $this->_db->prepare('select * from stp_abonnement
                     where ref_abonnement in (
                         select ref_abonnement from stp_interruption where ref_interruption > :ref_interruption
                     )');
-                $q->bindValue(':ref_interruption', $ref_interruption);
-                $q->execute();
-            } else if (array_search("get_trial_account_to_desactivate", $info, true) !== false && array_key_exists("limit", $info)) { // compte en essai dont l'essai est termine et sans message depuis 5 jours
+                    $q->bindValue(':ref_interruption', $ref_interruption);
+                    $q->execute();
+                } else if (array_search("get_trial_account_to_desactivate", $info, true) !== false && array_key_exists("limit", $info)) { // compte en essai dont l'essai est termine et sans message depuis 5 jours
 
-                $limit = $info["limit"];
+                    $limit = $info["limit"];
 
-                $q = $this->_db->prepare("select * from stp_abonnement
+                    $q = $this->_db->prepare("select * from stp_abonnement
 	               where fin_essai is not null and now() > fin_essai + interval '15' day
 				   	and ref_statut_abonnement = 2  
                     and first_prof_assigned = true
                         limit :limit");
-                $q->bindValue(":limit", $limit);
-                $q->execute();
-            } else if (array_search("trial_abo_to_relance", $info, true) !== false && array_key_exists("limit", $info)) {
+                    $q->bindValue(":limit", $limit);
+                    $q->execute();
+                } else if (array_search("trial_abo_to_relance", $info, true) !== false && array_key_exists("limit", $info)) {
 
-                $limit = $info["limit"];
+                    $limit = $info["limit"];
 
-                $q = $this->_db->prepare("
+                    $q = $this->_db->prepare("
                 select * from stp_abonnement where ref_statut_abonnement = 2 
                     and date_attribution_prof + interval '2 days' <= now()
                     and (dernier_contact is null or (dernier_contact + interval '2 days' <= now()))
@@ -952,29 +962,30 @@ class StpAbonnementManager
                 order by date_attribution_prof desc
                 limit :limit");
 
-                $q->bindValue(":limit", $limit);
+                    $q->bindValue(":limit", $limit);
 
-                $q->execute();
-            } else if (array_key_exists("ref_abos", $info)) {
+                    $q->execute();
+                } else if (array_key_exists("ref_abos", $info)) {
 
-                $ref_abos = $info["ref_abos"];
+                    $ref_abos = $info["ref_abos"];
 
-                $ref_abos = toPgArray($ref_abos, true);
+                    $ref_abos = toPgArray($ref_abos, true);
 
-                $q = $this->_db->prepare("select * from stp_abonnement where ref_abonnement in " . $ref_abos);
+                    $q = $this->_db->prepare("select * from stp_abonnement where ref_abonnement in " . $ref_abos);
 
-                $q->execute();
-            } else if (array_key_exists("with_statut", $info) && array_key_exists("limit", $info)) {
+                    $q->execute();
+                } else if (array_key_exists("with_statut", $info) && array_key_exists("limit", $info)) {
 
-                $ref_statut_abonnement = $info["with_statut"];
-                $limit = $info["limit"];
+                    $ref_statut_abonnement = $info["with_statut"];
+                    $limit = $info["limit"];
 
-                $q = $this->_db->prepare("select *  from stp_abonnement
+                    $q = $this->_db->prepare("select *  from stp_abonnement
 	               where ref_statut_abonnement = :ref_statut_abonnement
                         limit :limit");
-                $q->bindValue(':ref_statut_abonnement', $ref_statut_abonnement);
-                $q->bindValue(':limit', $limit);
-                $q->execute();
+                    $q->bindValue(':ref_statut_abonnement', $ref_statut_abonnement);
+                    $q->bindValue(':limit', $limit);
+                    $q->execute();
+                }
             }
         }
 
