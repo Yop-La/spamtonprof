@@ -970,6 +970,24 @@ function toSimilarTo(array $elements)
     return ($retour);
 }
 
+
+function gene_text($spins){
+    
+    $spin_gen = new \ContentSpinning\Spin();
+    $paras = [];
+    foreach ($spins as $spin) {
+        
+        $paras[] = $spin_gen->process($spin);
+        
+    }
+    
+    
+    $txt = implode(PHP_EOL . PHP_EOL, $paras);
+    
+    return( $txt);
+    
+}
+
 function toPgArray(array $elements, $parenthese = false)
 {
     $rBracket = "}";
