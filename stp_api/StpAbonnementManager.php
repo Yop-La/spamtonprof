@@ -1110,7 +1110,7 @@ class StpAbonnementManager
     }
 
     // pour redemarrer un abonnement qui a ete arrete (startDate vaut now ou une date)
-    function restart(int $refAbo, bool $testMode = true, bool $in_trial = false, $startDate = 'now', $add_getreponse = false)
+    function restart(int $refAbo, bool $testMode = true, bool $in_trial = false, $startDate = 'now', $add_getreponse = false, $facturer = true)
     {
         if ($startDate != 'now') {
             $startDate = \DateTime::createFromFormat('j/m/Y', $startDate);
@@ -1141,7 +1141,7 @@ class StpAbonnementManager
 
         // mise a jour dans stripe
 
-        if (! $in_trial) {
+        if (! $in_trial && ! $facturer) {
 
             $planStripeId = $abo->getPlan()->getRef_plan_stripe();
             $stripeProfId = $abo->getProf()->getStripe_id();
