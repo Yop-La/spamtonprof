@@ -58,7 +58,7 @@ class LbcAccountManager
             $ref_client = $info["valid_lbc_act"];
 
             $query = "select * from compte_lbc 
-                            where (now() >= ( date_publication +  interval '30 days') or ( date_publication is null and controle_date is not null))
+                            where (now() >= ( date_publication +  interval '15 days') or ( date_publication is null and controle_date is not null))
                                  and nb_annonces_online != 0
                                  and disabled is false
 						         and ref_client = :ref_client
