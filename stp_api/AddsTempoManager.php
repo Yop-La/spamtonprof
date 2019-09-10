@@ -53,7 +53,7 @@ class AddsTempoManager
                     delete from adds_tempo where
                     ref_commune in (select ref_commune from lbc_commune where population >= 20)
                     and statut = 'online' 
-                    and first_publication_date < ( now() - interval '15 days' )
+                    and first_publication_date < ( now() - interval '7 days' )
                     and first_publication_date is not null
                     and ref_compte in (select ref_compte from compte_lbc where ref_client = :ref_client);");
                     $q->bindValue(":ref_client", $ref_client);
