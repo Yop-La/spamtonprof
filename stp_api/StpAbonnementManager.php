@@ -1141,8 +1141,9 @@ class StpAbonnementManager
 
         // mise a jour dans stripe
 
-        if (! $in_trial && ! $facturer) {
+        if (! $in_trial && $facturer) {
 
+            
             $planStripeId = $abo->getPlan()->getRef_plan_stripe();
             $stripeProfId = $abo->getProf()->getStripe_id();
             if ($testMode) {
