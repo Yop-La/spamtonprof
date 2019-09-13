@@ -93,19 +93,19 @@ jQuery( document ).ready( function( $ ) {
 
 		/** début formulaire de paiement stripe **/
 
-		var handler = StripeCheckout.configure({
-			key: publicStripeKey,
-			image: 'https://spamtonprof.com/wp-content/uploads/2018/03/logo-stripe.png',
-			locale: 'auto',
-			allowRememberMe: false,
-			token: function(token) {
+//		var handler = StripeCheckout.configure({
+//		key: publicStripeKey,
+//		image: 'https://spamtonprof.com/wp-content/uploads/2018/03/logo-stripe.png',
+//		locale: 'auto',
+//		allowRememberMe: false,
+//		token: function(token) {
 
-				aboClique = abosEssai[indiceAbo];
+//		aboClique = abosEssai[indiceAbo];
 
-				createSubscription(aboClique.ref_abonnement, token.id, testMode);
+//		createSubscription(aboClique.ref_abonnement, token.id, testMode);
 
-			}
-		});
+//		}
+//		});
 
 		// pour attacher la popup de paiement cb au bouton payer 
 		jQuery('.payer').click(function(e) {
@@ -113,52 +113,80 @@ jQuery( document ).ready( function( $ ) {
 			indiceAbo = jQuery(this).parents(".row-essai").find(".ref-abo").val();
 			aboClique = abosEssai[indiceAbo];
 
-			console.log("aboClique")
-			console.log(aboClique)
 
-			montantAbo = aboClique.plan.tarif;
-			montant = montantAbo
+			// faire appel ajax pour création de de la session
 
 
-			if(aboClique.coupon){
+			jQuery("#loading_screen").removeClass("hide");
+			jQuery(".hide_loading").addClass("hide");
 
-				coupon = aboClique.coupon
-				montant = montant * (1-coupon.pct_off/100)
-			}
+			ajaxEnCours++;
+			jQuery.post(
+					ajaxurl,
+					{
+						'action': 'ajaxCreateCheckoutSession',
+						'ref_abonnement' : abo.ref_abonnement,
+						'testMode' : testMode
+					}
+			)
+			.done(function(retour) {
+				if(retour.error){
+					showMessage('Ooops : il y a eu un problème : '.concat(retour.message,'. Veuillez réessayer ou contacter l\'équipe.'));	
+					ajaxEnCours  --;
+					if(ajaxEnCours == 0){
+						jQuery(".hide_loading").removeClass("hide");
+						jQuery("#loading_screen").addClass("hide");
+					}
 
-			description = 'Abonnement de '.concat(montantAbo,' € par semaine')
 
-			emailCheckout = "alexandre@spamtonprof.com";
-			if(!aboClique.eleve.parent_required){
-				emailCheckout = aboClique.eleve.email;
-			}else{
-				emailCheckout = aboClique.proche.email;
-			}
 
-			// Open Checkout with further options:
-			handler.open({
-				name: 'SpamTonProf',
-				description: description,
-				zipCode: false,
-				amount: montant*100,
-				email : emailCheckout,
-				currency: 'EUR',
-				locale: 'auto',
-				'panel-label': "Payer {{amount}}"
+				}else{
+
+					var stripe = Stripe(publicStripeKey);
+
+					stripe.redirectToCheckout({
+						// Make the id field from the Checkout Session creation API response
+						// available to this file, so you can provide it as parameter here
+						// instead of the {{CHECKOUT_SESSION_ID}} placeholder.
+						sessionId: retour.session_id
+					}).then(function (result) {
+
+						result.error.message = 'Oops : il y a eu un problème. Veuillez réessayer ou contacter l\'équipe. ';
+
+
+						// If `redirectToCheckout` fails due to a browser or network
+						// error, display the localized error message to your customer
+						// using `result.error.message`.
+					});
+
+
+				}
+			})
+			.fail(function() {
+				showMessage('Oops : il y a eu un problème. Veuillez réessayer ou contacter l\'équipe. ');
+				ajaxEnCours  --;
+				if(ajaxEnCours == 0){
+					jQuery(".hide_loading").removeClass("hide");
+					jQuery("#loading_screen").addClass("hide");
+				}
 			});
-			e.preventDefault();
+
+
+
+			/** fin formulaire de paiement stripe **/
+
 		});
-
-
-		// Close Checkout on page navigation:
-		window.addEventListener('popstate', function() {
-			handler.close();
-		});
-
-		/** fin formulaire de paiement stripe **/
-
-
 	});
+
+
+
+
+
+
+
+
+
+	/* lignes des abonnements */
 
 	waitForEl(".row-abo", function() {
 
@@ -350,7 +378,7 @@ jQuery( document ).ready( function( $ ) {
 
 		console.log(nbEleves)
 		console.log(eleves)
-		
+
 
 		for(var i = 0; i< nbEleves ; i++){
 
@@ -365,7 +393,7 @@ jQuery( document ).ready( function( $ ) {
 			rowEleve.find(".famille-eleve-email").html(eleve.email);
 			rowEleve.find(".famille-eleve-telephone").html(eleve.telephone);
 
-			
+
 
 			rowEleve.removeClass("hide");
 
@@ -374,26 +402,26 @@ jQuery( document ).ready( function( $ ) {
 
 //		// pour attacher la popup d'annulation ou d'interruption au bouton d'annulation
 //		jQuery('.pause').click(function(e) {
-//
-//
-//
-//			console.log("fr");
-//
-//			e.preventDefault();
+
+
+
+//		console.log("fr");
+
+//		e.preventDefault();
 //		});
-//
+
 //		jQuery('.arreter').click(function(e) {
-//
-//			indiceAbo = jQuery(this).parents(".row-abo").find(".ref-abo").val();
-//			jQuery("#popmake-".concat(popupArret," .ref-abo")).val(indiceAbo);
-//
-//
-//
-//			console.log("fr");
-//
-//			e.preventDefault();
+
+//		indiceAbo = jQuery(this).parents(".row-abo").find(".ref-abo").val();
+//		jQuery("#popmake-".concat(popupArret," .ref-abo")).val(indiceAbo);
+
+
+
+//		console.log("fr");
+
+//		e.preventDefault();
 //		});
-//
+
 
 
 

@@ -435,6 +435,57 @@ class StripeManager
         }
     }
 
+  
+
+    public function create_subscription_checkout_session($plan_strp_id, $customer_id, $meta_sub = false, $trial_end = 'now')
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $params_session = [
+            'customer' => $customer_id,
+            'payment_method_types' => [
+                'card'
+            ],
+            'subscription_data' => [
+                'items' => [
+                    [
+                        'plan' => $plan_strp_id
+                    ]
+                ]
+            ],
+            'success_url' => domain_to_url() . '/remerciement-abonnement/?ref_abo=' . $meta_sub["ref_abonnement"],
+            'cancel_url' => domain_to_url()  . '/dashboard-eleve/?info=' . urlencode("Oups, le paiement a échoué,  veuillez réssayer ou contactez nous ! "),
+        ];
+        
+        
+
+        if ($trial_end != 'now') {
+            $params_session['trial_end'] = $trial_end;
+        }
+        
+        if($meta_sub){
+            $params_session['subscription_data']['metadata'] = $meta_sub;
+        }
+
+        $session = \Stripe\Checkout\Session::create($params_session);
+
+        return ($session->id);
+    }
+
+    public function create_customer($email, $metadata)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $customer = \Stripe\Customer::create(array(
+
+            'email' => $email,
+
+            "metadata" => $metadata
+        ));
+
+        return ($customer);
+    }
+
     public function retrieve_customer($stripe_id)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
@@ -578,28 +629,29 @@ class StripeManager
 
         return ($ret);
     }
-    
+
     public function retrieveAllInvoice($email)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-        
-        $customers = \Stripe\Customer::all(["email" => $email]);
-        
+
+        $customers = \Stripe\Customer::all([
+            "email" => $email
+        ]);
+
         $cus = $customers->data[0];
-        
-        
-        
-        $invoices = \Stripe\Invoice::all(array("customer" => $cus->id));
-        
-        $invoices = $invoices -> data;
-        
-        foreach ($invoices as $invoice){
-            
-            echo($invoice->invoice_pdf . '<br>');
-            
+
+        $invoices = \Stripe\Invoice::all(array(
+            "customer" => $cus->id
+        ));
+
+        $invoices = $invoices->data;
+
+        foreach ($invoices as $invoice) {
+
+            echo ($invoice->invoice_pdf . '<br>');
         }
-        
     }
+
     public function retrieveInvoice()
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());

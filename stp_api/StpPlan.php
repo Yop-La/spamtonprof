@@ -6,6 +6,15 @@ class StpPlan implements \JsonSerializable
 
     protected $ref_plan, $nom, $tarif, $ref_formule, $ref_plan_stripe, $ref_plan_stripe_test, $ref_plan_old, $formule, $defaut, $installments, $label_installment, $nb_days;
 
+    public function get_plan_stripe_id(bool $test_mode)
+    {
+        if ($test_mode) {
+            return ($this->getRef_plan_stripe_test());
+        } else {
+            return ($this->getRef_plan_stripe());
+        }
+    }
+
     /**
      *
      * @return mixed

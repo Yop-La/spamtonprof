@@ -556,6 +556,105 @@ class StpAbonnementManager
         return ($object);
     }
 
+    function activate_sub_after_checkout_sucess($subscription_id, $customer_id, $livemode)
+    {
+        $stripeMg = new \spamtonprof\stp_api\StripeManager(! $livemode);
+
+        $sub = $stripeMg->retrieve_sub($subscription_id);
+
+        $refAbonnement = $sub->metadata['ref_abonnement'];
+
+        $constructor = array(
+            "construct" => array(
+                'ref_prof',
+                'ref_eleve',
+                'ref_parent',
+                'ref_formule',
+                'ref_plan',
+                'ref_compte'
+            )
+        );
+
+        $abonnement = $this->get(array(
+            "ref_abonnement" => $refAbonnement
+        ), $constructor);
+
+        $eleve = $abonnement->getEleve();
+        $proche = $abonnement->getProche();
+        $prof = $abonnement->getProf();
+        $plan = $abonnement->getPlan();
+        $formule = $abonnement->getFormule();
+        $compte = $abonnement->getCompte();
+
+        $slack = new \spamtonprof\slack\Slack();
+
+        $slack->sendMessages("abonnement", array(
+
+            "Nouvel abonnement, bien joué la team !!",
+
+            'Email eleve : ' . $eleve->getEmail(),
+
+            'Ref abo stripe : ' . $subscription_id
+        ));
+
+        $abonnement->setSubs_Id($subscription_id);
+        $this->updateSubsId($abonnement);
+
+        $compteMg = new \spamtonprof\stp_api\StpCompteManager();
+        $compte->setStripe_client($customer_id);
+        $compteMg->updateStripeClient($compte);
+
+        $abonnement->setRef_statut_abonnement(\spamtonprof\stp_api\StpStatutAbonnementManager::ACTIF);
+        $this->updateRefStatutAbonnement($abonnement);
+
+        $logAboMg = new \spamtonprof\stp_api\StpLogAbonnementManager();
+        $logAboMg->add(new \spamtonprof\stp_api\StpLogAbonnement(array(
+            "ref_abonnement" => $abonnement->getRef_abonnement(),
+            "ref_statut_abo" => $abonnement->getRef_statut_abonnement()
+        )));
+
+        $smtpMg = new \spamtonprof\stp_api\SmtpServerManager();
+        $smtp = $smtpMg->get(array(
+            "ref_smtp_server" => $smtpMg::smtp2Go
+        ));
+        $expeMg = new \spamtonprof\stp_api\StpExpeManager();
+        $expe = $expeMg->get("info@spamtonprof.com");
+
+        if ($eleve->hasToSendToParent()) {
+            $body_parent = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/abonnement_parent.html");
+            $body_parent = str_replace("[[prof_name]]", ucfirst($prof->getPrenom()), $body_parent);
+            $body_parent = str_replace("[[name_proche]]", ucfirst($eleve->getPrenom()), $body_parent);
+            $body_parent = str_replace("[[name]]", ucfirst($proche->getPrenom()), $body_parent);
+
+            $smtp->sendEmail("Félicitations, " . ucfirst($eleve->getPrenom()) . " a compris notre philosophie", $proche->getEmail(), $body_parent, $expe->getEmail(), "Alexandre de SpamTonProf", true);
+        }
+
+        if ($eleve->hasToSendToEleve()) {
+            $body_eleve = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/abonnement_eleve.html");
+            $body_eleve = str_replace("[[name]]", ucfirst($eleve->getPrenom()), $body_eleve);
+            $body_eleve = str_replace("[[prof_name]]", ucfirst($prof->getPrenom()), $body_eleve);
+            $smtp->sendEmail("Félicitations, tu as compris notre philosophie", $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alexandre de SpamTonProf", true);
+        }
+
+        // envoi prof
+        $body_prof = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/abonnement_prof.html");
+        $body_prof = str_replace("[[eleve_name]]", ucfirst($eleve->getPrenom()), $body_prof);
+        $body_prof = str_replace("[[prof_name]]", ucfirst($prof->getPrenom()), $body_prof);
+        $body_prof = str_replace("[[formule]]", $formule->getFormule(), $body_prof);
+        $body_prof = str_replace("[[tarif]]", $plan->getTarif(), $body_prof);
+        $smtp->sendEmail("Bravo, une semaine d'essai concluante pour " . $eleve->getPrenom() . "! ", $prof->getEmail_stp(), $body_prof, $expe->getEmail(), "Alexandre de SpamTonProf", true);
+
+        $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+
+        $constructor = array(
+            "construct" => array(
+                'ref_statut_abonnement'
+            )
+        );
+
+        $algoliaMg->updateAbonnement($abonnement->getRef_abonnement(), $constructor);
+    }
+
     public function construct($constructor)
     {
         $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
@@ -1143,7 +1242,6 @@ class StpAbonnementManager
 
         if (! $in_trial && $facturer) {
 
-            
             $planStripeId = $abo->getPlan()->getRef_plan_stripe();
             $stripeProfId = $abo->getProf()->getStripe_id();
             if ($testMode) {

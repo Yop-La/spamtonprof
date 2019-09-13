@@ -28,7 +28,11 @@ header("Pragma: no-cache");
 
 $input = @file_get_contents("php://input");
 
+
 $event_json = json_decode($input);
+
+
+serializeTemp($event_json);
 
 $slack = new \spamtonprof\slack\Slack();
 $slack->sendMessages('log', array(
@@ -49,7 +53,7 @@ if ($event_json->type == "invoice.payment_succeeded") {
     }
 
     if ($email_prof) {
-        
+
         $stripeMg->transfert_custom_facture($event_json, $email_prof);
     } else {
         $stripeMg->transfertSubscriptionCharge($event_json);

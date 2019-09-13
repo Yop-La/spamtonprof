@@ -29,9 +29,8 @@ $event_json = json_decode($input);
 
 if ($event_json->type == "invoice.payment_succeeded") {
 
-
     $stripeMg = new \spamtonprof\stp_api\StripeManager(false);
-    
+
     $custom_fields = $event_json->data->object->custom_fields;
     $email_prof = false;
     foreach ($custom_fields as $custom_field) {
@@ -39,15 +38,13 @@ if ($event_json->type == "invoice.payment_succeeded") {
             $email_prof = $custom_field->value;
         }
     }
-    
+
     if ($email_prof) {
-        
+
         $stripeMg->transfert_custom_facture($event_json, $email_prof);
     } else {
         $stripeMg->transfertSubscriptionCharge($event_json);
     }
-    
-    
 }
 
 

@@ -48,6 +48,9 @@ require_once (dirname(__FILE__) . '/inc/autoloader_cnl.php'); // autoloader les 
 
 require_once (dirname(__FILE__) . '/inc/autoloader_lbc.php'); // autoloader les custom classes de lbc
 
+require_once (dirname(__FILE__) . '/shortcode/shortcodes.php');
+
+
 require_once (dirname(__FILE__) . '/vendor/autoload.php'); // autoload strip, paypal , gmail
 
 require_once (dirname(__FILE__) . '/vendor/getresponse/GetResponseAPI3.class.php');

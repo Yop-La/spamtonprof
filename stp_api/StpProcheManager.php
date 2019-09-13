@@ -12,6 +12,11 @@ class StpProcheManager
     {
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
+    
+    public function cast(\spamtonprof\stp_api\StpProche $object)
+    {
+        return ($object);
+    }
 
     public function add(StpProche $StpProche)
     {

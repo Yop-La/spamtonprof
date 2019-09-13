@@ -15,6 +15,14 @@ class StpProf implements \JsonSerializable
         return $this->gr_id;
     }
 
+    public function get_stripe_id($testMode)
+    {
+        if ($testMode) {
+            return ($this->getStripe_id_test());
+        }
+        return ($this->getStripe_id());
+    }
+
     /**
      *
      * @param mixed $gr_id
