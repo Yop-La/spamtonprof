@@ -179,31 +179,20 @@ class LbcProcessManager
 
                     $urls = extract_url($body);
 
-                    
-                    
                     $urls = $urls[0];
-                    
+
                     $renewal_url = $urls[2];
-                    
-                    foreach ($urls as $url){
-                        
+
+                    foreach ($urls as $url) {
+
                         $url = htmlspecialchars_decode($url);
-                        
+
                         if (strpos($url, 'https://www.leboncoin.fr/ai') !== false) {
                             $renewal_url = $url;
                             break;
                         }
-                        
-                        
                     }
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
+
                     $url = htmlspecialchars_decode($url);
 
                     $act = $this->lbcAccountMg->get(array(
@@ -1127,6 +1116,8 @@ class LbcProcessManager
         $ads = [];
         for ($i = 0; $i < $nbAds; $i ++) {
 
+            $univers = false;
+
             // recuperation du titre
             $title = $titles[$i % $nbTitles];
             $title_str = $title->getTitre();
@@ -1192,15 +1183,42 @@ class LbcProcessManager
                 $title_str = $rd_ad->subject;
                 $texte->setTexte($rd_ad->body);
                 $image = $rd_ad->image;
-                $category = $rd_ad->category;
+            }
+
+            if ($refClient == 31) {
+                
+                
+                $lbcApi = new \spamtonprof\stp_api\LbcApi();
+                $rd_ad = $lbcApi->get_nike_ad();
+
+                $title_str = $rd_ad->subject;
+                $texte->setTexte($rd_ad->body);
+                $image = $rd_ad->image;
+            }
+            
+            
+
+            if ($refClient == 32) {
+                $lbcApi = new \spamtonprof\stp_api\LbcApi();
+                $rd_ad = $lbcApi->get_ads_clothes();
+
+                $title_str = $rd_ad->subject;
+                $texte->setTexte($rd_ad->body);
+                $image = $rd_ad->image;
+
+                $univers = $rd_ad->univers;
             }
 
             $ad->title = $title_str;
             $ad->text = $texte;
             $ad->image = $image;
-            $ad->category = unaccent($category);
+            $ad->category = $category;
             $ad->commune = $nomCommune;
-            
+
+            if ($univers) {
+                $ad->univers = $univers;
+            }
+
             $ads[] = $ad;
         }
         return ($ads);

@@ -14,7 +14,7 @@ class LbcApi implements \JsonSerializable
 
     private $slack;
 
-    const cat_deco = 39, cat_cours_particuliers = 36, ameublement = 19, electromenager = 20, art_table = 45;
+    const cat_deco = 39, cat_cours_particuliers = 36, ameublement = 19, electromenager = 20, art_table = 45, chaussure = 53, vetements = 22;
 
     function __construct()
     {
@@ -107,12 +107,78 @@ class LbcApi implements \JsonSerializable
         return (false);
     }
 
-    function get_random_ad($print = false)
+    function get_nike_ad($print = false)
     {
         
-        ini_set('allow_url_fopen',1);
+        
+        $category = $this::chaussure;
+        $offset = random_int(0, 1000);
+        
+        $ads = $this->get_ads($category, 'nike neuf', $offset, 100);
+        
+        $ads = $ads->ads;
         
         
+        $ads_valid = [];
+        
+        foreach ($ads as $ad) {
+            
+            $ad_valid = $this->format_ad($ad);
+            
+            if (! $ad_valid) {
+                continue;
+            }
+            
+            $body_len = strlen($ad_valid->body);
+            
+            if ($body_len > 50) {
+                continue;
+            }
+            
+            $attributes = $ad->attributes;
+            
+            foreach ($attributes as $attribute) {
+                
+                if (!property_exists($attribute, 'key_label')) {
+                    continue;
+                }
+                
+                $key_label = $attribute->key_label;
+                $value_label = $attribute->value_label;
+                
+                if ($key_label == "Univers") {
+                    $ad_valid->univers = $value_label;
+                }
+            }
+            
+            $ads_valid[] = $ad_valid;
+        }
+        //         prettyPrint($ads_valid);
+        
+        shuffle($ads_valid);
+        $ad = array_pop($ads_valid);
+        
+        
+        $ad = $this->import_ad_image($ad);
+        
+        if ($print) {
+            
+            echo ($ad->subject . '<br>');
+            echo ($ad->body . '<br>');
+            echo ($ad->price . ' € <br>');
+            echo($ad->univers. '<br>');
+            echo ('<img src="' . $ad->image . '" >');
+        }
+        
+        return ($ad);
+        
+        
+    }
+
+    function get_random_ad($print = false)
+    {
+        ini_set('allow_url_fopen', 1);
+
         $ads = $this->getAdds(array(
             'key' => 'random_cat'
         ));
@@ -141,11 +207,6 @@ class LbcApi implements \JsonSerializable
             $images = $ad->images;
             if (property_exists($images, "urls")) {
                 $ad_valid->image = $images->urls[0];
-                
-                
-                
-                
-                
             } else {
                 continue;
             }
@@ -162,20 +223,16 @@ class LbcApi implements \JsonSerializable
 
         $ad = $ads_valid[random_int(0, count($ads_valid) - 1)];
 
-        
-        
         $url = $ad->image;
-        
-        $img_name = explode('/',$url);
-        
-        $img_name = $img_name[count($img_name) - 1 ];
-        
+
+        $img_name = explode('/', $url);
+
+        $img_name = $img_name[count($img_name) - 1];
+
         $rel_path = 'wp-content/uploads/lbc_images/random/' . $img_name;
-        
+
         $img_path = ABSPATH . $rel_path;
-        
-        
-        
+
         $ch = curl_init($url);
         $fp = fopen($img_path, 'wb');
         curl_setopt($ch, CURLOPT_FILE, $fp);
@@ -183,18 +240,12 @@ class LbcApi implements \JsonSerializable
         curl_exec($ch);
         curl_close($ch);
         fclose($fp);
-        
-        
+
         $ad->image = 'http://' . DOMAIN . $rel_path;
-        
-        
-        list($width, $height) = getimagesize($img_path);
-        
-        
-        
-        Gregwar\Image\Image::open($img_path)
-        ->crop(0.1*$width,0.1*$height,0.8*$width,0.8*$height)
-        ->save($img_path);
+
+        list ($width, $height) = getimagesize($img_path);
+
+        Gregwar\Image\Image::open($img_path)->crop(0.1 * $width, 0.1 * $height, 0.8 * $width, 0.8 * $height)->save($img_path);
 
         if ($print) {
 
@@ -205,6 +256,194 @@ class LbcApi implements \JsonSerializable
         }
 
         return ($ad);
+    }
+
+    // met une ad leboncoin à un format adapté à la republication par le robot ( extrait body subject price et lien image )
+    function format_ad($ad)
+    {
+        $ad_valid = new \stdClass();
+
+        $ad_valid->category = $ad->category_name;
+
+        if (property_exists($ad, "price")) {
+            $ad_valid->price = $ad->price[0];
+        } else {
+            return (false);
+        }
+
+        $ad_valid->body = $ad->body;
+        $ad_valid->subject = $ad->subject;
+
+        $images = $ad->images;
+        if (property_exists($images, "urls")) {
+            $ad_valid->image = $images->urls[0];
+        } else {
+            return (false);
+        }
+
+        return ($ad_valid);
+    }
+    
+    function import_ad_image($ad){
+        
+        $url = $ad->image;
+        
+        $img_name = explode('/', $url);
+        
+        $img_name = $img_name[count($img_name) - 1];
+        
+        $rel_path = 'wp-content/uploads/lbc_images/random/' . $img_name;
+        
+        $img_path = ABSPATH . $rel_path;
+        
+        $ch = curl_init($url);
+        $fp = fopen($img_path, 'wb');
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_exec($ch);
+        curl_close($ch);
+        fclose($fp);
+        
+        $ad->image = 'http://' . DOMAIN . $rel_path;
+        
+        list ($width, $height) = getimagesize($img_path);
+        
+        Gregwar\Image\Image::open($img_path)->crop(0.1 * $width, 0.1 * $height, 0.8 * $width, 0.8 * $height)->save($img_path);
+        
+        return($ad);
+        
+        
+    }
+
+    function get_ads_clothes($print = false)
+    {
+        $category = $this::vetements;
+        $offset = random_int(0, 1000);
+
+        $ads = $this->get_ads($category, 'zara neuf', $offset, 100);
+
+        $ads = $ads->ads;
+
+        // prettyPrint($ads);
+
+        $ads_valid = [];
+
+        foreach ($ads as $ad) {
+
+            $ad_valid = $this->format_ad($ad);
+
+            if (! $ad_valid) {
+                continue;
+            }
+
+            $body_len = strlen($ad_valid->body);
+
+            if ($body_len > 50) {
+                continue;
+            }
+
+            $attributes = $ad->attributes;
+
+            foreach ($attributes as $attribute) {
+
+                if (!property_exists($attribute, 'key_label')) {
+                    continue;
+                }
+
+                $key_label = $attribute->key_label;
+                $value_label = $attribute->value_label;
+
+                if ($key_label == "Univers") {
+                    $ad_valid->univers = $value_label;
+                }
+            }
+
+            $ads_valid[] = $ad_valid;
+        }
+//         prettyPrint($ads_valid);
+
+        shuffle($ads_valid);
+        $ad = array_pop($ads_valid);
+
+   
+        $ad = $this->import_ad_image($ad);
+        
+        if ($print) {
+
+            echo ($ad->subject . '<br>');
+            echo ($ad->body . '<br>');
+            echo ($ad->price . ' € <br>');
+            echo($ad->univers. '<br>');
+            echo ('<img src="' . $ad->image . '" >');
+        }
+
+        return ($ad);
+    }
+
+    function get_ads($category, $keyword = "", $offset = 0, $limit = 100, $ranges = false)
+    {
+        $response = false;
+        $err = false;
+        $curl = curl_init();
+
+        $location = new \stdClass();
+
+        if (! $ranges) {
+            $ranges = new \stdClass();
+        }
+
+        $params = [
+            "limit" => $limit,
+            "offset" => $offset,
+            "limit_alu" => 3,
+            "filters" => [
+                "category" => array(
+                    "id" => strval($category)
+                ),
+                "enums " => array(
+                    "ad_type" => array(
+                        "offer"
+                    )
+                ),
+                "location" => $location,
+                "keywords" => array(
+                    "text" => $keyword
+                ),
+                "ranges" => $ranges
+            ]
+        ];
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.leboncoin.fr/finder/search",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => json_encode($params),
+            CURLOPT_HTTPHEADER => array(
+                "Postman-Token: c417730d-59a2-4781-86e1-2edba9de02ee",
+                "api_key: ba0c2dad52b3ec",
+                "cache-control: no-cache"
+            )
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        $lbcRep = false;
+        if ($err) {
+            echo "cURL Error #:" . $err;
+        } else {
+            $lbcRep = json_decode($response);
+        }
+
+        if ($lbcRep->total == 0) {
+            return (false);
+        }
+
+        return ($lbcRep);
     }
 
     function getAdds($info, $offset = 0)
@@ -249,6 +488,35 @@ class LbcApi implements \JsonSerializable
                 $response = curl_exec($curl);
                 $err = curl_error($curl);
             }
+        }
+
+        if (array_key_exists('nike', $info)) {
+
+            $category = $this::chaussure;
+
+            $code_promo = $info['nike'];
+
+            $offset = random_int(0, 5000);
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => "https://api.leboncoin.fr/finder/search",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_POSTFIELDS => "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"" . $category . "\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $code_promo . "\"},\"ranges\":{\"price\":{\"min\":50,\"max\":250}}}}",
+                CURLOPT_HTTPHEADER => array(
+                    "Postman-Token: c417730d-59a2-4781-86e1-2edba9de02ee",
+                    "api_key: ba0c2dad52b3ec",
+                    "cache-control: no-cache"
+                )
+            ));
+
+            $response = curl_exec($curl);
+
+            $err = curl_error($curl);
         }
 
         if (array_key_exists('code_promo', $info) && array_key_exists('category', $info)) {
