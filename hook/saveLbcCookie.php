@@ -126,11 +126,11 @@ if (array_key_exists("cookies", $_POST) && array_key_exists("ref_compte", $_POST
         $act->setCookie($luat);
         $lbcAcctMg->updateCookie($act);
 
-        $lbcApi = new \spamtonprof\stp_api\LbcApi();
-        $userId = $lbcApi->getUserId($luat);
+        // $lbcApi = new \spamtonprof\stp_api\LbcApi();
+        // $userId = $lbcApi->getUserId($luat);
 
-        $act->setUser_id($userId);
-        $lbcAcctMg->updateUserId($act);
+        // $act->setUser_id($userId);
+        // $lbcAcctMg->updateUserId($act);
 
         $lbcAcctMg = new \spamtonprof\stp_api\LbcAccountManager();
         $act = $lbcAcctMg->get(array(
