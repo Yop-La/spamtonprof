@@ -604,6 +604,8 @@ class LbcProcessManager
     // --- step 7 : on met a jour la de controle
     public function check_account(\spamtonprof\stp_api\LbcAccount $lbcAccount, $send_msg = false)
     {
+        
+        
         $msgs = [];
 
         $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
@@ -637,6 +639,7 @@ class LbcProcessManager
             $msgs[] = "Pas de user_id : ";
         }
 
+        
         // step 4-1 : si il y a des annonces en ligne sur leboncoin
         $disabled = false;
         $nbAnnonce = 0;
@@ -1189,11 +1192,12 @@ class LbcProcessManager
                 
                 
                 $lbcApi = new \spamtonprof\stp_api\LbcApi();
-                $rd_ad = $lbcApi->get_nike_ad();
-
-                $title_str = $rd_ad->subject;
-                $texte->setTexte($rd_ad->body);
-                $image = $rd_ad->image;
+                $ad = $lbcApi->get_local_nike_ad();
+                
+                
+                $title_str = $ad->subject;
+                $texte->setTexte($ad->body);
+                $image = 'http://' . DOMAIN . $ad->image;
             }
             
             
@@ -1223,6 +1227,8 @@ class LbcProcessManager
         }
         return ($ads);
     }
+    
+    
 
     // pour retouner la configuration d'un client leboncoin (le type de texte par defaut et le type de titre par defaut d'un client)
     public function getDefaultConf($refClient)
