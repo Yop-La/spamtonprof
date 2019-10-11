@@ -16,9 +16,17 @@ class LbcApi implements \JsonSerializable
 
     const cat_deco = 39, cat_cours_particuliers = 36, ameublement = 19, electromenager = 20, art_table = 45, chaussure = 53, vetements = 22;
 
+    private $cookie_datadome;
+
     function __construct()
     {
         $this->slack = new \spamtonprof\slack\Slack();
+
+        // $this->cookie_datadome = 'Gn3MKDnibULmesktqg2XNsQOxNkmVWMaQsOXeD63M9Td9~77LzWmp5kgRKGfS548xYOxHeZBJl95scuNbSB5WlGvOOdUcdvte.J_JQOa1M';
+
+        // $this->cookie_datadome = '8iCiTIvy1sxniKUgTx5JSCcn1RjJ_.cGdeNgYDFdpumxPvUAvRttQgMw33yMub0bNP.TcmrM4~5BL40Qc6ED8kau18v~38nwYe5XtMhBrh';
+
+        $this->cookie_datadome = unserializeTemp("/tempo/datadome");
     }
 
     function get_maths_ads($offset = 0)
@@ -58,6 +66,7 @@ class LbcApi implements \JsonSerializable
 
     function getUserId($luat)
     {
+
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
@@ -67,25 +76,53 @@ class LbcApi implements \JsonSerializable
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => array(
-                "Postman-Token: 81bc2fa8-dee0-43d1-a3ab-c861b219a19d",
-                "authorization: Bearer " . $luat,
-                "cache-control: no-cache"
-            )
+            CURLOPT_CUSTOMREQUEST => "GET"
+            // CURLOPT_HTTPHEADER => array(
+            // "Postman-Token: 81bc2fa8-dee0-43d1-a3ab-c861b219a19d",
+            // "authorization: Bearer " . $luat,
+            // "cache-control: no-cache"
+            // )
         ));
+        curl_setopt($curl, CURLOPT_HEADER, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_VERBOSE, 1);
 
-        $response = json_decode(curl_exec($curl));
+        $headers = array();
+        $headers[] = 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:69.0) Gecko/20100101 Firefox/69.0';
+        $headers[] = 'Accept: */*';
+        $headers[] = 'Accept-Language: fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3';
+        $headers[] = 'Referer: https://www.leboncoin.fr/recherche/?text=nike&locations=r_7';
+        $headers[] = 'Api_key: ba0c2dad52b3ec';
+        $headers[] = 'Content-Type: application/json';
+        $headers[] = 'Origin: https://www.leboncoin.fr';
+        $headers[] = "authorization: Bearer " . $luat;
+        $headers[] = 'Connection: keep-alive';
+        $headers[] = 'Cookie: _ENV["datadome=' . $this->cookie_datadome . '; ABTasty=uid%3D19100614412715504%26fst%3D1570365687435%26pst%3Dnull%26cst%3D1570365687435%26ns%3D1%26pvt%3D5%26pvis%3D5%26th%3D; ABTastySession=sen%3D21__referrer%3D__landingPage%3Dhttps%3A//www.leboncoin.fr/; cikneeto_uuid=id:fd4738ba-e7af-4a0f-a228-eefaf5a6c99e; _gcl_au=1.1.2037802551.1570365687; cikneeto=date:1570366905871; consent_allpurpose=cDE9MTtwMj0xO3AzPTE7cDQ9MTtwNT0x; cookieBanner=1; utag_main=v_id:016da116cbf20014cc52dc40d7dd0004c001900900bd0_sn:1_ss:0_pn:2%3Bexp-session_st:1570368705660ses_id:1570365688818%3Bexp-session; xtvrn=562498; xtan562498=-undefined; xtant562498=1; cto_lwid=40b20c18-da25-456e-9177-902a4da85224; _pulse2data=9af27d9e-a067-40f3-b6c3-887214ecca21%2Cv%2C%2C1570367689490%2CeyJpc3N1ZWRBdCI6IjIwMTktMTAtMDZUMTI6NDE6MjlaIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImFsZyI6ImRpciIsImtpZCI6IjIifQ..JdkB3pM_kc30lX5VMP54Uw.8jawGme9E4jVcDobZb55Mqr96j6CKMu-2_C9-AxkeY7w-catWdCBt35_dtmbyqZV9Bru9zl2RDjhs2oNRWzpMfy5aTdwfGjKIdM9yDLh89A4bTgmY2EGgqcBR9Nb2pKD3DqWPgggKhboDbyTFuZ61NmyLsyKSd1_ze-TrJYYKtQA9CSvtqC-HTE_ziirqUOznsK_4yckfv4lKav3QZxrVg.ufWfitkciGAAYt3PCKo0NQ%2C%2C0%2Ctrue%2C%2CeyJraWQiOiIyIiwiYWxnIjoiSFMyNTYifQ..QqnxKllfRSukjfpazBiVeXEOIMYPKeLteyUJoUfNTbA; _fbp=fb.1.1570365690280.1099195613; cto_bundle=y2JxzF9xaExQZ1NpUiUyRkR6SkJKZFRXMDc2NDZETTNZalZTb0JXc1RIVSUyQlN2Y2FBcE5HMUZnQWpxSTNvdWNXOUFtYnNuQ2ttbVNjV2s5a0VobjFHVEhxeDFzMyUyQnlKek1JOVVNV2dqYlVtaWVoY2VZQktKQjNLcUgxRnZqMEh0M0hVSmVsNQ; sq=ca=7_s; shippableOnboarding=1; saveOnboarding=1"]';
+
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        $response = curl_exec($curl);
         $err = curl_error($curl);
 
-        curl_close($curl);
+        $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+        $header = substr($response, 0, $header_size);
+        $body = substr($response, $header_size);
 
+        $cookies = extract_cookies($response);
+
+        $lbcRep = false;
         if ($err) {
-            return (false);
+            echo "cURL Error #:" . $err;
+            die();
         } else {
-
-            return ($response->userId);
+            $lbcRep = json_decode($body);
         }
+
+        $this->cookie_datadome = $cookies['datadome'];
+        serializeTemp($this->cookie_datadome, "/tempo/datadome");
+
+        
+        
+        return ($lbcRep->userId);
     }
 
     function getTexts($info, $offset = 0)
@@ -109,70 +146,63 @@ class LbcApi implements \JsonSerializable
 
     function get_nike_ad($print = false)
     {
-        
-        
         $category = $this::chaussure;
         $offset = random_int(0, 1000);
-        
+
         $ads = $this->get_ads($category, 'nike neuf', $offset, 100);
-        
+
         $ads = $ads->ads;
-        
-        
+
         $ads_valid = [];
-        
+
         foreach ($ads as $ad) {
-            
+
             $ad_valid = $this->format_ad($ad);
-            
+
             if (! $ad_valid) {
                 continue;
             }
-            
+
             $body_len = strlen($ad_valid->body);
-            
+
             if ($body_len > 50) {
                 continue;
             }
-            
+
             $attributes = $ad->attributes;
-            
+
             foreach ($attributes as $attribute) {
-                
-                if (!property_exists($attribute, 'key_label')) {
+
+                if (! property_exists($attribute, 'key_label')) {
                     continue;
                 }
-                
+
                 $key_label = $attribute->key_label;
                 $value_label = $attribute->value_label;
-                
+
                 if ($key_label == "Univers") {
                     $ad_valid->univers = $value_label;
                 }
             }
-            
+
             $ads_valid[] = $ad_valid;
         }
-        //         prettyPrint($ads_valid);
-        
+
         shuffle($ads_valid);
         $ad = array_pop($ads_valid);
-        
-        
-        $ad = $this->import_ad_image($ad);
-        
+
+        $ad = $this->import_ad_image($ad,"nike_shoes");
+
         if ($print) {
-            
+
             echo ($ad->subject . '<br>');
             echo ($ad->body . '<br>');
             echo ($ad->price . ' € <br>');
-            echo($ad->univers. '<br>');
+            echo ($ad->univers . '<br>');
             echo ('<img src="' . $ad->image . '" >');
         }
-        
+
         return ($ad);
-        
-        
     }
 
     function get_random_ad($print = false)
@@ -284,18 +314,26 @@ class LbcApi implements \JsonSerializable
         return ($ad_valid);
     }
     
-    function import_ad_image($ad){
+    
+    function get_local_nike_ad(){
         
+        $ads = unserializeTemp("/tempo/nike_ads");
+        return($ads[array_rand($ads,1)]);
+        
+    }
+
+    function import_ad_image($ad,$folder)
+    {
         $url = $ad->image;
-        
+
         $img_name = explode('/', $url);
-        
+
         $img_name = $img_name[count($img_name) - 1];
-        
-        $rel_path = 'wp-content/uploads/lbc_images/random/' . $img_name;
-        
+
+        $rel_path = 'wp-content/uploads/lbc_images/'.$folder.'/' . $img_name;
+
         $img_path = ABSPATH . $rel_path;
-        
+
         $ch = curl_init($url);
         $fp = fopen($img_path, 'wb');
         curl_setopt($ch, CURLOPT_FILE, $fp);
@@ -303,16 +341,14 @@ class LbcApi implements \JsonSerializable
         curl_exec($ch);
         curl_close($ch);
         fclose($fp);
-        
-        $ad->image = 'http://' . DOMAIN . $rel_path;
-        
+
+        $ad->image =  $rel_path;
+
         list ($width, $height) = getimagesize($img_path);
-        
+
         Gregwar\Image\Image::open($img_path)->crop(0.1 * $width, 0.1 * $height, 0.8 * $width, 0.8 * $height)->save($img_path);
-        
-        return($ad);
-        
-        
+
+        return ($ad);
     }
 
     function get_ads_clothes($print = false)
@@ -346,7 +382,7 @@ class LbcApi implements \JsonSerializable
 
             foreach ($attributes as $attribute) {
 
-                if (!property_exists($attribute, 'key_label')) {
+                if (! property_exists($attribute, 'key_label')) {
                     continue;
                 }
 
@@ -360,20 +396,19 @@ class LbcApi implements \JsonSerializable
 
             $ads_valid[] = $ad_valid;
         }
-//         prettyPrint($ads_valid);
+        // prettyPrint($ads_valid);
 
         shuffle($ads_valid);
         $ad = array_pop($ads_valid);
 
-   
-        $ad = $this->import_ad_image($ad);
-        
+//         $ad = $this->import_ad_image($ad);
+
         if ($print) {
 
             echo ($ad->subject . '<br>');
             echo ($ad->body . '<br>');
             echo ($ad->price . ' € <br>');
-            echo($ad->univers. '<br>');
+            echo ($ad->univers . '<br>');
             echo ('<img src="' . $ad->image . '" >');
         }
 
@@ -413,30 +448,47 @@ class LbcApi implements \JsonSerializable
             ]
         ];
 
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.leboncoin.fr/finder/search",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => json_encode($params),
-            CURLOPT_HTTPHEADER => array(
-                "Postman-Token: c417730d-59a2-4781-86e1-2edba9de02ee",
-                "api_key: ba0c2dad52b3ec",
-                "cache-control: no-cache"
-            )
-        ));
+        $headers = array();
+        $headers[] = 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:69.0) Gecko/20100101 Firefox/69.0';
+        $headers[] = 'Accept: */*';
+        $headers[] = 'Accept-Language: fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3';
+        $headers[] = 'Referer: https://www.leboncoin.fr/recherche/?text=nike&locations=r_7';
+        $headers[] = 'Api_key: ba0c2dad52b3ec';
+        $headers[] = 'Content-Type: application/json';
+        $headers[] = 'Origin: https://www.leboncoin.fr';
+        $headers[] = 'Connection: keep-alive';
+        $headers[] = 'Cookie: _ENV["datadome=' . $this->cookie_datadome . '; ABTasty=uid%3D19100614412715504%26fst%3D1570365687435%26pst%3Dnull%26cst%3D1570365687435%26ns%3D1%26pvt%3D5%26pvis%3D5%26th%3D; ABTastySession=sen%3D21__referrer%3D__landingPage%3Dhttps%3A//www.leboncoin.fr/; cikneeto_uuid=id:fd4738ba-e7af-4a0f-a228-eefaf5a6c99e; _gcl_au=1.1.2037802551.1570365687; cikneeto=date:1570366905871; consent_allpurpose=cDE9MTtwMj0xO3AzPTE7cDQ9MTtwNT0x; cookieBanner=1; utag_main=v_id:016da116cbf20014cc52dc40d7dd0004c001900900bd0_sn:1_ss:0_pn:2%3Bexp-session_st:1570368705660ses_id:1570365688818%3Bexp-session; xtvrn=562498; xtan562498=-undefined; xtant562498=1; cto_lwid=40b20c18-da25-456e-9177-902a4da85224; _pulse2data=9af27d9e-a067-40f3-b6c3-887214ecca21%2Cv%2C%2C1570367689490%2CeyJpc3N1ZWRBdCI6IjIwMTktMTAtMDZUMTI6NDE6MjlaIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImFsZyI6ImRpciIsImtpZCI6IjIifQ..JdkB3pM_kc30lX5VMP54Uw.8jawGme9E4jVcDobZb55Mqr96j6CKMu-2_C9-AxkeY7w-catWdCBt35_dtmbyqZV9Bru9zl2RDjhs2oNRWzpMfy5aTdwfGjKIdM9yDLh89A4bTgmY2EGgqcBR9Nb2pKD3DqWPgggKhboDbyTFuZ61NmyLsyKSd1_ze-TrJYYKtQA9CSvtqC-HTE_ziirqUOznsK_4yckfv4lKav3QZxrVg.ufWfitkciGAAYt3PCKo0NQ%2C%2C0%2Ctrue%2C%2CeyJraWQiOiIyIiwiYWxnIjoiSFMyNTYifQ..QqnxKllfRSukjfpazBiVeXEOIMYPKeLteyUJoUfNTbA; _fbp=fb.1.1570365690280.1099195613; cto_bundle=y2JxzF9xaExQZ1NpUiUyRkR6SkJKZFRXMDc2NDZETTNZalZTb0JXc1RIVSUyQlN2Y2FBcE5HMUZnQWpxSTNvdWNXOUFtYnNuQ2ttbVNjV2s5a0VobjFHVEhxeDFzMyUyQnlKek1JOVVNV2dqYlVtaWVoY2VZQktKQjNLcUgxRnZqMEh0M0hVSmVsNQ; sq=ca=7_s; shippableOnboarding=1; saveOnboarding=1"]';
+
+        curl_setopt($curl, CURLOPT_URL, 'https://api.leboncoin.fr/finder/search');
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_ENCODING, 'gzip, deflate');
+        curl_setopt($curl, CURLOPT_HEADER, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_VERBOSE, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($params));
+        
+
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 
         $response = curl_exec($curl);
         $err = curl_error($curl);
+
+        $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+        $header = substr($response, 0, $header_size);
+        $body = substr($response, $header_size);
+
+        
+        $cookies = extract_cookies($response);
+
+        $this->cookie_datadome = $cookies['datadome'];
+        serializeTemp($this->cookie_datadome, "/tempo/datadome");
 
         $lbcRep = false;
         if ($err) {
             echo "cURL Error #:" . $err;
         } else {
-            $lbcRep = json_decode($response);
+            $lbcRep = json_decode($body);
         }
 
         if ($lbcRep->total == 0) {
@@ -451,6 +503,25 @@ class LbcApi implements \JsonSerializable
         $response = false;
         $err = false;
         $curl = curl_init();
+
+        $headers = array();
+        $headers[] = 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:69.0) Gecko/20100101 Firefox/69.0';
+        $headers[] = 'Accept: */*';
+        $headers[] = 'Accept-Language: fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3';
+        $headers[] = 'Referer: https://www.leboncoin.fr/recherche/?text=nike&locations=r_7';
+        $headers[] = 'Api_key: ba0c2dad52b3ec';
+        $headers[] = 'Content-Type: application/json';
+        $headers[] = 'Origin: https://www.leboncoin.fr';
+        $headers[] = 'Connection: keep-alive';
+        $headers[] = 'Cookie: _ENV["datadome=' . $this->cookie_datadome . '; ABTasty=uid%3D19100614412715504%26fst%3D1570365687435%26pst%3Dnull%26cst%3D1570365687435%26ns%3D1%26pvt%3D5%26pvis%3D5%26th%3D; ABTastySession=sen%3D21__referrer%3D__landingPage%3Dhttps%3A//www.leboncoin.fr/; cikneeto_uuid=id:fd4738ba-e7af-4a0f-a228-eefaf5a6c99e; _gcl_au=1.1.2037802551.1570365687; cikneeto=date:1570366905871; consent_allpurpose=cDE9MTtwMj0xO3AzPTE7cDQ9MTtwNT0x; cookieBanner=1; utag_main=v_id:016da116cbf20014cc52dc40d7dd0004c001900900bd0_sn:1_ss:0_pn:2%3Bexp-session_st:1570368705660ses_id:1570365688818%3Bexp-session; xtvrn=562498; xtan562498=-undefined; xtant562498=1; cto_lwid=40b20c18-da25-456e-9177-902a4da85224; _pulse2data=9af27d9e-a067-40f3-b6c3-887214ecca21%2Cv%2C%2C1570367689490%2CeyJpc3N1ZWRBdCI6IjIwMTktMTAtMDZUMTI6NDE6MjlaIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImFsZyI6ImRpciIsImtpZCI6IjIifQ..JdkB3pM_kc30lX5VMP54Uw.8jawGme9E4jVcDobZb55Mqr96j6CKMu-2_C9-AxkeY7w-catWdCBt35_dtmbyqZV9Bru9zl2RDjhs2oNRWzpMfy5aTdwfGjKIdM9yDLh89A4bTgmY2EGgqcBR9Nb2pKD3DqWPgggKhboDbyTFuZ61NmyLsyKSd1_ze-TrJYYKtQA9CSvtqC-HTE_ziirqUOznsK_4yckfv4lKav3QZxrVg.ufWfitkciGAAYt3PCKo0NQ%2C%2C0%2Ctrue%2C%2CeyJraWQiOiIyIiwiYWxnIjoiSFMyNTYifQ..QqnxKllfRSukjfpazBiVeXEOIMYPKeLteyUJoUfNTbA; _fbp=fb.1.1570365690280.1099195613; cto_bundle=y2JxzF9xaExQZ1NpUiUyRkR6SkJKZFRXMDc2NDZETTNZalZTb0JXc1RIVSUyQlN2Y2FBcE5HMUZnQWpxSTNvdWNXOUFtYnNuQ2ttbVNjV2s5a0VobjFHVEhxeDFzMyUyQnlKek1JOVVNV2dqYlVtaWVoY2VZQktKQjNLcUgxRnZqMEh0M0hVSmVsNQ; sq=ca=7_s; shippableOnboarding=1; saveOnboarding=1"]';
+
+        curl_setopt($curl, CURLOPT_URL, 'https://api.leboncoin.fr/finder/search');
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_ENCODING, 'gzip, deflate');
+        curl_setopt($curl, CURLOPT_HEADER, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_VERBOSE, 1);
 
         if (array_key_exists('key', $info)) {
 
@@ -469,24 +540,7 @@ class LbcApi implements \JsonSerializable
 
                 $code_promo = "";
 
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => "https://api.leboncoin.fr/finder/search",
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => "",
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 30,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => "POST",
-                    CURLOPT_POSTFIELDS => "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"" . $category . "\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $code_promo . "\"},\"ranges\":{}}}",
-                    CURLOPT_HTTPHEADER => array(
-                        "Postman-Token: c417730d-59a2-4781-86e1-2edba9de02ee",
-                        "api_key: ba0c2dad52b3ec",
-                        "cache-control: no-cache"
-                    )
-                ));
-
-                $response = curl_exec($curl);
-                $err = curl_error($curl);
+                curl_setopt($curl, CURLOPT_POSTFIELDS, "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"" . $category . "\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $code_promo . "\"},\"ranges\":{}}}");
             }
         }
 
@@ -498,25 +552,7 @@ class LbcApi implements \JsonSerializable
 
             $offset = random_int(0, 5000);
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://api.leboncoin.fr/finder/search",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "",
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 30,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => "POST",
-                CURLOPT_POSTFIELDS => "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"" . $category . "\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $code_promo . "\"},\"ranges\":{\"price\":{\"min\":50,\"max\":250}}}}",
-                CURLOPT_HTTPHEADER => array(
-                    "Postman-Token: c417730d-59a2-4781-86e1-2edba9de02ee",
-                    "api_key: ba0c2dad52b3ec",
-                    "cache-control: no-cache"
-                )
-            ));
-
-            $response = curl_exec($curl);
-
-            $err = curl_error($curl);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"" . $category . "\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $code_promo . "\"},\"ranges\":{\"price\":{\"min\":50,\"max\":250}}}}");
         }
 
         if (array_key_exists('code_promo', $info) && array_key_exists('category', $info)) {
@@ -524,56 +560,35 @@ class LbcApi implements \JsonSerializable
             $code_promo = $info['code_promo'];
             $category = $info['category'];
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://api.leboncoin.fr/finder/search",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "",
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 30,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => "POST",
-                CURLOPT_POSTFIELDS => "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"" . $category . "\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $code_promo . "\"},\"ranges\":{}}}",
-                CURLOPT_HTTPHEADER => array(
-                    "Postman-Token: c417730d-59a2-4781-86e1-2edba9de02ee",
-                    "api_key: ba0c2dad52b3ec",
-                    "cache-control: no-cache"
-                )
-            ));
-
-            $response = curl_exec($curl);
-            $err = curl_error($curl);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"" . $category . "\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $code_promo . "\"},\"ranges\":{}}}");
         }
 
         if (array_key_exists('user_id', $info)) {
 
             $user_id = $info['user_id'];
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://api.leboncoin.fr/finder/search",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "",
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 30,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => "POST",
-                CURLOPT_POSTFIELDS => "{\"limit\":100, \"offset\":" . $offset . ", \"filters\":{\"owner\":{\"user_id\":\"" . $user_id . "\"},\"enums\":{\"ad_type\":[\"offer\"]}},\"limit\":100}",
-                CURLOPT_HTTPHEADER => array(
-                    "Postman-Token: e7ce26b5-3715-466a-940e-1e64c45b7013",
-                    "api_key: ba0c2dad52b3ec",
-                    "cache-control: no-cache"
-                )
-            ));
-
-            $response = curl_exec($curl);
-            $err = curl_error($curl);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, "{\"limit\":100, \"offset\":" . $offset . ", \"filters\":{\"owner\":{\"user_id\":\"" . $user_id . "\"},\"enums\":{\"ad_type\":[\"offer\"]}},\"limit\":100}");
         }
+
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+        $header = substr($response, 0, $header_size);
+        $body = substr($response, $header_size);
+
+        $cookies = extract_cookies($response);
 
         $lbcRep = false;
         if ($err) {
             echo "cURL Error #:" . $err;
         } else {
-            $lbcRep = json_decode($response);
+            $lbcRep = json_decode($body);
         }
+
+        $this->cookie_datadome = $cookies['datadome'];
+        serializeTemp($this->cookie_datadome, "/tempo/datadome");
 
         if ($lbcRep->total == 0) {
             return (false);
