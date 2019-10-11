@@ -22,6 +22,29 @@ function domain_to_url()
     return (false);
 }
 
+function extract_cookies($curl_result)
+{
+    $cookies = array();
+    $matches = [];
+    preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $curl_result, $matches);
+    $cookies = array();
+    
+    foreach ($matches[1] as $item) {
+
+        parse_str($item, $cookie);
+        $cookies = array_merge($cookies, $cookie);
+    }
+    $matches = $matches[1];
+
+    $cookies = [];
+    foreach ($matches as $cookie) {
+        $cookie = explode("=", $cookie);
+        $cookies[$cookie[0]] = $cookie[1];
+    }
+
+    return ($cookies);
+}
+
 function unaccent($str)
 {
     $transliteration = array(
