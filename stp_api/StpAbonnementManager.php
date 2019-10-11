@@ -1391,6 +1391,74 @@ class StpAbonnementManager
     }
 
     // pour mettre a jour l'email d'un parent
+    function updateEmailEleve($email, $refAbo)
+    {
+
+        // on recupere l'abonnement
+        $constructor = array(
+            "construct" => array(
+                'ref_eleve',
+                'ref_parent',
+                'ref_statut_abonnement',
+                'ref_formule',
+                'ref_prof'
+            )
+        );
+
+        $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
+
+        $abo = $this->get(array(
+            "ref_abonnement" => $refAbo
+        ), $constructor);
+
+        $eleve = $abo->getEleve();
+        $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
+
+        $parent = $abo->getProche();
+        $parent = \spamtonprof\stp_api\StpProche::cast($parent);
+
+        $formule = $abo->getFormule();
+        $prof = $abo->getProf();
+
+        if ($eleve->getEmail() == $email) {
+
+            exit(0);
+        }
+
+        // maj getresponse - remove list essai + ajout liste essai si essai
+
+        if ($abo->getFirst_prof_assigned() && $abo->getRef_statut_abonnement() == $abo::ESSAI) {
+
+            $gr = new \GetResponse();
+
+            $contact = $gr->getContactInList($parent->getEmail(), "stp_eleve_essai");
+
+            $dayOfCycle = 0;
+            if ($contact) {
+                $dayOfCycle = $contact->dayOfCycle;
+                $gr->deleteContact($contact->contactId);
+            }
+            $parent->setEmail($email);
+            $gr->addEleveInTrialSequence($eleve, $prof, $formule, $dayOfCycle);
+        }
+
+        // mise a jour de l'email dans la base
+        $eleve->setEmail($email);
+        $eleveMg->updateEmail($eleve);
+
+        // update index
+        $algolia = new \spamtonprof\stp_api\AlgoliaManager();
+        $algolia->updateAbonnement($refAbo, $constructor);
+
+        // mise à jour compte wp
+        $ret = wp_update_user(array(
+            'ID' => $eleve->getRef_compte_wp(),
+            'user_email' => $email
+        ));
+        prettyPrint($ret);
+    }
+
+    // pour mettre a jour l'email d'un parent
     function updateEmailParent($email, $refAbo)
     {
 
