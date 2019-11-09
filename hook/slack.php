@@ -2,8 +2,8 @@
 /**
  * 
  *  pour recevoir les hooks de stripe en mode prof
- *  Voilà les hooks reçus :
- *  - invoice.payment_succeeded pour transférer les fonds au prof
+ *  Voilï¿½ les hooks reï¿½us :
+ *  - invoice.payment_succeeded pour transfï¿½rer les fonds au prof
  *  
  */
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
@@ -22,9 +22,11 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 
+$slack = new \spamtonprof\slack\Slack();
 
-$message = explode("-",$_GET["message"]);
-$channel = $_GET["channel"];
+
+$message = explode("-",$_POST["message"]);
+$channel = $_POST["channel"];
 
 $slack = new \spamtonprof\slack\Slack();
 $slack -> sendMessages($channel, $message);
