@@ -21,9 +21,12 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
+define('PROBLEME_CLIENT', true);
+
+
 $lbc = new \spamtonprof\stp_api\LbcProcessManager();
 
-$lbc->checkAds(100);
+$lbc->checkAds(20);
 
 // $lbc->analyse_campaigns();
 
