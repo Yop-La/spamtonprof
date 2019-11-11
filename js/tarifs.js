@@ -256,23 +256,31 @@ jQuery( document ).ready( function( jQuery ) {
 							jQuery(formulaSelector).removeClass('hide');
 							formulaSelectors.push(formulaSelector)
 
-							console.log(formulaSelectors)
 
 							var i = 0;
 
 							//remplissge colonne par colonne de la table des matières
 
 							formules.forEach(function(formule){
+								
+						
 
 								var formulaSelector  = formulaSelectors[formulaSelectors.length-1];
+								
 
 								if(i > 2){
 
 									formulaSelector  = formulaSelectors[0];
+									
+
+									
 								}
+								
+
 
 								j = i % 3;
 
+								
 								var formulaClass = '.matiere'.concat(j+1); 
 
 								matieres = formule.formule.split('|');
@@ -280,7 +288,9 @@ jQuery( document ).ready( function( jQuery ) {
 
 
 								// ecriture des matières
-								jQuery(formulaClass).text(matieres);
+								jQuery(formulaSelector.concat(" ",formulaClass)).text(matieres);
+								
+								console.log(formulaClass);
 
 								//écriture du nom de la formule
 								jQuery(formulaSelector.concat(' .pricing-column h3:eq( ',j,' )')).html('<div>'.concat('Formule ',niveau.niveau,'<br></div><div>',matieres,'</div>'));
@@ -300,7 +310,8 @@ jQuery( document ).ready( function( jQuery ) {
 
 								//récupérer le prix
 
-
+								console.log("avant i++");
+								console.log(i);
 								i++;
 							});
 						}
