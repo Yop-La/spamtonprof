@@ -127,7 +127,7 @@ function ajaxUpdateCfgClient()
             'domain' => $domain,
             'img_folder' => $folder_img
         ));
-        $clientMg->add($client);
+        $client = $clientMg->add($client);
 
         $client->setRef_reponse_lbc($reponse_lbc);
         $clientMg->updateRefReponseLbc($client);
@@ -139,6 +139,40 @@ function ajaxUpdateCfgClient()
         $clientMg->update_label($client);
 
         $choisir_client = $client->getRef_client();
+        
+        // pour ajouter les emails au client automatiquement
+        $new_ref_client = $client->getRef_client();
+        
+        $compteMg = new \spamtonprof\stp_api\LbcAccountManager();
+        
+        $actMg = new \spamtonprof\stp_api\LbcAccountManager();
+        $comptes = $actMg->getAll(array(
+            'like_mail' => 'gmx'
+        ));
+        
+        foreach ($comptes as $compte) {
+            
+            $compte->setRef_compte(0);
+            
+            $mail = $compte->getMail();
+            $mail = strtolower($mail);
+            
+            $email = explode('@', $compte->getMail())[0];
+            
+            if (strlen($email) <= 10) {
+                $pattern = '/\d+/i';
+                $replacement = '';
+                $mail = preg_replace($pattern, $replacement, $mail);
+                $mail = preg_replace('/gmx/', strtolower(generateRandomString(5)), $mail);
+                
+                $compte  =$compteMg->add(new \spamtonprof\stp_api\LbcAccount(array(
+                    'mail' => $mail,
+                    'ref_client' => $new_ref_client
+                )));
+                
+            }
+        }
+        
     } else if ($client_action == 'update') {
         $client = $clientMg->get(array(
             'ref_client' => $choisir_client
