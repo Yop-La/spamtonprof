@@ -7,35 +7,29 @@
  */
 define('PROBLEME_CLIENT', true);
 
-$type_txt_str = "rep_vetement";
+$type_txt_str = "rep_amazon";
 
 $textes_str = array(
     "Bonjour,
     
-Désolé, il vient tout juste de partir. Ça part vite.
+Désolé, ça vient tout juste de partir. C'est plus vite que je pensais.
 
-Je l'ai acheté sur ce site : 
+Si tu veux, je l'ai acheté ici: [lien_affilie]. Il en reste peut être encore.
 
-C'est proposé par les fabriquants directement.
-
-Du coup, c'est pas cher !! 
-
-J'ai trouvé des affaires zara à 20-30 € moins cher. Et c'est la même qualité.
-
-Un sacré bon plan.
+Comme ça, tu l'auras en neuf et à pas cher.
 
 Allez, bonne journée :)
 
 [prof_name]
-",    "Désole, je viens de confirmer la vente à qq d'autres. Mais t'inquiète pas, tu peux vite retrouver cette article sur ce site : 
+",    "Désole, je viens de confirmer la vente à qq d'autres. 
 
-Tu connais peut être. Il y a des fringues que tu peux trouvez, en ce moment, chez Zara par exemple. 
+Mais t'inquiète pas, tu retrouver ça sur ce site : [lien_affilie] 
 
-Avec la même qualité mais c'est 70% moins chères. ( comme ça vient du fabricant directement ). 
+Il en reste peut être encore.
 
-Quand j'ai découvert ce site, j'ai direcement commandé 6 tenues pour presque rien du tout. 
+Tu connais peut être. C'est amazon. Il y a des bons produits neufs et à pas cher. 
 
-Voilà mon bon plan !
+Je trouve que c'est un bon plan !
 
 Bonne journée :)
 
