@@ -604,8 +604,6 @@ class LbcProcessManager
     // --- step 7 : on met a jour la de controle
     public function check_account(\spamtonprof\stp_api\LbcAccount $lbcAccount, $send_msg = false)
     {
-        
-        
         $msgs = [];
 
         $lbcAccountMg = new \spamtonprof\stp_api\LbcAccountManager();
@@ -616,6 +614,7 @@ class LbcProcessManager
 
         $codePromo = $lbcAccount->getCode_promo();
         $user_id = $lbcAccount->getUser_id();
+        $cookie = $lbcAccount->getCookie();
 
         // step 2 : suppression des annonces dans la base sans ref_titre et ref_texte ( vestige du robot qui ne mémoriser pas les textes et les titres d'annonces )
         $adTempoMg->deleteAll(array(
@@ -627,10 +626,42 @@ class LbcProcessManager
         // step 3 : recuperation des annonces via api leboncoin
         $ads = false;
 
-        if ($user_id) {
+        
+        
+        if ($cookie) {
+            
+
+            if (! $user_id) {
+
+                $lbcApi = new \spamtonprof\stp_api\LbcApi();
+                $user_id = $lbcApi->getUserId($cookie);
+                
+                
+
+                if(!$user_id){
+                    
+                    $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+                    $lbcAccount->setControle_date($now);
+                    $lbcAccountMg->updateControleDate($lbcAccount);
+                    
+                    
+                    $lbcAccount->setUncheckable(true);
+                    $lbcAccountMg->update_uncheckable($lbcAccount);
+                    
+                    $msgs[] = 'impossible de récupérer le user_id';
+                    return($msgs);
+                }
+                
+                $lbcAccount->setUser_id($user_id);
+                $lbcAccountMg->updateUserId($lbcAccount);
+                
+            }
+
             $ads = $lbcApi->getAdds(array(
                 'user_id' => $user_id
             ));
+            
+            
             $msgs[] = "User_id : " . $user_id;
         } else if (! is_null($codePromo)) {
             $ads = $lbcApi->getAdds(array(
@@ -639,7 +670,6 @@ class LbcProcessManager
             $msgs[] = "Pas de user_id : ";
         }
 
-        
         // step 4-1 : si il y a des annonces en ligne sur leboncoin
         $disabled = false;
         $nbAnnonce = 0;
@@ -990,11 +1020,14 @@ class LbcProcessManager
         // step 1 :recuperer les comptes ages d'au moins 2h.
         $lbcAccounts = $lbcAccountMg->getAccountToScrap($nbCompte);
 
+        
         $i = 0;
         $msgs = [];
         $nb_acts = count($lbcAccounts);
         foreach ($lbcAccounts as $lbcAccount) {
 
+            echo($lbcAccount->getRef_compte() . '<br>');
+            
             try {
                 $msgs_inter = $this->check_account($lbcAccount);
             } catch (\Exception $e) {
@@ -1003,7 +1036,7 @@ class LbcProcessManager
             $msgs = array_merge($msgs_inter, $msgs);
 
             if ($i % 20 == 0 || $i == ($nb_acts - 1)) {
-                $slack->sendMessages("log-lbc", $msgs);
+                $slack->sendMessages("log", $msgs);
                 $msgs = [];
             }
             $i ++;
@@ -1189,28 +1222,23 @@ class LbcProcessManager
             }
 
             if ($refClient == 31) {
-                
-                
+
                 $lbcApi = new \spamtonprof\stp_api\LbcApi();
                 $ad = $lbcApi->get_local_nike_ad();
-                
-                
+
                 $title_str = $ad->subject;
                 $texte->setTexte($ad->body);
                 $image = 'http://' . DOMAIN . $ad->image;
             }
-            
-            
 
-            if ($refClient == 32) {
+            if ($refClient >= 33) {
+
                 $lbcApi = new \spamtonprof\stp_api\LbcApi();
-                $rd_ad = $lbcApi->get_ads_clothes();
+                $ad = $lbcApi->get_local_ad($client->getImg_folder());
 
-                $title_str = $rd_ad->subject;
-                $texte->setTexte($rd_ad->body);
-                $image = $rd_ad->image;
-
-                $univers = $rd_ad->univers;
+                $title_str = $ad->subject;
+                $texte->setTexte($ad->body);
+                $image = 'http://' . DOMAIN . $ad->image;
             }
 
             $ad->title = $title_str;
@@ -1227,8 +1255,6 @@ class LbcProcessManager
         }
         return ($ads);
     }
-    
-    
 
     // pour retouner la configuration d'un client leboncoin (le type de texte par defaut et le type de titre par defaut d'un client)
     public function getDefaultConf($refClient)
@@ -1440,6 +1466,8 @@ class LbcProcessManager
             ), $spamtonprof, $txt);
 
             $body = str_replace('[prof_name]', $act->getPrenom(), $txt);
+
+            $body = str_replace('[lien_affilie]', $client->getLink(), $body);
 
             // on envoie le message
             $this->gmailManager->sendMessage($body, 'Re: ' . $subject, 'mailsfromlbc@gmail.com', 'mailsfromlbc@gmail.com', 'le.bureau.des.profs@gmail.com', 'Cannelle Gaucher', $threadId);
