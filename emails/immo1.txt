@@ -1,0 +1,37 @@
+Dans le cadre de la stratégie 1, je viens de trouver un bien potentiellement intéressant.
+
+Déjà, ce bien est au moins 20 % en dessous du prix moyen du marché.
+
+Rappel stratégie 1:
+
+	pour coloc à 2 à 60 000 € max après négo  - 90 000 € affiché max
+
+	type de bien : 2 pièces ou 3 pièces. Faire deux chambres
+
+	surface : 20 à 40 m²
+
+	Charges: 10 000 € frais de notaire / 40 000 € travaux et ameublement / 10 000 € de marge
+
+	Total à emprunter : 120 000 €
+
+	crédit à 120 000 € / 516 € de mensualité
+
+	516 € de mensualité avec assurance
+	 
+	350 * 2 = 700 € de loyer - casflowh : 180 € / mois 
+
+
+Fin Rappel
+
+Le bien:
+	Prix: [price] €
+	Surface: [square] m²
+	Prix: [price] €
+	Surface: [square] m²
+	url leboncoin: [url]
+ 	ville : [city]
+	type de bien: [type_bien]
+	date de première publication ( pour voir marge de négo ) : [first_publication_date]
+	nombre de pièces: [room]
+	prix au m² : [prixm] € / m²
+	prix moyen au m² du marché dans cette ville: [prixmoyen] € / m²
