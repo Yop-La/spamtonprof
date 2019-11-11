@@ -58,7 +58,7 @@ class LbcAccountManager
             $ref_client = $info["valid_lbc_act"];
 
             $query = "select * from compte_lbc 
-                            where (now() >= ( date_publication +  interval '15 days') or ( date_publication is null and controle_date is not null))
+                            where (now() >= ( date_publication +  interval '5 days') or ( date_publication is null and controle_date is not null))
                                  and nb_annonces_online != 0
                                  and disabled is false
 						         and ref_client = :ref_client
@@ -194,7 +194,7 @@ class LbcAccountManager
 
             if (array_key_exists("global_nb_ads", $info)) {
 
-                $q = $this->_db->prepare("select  prenom_client,client.ref_client, sum(nb_annonces_online) as nb_adds 
+                $q = $this->_db->prepare("select  prenom_client || ' ' || nom_client, client.ref_client, sum(nb_annonces_online) as nb_adds 
                     from compte_lbc, client where  compte_lbc.ref_client = client.ref_client
                         group by client.ref_client,prenom_client order by nb_adds desc");
             }
@@ -209,7 +209,7 @@ class LbcAccountManager
 
             if (array_key_exists("ads_by_day", $info)) {
 
-                $q = $this->_db->prepare("select  client.prenom_client as prenom, sum(nb_annonces_online) as nb_ads, date(date_creation) as date_creation from compte_lbc,client
+                $q = $this->_db->prepare("select  client.prenom_client  || ' ' ||  client.nom_client as prenom, sum(nb_annonces_online) as nb_ads, date(date_creation) as date_creation from compte_lbc,client
                     where nb_annonces_online != 0 and compte_lbc.ref_client = client.ref_client
                     group by date(date_creation), client.prenom_client
                     order by date_creation desc,nb_ads desc ;");
@@ -217,7 +217,7 @@ class LbcAccountManager
 
             if (array_key_exists("ads_by_domain", $info)) {
 
-                $q = $this->_db->prepare("select client.ref_client, client.prenom_client, regexp_matches(mail, '@.*')  as domain , sum(nb_annonces_online)from compte_lbc , client
+                $q = $this->_db->prepare("select client.ref_client, client.prenom_client  || ' ' ||  client.nom_client as prenom, regexp_matches(mail, '@.*')  as domain , sum(nb_annonces_online)from compte_lbc , client
                     where compte_lbc.ref_client = client.ref_client
                     group by regexp_matches(mail, '@.*')  ,client.ref_client, client.prenom_client
                     order by ref_client desc , domain 
@@ -250,6 +250,15 @@ class LbcAccountManager
         $q = $this->_db->prepare("update compte_lbc set disabled = :disabled, date_of_disabling = :date_of_disabling where ref_compte = :ref_compte");
         $q->bindValue(":disabled", $lbcAccount->getDisabled(), PDO::PARAM_BOOL);
         $q->bindValue(":date_of_disabling", $now->format(PG_DATETIME_FORMAT));
+        $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
+        $q->execute();
+    }
+    
+    
+    public function update_uncheckable(\spamtonprof\stp_api\LbcAccount $lbcAccount)
+    {
+        $q = $this->_db->prepare("update compte_lbc set uncheckable = :uncheckable where ref_compte = :ref_compte");
+        $q->bindValue(":uncheckable", $lbcAccount->getUncheckable(), PDO::PARAM_BOOL);
         $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
         $q->execute();
     }
@@ -314,14 +323,13 @@ class LbcAccountManager
 
     public function add(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
-        $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+
         $q = $this->_db->prepare("insert into compte_lbc(mail, password, nb_annonces_online, disabled, ref_client, telephone, date_creation, open, nb_successful_campaigns, nb_failed_campaigns) 
-            values(:mail, :password, 0, false, :ref_client, :telephone, :date_creation,true, 0, 0)");
+            values(:mail, :password, 0, false, :ref_client, :telephone, NOW(),true, 0, 0)");
         $q->bindValue(":mail", $lbcAccount->getMail());
         $q->bindValue(":password", $lbcAccount->getPassword());
         $q->bindValue(":ref_client", $lbcAccount->getRef_client());
         $q->bindValue(":telephone", $lbcAccount->getTelephone());
-        $q->bindValue(":date_creation", $now->format(PG_DATETIME_FORMAT));
         $q->execute();
 
         $lbcAccount->setRef_compte($this->_db->lastInsertId());
