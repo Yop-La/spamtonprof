@@ -29,7 +29,6 @@ wptitle="[[wptitle]]"
 
 host="[[host]]"
 
-links="[[links]]"
 
 
 #export db

@@ -5,14 +5,13 @@ class CpanelMg
 
 {
 
-    private $APITOKEN = "10VLQ2Y8TC6LTR6GN2Q1O16G1PET23N7";
+    private $APITOKEN = "OGNKRC51XOO4IR9H6QY7PE5POVMS4UG3";
 
-    private $username = "aafhpget";
+    private $username = "yopla";
 
     public function __construct()
 
     {}
-
 
     public function call($module, $function, $params = false)
     {
@@ -24,7 +23,7 @@ class CpanelMg
             $params = "";
         }
 
-        curl_setopt($ch, CURLOPT_URL, "https://world-387.fr.planethoster.net:2083/execute/$module/$function$params");
+        curl_setopt($ch, CURLOPT_URL, "https://hybrid2313.fr.ns.planethoster.net:2083/execute/$module/$function$params");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 
@@ -64,7 +63,7 @@ class CpanelMg
         $module = "Mysql";
         $function = "create_database";
 
-        $dbname = "aafhpget_" . str_replace(".", "_", $dbname);
+        $dbname = "yopla_" . str_replace(".", "_", $dbname);
 
         $dbs = $this->list_mysql_db();
 
@@ -86,11 +85,11 @@ class CpanelMg
         return ($dbname);
     }
 
-    public function create_data_base_with_admin($dbname,$password)
+    public function create_data_base_with_admin($dbname, $password)
     {
         $db_name = $this->create_data_base($dbname);
 
-        $password = $this->create_db_user($db_name,$password);
+        $password = $this->create_db_user($db_name, $password);
 
         $this->set_privileges_on_database($db_name, $db_name);
 
@@ -150,28 +149,43 @@ class CpanelMg
         return ($ret);
     }
 
-    
-    public function ad_sub_domain($domain,$rootdomain)
+    public function ad_domain($domain, $rootdomain)
     {
         $module = "SubDomain";
         $function = "addsubdomain";
-        
-  
-        
+
         $params = array(
             'domain' => $domain,
             'rootdomain' => $rootdomain,
-            'dir' => "/".$rootdomain . '.' . $domain
+            'dir' => "/" . $rootdomain . '.' . $domain
         );
-        
+
         $params = http_build_query($params);
-        
+
         $ret = $this->call($module, $function, $params);
-        
-        return($ret);
+
+        return ($ret);
     }
-    
-    public function create_db_user($name,$password)
+
+    public function ad_sub_domain($domain, $rootdomain)
+    {
+        $module = "SubDomain";
+        $function = "addsubdomain";
+
+        $params = array(
+            'domain' => $domain,
+            'rootdomain' => $rootdomain,
+            'dir' => "/" . $rootdomain . '.' . $domain
+        );
+
+        $params = http_build_query($params);
+
+        $ret = $this->call($module, $function, $params);
+
+        return ($ret);
+    }
+
+    public function create_db_user($name, $password)
     {
         $module = "Mysql";
         $function = "create_user";
@@ -214,23 +228,20 @@ class CpanelMg
 
         return ($res);
     }
-    
+
     public function start_wp_backup($url = "template.aafhaiti.org")
     {
         $module = "WordPressBackup";
         $function = "start";
-        
-        
-        $params = array(
-            'site' => $url,
 
+        $params = array(
+            'site' => $url
         );
-        
+
         $params = http_build_query($params);
-        
+
         $res = $this->call($module, $function, $params);
 
-        
         return ($res);
     }
 

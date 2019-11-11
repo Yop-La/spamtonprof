@@ -5,84 +5,75 @@ class WpMg
 
 {
 
+    public $sh = "";
+
     public function __construct()
 
     {
         $script = "";
     }
-    
-    public function update_links_on_network(){
+
+    public function update_links_on_network($domains, $target_subdomains)
+    {
+
         
-        $target_subdomains = [
-            "comparateurs",
-            "comparer",
-            "conseils",
-            "cabinet",
-            ""
-        ];
-        
-        $domains = [
-            "acmbasket.com",
-            "ateliers-broderie-doyen.com",
-            "balade-des-vignerons.fr",
-            "basketpaysgex.fr",
-            "gerda2017.com",
-            "gite-haut-allier.fr",
-            "labayonnaise04.com",
-            "mendespokerclub.fr",
-            "recuperer-son-ex.info",
-            "se-marier-en-caleche.com",
-            "web-annuaire-france.com"
-        ];
-        $sh = "";
-        foreach ($target_subdomains as $target_subdomain){
-            
-            $sh = $sh .  $this->update_links_on_subdomains($domains,$target_subdomain,$target_subdomains);
-            
+        foreach ($target_subdomains as $target_subdomain) {
+
+            $this->update_links_on_subdomains($domains, $target_subdomain, $target_subdomains);
         }
+
+        echo (nl2br($this->sh));
         
-        $this->execute_remote($sh);
+        $this->execute_remote();
         
-        echo (nl2br($sh));
+
+        
         
     }
 
-    public function update_links_on_subdomains($domains,$target_sub,$target_subdomains)
+    public function update_links_on_subdomains($domains, $target_sub, $target_subdomains)
     {
-
-
         $pre_subdomains = $target_subdomains;
 
-
-        $wpmg = new \spamtonprof\stp_api\WpMg();
         // $wpmg -> clone_wp($domain, $domain_to_clone, $path_to_clone);
-        $sh = "";
+        
         foreach ($domains as $domain) {
 
-            $wd = "/home/aafhpget/" . $target_sub . "." . $domain;
-            
+            $wd = "/home/yopla/" . $target_sub . "." . $domain;
+
             if ($target_sub == "") {
-                $wd = "/home/aafhpget/sites/"  . explode(".", $domain)[0];
+                $wd = "/home/yopla/" . $domain;
             }
 
             if (($key = array_search($target_sub, $pre_subdomains)) !== false) {
                 unset($pre_subdomains[$key]);
             }
 
-            $sh = $sh . $wpmg->add_subdomains_link($wd, $domain, $pre_subdomains);
+            $this->add_subdomains_link($wd, $domain, $pre_subdomains);
 
-            $sh = $sh . $wpmg->remove_cache($wd);
-
-         
+            
+            
+            
+//             $this->remove_cache($wd);
+            
         }
-
-        return($sh);
         
+        
+
     }
 
-    public function install_wp_new_subdomains()
+//    Exemples d'utilisation
+//     $domains = [
+//         "artdumariage-paris.com","bien-etre-facile.net","breizhtrotteuse.com","chatmallowc.com","clopipop.com","expertise-marchespublics.fr"
+//     ];
+    
+//     $wpMg = new \spamtonprof\stp_api\WpMg();
+//     $wpMg->install_wp_new_domains($domains);
+//     $wpMg->install_wp_new_domains($domains,"comparer");
+    
+    
+    public function install_wp_new_domains($domains, $subdomain = false)
     {
-        
         $cpanel = new \spamtonprof\stp_api\CpanelMg();
 
         // création des sous domaines
@@ -90,52 +81,35 @@ class WpMg
         // activé bhm sur les copies
         // ajouter widget avec les liens
 
-        $domains = [
-            "aafhaiti.org",
-            "acmbasket.com",
-            "ateliers-broderie-doyen.com",
-            "balade-des-vignerons.fr",
-            "basketpaysgex.fr",
-            "gerda2017.com",
-            "gite-haut-allier.fr",
-            "labayonnaise04.com",
-            "mendespokerclub.fr",
-            "recuperer-son-ex.info",
-            "se-marier-en-caleche.com",
-            "web-annuaire-france.com"
-        ];
-
-        $subdomain = "comparer";
-
-        $wpmg = new \spamtonprof\stp_api\WpMg();
-
         $sh = "";
         foreach ($domains as $domain) {
 
-            $wd = "/home/aafhpget/" . $subdomain . "." . $domain;
+            $wd = "/home/yopla/" . $domain;
+            if ($subdomain) {
+                $wd = "/home/yopla/" . $subdomain . "." . $domain;
+                $cpanel->add_sub_domain($subdomain, $domain);
+                $domain = $subdomain . "." . $domain;
+            }
 
-            
-            $cpanel->add_sub_domain($subdomain, $domain);
+            $this->clone_wp($domain, "suiviparemail.fr", "/home/yopla/www");
 
-            $sh = $sh . $wpmg->clone_wp("$subdomain." . $domain, "essai.aafhaiti.org", "/home/aafhpget/essai.aafhaiti.org");
+            $plugin_path = "/home/yopla/plugins/BHMCloaking-normal.zip";
+            $this->install_plugins($wd, $plugin_path, "BHMCloaking");
 
-            $plugin_path = "/home/aafhpget/plugins/BHMCloaking-normal.zip";
-            $sh = $sh . $wpmg->install_plugins($wd, $plugin_path, "BHMCloaking");
+            $plugin_path = "/home/yopla/plugins/wp-rocket.zip";
+            $this->install_plugins($wd, $plugin_path, "wp-rocket");
 
-            $plugin_path = "/home/aafhpget/plugins/wp-rocket.zip";
-            $sh = $sh . $wpmg->install_plugins($wd, $plugin_path, "wp-rocket");
+            $this->create_bhm_campaigns($domain);
 
-            $sh = $sh . $wpmg->create_bhm_campaigns($wd);
+            $this->deactivate_plugin($wd, "wp-rocket");
+            $this->activate_plugin($wd, "wp-rocket");
 
-            $sh = $sh . $wpmg->deactivate_plugin($wd, "wp-rocket");
-            $sh = $sh . $wpmg->activate_plugin($wd, "wp-rocket");
-    
-            $sh = $sh . $wpmg->remove_cache($wd);
+            $this->remove_cache($domain);
 
-            $sh = $sh . $wpmg->add_cron("$subdomain." . $domain);
+            $this->add_cron($domain);
         }
 
-        $wpmg->execute_remote($sh);
+        $this->execute_remote($sh);
 
         echo (nl2br($sh));
 
@@ -165,70 +139,38 @@ class WpMg
         $sh = str_replace("[[links]]", $links, $sh);
         $sh = str_replace("[[wppath]]", $wd, $sh);
 
-        $sh = str_replace("cmdwp", "~/wd/scripts/wp", $sh);
-
+        $this->add_to_sh($sh);
+        
+        
         return ($sh);
     }
 
-    public function create_bhm_campaigns($dir)
+    public function create_bhm_campaigns($domain, $dir = false)
     {
+        $rows = readCsv("/var/www/html/spamtonprof/wp-content/plugins/spamtonprof/tempo/export.csv", ",");
+
+        array_shift($rows);
+
+        if (! $dir) {
+            $dir = "/home/yopla/" . $domain;
+        }
+
         $params = array(
             'dir' => $dir,
             'minutes' => 1,
-            'maillage' => 4,
-            'nb_posts' => 2000
+            'maillage' => 0,
+            'nb_posts' => 500
         );
 
         $campaigns = [];
-        // pinel
-        $campaigns[] = array(
-            'cat_id' => 3,
-            'url' => 'https://generator.blackhat.money/page/3/775?token=50637a15e23bf111801a8138e430174f'
-        );
-        $campaigns[] = array(
-            'cat_id' => 3,
-            'url' => 'https://generator.blackhat.money/page/401/775?token=50637a15e23bf111801a8138e430174f'
-        );
 
-        // rachat crédit
-        $campaigns[] = array(
-            'cat_id' => 4,
-            'url' => 'https://generator.blackhat.money/page/3/776?token=50637a15e23bf111801a8138e430174f'
-        );
-        $campaigns[] = array(
-            'cat_id' => 4,
-            'url' => 'https://generator.blackhat.money/page/401/776?token=50637a15e23bf111801a8138e430174f'
-        );
+        foreach ($rows as $row) {
 
-        // crédit immo
-        $campaigns[] = array(
-            'cat_id' => 5,
-            'url' => 'https://generator.blackhat.money/page/3/777?token=50637a15e23bf111801a8138e430174f'
-        );
-        $campaigns[] = array(
-            'cat_id' => 5,
-            'url' => 'https://generator.blackhat.money/page/401/777?token=50637a15e23bf111801a8138e430174f'
-        );
-
-        // lmnp
-        $campaigns[] = array(
-            'cat_id' => 6,
-            'url' => 'https://generator.blackhat.money/page/3/778?token=50637a15e23bf111801a8138e430174f'
-        );
-        $campaigns[] = array(
-            'cat_id' => 6,
-            'url' => 'https://generator.blackhat.money/page/401/778?token=50637a15e23bf111801a8138e430174f'
-        );
-
-        // mutuelle santé
-        $campaigns[] = array(
-            'cat_id' => 7,
-            'url' => 'https://generator.blackhat.money/page/3/791?token=50637a15e23bf111801a8138e430174f'
-        );
-        $campaigns[] = array(
-            'cat_id' => 7,
-            'url' => 'https://generator.blackhat.money/page/401/791?token=50637a15e23bf111801a8138e430174f'
-        );
+            $campaigns[] = array(
+                'cat_id' => $row[0],
+                'url' => $row[3]
+            );
+        }
 
         $sh = "";
         foreach ($campaigns as $campaign) {
@@ -241,13 +183,17 @@ class WpMg
         return ($sh);
     }
 
-    public function remove_cache($wd)
+    public function remove_cache($domain, $dir = false)
     {
+        if (! $dir) {
+            $dir = "/home/yopla/" . $domain;
+        }
+
         $sh = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/sh/template/clear_cache.sh");
 
-        $sh = str_replace("[[dir]]", $wd, $sh);
+        $sh = str_replace("[[dir]]", $dir, $sh);
 
-        $sh = str_replace("cmdwp", "~/wd/scripts/wp", $sh);
+        $this->add_to_sh($sh);
 
         return ($sh);
     }
@@ -257,8 +203,6 @@ class WpMg
         $sh = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/sh/template/install_wp_rocket_cli.sh");
 
         $sh = str_replace("[[dir]]", $wd, $sh);
-
-        $sh = str_replace("cmdwp", "~/wd/scripts/wp", $sh);
 
         return ($sh);
     }
@@ -270,18 +214,29 @@ class WpMg
         $sh = str_replace("[[dir]]", $wd, $sh);
         $sh = str_replace("[[plugin_name]]", $plugin_name, $sh);
 
-        $sh = str_replace("cmdwp", "~/wd/scripts/wp", $sh);
+        $this->add_to_sh($sh);
 
         return ($sh);
     }
 
+    public function count_post($domain)
+    {
+        $sh = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/sh/template/count_post.sh");
+        
+        $sh = str_replace("[[domain]]", $domain, $sh);
+        
+        $this->add_to_sh($sh);
+        
+        return ($sh);
+    }
+    
     public function add_cron($domain)
     {
         $sh = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/sh/template/add_cron.sh");
 
         $sh = str_replace("[[domain]]", $domain, $sh);
 
-        $sh = str_replace("cmdwp", "~/wd/scripts/wp", $sh);
+        $this->add_to_sh($sh);
 
         return ($sh);
     }
@@ -293,7 +248,7 @@ class WpMg
         $sh = str_replace("[[dir]]", $wd, $sh);
         $sh = str_replace("[[plugin_name]]", $plugin_name, $sh);
 
-        $sh = str_replace("cmdwp", "~/wd/scripts/wp", $sh);
+        $this->add_to_sh($sh);
 
         return ($sh);
     }
@@ -306,7 +261,7 @@ class WpMg
         $sh = str_replace("[[plugin_name]]", $plugin_name, $sh);
         $sh = str_replace("[[plugin_path]]", $plugin_path, $sh);
 
-        $sh = str_replace("cmdwp", "~/wd/scripts/wp", $sh);
+        $this->add_to_sh($sh);
 
         return ($sh);
     }
@@ -329,9 +284,7 @@ class WpMg
         $sh = str_replace("[[minutes]]", $minutes, $sh);
         $sh = str_replace("[[maillage]]", $maillage, $sh);
 
-        $sh = str_replace("cmdwp", "~/wd/scripts/wp", $sh);
-
-        return ($sh);
+        $this->add_to_sh($sh);
     }
 
     public function clone_wp($domain, $domain_to_clone, $path_to_clone, $pathtoinstall = false)
@@ -348,7 +301,7 @@ class WpMg
         $username = "yopla";
 
         if (! $pathtoinstall) {
-            $pathtoinstall = "/home/aafhpget/$domain";
+            $pathtoinstall = "/home/yopla/$domain";
         }
 
         $dbname = $db["db_name"];
@@ -368,20 +321,29 @@ class WpMg
         $sh = str_replace("[[wptitle]]", $wptitle, $sh);
         $sh = str_replace("[[host]]", $host, $sh);
 
-        $sh = str_replace("cmdwp", "~/wd/scripts/wp", $sh);
+        $this->add_to_sh($sh);
 
         return ($sh);
     }
 
-    public function execute_remote($sh)
+    public function add_to_sh($sh)
     {
-        file_put_contents(ABSPATH . "wp-content/plugins/spamtonprof/sh/run/tempo.sh", $sh);
+        $this->sh = $this->sh . PHP_EOL . $sh;
+    }
+
+    public function execute_remote()
+    {
+        $sh1 = $this->sh;
+        $sh1 = str_replace("cmdwp", "/usr/local/cpanel/3rdparty/bin/wp", $sh1);
+        file_put_contents(ABSPATH . "wp-content/plugins/spamtonprof/sh/run/tempo.sh", $sh1);
 
         $sh = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/sh/template/execute_sh_via_ssh.sh");
 
-//         $sh = str_replace("[[file]]", "tempo.sh", $sh);
-//         $sh = str_replace("[[cmd]]", ". ~/sh/tempo.sh", $sh);
+        $sh = str_replace("[[file]]", "tempo.sh", $sh);
+        $sh = str_replace("[[cmd]]", ". ~/sh/tempo.sh", $sh);
 
         file_put_contents(ABSPATH . "wp-content/plugins/spamtonprof/sh/run/execute_sh_via_ssh.sh", $sh);
+
+        echo (nl2br($sh1));
     }
 }
