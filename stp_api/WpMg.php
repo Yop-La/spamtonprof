@@ -219,6 +219,23 @@ class WpMg
         return ($sh);
     }
 
+    
+    public function search_replace($domain,$search,$replace)
+    {
+        $sh = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/sh/template/search_replace.sh");
+        
+        $sh = str_replace("[[domain]]", $domain, $sh);
+        
+        $sh = str_replace("[[search]]", $search, $sh);
+        
+        $sh = str_replace("[[replace]]", $replace, $sh);
+        
+        
+        $this->add_to_sh($sh);
+        
+        return ($sh);
+    }
+    
     public function count_post($domain)
     {
         $sh = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/sh/template/count_post.sh");
