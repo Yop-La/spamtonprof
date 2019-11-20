@@ -1435,10 +1435,35 @@ class StripeManager
         }
     }
 
-    public function addTrial($subId, $endDay, $prorate)
+    
+    
+    public function addTrialTest($subId, $endDay, $prorate =false)
     {
+        
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        
+        
+        $endDay = \DateTime::createFromFormat(PG_DATETIME_FORMAT, $endDay);
+        
+        
+        
+        \Stripe\Subscription::update($subId, [
+            'trial_end' => $endDay->getTimestamp(),
+            'prorate' => $prorate
+        ]);
+    }
+    
+    
+    public function addTrial($subId, $endDay, $prorate =false)
+    {
+        
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        
+        
         $endDay = \DateTime::createFromFormat(PG_DATE_FORMAT, $endDay);
 
+        
+        
         \Stripe\Subscription::update($subId, [
             'trial_end' => $endDay->getTimestamp(),
             'prorate' => $prorate
