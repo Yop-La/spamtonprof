@@ -4,6 +4,8 @@ namespace spamtonprof\stp_api;
 class StpInterruptionManager
 {
 
+    const scheduled = 'scheduled', running = 'running', done = 'done', stopping = 'stopping';
+
     private $_db;
 
     public function __construct()
@@ -13,39 +15,61 @@ class StpInterruptionManager
 
     public function add(StpInterruption $stpInterruption)
     {
-        $q = $this->_db->prepare('insert into stp_interruption(debut, fin, prorate, ref_abonnement) values(:debut,:fin,:prorate,:ref_abonnement)');
+        $q = $this->_db->prepare('insert into stp_interruption(debut, fin, statut,ref_abonnement) values(:debut,:fin,:statut,:ref_abonnement)');
         $q->bindValue(':debut', $stpInterruption->getDebut());
         $q->bindValue(':fin', $stpInterruption->getFin());
-        $q->bindValue(':prorate', $stpInterruption->getProrate(), \PDO::PARAM_BOOL);
+        $q->bindValue(':statut', $stpInterruption->getStatut());
         $q->bindValue(':ref_abonnement', $stpInterruption->getRef_abonnement());
+
         $q->execute();
+
 
         $stpInterruption->setRef_interruption($this->_db->lastInsertId());
         return ($stpInterruption);
     }
 
-    public function getAll($info)
+    public function getAll($info=false)
     {
-        $q = null;
+        
+        $q = $this->_db->prepare("select * from stp_interruption ");
         if (is_array($info)) {
-            if (array_key_exists('debut', $info)) {
 
-                $deb = $info['debut'];
-                $q = $this->_db->prepare('select * from stp_interruption where debut = :debut');
-                $q->bindValue(':debut', $deb);
-                $q->execute();
-            } else if (array_key_exists('fin', $info)) {
+            if (array_key_exists('key', $info)) {
+                $key = $info['key'];
+                $params = false;
+                if (array_key_exists('params', $info)) {
+                    $params = $info['params'];
+                }
 
-                $fin = $info['fin'];
-                $q = $this->_db->prepare('select * from stp_interruption where fin = :fin');
-                $q->bindValue(':fin', $fin);
-                $q->execute();
-            } else if (array_key_exists('prolongation', $info)) {
+                if ($key == 'to_start') {
 
-                $prolongation = $info['prolongation'];
-                $q = $this->_db->prepare('select * from stp_interruption where prolongation = :prolongation');
-                $q->bindValue(':prolongation', $prolongation);
-                $q->execute();
+                    $q = $this->_db->prepare("select * from stp_interruption where statut = 'scheduled' and now() > debut and now() < fin");
+                }
+                if ($key == 'all') {
+                    
+                 
+                }
+                
+            } else {
+                if (array_key_exists('debut', $info)) {
+
+                    $deb = $info['debut'];
+                    $q = $this->_db->prepare('select * from stp_interruption where debut = :debut');
+                    $q->bindValue(':debut', $deb);
+                    $q->execute();
+                } else if (array_key_exists('fin', $info)) {
+
+                    $fin = $info['fin'];
+                    $q = $this->_db->prepare('select * from stp_interruption where fin = :fin');
+                    $q->bindValue(':fin', $fin);
+                    $q->execute();
+                } else if (array_key_exists('prolongation', $info)) {
+
+                    $prolongation = $info['prolongation'];
+                    $q = $this->_db->prepare('select * from stp_interruption where prolongation = :prolongation');
+                    $q->bindValue(':prolongation', $prolongation);
+                    $q->execute();
+                }
             }
         }
 
@@ -58,6 +82,12 @@ class StpInterruptionManager
         }
         return ($interrups);
     }
+    
+    public function deleteAll()
+    {
+        $q = $this->_db->prepare("delete from stp_interruption");
+        $q->execute();
+    }
 
     public function updateFin(\spamtonprof\stp_api\StpInterruption $interrup)
     {
@@ -67,11 +97,11 @@ class StpInterruptionManager
         $q->execute();
     }
 
-    public function updateProlongation(\spamtonprof\stp_api\StpInterruption $interrup)
+    public function update_statut(\spamtonprof\stp_api\StpInterruption $interrup)
     {
-        $q = $this->_db->prepare("update stp_interruption set prolongation = :prolongation where ref_abonnement = :ref_abonnement");
+        $q = $this->_db->prepare("update stp_interruption set statut = :statut where ref_abonnement = :ref_abonnement");
         $q->bindValue(":ref_abonnement", $interrup->getRef_abonnement());
-        $q->bindValue(":prolongation", $interrup->getProlongation());
+        $q->bindValue(":statut", $interrup->getStatut());
         $q->execute();
     }
 
@@ -79,15 +109,36 @@ class StpInterruptionManager
     {
         $q = null;
         if (is_array($info)) {
-            if (array_key_exists('currentOrNextInterruption', $info)) {
-                $refAbo = $info['currentOrNextInterruption'];
-                $q = $this->_db->prepare('select * from stp_interruption where fin >= current_date and ref_abonnement = :ref_abonnement order by fin ');
-                $q->bindValue(":ref_abonnement", $refAbo);
+
+            if (array_key_exists('key', $info)) {
+                $key = $info['key'];
+                $params = false;
+                if (array_key_exists('params', $info)) {
+                    $params = $info['params'];
+                }
+
+                if ($key == 'to_stop') {
+                    
+                    $refAbo = $params['ref_abo'];
+
+                    $q = $this->_db->prepare("select * from stp_interruption where ref_abonnement = :ref_abonnement and statut = 'running'");
+                    $q->bindValue(":ref_abonnement", $refAbo);
+                    
+                    
+                }
+            } else {
+
+                if (array_key_exists('currentOrNextInterruption', $info)) {
+                    $refAbo = $info['currentOrNextInterruption'];
+                    $q = $this->_db->prepare('select * from stp_interruption where fin >= current_date and ref_abonnement = :ref_abonnement order by fin ');
+                    $q->bindValue(":ref_abonnement", $refAbo);
+                }
             }
         }
 
         $q->execute();
 
+        
         $data = $q->fetch(\PDO::FETCH_ASSOC);
 
         if ($data) {
