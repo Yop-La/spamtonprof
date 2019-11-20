@@ -268,6 +268,37 @@ class StpAbonnementManager
             }
         }
     }
+    
+    public function get_full_abo($refAbo)
+    {
+        $constructor = array(
+            "construct" => array(
+                'ref_eleve',
+                'ref_formule',
+                'ref_parent',
+                'ref_plan',
+                'remarquesMatieres',
+                'ref_statut_abonnement',
+                'ref_prof'
+            ),
+            "ref_eleve" => array(
+                "construct" => array(
+                    'ref_niveau'
+                )
+            ),
+            "remarquesMatieres" => array(
+                "construct" => array(
+                    'ref_matiere'
+                )
+            )
+        );
+        
+        $stpAbo = $this->get(array(
+            "ref_abonnement" => $refAbo
+        ), $constructor);
+        
+        return ($stpAbo);
+    }
 
     public function toAlgoliaSupport($refAbo)
     {
@@ -1385,7 +1416,7 @@ class StpAbonnementManager
         $abonnements = $this->getAll(array(
             "telephones" => $nums,
             "teleprospection" => "oui",
-            "remarques" => "chloe "
+            "remarques" => "arnaud"
         ), $constructor);
         return ($abonnements);
     }
