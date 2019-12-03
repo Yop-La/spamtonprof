@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.8.6.4
+ * Version: 1.1.8.6.5
  *
  *
  * Author: yopla
@@ -49,7 +49,6 @@ require_once (dirname(__FILE__) . '/inc/autoloader_cnl.php'); // autoloader les 
 require_once (dirname(__FILE__) . '/inc/autoloader_lbc.php'); // autoloader les custom classes de lbc
 
 require_once (dirname(__FILE__) . '/shortcode/shortcodes.php');
-
 
 require_once (dirname(__FILE__) . '/vendor/autoload.php'); // autoload strip, paypal , gmail
 
@@ -421,6 +420,62 @@ function my_pre_population_callback($options, $settings)
                 'value' => $cat,
                 'label' => $cat
             );
+        }
+    }
+
+    // target "ref_formule" du formulaire "ajout interruption"
+    if ($settings['key'] == 'ref_formule_1575352684285') {
+
+        if (is_user_logged_in()) {
+
+            if (current_user_can('client')) {
+
+
+                $current_user = wp_get_current_user();
+                
+                $compteMg = new \spamtonprof\stp_api\StpCompteManager();
+                $compte = $compteMg->get(array(
+                    'ref_compte_wp' => $current_user->ID
+                ));
+                
+                $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
+
+                $constructor = array(
+                    "construct" => array(
+                        'ref_eleve',
+                        'ref_formule'
+                    )
+                );
+
+                $abos = $aboMg->getAll(array('key' => 'all_actif_abos_of_account','ref_compte' => $compte->getRef_compte()), $constructor);
+
+
+                foreach ($abos as $abo){
+                    
+                    $ref_abo = $abo->getRef_abonnement();
+                    
+                    $eleve = $abo->getEleve();
+                    $formule = $abo->getFormule();
+                    
+                    $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
+                    $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
+                    
+                    $nom_formule = $formule->getFormule();
+                    $prenom = $eleve->getPrenom();
+                    
+                    $label = $prenom . ' - ' . $nom_formule;
+
+                    
+                    $options[] = array(
+                        'label' => $label,
+                        'value' => $ref_abo
+                    );
+                    
+                }
+                
+                
+
+            }
         }
     }
 

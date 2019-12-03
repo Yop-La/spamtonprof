@@ -3,29 +3,53 @@ jQuery( document ).ready( function( $ ) {
 
 
 	/* pour algolia */
+	
+	
+	
+	const searchClient = algoliasearch('3VXJH73YCI', '679e64fbe87fa37d0d43e1fbb19e45d8');
 
-	var search = instantsearch({
-		// Replace with your own values
-		appId: '3VXJH73YCI',
-		apiKey: '679e64fbe87fa37d0d43e1fbb19e45d8', // search only API key, no ADMIN key
+	const search = instantsearch({
+		searchClient,
 		indexName: 'support_client',
-		urlSync: true,
+		routing: true,
 		searchParameters: {
 			hitsPerPage: 10,
 			filters: "ref_statut_abonnement = 1 OR ref_statut_abonnement = 2 OR ref_statut_abonnement = 3 "
 		}
 	});
+	
+//
+//	const search = instantsearch({
+//		// Replace with your own values
+//		appId: '3VXJH73YCI',
+//		apiKey: '679e64fbe87fa37d0d43e1fbb19e45d8', // search only API key, no ADMIN key
+//		indexName: 'support_client',
+//		urlSync: true,
+//		searchParameters: {
+//			hitsPerPage: 10,
+//			filters: "ref_statut_abonnement = 1 OR ref_statut_abonnement = 2 OR ref_statut_abonnement = 3 "
+//		}
+//	});
 
 	waitForEl('#search-input', function() {
-
-
+		
+		console.log('la search input');
+		
 		search.addWidget(
 				instantsearch.widgets.searchBox({
-					container: '#search-input'
+					container: '#search-input',
+					placeholder: 'Rechercher des abonnements',
+					searchAsYouType: true,
+					 queryHook(query, search) {
+						console.log(query);
+					    search(query);
+					  }
 				})
 		);
 	});
 
+	
+	
 	waitForEl('#refinement-list1', function() {
 
 
@@ -34,7 +58,7 @@ jQuery( document ).ready( function( $ ) {
 		search.addWidget(
 				instantsearch.widgets.refinementList({
 					container: '#refinement-list1',
-					attributeName: "statut.statut_abonnement",
+					attribute: "statut.statut_abonnement",
 					autoHideContainer: false,
 					templates: {
 						header: "Statut abonnement"
@@ -44,6 +68,7 @@ jQuery( document ).ready( function( $ ) {
 
 
 	});
+	
 
 	waitForEl('#refinement-list2', function() {
 
@@ -53,12 +78,36 @@ jQuery( document ).ready( function( $ ) {
 		search.addWidget(
 				instantsearch.widgets.refinementList({
 					container: '#refinement-list2',
-					attributeName: "prof.email_stp",
+					attribute: "prof.email_stp",
 					autoHideContainer: false,
 					templates: {
 						header: "Prof"
 					}
 				})
+		);
+	
+
+
+	});
+
+
+	waitForEl('#refinement-list3', function() {
+
+
+		
+
+		
+		search.addWidget(
+				instantsearch.widgets.toggleRefinement({
+					  container: '#refinement-list3',
+					  attribute: "interruption",
+						templates: {
+							header: "En interruption"
+						}
+					})
+				
+				
+			
 		);
 
 
@@ -92,22 +141,23 @@ jQuery( document ).ready( function( $ ) {
 
 	waitForEl('#sort-by', function() {
 		search.addWidget(
-				instantsearch.widgets.sortBySelector({
+				instantsearch.widgets.sortBy({
 					container: '#sort-by',
 					autoHideContainer: true,
-					indices: [
+					items: [
 						{
-							name: 'support_client',
+							value: 'support_client',
 							label: 'Nb de jours depuis dernier message'
 						},
 						{
-							name: 'support_client_by_nb_msg',
+							value: 'support_client_by_nb_msg',
 							label: 'Nb de messages 7 derniers jours'
 						}
 						]
 				})
 		);
 	});
+	
 	search.start();
 
 	search.on('render', function() {
