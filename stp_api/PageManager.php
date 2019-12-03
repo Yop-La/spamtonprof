@@ -659,8 +659,12 @@ class PageManager
 
         // wp_enqueue_script('helper_js', "https://cdn.jsdelivr.net/npm/algoliasearch-helper@2.26.1/dist/algoliasearch.helper.min.js");
 
-        wp_enqueue_script('algolia_js', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.js');
+        wp_enqueue_script('algolia_js', 'https://cdn.jsdelivr.net/npm/algoliasearch@3.35.1/dist/algoliasearchLite.min.js');
+        
+        wp_enqueue_script('instant_seach_js', 'https://cdn.jsdelivr.net/npm/instantsearch.js@4.0.0/dist/instantsearch.production.min.js');
+        
 
+        
         wp_enqueue_script('dashboard', plugins_url() . '/spamtonprof/js/back-office.js', array(
 
             'nf-front-end'
@@ -807,7 +811,7 @@ class PageManager
         // wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/ad-review.css');
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
 
-        wp_enqueue_style('css_data_table', "https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.css");
+
     }
 }
 
