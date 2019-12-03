@@ -20,12 +20,11 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-// define('PROBLEME_CLIENT', true);
-
+define('PROBLEME_CLIENT', true);
 
 $interruptionMg = new \spamtonprof\stp_api\StpInterruptionManager();
 $interruptions = $interruptionMg->getAll(array(
-    'key' => 'to_start'
+    'key' => 'to_stop'
 ));
 
 $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
@@ -35,14 +34,14 @@ $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
 $slack = new \spamtonprof\slack\Slack();
 
 $slack->sendMessages('interruption', array(
-    'Running CRON mise en place interruption'
+    'Running CRON arrêt interruption'
 ));
 
 foreach ($interruptions as $interruption) {
 
     $slack->sendMessages('interruption', array(
         "---------------------",
-        "Mise en place interruption n°" . $interruption->getRef_interruption()
+        "Fin de l'interruption n°" . $interruption->getRef_interruption()
     ));
 
     $msgs = array();
@@ -52,12 +51,6 @@ foreach ($interruptions as $interruption) {
 
     $abo = $aboMg->get_full_abo($interruption->getRef_abonnement());
 
-    // ------- mise en place période d'essai stripe-------
-    $stripe = new \spamtonprof\stp_api\StripeManager($abo->getTest());
-    $stripe->addTrial($abo->getSubs_Id(), $interruption->getFin());
-    
-    
-    
     // -------------------- notis emails ------------------
 
     $proche = \spamtonprof\stp_api\StpProche::cast($abo->getProche());
@@ -94,45 +87,43 @@ foreach ($interruptions as $interruption) {
 
     if ($envoiEleve) {
 
-        $body_eleve = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/debut_interruption_eleve.html");
+        $body_eleve = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/fin_interruption_eleve.html");
 
         $body_eleve = str_replace("[nom-formule]", $formule->getFormule(), $body_eleve);
         $body_eleve = str_replace("[prenom-eleve]", $eleve->getPrenom(), $body_eleve);
-        $body_eleve = str_replace("[date-fin]", $endDay, $body_eleve);
 
-        $smtp->sendEmail("Interruption en place", $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alexandre de SpamTonProf", true, $ccs);
+        $smtp->sendEmail("C'est la reprise !", $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alexandre de SpamTonProf", true, $ccs);
 
         $send_to_prof = false;
     }
 
     if ($envoiParent) {
-        $body_parent = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/debut_interruption_parent.html");
+        $body_parent = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/fin_interruption_eleve.html");
         $body_parent = str_replace("[prenom-parent]", $proche->getPrenom(), $body_parent);
         $body_parent = str_replace("[nom-formule]", $formule->getFormule(), $body_parent);
         $body_parent = str_replace("[prenom-eleve]", $eleve->getPrenom(), $body_parent);
-        $body_parent = str_replace("[date-fin]", $endDay, $body_parent);
 
         if (! $send_to_prof) {
             $ccs = false;
         }
 
-        $smtp->sendEmail("Interruption en place", $proche->getEmail(), $body_parent, $expe->getEmail(), "Alexandre de SpamTonProf", true, $ccs);
+        $smtp->sendEmail("C'est la reprise !", $proche->getEmail(), $body_parent, $expe->getEmail(), "Alexandre de SpamTonProf", true, $ccs);
     }
 
     // mise à jour alogia et table abonnement
-    $abo->setInterruption(true);
+    $abo->setInterruption(false);
     $aboMg->updateInterruption($abo);
 
     $abo = $aboMg->toAlgoliaSupport($interruption->getRef_abonnement());
     $algoliaMg->updateSupport($abo);
 
     // changement du statut
-    $interruption->setStatut($interruptionMg::running);
+    $interruption->setStatut($interruptionMg::done);
     $interruptionMg->update_statut($interruption);
 
     $slack->sendMessages('interruption', $msgs);
 }
 
 $slack->sendMessages('interruption', array(
-    'Fin CRON mise en place interruption'
+    'Fin CRON arrêt interruption'
 ));

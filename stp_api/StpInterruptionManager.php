@@ -45,6 +45,12 @@ class StpInterruptionManager
 
                     $q = $this->_db->prepare("select * from stp_interruption where statut = 'scheduled' and now() > debut and now() < fin");
                 }
+                
+                if ($key == 'to_stop') {
+                    
+                    $q = $this->_db->prepare("select * from stp_interruption where statut = 'stopping' ");
+                }
+                
                 if ($key == 'all') {
                     
                  
