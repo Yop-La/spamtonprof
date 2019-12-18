@@ -1454,7 +1454,7 @@ class StripeManager
     }
     
     
-    public function addTrial($subId, $endDay, $prorate =false)
+    public function addTrial($subId, $endDay, $prorate = true)
     {
         
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
