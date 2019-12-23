@@ -9,7 +9,7 @@ class StpAbonnementManager
 
     private $_db, $eleveMg;
 
-    const abos_en_cours_dun_prof = 'abos_en_cours_dun_prof';
+    const abos_en_cours_dun_prof = 'abos_en_cours_dun_prof',all_actif_abos_of_account = 'all_actif_abos_of_account';
 
     public function __construct()
     {
@@ -862,10 +862,21 @@ class StpAbonnementManager
 
                     $ref_prof = $info['ref_prof'];
 
-                    $q = $this->_db->prepare('select * from stp_abonnement where ref_statut_abonnement in (1,2) and ref_prof = :ref_prof');
+                    $q = $this->_db->prepare('select * from stp_abonnement where ref_statut_abonnement in (1) and ref_prof = :ref_prof');
                     $q->bindValue(":ref_prof", $ref_prof);
                     $q->execute();
                 }
+                
+                if ($key == $this::all_actif_abos_of_account) {
+                    
+                    $ref_compte = $info['ref_compte'];
+                    
+                    $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte and ref_statut_abonnement = 1');
+                    $q->bindValue(":ref_compte", $ref_compte);
+                    $q->execute();
+                }
+                
+                
             } else {
 
                 if (array_key_exists("ref_abonnement_lower_with_prof", $info)) {
@@ -1390,7 +1401,7 @@ class StpAbonnementManager
         $this->updateRefFormule($abo);
 
         // traitement specifique aux status
-        if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ESSAI) {
+        if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ESSAI && $abo->getRef_prof()) {
             $gr = new \GetResponse();
             $gr->updateTrialList($refAbo);
         } else if ($abo->getRef_statut_abonnement() == \spamtonprof\stp_api\StpAbonnement::ACTIF) {
