@@ -110,30 +110,43 @@ class LbcCommuneManager
         $q = null;
         $communes = [];
         if (is_array($info)) {
-            if (array_key_exists('ref_client', $info)) {
+            if (array_key_exists('ref_client', $info) && array_key_exists('nb_ads', $info)) {
                 $refClient = $info['ref_client'];
+                $nb_ads = $info['nb_ads'];
 
-                $q = $this->_db->prepare("
-                select * from (
-  select ref_commune,
-		libelle,
-		code_postal,
-		population,
-        row_number() over
-          (partition by libelle ) row_num
-		       from lbc_commune
-                    where ref_commune not in(
-                        select ref_commune from adds_tempo 
-                            where ref_compte in (select ref_compte from compte_lbc where ref_client = :ref_client)  and statut in ('online','publie') and ref_commune is not null
-                    )
-                and (lbc is not true ) 
+                $req = "select * from (
+                  select ref_commune,
+                		libelle,
+                		code_postal,
+                		population,
+                        row_number() over
+                          (partition by libelle ) row_num
+                		       from lbc_commune
+                                    where ref_commune not in(
+                                        select ref_commune from adds_tempo
+                                            where ref_compte in (select ref_compte from compte_lbc where ref_client = :ref_client)  and statut in ('online','publie') and ref_commune is not null
+                                    )
+                                and (lbc is not true )
+                                [pop]
+                                    order by population  desc limit 500) t
+                				where row_num = 1 ";
+
+                $pop = "and population <= 70 and population >= 20";
+                if($nb_ads == 1){
+                    $pop = '';
+                }
                 
-                    order by population  desc limit 500) t 
-				where row_num = 1 ");
+               
+                
+                $req = str_replace("[pop]", $pop, $req);
+                
+
+                
+                $q = $this->_db->prepare($req);
                 $q->bindValue(":ref_client", $refClient);
             }
         }
-        //and population <= 70 and population >= 20 
+        //
         $q->execute();
 
         while ($data = $q->fetch(\PDO::FETCH_ASSOC)) {

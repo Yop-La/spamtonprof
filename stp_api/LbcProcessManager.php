@@ -1117,7 +1117,8 @@ class LbcProcessManager
 
         // on recupere les communes
         $communes = $communeMg->getAll(array(
-            "ref_client" => $refClient
+            "ref_client" => $refClient,
+            'nb_ads' => $nbAds
         ));
 
         // on constitue les annonces ( en verouillant les communes de ces annonces)
