@@ -93,8 +93,3 @@ function clone(src) {
 	};
 })(window);
 
-
-
-if(numMessage.print == "true"){
-	showMessage(numMessage.message);
-}
