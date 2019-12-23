@@ -18,6 +18,204 @@ add_action('wp_ajax_ajaxCreateCheckoutSession', 'ajaxCreateCheckoutSession');
 
 add_action('wp_ajax_nopriv_ajaxCreateCheckoutSession', 'ajaxCreateCheckoutSession');
 
+add_action('wp_ajax_addInterruption', 'addInterruption');
+
+add_action('wp_ajax_nopriv_addInterruption', 'addInterruption');
+
+add_action('wp_ajax_updateInterruption', 'updateInterruption');
+
+add_action('wp_ajax_nopriv_updateInterruption', 'updateInterruption');
+
+add_action('wp_ajax_stopInterruption', 'stopInterruption');
+
+add_action('wp_ajax_nopriv_stopInterruption', 'stopInterruption');
+
+
+function stopInterruption()
+{
+    
+    
+    /* on s'occupe d'abord de l'essai pour prospect */
+    header('Content-type: application/json');
+    
+    $slack = new \spamtonprof\slack\Slack();
+    
+    
+    $retour = new \stdClass();
+    $retour->error = false;
+    $retour->message = 'Fin de l\'interruption';
+    
+    $refInterruption = $_POST['ref_interruption'];
+
+    $slack -> sendMessages("interruption", array('dans stop interruption',$refInterruption));
+    
+    
+    $interruptionMg = new \spamtonprof\stp_api\StpInterruptionManager();
+    $interruption = $interruptionMg->get(array('key'=>'by_ref','params' =>array('ref_interruption' => $refInterruption)));
+    
+    if($interruption->getStatut()==$interruptionMg::scheduled){
+        $interruptionMg->delete($interruption);
+        $retour->message = "C'est bon: on vient de supprimer l'interruption !";
+    }
+    
+    if($interruption->getStatut()==$interruptionMg::running){
+        
+        $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
+        $abo = $aboMg->get(array('ref_abonnement' => $interruption->getRef_abonnement()));
+        
+        $stripe = new \spamtonprof\stp_api\StripeManager($abo->getTest());
+        $stripe->stopTrial($abo->getSubs_Id());
+        
+        $interruption->setStatut($interruptionMg::stopping);
+        $interruptionMg->update_statut($interruption);
+        
+        $fin = new \DateTime("",new \DateTimeZone('Europe/Paris'));
+        $interruption->setFin($fin->format(PG_DATE_FORMAT));
+        $interruptionMg->updateFin($interruption);
+        
+        $retour->message = "C'est bon: on vient de mettre fin à l'interruption !";
+        
+    }
+
+    echo (json_encode($retour));
+    die();
+    
+}
+
+function updateInterruption()
+{
+    
+    
+    /* on s'occupe d'abord de l'essai pour prospect */
+    header('Content-type: application/json');
+    
+    $slack = new \spamtonprof\slack\Slack();
+    $slack -> sendMessages("interruption", array('dans update interruption'));
+    
+    
+    $retour = new \stdClass();
+    $retour->error = false;
+    $retour->message = 'Interruption bien mise à jour';
+    
+    $fields = $_POST['fields'];
+    $fields = json_decode(stripslashes($fields));
+    
+    serializeTemp($fields);
+    
+    
+    $slack->sendMessages("interruption", array(json_encode($fields)));
+    
+    $date_fin = $fields->date_fin;
+    $ref_interruption = $fields->ref_interruption;
+    
+    
+    
+    
+    $date_fin = \DateTime::createFromFormat(FR_DATE_FORMAT, $date_fin);
+    
+    $interruptionMg = new \spamtonprof\stp_api\StpInterruptionManager();
+    
+    
+    $interruption = $interruptionMg->get(array('key' => 'by_ref','params' => array('ref_interruption' => $ref_interruption)));
+    
+    $date_debut = \DateTime::createFromFormat(PG_DATE_FORMAT, $interruption->getDebut());
+    $statut = $interruption->getStatut();
+     
+    
+    
+    $ref_abo = $interruption->getRef_abonnement();
+    
+    $interruptionMg->delete($interruption);
+    $isValidBreak = $interruptionMg->isValidInterruption($date_debut, $date_fin, $ref_abo,$statut);
+    
+    if(!$isValidBreak->valide){
+        $interruptionMg->add($interruption);
+        
+        $retour->message=$isValidBreak->message;
+        echo (json_encode($retour));
+        die();
+        
+    }
+    
+    $interruption->setFin($date_fin->format(PG_DATETIME_FORMAT));
+    $interruptionMg->add($interruption);
+    
+    if($interruption->getStatut() == $interruptionMg::running){
+        
+        $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
+        $abo = $aboMg->get(array('ref_abonnement' => $ref_abo));
+        
+        $stripe = new \spamtonprof\stp_api\StripeManager($abo->getTest());
+        $stripe->addTrial($abo->getSubs_Id(), $date_fin->format(PG_DATE_FORMAT));
+        
+        
+        
+    }
+    
+    echo (json_encode($retour));
+    die();
+    
+}
+
+function addInterruption()
+{
+    
+    /* on s'occupe d'abord de l'essai pour prospect */
+    header('Content-type: application/json');
+    
+    $retour = new \stdClass();
+    $retour->error = false;
+    $retour->message = "Interruption bien ajouté !";
+    
+    $slack = new \spamtonprof\slack\Slack();
+    
+    $fields = $_POST['fields'];
+    $fields = json_decode(stripslashes($fields));
+    
+    $date_debut = $fields->date_debut;
+    $date_fin = $fields->date_fin;
+    $ref_abonnement = $fields->ref_formule;
+    
+    $date_debut = \DateTime::createFromFormat(FR_DATE_FORMAT, $date_debut);
+    $date_fin = \DateTime::createFromFormat(FR_DATE_FORMAT, $date_fin);
+    
+    
+    $interruptionMg = new \spamtonprof\stp_api\StpInterruptionManager();
+    $isValidBreak = $interruptionMg->isValidInterruption($date_debut, $date_fin, $ref_abonnement);
+    
+    if(!$isValidBreak->valide){
+ 
+        
+        $retour->message=$isValidBreak->message;
+        echo (json_encode($retour));
+        die();
+    }
+    
+    
+    
+    $slack->sendMessages('interruption', array(
+        "---------",
+        "nouvel ajout interruption pour abo: "  . $ref_abonnement,
+        $date_debut->format(PG_DATE_FORMAT),
+        $date_fin->format(PG_DATE_FORMAT)
+    ));
+    
+    $stpInterruption = new \spamtonprof\stp_api\StpInterruption(array(
+        "ref_abonnement" => $ref_abonnement,
+        "debut" => $date_debut->format(PG_DATE_FORMAT),
+        "fin" => $date_fin->format(PG_DATE_FORMAT),
+        "statut" => $interruptionMg::scheduled
+    ));
+    
+    $interruptionMg->add($stpInterruption);
+    
+    
+    echo (json_encode($retour));
+    die();
+    
+}
+
+
 function ajaxCreateCheckoutSession()
 {
     serializeTemp($_POST);
