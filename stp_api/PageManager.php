@@ -11,12 +11,14 @@ class PageManager
 
 {
 
-    private $pageSlug, $domain;
+    private $pageSlug, $domain, $stpAccount = false, $pagesVariables = [];
 
     public function __construct($pageSlug)
 
     {
         $this->pageSlug = $pageSlug;
+
+        $this->setCommonPageVariables();
 
         $this->loadScripts();
 
@@ -26,19 +28,31 @@ class PageManager
 
         $_SESSION["domain"] = $this->domain;
 
-        $this->loadSessionVariable();
+        $this->loadVariablesOnPages();
     }
 
-    public function loadSessionVariable()
+    public function loadVariablesOnPages()
+    {
+        foreach ($this->pagesVariables as $key => $value) {
+            wp_localize_script('functions_js', $key, $value);
+        }
+    }
+
+    public function setCommonPageVariables()
 
     {
+
         /* pour le mode test et le mode prod */
         $TestModeManager = new \spamtonprof\stp_api\TestModeManager($this->pageSlug);
         $testMode = $TestModeManager->testMode();
         $TestModeManager->initDebuger();
         $testMode = $testMode ? 'true' : 'false';
-        wp_localize_script('functions_js', 'testMode', $testMode);
-        wp_localize_script('functions_js', 'publicStripeKey', $TestModeManager->getPublicStripeKey());
+
+        // wp_localize_script('functions_js', 'testMode', $testMode);
+        // wp_localize_script('functions_js', 'publicStripeKey', $TestModeManager->getPublicStripeKey());
+
+        $this->pagesVariables['testMode'] = $testMode;
+        $this->pagesVariables['publicStripeKey'] = $TestModeManager->getPublicStripeKey();
 
         /* pour savoir si le user est logg� */
         $isLogged = is_user_logged_in();
@@ -53,8 +67,12 @@ class PageManager
         $is_admin = ($is_admin) ? 'true' : 'false';
         $printNum = "false";
 
-        wp_localize_script('functions_js', 'isAdmin', $is_admin);
-        wp_localize_script('functions_js', 'isLogged', $isLogged);
+        // wp_localize_script('functions_js', 'isAdmin', $is_admin);
+        // wp_localize_script('functions_js', 'isLogged', $isLogged);
+
+        $this->pagesVariables['isAdmin'] = $is_admin;
+        $this->pagesVariables['isLogged'] = $isLogged;
+
         /* pour connaitre le type de user : prof, eleve, proche, autre */
         $current_user = wp_get_current_user();
 
@@ -86,7 +104,10 @@ class PageManager
                     'ref_compte_wp' => $current_user->ID
                 ));
 
-                wp_localize_script('functions_js', 'compte', $compte->toArray());
+                $this->stpAccount = $compte;
+
+                // wp_localize_script('functions_js', 'compte', $compte->toArray());
+                $this->pagesVariables['compte'] = $compte->toArray();
 
                 $abonnementMg = new \spamtonprof\stp_api\StpAbonnementManager();
 
@@ -118,7 +139,8 @@ class PageManager
                     $proche = $procheMg->get((array(
                         'ref_proche' => $ref_proche
                     )));
-                    wp_localize_script('functions_js', 'proche', json_decode(json_encode($proche), true));
+                    // wp_localize_script('functions_js', 'proche', json_decode(json_encode($proche), true));
+                    $this->pagesVariables['proche'] = json_decode(json_encode($proche), true);
                 }
 
                 foreach ($abonnements as $abonnement) {
@@ -136,9 +158,13 @@ class PageManager
                     }
                 }
 
-                wp_localize_script('functions_js', 'abosActif', $abosActif);
-                wp_localize_script('functions_js', 'abosEssai', $abosEssai);
-                wp_localize_script('functions_js', 'abosTermine', $abosTermine);
+                // wp_localize_script('functions_js', 'abosActif', $abosActif);
+                // // wp_localize_script('functions_js', 'abosEssai', $abosEssai);
+                // wp_localize_script('functions_js', 'abosTermine', $abosTermine);
+
+                $this->pagesVariables['abosActif'] = $abosActif;
+                $this->pagesVariables['abosEssai'] = $abosEssai;
+                $this->pagesVariables['abosTermine'] = $abosTermine;
 
                 $eleves = $eleveMg->getAll(array(
                     "ref_compte" => $compte->getRef_compte()
@@ -155,23 +181,38 @@ class PageManager
                     $eleves[$i] = $eleveTemp;
                 }
 
-                wp_localize_script('functions_js', 'eleves', $eleves);
+                // wp_localize_script('functions_js', 'eleves', $eleves);
+
+                $this->pagesVariables['eleves'] = $eleves;
             }
 
-            wp_localize_script('functions_js', 'userType', 'autre');
+            // wp_localize_script('functions_js', 'userType', 'autre');
+
+            $this->pagesVariables['userType'] = 'autre';
+
             if ($loggedProche) {
-                wp_localize_script('functions_js', 'userType', 'proche');
-                wp_localize_script('functions_js', 'loggedProche', $loggedProche->toArray());
+                // wp_localize_script('functions_js', 'userType', 'proche');
+                // wp_localize_script('functions_js', 'loggedProche', $loggedProche->toArray());
+
+                $this->pagesVariables['userType'] = 'proche';
+                $this->pagesVariables['loggedProche'] = $loggedProche->toArray();
             }
 
             if ($eleve) {
-                wp_localize_script('functions_js', 'userType', 'eleve');
-                wp_localize_script('functions_js', 'loggedEleve', $eleve->toArray());
+                // wp_localize_script('functions_js', 'userType', 'eleve');
+                // wp_localize_script('functions_js', 'loggedEleve', $eleve->toArray());
+
+                $this->pagesVariables['userType'] = 'eleve';
+                $this->pagesVariables['loggedEleve'] = $eleve->toArray();
             }
 
             if ($prof) {
-                wp_localize_script('functions_js', 'userType', 'prof');
-                wp_localize_script('functions_js', 'loggedProf', $prof->toArray());
+
+                $this->pagesVariables['userType'] = 'prof';
+                $this->pagesVariables['loggedEleve'] = $prof->toArray();
+
+                // wp_localize_script('functions_js', 'userType', 'prof');
+                // wp_localize_script('functions_js', 'loggedProf', $prof->toArray());
             }
         } else { // si pas logg� (simple visiteur)
 
@@ -190,14 +231,11 @@ class PageManager
             // }
         }
 
-        $numMessage = 'Vous venez de d�couvrir notre site ? Et si on en discutait au t�l�phone ? Appelez nous au 04-34-10-25-49.';
-        wp_localize_script('functions_js', 'numMessage', array(
-            'message' => utf8_encode($numMessage),
-            'print' => $printNum
-        ));
-
         /* avoir le domain */
-        wp_localize_script('functions_js', 'domain', $this->domain);
+
+        $this->pagesVariables['domain'] = $this->domain;
+
+        // wp_localize_script('functions_js', 'domain', $this->domain);
     }
 
     public function loadScripts()
@@ -214,155 +252,154 @@ class PageManager
 
         if ($this->pageSlug == "accueil") {
 
-            PageManager::acceuil();
+            $this->acceuil();
         }
 
         if ($this->pageSlug == "temoignages") {
 
-            PageManager::temoignages();
+            $this->temoignages();
         }
 
         if ($this->pageSlug == "decouvrir-spamtonprof") {
 
-            PageManager::decouvrirSpamtonprof();
+            $this->decouvrirSpamtonprof();
         }
 
         if ($this->pageSlug == 'abonnement-apres-essai') {
 
-            PageManager::abonnementApresEssaiLoader();
+            $this->abonnementApresEssaiLoader();
         }
 
         if ($this->pageSlug == 'inscription-essai-eleve') {
 
-            PageManager::inscriptionEssaiEleve();
+            $this->inscriptionEssaiEleve();
         }
 
         if ($this->pageSlug == 'inscription-essai-parent') {
 
-            PageManager::inscriptionEssaiEleve();
+            $this->inscriptionEssaiEleve();
         }
 
         if ($this->pageSlug == 'lbc-adds') {
 
-            PageManager::lbcAdds();
+            $this->lbcAdds();
         }
 
         if ($this->pageSlug == 'semaine-decouverte') {
 
-            PageManager::discoverWeek();
+            $this->discoverWeek();
         }
 
         if ($this->pageSlug == 'stage-bac') {
 
-            PageManager::stageBac();
+            $this->stageBac();
         }
 
         if ($this->pageSlug == 'stage-ete') {
 
-            PageManager::stageEte();
+            $this->stageEte();
         }
 
         if ($this->pageSlug == 'paiement') {
 
-            PageManager::paiement();
+            $this->paiement();
         }
 
         if ($this->pageSlug == 'reset-password') {
 
-            PageManager::passwordReset();
+            $this->passwordReset();
         }
 
         if ($this->pageSlug == 'connexion') {
 
-            PageManager::logIn();
+            $this->logIn();
         }
 
         if ($this->pageSlug == 'tarifs') {
 
-            PageManager::tarifs();
+            $this->tarifs();
         }
 
         if ($this->pageSlug == 'inscription-prof') {
 
-            PageManager::inscriptionProf();
+            $this->inscriptionProf();
         }
 
         if ($this->pageSlug == 'onboarding-prof') {
 
-            PageManager::onboardingProf();
+            $this->onboardingProf();
         }
 
         if ($this->pageSlug == 'temoigner') {
 
-            PageManager::temoigner();
+            $this->temoigner();
         }
 
         if ($this->pageSlug == 'choisir-prof') {
 
-            PageManager::choisirProf();
+            $this->choisirProf();
         }
 
         if ($this->pageSlug == 'dashboard-eleve') {
 
-            PageManager::dashboardEleve();
+            $this->dashboardEleve();
         }
 
         if ($this->pageSlug == 'dashboard-prof') {
 
-            PageManager::dashboardProf();
+            $this->dashboardProf();
         }
 
         if ($this->pageSlug == 'back-office') {
 
-            PageManager::backOffice();
+            $this->backOffice();
         }
 
         if ($this->pageSlug == 'formule') {
 
-            PageManager::formule();
+            $this->formule();
         }
 
         if ($this->pageSlug == 'reporting-lbc') {
 
-            PageManager::reportingLbc();
+            $this->reportingLbc();
         }
         if ($this->pageSlug == 'tes-abonnements') {
 
-            PageManager::tesAbonnements();
+            $this->tesAbonnements();
         }
         if ($this->pageSlug == 'gestion-formule') {
 
-            PageManager::gestionFormule();
+            $this->gestionFormule();
         }
 
         if ($this->pageSlug == 'ad-review') {
 
-            PageManager::adReview();
+            $this->adReview();
         }
 
         if ($this->pageSlug == 'edit_lbc_text') {
 
-            PageManager::editLbcText();
+            $this->editLbcText();
         }
 
         if ($this->pageSlug == 'espace-presse') {
 
-            PageManager::espacePresse();
+            $this->espacePresse();
         }
 
         if ($this->pageSlug == 'lbc-report') {
 
-            PageManager::lbcReport();
+            $this->lbcReport();
         }
 
         if ($this->pageSlug == 'facturation-prof') {
-            
-            PageManager::facturation_prof();
-        }
 
+            $this->facturation_prof();
+        }
     }
 
-    public static function abonnementApresEssaiLoader()
+    public function abonnementApresEssaiLoader()
 
     {
         wp_enqueue_script('get_trial_account_js', plugins_url() . '/spamtonprof/js/paiement-complet.js', array(
@@ -383,7 +420,7 @@ class PageManager
         wp_enqueue_script('checkout_paypal_js', 'https://www.paypalobjects.com/api/checkout.js');
     }
 
-    public static function inscriptionEssaiEleve()
+    public function inscriptionEssaiEleve()
 
     {
         wp_enqueue_script('inscription-essai_js', plugins_url() . '/spamtonprof/js/inscription-essai-eleve.js', array(
@@ -392,7 +429,7 @@ class PageManager
         ), time());
     }
 
-    public static function acceuil()
+    public function acceuil()
 
     {
         wp_enqueue_script('countdown_js', plugins_url() . '/spamtonprof/js/jquery.countdown-2.2.0/jquery.countdown.min.js', array(
@@ -404,7 +441,7 @@ class PageManager
         ), time());
     }
 
-    public static function temoignages()
+    public function temoignages()
 
     {
         wp_enqueue_script('countdown_js', plugins_url() . '/spamtonprof/js/jquery.countdown-2.2.0/jquery.countdown.min.js', array(
@@ -416,7 +453,7 @@ class PageManager
         ), time());
     }
 
-    public static function decouvrirSpamtonprof()
+    public function decouvrirSpamtonprof()
 
     {
         wp_enqueue_script('countdown_js', plugins_url() . '/spamtonprof/js/jquery.countdown-2.2.0/jquery.countdown.min.js', array(
@@ -428,7 +465,7 @@ class PageManager
         ), time());
     }
 
-    public static function lbcAdds()
+    public function lbcAdds()
 
     {
         wp_enqueue_script('adds_bo_js', plugins_url() . '/spamtonprof/js/lbc-adds.js', array(
@@ -437,7 +474,7 @@ class PageManager
         ), time());
     }
 
-    public static function gestionFormule()
+    public function gestionFormule()
 
     {
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
@@ -448,27 +485,29 @@ class PageManager
         ), time());
     }
 
-    public static function stageBac()
+    public function stageBac()
 
     {
         wp_enqueue_script('countdown_js', plugins_url() . '/spamtonprof/js/jquery.countdown-2.2.0/jquery.countdown.min.js');
 
-        wp_enqueue_script('paiement_js', plugins_url() . '/spamtonprof/js/stage-bac.js',array(),time());
-        
+        wp_enqueue_script('paiement_js', plugins_url() . '/spamtonprof/js/stage-bac.js', array(), time());
+
         wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/stage-ete.css');
     }
 
-    public static function stageEte()
+    public function stageEte()
 
     {
         wp_enqueue_script('countdown_js', plugins_url() . '/spamtonprof/js/jquery.countdown-2.2.0/jquery.countdown.min.js');
-        
-        wp_enqueue_script('paiement_js', plugins_url() . '/spamtonprof/js/stage-ete.js',array('nf-front-end'),time());
-        
+
+        wp_enqueue_script('paiement_js', plugins_url() . '/spamtonprof/js/stage-ete.js', array(
+            'nf-front-end'
+        ), time());
+
         wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/stage-ete.css');
     }
 
-    public static function paiement()
+    public function paiement()
 
     {
         wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/paiement.css');
@@ -506,7 +545,7 @@ class PageManager
         }
     }
 
-    public static function discoverWeek()
+    public function discoverWeek()
 
     {
         wp_enqueue_script('discover_week', plugins_url() . '/spamtonprof/js/discover_week.js', array(
@@ -539,7 +578,7 @@ class PageManager
         wp_enqueue_script('algolia_js_auto', "https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.min.js");
     }
 
-    public static function passwordReset()
+    public function passwordReset()
 
     {
         wp_enqueue_script('password_reset', plugins_url() . '/spamtonprof/js/password_reset.js', array(
@@ -552,7 +591,7 @@ class PageManager
         wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
     }
 
-    public static function logIn()
+    public function logIn()
 
     {
         wp_enqueue_script('log_in', plugins_url() . '/spamtonprof/js/log_in.js', array(
@@ -565,7 +604,7 @@ class PageManager
         wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
     }
 
-    public static function inscriptionProf()
+    public function inscriptionProf()
 
     {
         wp_enqueue_script('discover_week', plugins_url() . '/spamtonprof/js/inscription-prof.js', array(
@@ -580,7 +619,7 @@ class PageManager
         wp_enqueue_script('jquery_ui_css', plugins_url() . '/spamtonprof/js/jquery-ui-1.12.1.custom/jquery-ui.min.css');
     }
 
-    public static function onboardingProf()
+    public function onboardingProf()
 
     {
         wp_enqueue_script('stripe_main_js', 'https://js.stripe.com/v3/');
@@ -609,7 +648,7 @@ class PageManager
         }
     }
 
-    public static function temoigner()
+    public function temoigner()
 
     {
         wp_enqueue_script('temoigner', plugins_url() . '/spamtonprof/js/temoigner.js', array(
@@ -618,7 +657,7 @@ class PageManager
         ), time());
     }
 
-    public static function choisirProf()
+    public function choisirProf()
 
     {
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
@@ -635,7 +674,7 @@ class PageManager
         wp_localize_script('choisir_prof', 'abonnementsSansProf', $abonnementsSansProf);
     }
 
-    public static function dashboardEleve()
+    public function dashboardEleve()
 
     {
         wp_enqueue_script('dashboard', plugins_url() . '/spamtonprof/js/dashboard-eleve.js', array(
@@ -648,9 +687,63 @@ class PageManager
         wp_enqueue_script('stripe_main_js', 'https://js.stripe.com/v3/');
 
         wp_enqueue_style('ds_eleve_css', get_stylesheet_directory_uri() . '/css/pages/dashboard-eleve.css');
+        
+        
+        $interruptionMg = new \spamtonprof\stp_api\StpInterruptionManager();
+
+        $stpAct = $this->stpAccount;
+
+        if ($stpAct) {
+
+            $constructor = array(
+                "construct" => array(
+                    'ref_abonnement'
+                ),
+                "ref_abonnement" => array(
+                    "construct" => array(
+                        'ref_eleve',
+                        'ref_formule'
+                    )
+                )
+            );
+
+            // on récupère les interruptions
+            $interruptions = $interruptionMg->getAll(array(
+                'key' => 'of_an_account',
+                'params' => [
+                    'ref_compte' => $stpAct->getRef_compte()
+                ]
+            ), $constructor);
+            
+            foreach ($interruptions as $interruption) {
+
+                $debut = $interruption->getDebut();
+                $debut = \DateTime::createFromFormat(PG_DATE_FORMAT, $debut);
+                $debut = $debut->format(FR_DATE_FORMAT);
+
+                $fin = $interruption->getFin();
+                $fin = \DateTime::createFromFormat(PG_DATE_FORMAT, $fin);
+                $fin = $fin->format(FR_DATE_FORMAT);
+
+                $interruption->setDebut($debut);
+                $interruption->setFin($fin);
+            }
+
+
+            $this->pagesVariables['interruptions'] = json_decode(json_encode($interruptions), true);
+            
+            
+            $onglet = "0";
+            if(array_key_exists('onglet', $_GET)){
+                $onglet = $_GET['onglet'];
+                
+            }
+            $this->pagesVariables['onglet'] = $onglet;
+            
+        }
     }
 
-    public static function backOffice()
+    public function backOffice()
 
     {
         wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
@@ -660,18 +753,16 @@ class PageManager
         // wp_enqueue_script('helper_js', "https://cdn.jsdelivr.net/npm/algoliasearch-helper@2.26.1/dist/algoliasearch.helper.min.js");
 
         wp_enqueue_script('algolia_js', 'https://cdn.jsdelivr.net/npm/algoliasearch@3.35.1/dist/algoliasearchLite.min.js');
-        
-        wp_enqueue_script('instant_seach_js', 'https://cdn.jsdelivr.net/npm/instantsearch.js@4.0.0/dist/instantsearch.production.min.js');
-        
 
-        
+        wp_enqueue_script('instant_seach_js', 'https://cdn.jsdelivr.net/npm/instantsearch.js@4.0.0/dist/instantsearch.production.min.js');
+
         wp_enqueue_script('dashboard', plugins_url() . '/spamtonprof/js/back-office.js', array(
 
             'nf-front-end'
         ), time());
     }
 
-    public static function dashboardProf()
+    public function dashboardProf()
 
     {
         wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
@@ -686,7 +777,7 @@ class PageManager
         ), time());
     }
 
-    public static function tarifs()
+    public function tarifs()
 
     {
         wp_enqueue_script('countdown_js', plugins_url() . '/spamtonprof/js/jquery.countdown-2.2.0/jquery.countdown.min.js', array(
@@ -709,7 +800,7 @@ class PageManager
         wp_enqueue_script('algolia_js_auto', "https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.min.js");
     }
 
-    public static function formule()
+    public function formule()
 
     {
         wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
@@ -724,7 +815,7 @@ class PageManager
         ), time());
     }
 
-    public static function reportingLbc()
+    public function reportingLbc()
     {
         wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
 
@@ -738,7 +829,7 @@ class PageManager
         ), time());
     }
 
-    public static function tesAbonnements()
+    public function tesAbonnements()
     {
         wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
 
@@ -752,7 +843,7 @@ class PageManager
         ), time());
     }
 
-    public static function adReview()
+    public function adReview()
 
     {
         wp_enqueue_script('tarifs', plugins_url() . '/spamtonprof/js/ad-review.js', array(
@@ -764,7 +855,7 @@ class PageManager
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
     }
 
-    public static function editLbcText()
+    public function editLbcText()
 
     {
         wp_enqueue_script('tarifs', plugins_url() . '/spamtonprof/js/edit_lbc_text.js', array(
@@ -776,26 +867,24 @@ class PageManager
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
     }
 
-    public static function espacePresse()
+    public function espacePresse()
 
     {
         wp_enqueue_style('css_espace-presse', get_home_url() . '/wp-content/themes/salient-child/css/pages/espace-presse.css');
     }
 
+    public function facturation_prof()
 
-    public static function facturation_prof()
-    
     {
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
-        
+
         wp_enqueue_script('formule_js', plugins_url() . '/spamtonprof/js/facturation-prof.js', array(
-            
+
             'nf-front-end'
         ), time());
-        
     }
 
-    public static function lbcReport()
+    public function lbcReport()
 
     {
         wp_enqueue_script('data_table_js', "https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.js", array(
@@ -810,8 +899,6 @@ class PageManager
 
         // wp_enqueue_style('bo_css', get_stylesheet_directory_uri() . '/css/pages/ad-review.css');
         wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/salient-child/css/form/inscription-essai.css');
-
-
     }
 }
 
