@@ -37,7 +37,7 @@ function inscriptionEssai()
     $telephone_eleve = $fields->telephone_eleve;
     $nb_matiere = $fields->nb_matiere;
     $date_debut = $fields->date_debut;
-    
+
     $prospect = boolval($fields->prospect);
     $remarques_matiere1 = $fields->remarques_matiere1;
     $matiere1 = $fields->matiere1;
@@ -59,8 +59,6 @@ function inscriptionEssai()
     $source_traffic = $fields->source_traffic;
     $parent_required = boolval($fields->parent_required);
 
-    
-    
     $matiere = json_decode(stripslashes($fields->matiere));
     $niveau = json_decode(stripslashes($fields->niveau));
     $formule = json_decode(stripslashes($fields->formule));
@@ -102,8 +100,6 @@ function inscriptionEssai()
 
     $proche = false;
     $eleve = false;
-
-    
 
     $current_user = wp_get_current_user();
 
@@ -429,12 +425,11 @@ function inscriptionEssai()
     }
 
     // etape 7 - inserer l'abonnement
-    
+
     $test = false;
     if (strpos($email_eleve, 'yopla.33mail') !== false || strpos($email_eleve, 'test') !== false || LOCAL) {
-        $test  = true;
+        $test = true;
     }
-    
 
     $abonnement = new \spamtonprof\stp_api\StpAbonnement(array(
         "ref_eleve" => $eleve->getRef_eleve(),
@@ -449,20 +444,16 @@ function inscriptionEssai()
     $abonnement = $abonnementMg->add($abonnement);
 
     // etape 6-1 : définir les dates de début et de fin d'essai
-    $begin = \DateTime::createFromFormat(FR_DATE_FORMAT, $date_debut,new \DateTimeZone("Europe/Paris"));
+    $begin = \DateTime::createFromFormat(FR_DATE_FORMAT, $date_debut, new \DateTimeZone("Europe/Paris"));
     $abonnement->setDebut_essai($begin->format(PG_DATE_FORMAT));
-    
+
     $end = clone $begin;
-    
+
     $end = $end->add(new DateInterval('P7D'));
     $abonnement->setFin_essai($end->format(PG_DATE_FORMAT));
-    
+
     $abonnementMg->updateDebutEssai($abonnement);
     $abonnementMg->updateFinEssai($abonnement);
-    
-    
-    
-    
 
     $logAboMg = new \spamtonprof\stp_api\StpLogAbonnementManager();
     $logAboMg->add(new \spamtonprof\stp_api\StpLogAbonnement(array(
@@ -490,7 +481,7 @@ function inscriptionEssai()
         $abonnementMg->updateRefCoupon($abonnement);
     }
 
-    // etape  8 - inserer les remarques d'inscription
+    // etape 8 - inserer les remarques d'inscription
 
     $stpRemarqueMg = new \spamtonprof\stp_api\StpRemarqueInscriptionManager();
 
