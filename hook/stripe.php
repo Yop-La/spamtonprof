@@ -51,9 +51,7 @@ if ($event_json->type == "invoice.payment_succeeded") {
 if ($event_json->type == "customer.subscription.updated") {
 
     $slack = new \spamtonprof\slack\Slack();
-    $slack->sendMessages('interruption', array(
-        '"customer.subscription.updated" reçu'
-    ));
+
 
     $interruptionMg = new \spamtonprof\stp_api\StpInterruptionManager();
 
