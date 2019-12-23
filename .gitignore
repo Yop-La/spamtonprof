@@ -19,7 +19,6 @@ wp-content/plugins/hello.php
 
 tempo/invoice/*
 !tempo/invoice/init
-tempo/*
 !tempo/invoice
 
 
@@ -42,3 +41,11 @@ text
 title
 
 urls
+
+tempo/tempoObject
+
+tempo/invoice/init
+
+tempo/datadome
+
+tempo/consumerKey
