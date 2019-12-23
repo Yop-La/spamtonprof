@@ -26,7 +26,7 @@ define('PROBLEME_CLIENT', true);
 
 $lbc = new \spamtonprof\stp_api\LbcProcessManager();
 
-$lbc->checkAds(20);
+$lbc->checkAds(50);
 
 // $lbc->analyse_campaigns();
 
