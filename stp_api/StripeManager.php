@@ -620,6 +620,7 @@ class StripeManager
 
         $this->testMode = $testMode;
     }
+    
 
     public function retrieve_event($id)
     {
@@ -1450,6 +1451,15 @@ class StripeManager
         \Stripe\Subscription::update($subId, [
             'trial_end' => $endDay->getTimestamp(),
             'prorate' => $prorate
+        ]);
+    }
+    
+    public function stopTrial($subId){
+        
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        
+        \Stripe\Subscription::update($subId, [
+            'trial_end' => 'now'
         ]);
     }
     
