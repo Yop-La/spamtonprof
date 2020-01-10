@@ -169,8 +169,12 @@ function addInterruption()
     
     $slack = new \spamtonprof\slack\Slack();
     
+    
     $fields = $_POST['fields'];
+    
+    
     $fields = json_decode(stripslashes($fields));
+    
     
     $date_debut = $fields->date_debut;
     $date_fin = $fields->date_fin;
