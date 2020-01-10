@@ -22,7 +22,6 @@ header("Pragma: no-cache");
 
 // define('PROBLEME_CLIENT', true);
 
-
 $interruptionMg = new \spamtonprof\stp_api\StpInterruptionManager();
 $interruptions = $interruptionMg->getAll(array(
     'key' => 'to_start'
@@ -40,99 +39,113 @@ $slack->sendMessages('interruption', array(
 
 foreach ($interruptions as $interruption) {
 
-    $slack->sendMessages('interruption', array(
-        "---------------------",
-        "Mise en place interruption n°" . $interruption->getRef_interruption()
-    ));
+    try {
 
-    $msgs = array();
+        $slack->sendMessages('interruption', array(
+            "---------------------",
+            "Mise en place interruption n°" . $interruption->getRef_interruption()
+        ));
 
-    $endDay = \DateTime::createFromFormat(PG_DATE_FORMAT, $interruption->getFin());
-    $endDay = $endDay->format(FR_DATE_FORMAT);
+        $msgs = array();
 
-    $abo = $aboMg->get_full_abo($interruption->getRef_abonnement());
+        $endDay = \DateTime::createFromFormat(PG_DATE_FORMAT, $interruption->getFin());
+        $endDay = $endDay->format(FR_DATE_FORMAT);
 
-    // ------- mise en place période d'essai stripe-------
-    $stripe = new \spamtonprof\stp_api\StripeManager($abo->getTest());
-    $stripe->addTrial($abo->getSubs_Id(), $interruption->getFin());
-    
-    
-    
-    // -------------------- notis emails ------------------
+        $abo = $aboMg->get_full_abo($interruption->getRef_abonnement());
 
-    $proche = \spamtonprof\stp_api\StpProche::cast($abo->getProche());
+        // ------- mise en place période d'essai stripe-------
 
-    $prof = \spamtonprof\stp_api\StpProf::cast($abo->getProf());
+        $stripe = new \spamtonprof\stp_api\StripeManager($abo->getTest());
+        $stripe->addTrial($abo->getSubs_Id(), $interruption->getFin());
 
-    $formule = \spamtonprof\stp_api\StpFormule::cast($abo->getFormule());
+        // -------------------- notis emails ------------------
 
-    $eleve = \spamtonprof\stp_api\StpEleve::cast($abo->getEleve());
-    $eleve->setHasToSend();
-
-    if ($proche) {
-        $msgs[] = 'Proche:' . $proche->getEmail();
-    }
-    $msgs[] = 'Eleve: ' . $eleve->getEmail();
-    $msgs[] = 'Ref abonnement: ' . $abo->getRef_abonnement();
-    $msgs[] = 'Date de fin: ' . $endDay;
-
-    $envoiEleve = $eleve->getHasToSendToEleve();
-    $envoiParent = $eleve->getHasToSendToParent();
-
-    $expeMg = new \spamtonprof\stp_api\StpExpeManager();
-    $expe = $expeMg->get("info@spamtonprof.com");
-    $smtpMg = new \spamtonprof\stp_api\SmtpServerManager();
-    $smtp = $smtpMg->get(array(
-        "ref_smtp_server" => $smtpMg::smtp2Go
-    ));
-
-    $send_to_prof = true;
-    $ccs = array(
-        'alexandre@spamtonprof.com',
-        $prof->getEmail_stp()
-    );
-
-    if ($envoiEleve) {
-
-        $body_eleve = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/debut_interruption_eleve.html");
-
-        $body_eleve = str_replace("[nom-formule]", $formule->getFormule(), $body_eleve);
-        $body_eleve = str_replace("[prenom-eleve]", $eleve->getPrenom(), $body_eleve);
-        $body_eleve = str_replace("[date-fin]", $endDay, $body_eleve);
-
-        $smtp->sendEmail("Interruption en place", $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alexandre de SpamTonProf", true, $ccs);
-
-        $send_to_prof = false;
-    }
-
-    if ($envoiParent) {
-        $body_parent = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/debut_interruption_parent.html");
-        $body_parent = str_replace("[prenom-parent]", $proche->getPrenom(), $body_parent);
-        $body_parent = str_replace("[nom-formule]", $formule->getFormule(), $body_parent);
-        $body_parent = str_replace("[prenom-eleve]", $eleve->getPrenom(), $body_parent);
-        $body_parent = str_replace("[date-fin]", $endDay, $body_parent);
-
-        if (! $send_to_prof) {
-            $ccs = false;
+        $proche = $abo->getProche(); 
+        if ($proche) {
+            $proche = \spamtonprof\stp_api\StpProche::cast($proche);
         }
 
-        $smtp->sendEmail("Interruption en place", $proche->getEmail(), $body_parent, $expe->getEmail(), "Alexandre de SpamTonProf", true, $ccs);
+        $prof = \spamtonprof\stp_api\StpProf::cast($abo->getProf());
+
+        $formule = \spamtonprof\stp_api\StpFormule::cast($abo->getFormule());
+
+        $eleve = \spamtonprof\stp_api\StpEleve::cast($abo->getEleve());
+        $eleve->setHasToSend();
+
+        if ($proche) {
+            $msgs[] = 'Proche:' . $proche->getEmail();
+        }
+        $msgs[] = 'Eleve: ' . $eleve->getEmail();
+        $msgs[] = 'Ref abonnement: ' . $abo->getRef_abonnement();
+        $msgs[] = 'Date de fin: ' . $endDay;
+
+        $envoiEleve = $eleve->getHasToSendToEleve();
+        $envoiParent = $eleve->getHasToSendToParent();
+
+        $expeMg = new \spamtonprof\stp_api\StpExpeManager();
+        $expe = $expeMg->get("info@spamtonprof.com");
+        $smtpMg = new \spamtonprof\stp_api\SmtpServerManager();
+        $smtp = $smtpMg->get(array(
+            "ref_smtp_server" => $smtpMg::smtp2Go
+        ));
+
+        $send_to_prof = true;
+        $ccs = array(
+            'alexandre@spamtonprof.com',
+            $prof->getEmail_stp()
+        );
+
+        if ($envoiEleve) {
+
+            $body_eleve = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/debut_interruption_eleve.html");
+
+            $body_eleve = str_replace("[nom-formule]", $formule->getFormule(), $body_eleve);
+            $body_eleve = str_replace("[prenom-eleve]", $eleve->getPrenom(), $body_eleve);
+            $body_eleve = str_replace("[date-fin]", $endDay, $body_eleve);
+
+            $smtp->sendEmail("Interruption en place", $eleve->getEmail(), $body_eleve, $expe->getEmail(), "Alexandre de SpamTonProf", true, $ccs);
+
+            $send_to_prof = false;
+        }
+
+        if ($envoiParent) {
+            $body_parent = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/emails/debut_interruption_parent.html");
+            $body_parent = str_replace("[prenom-parent]", $proche->getPrenom(), $body_parent);
+            $body_parent = str_replace("[nom-formule]", $formule->getFormule(), $body_parent);
+            $body_parent = str_replace("[prenom-eleve]", $eleve->getPrenom(), $body_parent);
+            $body_parent = str_replace("[date-fin]", $endDay, $body_parent);
+
+            if (! $send_to_prof) {
+                $ccs = false;
+            }
+
+            $smtp->sendEmail("Interruption en place", $proche->getEmail(), $body_parent, $expe->getEmail(), "Alexandre de SpamTonProf", true, $ccs);
+        }
+
+        // mise à jour alogia et table abonnement
+        $abo->setInterruption(true);
+        $aboMg->updateInterruption($abo);
+
+        $abo = $aboMg->toAlgoliaSupport($interruption->getRef_abonnement());
+        $algoliaMg->updateSupport($abo);
+
+        // changement du statut
+        $interruption->setStatut($interruptionMg::running);
+        $interruptionMg->update_statut($interruption);
+
+        $slack->sendMessages('interruption', $msgs);
+    } catch (\Exception $e) {
+
+        $slack->sendMessages('interruption', array(
+            'Impossible de mettre en place : ' . $abo->getRef_abonnement(),
+            $e->getMessage()
+        ));
     }
-
-    // mise à jour alogia et table abonnement
-    $abo->setInterruption(true);
-    $aboMg->updateInterruption($abo);
-
-    $abo = $aboMg->toAlgoliaSupport($interruption->getRef_abonnement());
-    $algoliaMg->updateSupport($abo);
-
-    // changement du statut
-    $interruption->setStatut($interruptionMg::running);
-    $interruptionMg->update_statut($interruption);
-
-    $slack->sendMessages('interruption', $msgs);
 }
 
 $slack->sendMessages('interruption', array(
     'Fin CRON mise en place interruption'
 ));
+
+
+
