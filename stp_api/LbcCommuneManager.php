@@ -110,9 +110,9 @@ class LbcCommuneManager
         $q = null;
         $communes = [];
         if (is_array($info)) {
-            if (array_key_exists('ref_client', $info) && array_key_exists('nb_ads', $info)) {
+            if (array_key_exists('ref_client', $info) && array_key_exists('target_big_city', $info)) {
                 $refClient = $info['ref_client'];
-                $nb_ads = $info['nb_ads'];
+                $target_big_city = $info['target_big_city'];
 
                 $req = "select * from (
                   select ref_commune,
@@ -131,17 +131,15 @@ class LbcCommuneManager
                                     order by population  desc limit 500) t
                 				where row_num = 1 ";
 
-                $pop = "and population <= 70 and population >= 20";
-                if($nb_ads == 1){
-                    $pop = '';
+                $pop = '';
+                if($target_big_city){
+                    $pop = "and population <= 70 and population >= 20";
                 }
                 
-               
                 
                 $req = str_replace("[pop]", $pop, $req);
                 
 
-                
                 $q = $this->_db->prepare($req);
                 $q->bindValue(":ref_client", $refClient);
             }
