@@ -2,13 +2,13 @@
 use spamtonprof\slack\Slack;
 
 /**
- * il ne traque les emails des élève de des étudiants ( pas des parents )
+ * il ne traque les emails des ï¿½lï¿½ve de des ï¿½tudiants ( pas des parents )
  *
  * ce script sert :
- * - à stocker dans mail eleve - les messages des élèves
- * - à attribuer des libellées aux emails
+ * - ï¿½ stocker dans mail eleve - les messages des ï¿½lï¿½ves
+ * - ï¿½ attribuer des libellï¿½es aux emails
  * - il tourne tous les 5 minutes
- * - à mettre à jour la date de dernier contact
+ * - ï¿½ mettre ï¿½ jour la date de dernier contact
  *
  * en prod
  */
@@ -57,7 +57,7 @@ try {
         'ref_smtp_server' => $smtpServerMg::smtp2Go
     ));
 
-    $smtpServer->sendEmail('Erreur connexion gmail ', 'alexandre@spamtonprof.com', "Vient de ProcessMessageEleve.php - Impossible de se connecter à la boite : " . $gmailAccount->getEmail() . "Debug message : " . $e->getMessage(), 'alexandre@spamtonprof.com');
+    $smtpServer->sendEmail('Erreur connexion gmail ', 'alexandre@spamtonprof.com', "Vient de ProcessMessageEleve.php - Impossible de se connecter ï¿½ la boite : " . $gmailAccount->getEmail() . "Debug message : " . $e->getMessage(), 'alexandre@spamtonprof.com');
 
     exit(0);
 }
@@ -148,7 +148,7 @@ foreach ($messages as $message) {
                     'mail_expe' => $from
                 )));
 
-                // attribuer les libellées
+                // attribuer les libellÃ©es
 
                 $eleve = $abo->getEleve();
                 $statut = $abo->getStatut();
@@ -168,27 +168,28 @@ foreach ($messages as $message) {
                 if ($abo->isTrialOver() && $abo->getRef_statut_abonnement() == $abo::ESSAI) {
                     $labelsNameToAdd[] = 'test-over';
                 }
+                
 
                 $labelsNameToAdd[] = $niveau->getSigle();
                 $labelsNameToAdd[] = $statut->getStatut_abonnement();
 
-                // mettre à jour la date de dernier contact
+                // mettre Ã  jour la date de dernier contact
                 $abo->setDernier_contact($dateReception->format(PG_DATETIME_FORMAT));
                 $aboMg->updateDernierContact($abo);
 
-                // mise à jour de l'index
+                // mise Ã  jour de l'index
                 $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
                 $algoliaMg->updateAbonnement($abo->getRef_abonnement(), false);
 
                 break;
             default:
                 $slack->sendMessages("log", array(
-                    "Nb d'abonnements incohérent au moment du tracking des élèves. Voir ProcessMessageEleve.php"
+                    "Nb d'abonnements incohï¿½rent au moment du tracking des ï¿½lï¿½ves. Voir ProcessMessageEleve.php"
                 ));
                 exit(0);
         }
 
-        // attribuer les libellés s
+        // attribuer les libellï¿½s s
         $labelsToAdd = $gmailManager->getCustomLabelsToAdd($labelsNameToAdd);
 
         $gmailManager->modifyMessage($gmailId, $labelsToAdd, array());
