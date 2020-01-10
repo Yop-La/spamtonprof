@@ -649,17 +649,22 @@ class LbcProcessManager
                     $lbcAccountMg->update_uncheckable($lbcAccount);
                     
                     $msgs[] = 'impossible de récupérer le user_id';
-                    return($msgs);
+                    // on va libérer les annonces d'un compte impossible à checker
+
                 }
                 
                 $lbcAccount->setUser_id($user_id);
                 $lbcAccountMg->updateUserId($lbcAccount);
                 
             }
+            
+            if($user_id){
+                
+                $ads = $lbcApi->getAdds(array(
+                    'user_id' => $user_id
+                ));
+            }
 
-            $ads = $lbcApi->getAdds(array(
-                'user_id' => $user_id
-            ));
             
             
             $msgs[] = "User_id : " . $user_id;
@@ -729,17 +734,40 @@ class LbcProcessManager
 
                 $nbAnnonce ++;
             }
+            
+            // 4-1-2: on va virer ( statut = bloque ), les annonces sans correspondance. On part du principe qu'il n'y pas d'annonces en attente de modération 
+            // ( ie le contrôle se fait au moins deux heures après la publication )
+            $ads_to_block = $adTempoMg->getAll(array(
+                "key" => $adTempoMg::get_ads_to_block_during_check,
+                "ref_compte" => $lbcAccount->getRef_compte()
+            ));
+            
+            foreach ($ads_to_block as $ad_to_block){
+                
+                $ad_to_block->setStatut($adTempoMg::bloque);
+                $adTempoMg->update_statut($ad_to_block);
+                
+            }
+            
 
-            // 4-1-2 : on va mettre a jour la ref_commune de adds_tempo car la commune saisi ne correspond pas forcément à la commune en ligne
+            // 4-1-3 : on va mettre a jour la ref_commune de adds_tempo car la commune saisi ne correspond pas forcément à la commune en ligne
             $adsTemp = $adTempoMg->getAll(array(
                 "key" => $adTempoMg::get_ads_online,
                 "ref_compte" => $lbcAccount->getRef_compte()
             ));
 
+            
             $adTempoMg->updateAllRefCommune($adsTemp);
         } else {
             $disabled = true;
             $nbAnnonce = 0;
+            
+            //toutes les annonces de ce compte se voient attribuer le statut bloqué
+            $adTempoMg->update_all(array(
+                'key' => $adTempoMg::block_ads_of_act,
+                'ref_compte' => $lbcAccount->getRef_compte()
+            ));
+            
         }
 
         // les annonces avec le statut publié se voit attribuer le statut refusé
@@ -1116,10 +1144,23 @@ class LbcProcessManager
         }
 
         // on recupere les communes
+        
+        $target_big_city = true;
+        if($nbAds == 1){
+            $target_big_city = false;
+        }
+        
         $communes = $communeMg->getAll(array(
             "ref_client" => $refClient,
-            'nb_ads' => $nbAds
+            'target_big_city' => $target_big_city
         ));
+        
+        if(count($communes) == 0){
+            $communes = $communeMg->getAll(array(
+                "ref_client" => $refClient,
+                'target_big_city' => false
+            ));
+        }
 
         // on constitue les annonces ( en verouillant les communes de ces annonces)
 
