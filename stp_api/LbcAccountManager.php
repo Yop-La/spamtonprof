@@ -58,11 +58,12 @@ class LbcAccountManager
             $ref_client = $info["valid_lbc_act"];
 
             $query = "select * from compte_lbc 
-                            where (now() >= ( date_publication +  interval '5 days') or ( date_publication is null and controle_date is not null))
+                            where (controle_date > date_publication and date_publication is not null and controle_date is not null)
                                  and nb_annonces_online != 0
                                  and disabled is false
 						         and ref_client = :ref_client
                                  and open is true
+                                 and user_id is not null
                             order by nb_annonces_online, nb_failed_campaigns, date_publication desc limit 1";
 
             $q = $this->_db->prepare($query);
@@ -399,7 +400,8 @@ class LbcAccountManager
         $accounts = [];
 
         $q = $this->_db->prepare("select * from compte_lbc 
-        where now() - interval '2 hour' > date_creation and (disabled = false or disabled is null) and (uncheckable = false or uncheckable is null)
+        where ( ( now() - interval '2 hour' > date_creation and date_publication is null ) or ( now() - interval '2 hour' > date_publication and date_publication is not null ) )
+            and (disabled = false or disabled is null) and (uncheckable = false or uncheckable is null)
             and ( now() - interval '5 hour' > controle_date or controle_date is null)
             and ref_compte not in (select ref_compte_lbc from lbc_renewal_url where statut = 1)
             order by date_publication desc, nb_annonces_online limit :nb_compte");
