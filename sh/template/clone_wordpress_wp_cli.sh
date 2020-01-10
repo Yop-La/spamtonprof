@@ -59,6 +59,12 @@ cmdwp db import ~/db/production.sql
 cmdwp search-replace $url $cloneurl 
 
 cmdwp user update 1 --user_pass=$dbpass 
+cmdwp user update 1 --user_login=$admin
+cmdwp user update 1 --display_name=$admin
+cmdwp user update 1 --user_email=$email
+ 
+
+
 
 #htaccess pour éviter les 404
 cp ~/wp_template/.htaccess .
