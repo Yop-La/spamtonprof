@@ -83,7 +83,7 @@ class StpInterruptionManager
             $previous = \DateTime::createFromFormat(PG_DATE_FORMAT, $previous);
 
             if ($previous->add(new \DateInterval('P15D')) > $date_debut) {
-                $retour->message = "Les interruptions doivent être espacés de 15 jours au minimum !";
+                $retour->message = "Les interruptions doivent être espacées de 15 jours au minimum !";
                 return ($retour);
             }
         }
