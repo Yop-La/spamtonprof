@@ -1292,3 +1292,87 @@ function url_get_contents($url)
 }
 
 
+function quote($word){
+    return('"' . $word . '"');
+}
+
+
+// le fichier doit être un export des inscription du formulaire à l'inscription de la semaine d'essai
+// le code est nathalie ou natali pour le moment, c'est configurable
+// exemple d'appel: count_inscription_teleprospecteur("inscription-decembre.csv");
+function count_inscription_teleprospecteur($path_csv_file){
+    
+    
+    $rows = readCsv($path_csv_file, ",");
+    
+    $targets = [];
+    
+    $nb_cols = [];
+    
+    foreach ($rows as $row) {
+        
+        
+        $rmqs = [];
+        
+        $nb_col = count($row);
+        
+        if ($nb_col <= 15) {
+            continue;
+            // prettyPrint($row);
+        }
+        
+        //email eleve
+        $rmqs[] = $row[4];
+        
+        if ($nb_col == 21) {
+
+            $rmqs["rmq matiere 1"] = $row[2];
+            $rmqs["rmq matiere 2"] = $row[4];
+            $rmqs["rmq matiere 3"] = $row[8];
+            $rmqs["rmq matiere 4"] = $row[10];
+            $rmqs["rmqs"] = $row[16];
+            $rmqs["code"] = $row[19];
+            $targets[] = $rmqs;
+        }
+        
+        if ($nb_col == 33) {
+            
+            
+            $rmqs["rmq matiere 1"] = $row[13];
+            $rmqs["rmq matiere 2"] = $row[15];
+            $rmqs["rmq matiere 3"] = $row[17];
+            $rmqs["rmq matiere 4"] = $row[19];
+            $rmqs["rmqs"] = $row[28];
+            $rmqs["code"] = $row[31];
+            $targets[] = $rmqs;
+        }
+        
+        $nb_cols[] = $nb_col;
+        
+    }
+    
+    $res = [];
+    
+    foreach ($targets as $target){
+        
+        $target = array_map('strtolower', $target);
+        
+        $email = array_shift($target);
+        
+        $matches  = preg_grep ('/.*nathali.*|.*natali.*/', $target);
+        
+        if($matches){
+            $matches[] = $email;
+            $res[] = $matches;
+        }
+        
+        
+    }
+    
+    prettyPrint(array(count($res),$res));
+    
+    
+    
+}
+
+
