@@ -26,6 +26,8 @@ class PageManager
 
         $this->domain = $host_split[0];
 
+        $this->pagesVariables['domain'] = $this->domain;
+        
         $_SESSION["domain"] = $this->domain;
 
         $this->loadVariablesOnPages();
@@ -209,7 +211,7 @@ class PageManager
             if ($prof) {
 
                 $this->pagesVariables['userType'] = 'prof';
-                $this->pagesVariables['loggedEleve'] = $prof->toArray();
+                $this->pagesVariables['loggedProf'] = $prof->toArray();
 
                 // wp_localize_script('functions_js', 'userType', 'prof');
                 // wp_localize_script('functions_js', 'loggedProf', $prof->toArray());
