@@ -1212,9 +1212,12 @@ class LbcProcessManager
                 'martin'
             ), $prenom, $texte->getTexte()));
 
+//             prettyPrint($nbImages);
+            
             // recuperation de l'image
-            $image = 'https://spamtonprof.com/wp-content/uploads/lbc_images/' . $client_content->getImg_folder() . '/' . $images[($i % $nbImages) + 2];
+            $image = 'https://spamtonprof.com/wp-content/uploads/lbc_images/' . $client_content->getImg_folder() . '/' . $images[($i % $nbImages) ];
 
+            
             // recuperation de la commune
             $commune = $communes[$i % $nbCommunes];
             $nomCommune = $commune->getLibelle() . " " . $commune->getCode_postal();
@@ -1273,7 +1276,7 @@ class LbcProcessManager
                 $image = 'http://' . DOMAIN . $ad->image;
             }
 
-            if ($refClient >= 33) {
+            if ($refClient >= 33 && $refClient < 47) {
 
                 $lbcApi = new \spamtonprof\stp_api\LbcApi();
                 $ad = $lbcApi->get_local_ad($client->getImg_folder());
