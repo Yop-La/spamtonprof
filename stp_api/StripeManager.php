@@ -21,7 +21,7 @@ class StripeManager
 
 {
 
-    private $testMode = true, $slack;
+    private $testMode = true, $slack, $stripe_account = false;
 
     public function stopSubscription($subscriptionId)
     {
@@ -435,8 +435,6 @@ class StripeManager
         }
     }
 
-  
-
     public function create_subscription_checkout_session($plan_strp_id, $customer_id, $meta_sub = false, $trial_end = 'now')
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
@@ -454,16 +452,14 @@ class StripeManager
                 ]
             ],
             'success_url' => domain_to_url() . '/remerciement-abonnement/?ref_abo=' . $meta_sub["ref_abonnement"],
-            'cancel_url' => domain_to_url()  . '/dashboard-eleve/?info=' . urlencode("Oups, le paiement a échoué,  veuillez réssayer ou contactez nous ! "),
+            'cancel_url' => domain_to_url() . '/dashboard-eleve/?info=' . urlencode("Oups, le paiement a échoué,  veuillez réssayer ou contactez nous ! ")
         ];
-        
-        
 
         if ($trial_end != 'now') {
             $params_session['trial_end'] = $trial_end;
         }
-        
-        if($meta_sub){
+
+        if ($meta_sub) {
             $params_session['subscription_data']['metadata'] = $meta_sub;
         }
 
@@ -507,10 +503,118 @@ class StripeManager
         return ($sub);
     }
 
+    public function retrieve_payout($id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        $payout = false;
+        if ($this->stripe_account) {
+
+            $payout = \Stripe\Payout::retrieve($id, [
+                'stripe_account' => $this->stripe_account
+            ]);
+        } else {
+            $payout = \Stripe\Payout::retrieve($id);
+        }
+
+        return ($payout);
+    }
+
+    public function retrieve_balance_transaction($id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        $charge = false;
+        if ($this->stripe_account) {
+
+            $charge = \Stripe\BalanceTransaction::retrieve($id, [
+                'stripe_account' => $this->stripe_account
+            ]);
+        } else {
+            $charge = \Stripe\BalanceTransaction::retrieve($id);
+        }
+
+        return ($charge);
+    }
+
+    public function retrieve_transfer($transfer_id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        $transfer = false;
+        if ($this->stripe_account) {
+
+            $transfer = \Stripe\Transfer::retrieve($transfer_id, [
+                'stripe_account' => $this->stripe_account
+            ]);
+        } else {
+            $transfer = \Stripe\Transfer::retrieve($transfer_id);
+        }
+
+        return ($transfer);
+    }
+
+    // à utiliser sur un compte connecté
+    public function retrieve_source_charge_of_transaction($transaction_id)
+    {
+        $transaction = $this->retrieve_balance_transaction($transaction_id);
+
+        $charge = false;
+
+        switch ($transaction->type) {
+            case 'payment':
+                $charge = $this->retrieve_charge($transaction->source);
+                break;
+            case 'payment_refund':
+                $refund = $this->retrieve_refund($transaction->source);
+                $charge = $this->retrieve_charge($refund->charge);
+                break;
+            case 'payout':
+                return (false);
+
+            default:
+                prettyPrint(array(
+                    "die bad transaction type",
+                    $transaction->type
+                ));
+                break;
+        }
+
+        $stripe_plateforme = new \spamtonprof\stp_api\StripeManager(false);
+
+        $transfer = $stripe_plateforme->retrieve_transfer($charge->source_transfer);
+
+        $charge = $stripe_plateforme->retrieve_charge($transfer->source_transaction);
+
+        return ($charge);
+    }
+
+    public function retrieve_refund($refund_id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        $refund = false;
+        if ($this->stripe_account) {
+
+            $refund = \Stripe\Refund::retrieve($refund_id, [
+                'stripe_account' => $this->stripe_account
+            ]);
+        } else {
+            $refund = \Stripe\Refund::retrieve($refund_id);
+        }
+
+        return ($refund);
+    }
+
     public function retrieve_charge($charge_id)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-        $charge = \Stripe\Charge::retrieve($charge_id);
+        $charge = false;
+        if ($this->stripe_account) {
+
+            $charge = \Stripe\Charge::retrieve($charge_id, [
+                'stripe_account' => $this->stripe_account
+            ]);
+        } else {
+            $charge = \Stripe\Charge::retrieve($charge_id);
+        }
+
         return ($charge);
     }
 
@@ -519,6 +623,111 @@ class StripeManager
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $invoice = \Stripe\Invoice::retrieve($invoice_id);
         return ($invoice);
+    }
+
+    public function list_balance_transaction($payout, int $limit = 100, $starting_after = false)
+    {
+        $all_transactions = [];
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $params = [
+            'limit' => $limit,
+            'payout' => $payout
+            // 'status' => 'paid'
+        ];
+
+        if ($starting_after) {
+            $params['starting_after'] = $starting_after;
+        }
+
+        if ($this->stripe_account) {
+
+            $all_transactions = \Stripe\BalanceTransaction::all($params, [
+                'stripe_account' => $this->stripe_account
+            ]);
+        } else {
+            $all_transactions = \Stripe\BalanceTransaction::all();
+        }
+
+        try {
+            $all_transactions = $all_transactions->data;
+        } catch (\Exception $e) {
+            return (false);
+        }
+
+        return ($all_transactions);
+    }
+
+    public function list_payouts($starting_after = false, $ending_before = false, $arrival_gte = false, $arrival_lte = false, int $limit = 100)
+    {
+        $all_payouts = [];
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $params = [
+            'limit' => $limit,
+            'status' => 'paid'
+        ];
+
+        if ($starting_after) {
+            $params['starting_after'] = $starting_after;
+        }
+
+        if ($ending_before) {
+            $params['ending_before'] = $ending_before;
+        }
+
+        $arrival = array();
+
+        if ($arrival_gte) {
+
+            $arrival_gte = \DateTime::createFromFormat(FR_DATE_FORMAT, $arrival_gte);
+            $arrival['gte'] = $arrival_gte->getTimestamp();
+            $arrival_gte = $arrival_gte->format(FR_DATE_FORMAT);
+        }
+
+        if ($arrival_lte) {
+            $arrival_lte = \DateTime::createFromFormat(FR_DATE_FORMAT, $arrival_lte);
+            $arrival['lte'] = $arrival_lte->getTimestamp();
+            $arrival_lte = $arrival_lte->format(FR_DATE_FORMAT);
+        }
+
+        if (count($arrival) != 0) {
+            $params['arrival_date'] = $arrival;
+        }
+
+        if ($this->stripe_account) {
+
+            
+            $payouts = \Stripe\Payout::all($params, [
+                'stripe_account' => $this->stripe_account
+            ]);
+
+            
+        } else {
+            $payouts = \Stripe\Payout::all($params);
+        }
+
+        // $invoices = \Stripe\Invoice::all($params);
+
+        $slack = new \spamtonprof\slack\Slack();
+
+        try {
+            $all_payouts = $payouts->data;
+
+            // if (count($all_payouts) == 100) {
+            // $last_payout = $all_payouts[99];
+            // $remaining_payouts = $this->list_payouts($arrival_gte, $arrival_lte, $last_payout->id, 100);
+            // if ($remaining_payouts) {
+            // return (array_merge($all_payouts, $remaining_payouts));
+            // }
+            // } else {
+            // return ($all_payouts);
+            // }
+        } catch (\Exception $e) {
+            return (false);
+        }
+
+        return ($all_payouts);
     }
 
     public function list_invoices(int $limit = 100, $starting_after = false)
@@ -608,7 +817,7 @@ class StripeManager
         prettyPrint($best_cus);
     }
 
-    public function __construct($testMode = true)
+    public function __construct($testMode = true, $prof_email = false)
 
     {
         $this->slack = new \spamtonprof\slack\Slack();
@@ -619,8 +828,20 @@ class StripeManager
         }
 
         $this->testMode = $testMode;
+
+        if ($prof_email) {
+
+            $profMg = new \spamtonprof\stp_api\StpProfManager();
+            $prof = $profMg->get(array(
+                'email_stp' => $prof_email
+            ));
+
+            $this->stripe_account = $prof->getStripe_id();
+            if ($this->testMode) {
+                $this->stripe_account = $prof->getStripe_id_test();
+            }
+        }
     }
-    
 
     public function retrieve_event($id)
     {
@@ -1436,44 +1657,33 @@ class StripeManager
         }
     }
 
-    
-    
-    public function addTrialTest($subId, $endDay, $prorate =false)
+    public function addTrialTest($subId, $endDay, $prorate = false)
     {
-        
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-        
-        
+
         $endDay = \DateTime::createFromFormat(PG_DATETIME_FORMAT, $endDay);
-        
-        
-        
+
         \Stripe\Subscription::update($subId, [
             'trial_end' => $endDay->getTimestamp(),
             'prorate' => $prorate
         ]);
     }
-    
-    public function stopTrial($subId){
-        
+
+    public function stopTrial($subId)
+    {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-        
+
         \Stripe\Subscription::update($subId, [
             'trial_end' => 'now'
         ]);
     }
-    
-    
+
     public function addTrial($subId, $endDay, $prorate = true)
     {
-        
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-        
-        
+
         $endDay = \DateTime::createFromFormat(PG_DATE_FORMAT, $endDay);
 
-        
-        
         \Stripe\Subscription::update($subId, [
             'trial_end' => $endDay->getTimestamp(),
             'prorate' => $prorate
