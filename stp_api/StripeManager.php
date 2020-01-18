@@ -568,7 +568,8 @@ class StripeManager
                 break;
             case 'payout':
                 return (false);
-
+            case 'payout_failure':
+                return (false);
             default:
                 prettyPrint(array(
                     "die bad transaction type",
@@ -645,6 +646,8 @@ class StripeManager
             $all_transactions = \Stripe\BalanceTransaction::all($params, [
                 'stripe_account' => $this->stripe_account
             ]);
+            
+            
         } else {
             $all_transactions = \Stripe\BalanceTransaction::all();
         }
@@ -654,6 +657,7 @@ class StripeManager
         } catch (\Exception $e) {
             return (false);
         }
+        
 
         return ($all_transactions);
     }
