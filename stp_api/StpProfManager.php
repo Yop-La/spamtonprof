@@ -106,7 +106,7 @@ class StpProfManager
 
                 $inboxReady = $info["inbox_ready"];
 
-                $q = $this->_db->prepare('select * from stp_prof where inbox_ready = :inbox_ready');
+                $q = $this->_db->prepare('select * from stp_prof where inbox_ready = :inbox_ready order by ref_prof');
 
                 $q->bindValue(":inbox_ready", $inboxReady, \PDO::PARAM_BOOL);
 
