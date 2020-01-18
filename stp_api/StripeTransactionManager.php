@@ -39,7 +39,29 @@ class StripeTransactionManager
         $q->execute();
     }
 
+    public function deleteAll($info = false)
+    {
+        $q = false;
+        if (is_array($info)) {
 
+            if (array_key_exists('key', $info)) {
+                $key = $info['key'];
+                $params = false;
+                if (array_key_exists('params', $info)) {
+                    $params = $info['params'];
+                }
+
+                if ($key == 'by_ref_payout') {
+
+                    $q = $this->_db->prepare("delete from stripe_transaction
+                        where ref_payout = :ref_payout'");
+                    $q->bindValue(':ref_payout', $params['ref_payout']);
+                }
+            }
+        }
+
+        $q->execute();
+    }
 
     public function getAll($info = false, $constructor = false)
     {
