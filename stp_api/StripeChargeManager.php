@@ -53,8 +53,7 @@ class StripeChargeManager
 
     public function get($info = false, $constructor = false)
     {
-        $q = $this->_db->prepare("select * from stripe_charge where ref = :ref");
-        $q->bindValue(":ref", $info);
+        $q = false;
         if (is_array($info)) {
 
             if (array_key_exists('key', $info)) {
@@ -64,13 +63,15 @@ class StripeChargeManager
                     $params = $info['params'];
                 }
 
-                // if ($key == 'by_ref_payout') {
+                if ($key == 'ref_stripe') {
 
-                // $q = $this->_db->prepare("select * from stripe_transaction
-                // where ref_payout = :ref_payout and type != 'payout'");
+                    $ref_stripe = $params['ref_stripe'];
 
-                // $q->bindValue(':ref_payout', $params['ref_payout']);
-                // }
+                    $q = $this->_db->prepare("select * from stripe_charge
+                where ref_stripe = :ref_stripe");
+
+                    $q->bindValue(':ref_stripe', $ref_stripe);
+                }
             }
         }
 

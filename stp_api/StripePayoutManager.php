@@ -112,7 +112,7 @@ class StripePayoutManager
                 
                 if ($key == 'no_transactions_status') {
                     
-                    $q = $this->_db->prepare("select * from stripe_payout where (transactions_status is null or transactions_status like '" . \spamtonprof\stp_api\StripePayout::not_all_transactions_retrieved ."')order by ref desc limit 20");
+                    $q = $this->_db->prepare("select * from stripe_payout where (transactions_status is null or transactions_status like '" . \spamtonprof\stp_api\StripePayout::not_all_transactions_retrieved ."')order by ref desc limit 25");
                     
                 }
             }

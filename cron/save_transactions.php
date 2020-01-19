@@ -47,17 +47,6 @@ if (count($payouts) == 0) {
 
 foreach ($payouts as $payout) {
 
-    $stripeTransactionMg->deleteAll(array(
-        'key' => $stripeTransactionMg::by_ref_payout,
-        'params' => array(
-            'ref_payout' => $payout->getRef()
-        )
-    ));
-
-    $stripeChargeManagerMg->deleteAll(array(
-        'key' => $stripeChargeManagerMg::not_referenced_by_stripe_transaction
-    ));
-
     $prof = $profMg->get(array(
         'ref_prof' => $payout->getRef_prof()
     ));
@@ -105,7 +94,18 @@ foreach ($payouts as $payout) {
             "type" => $transaction->type
         ));
 
-        $stripeTransactionMg->add($stripeTransaction);
+        $stripeTransactionInBase = $stripeTransactionMg->get(array(
+            'key' => 'transaction_id',
+            'params' => array(
+                'transaction_id' => $stripeTransaction->getTransaction_id()
+            )
+        ));
+
+        if ($stripeTransactionInBase) {
+            $stripeTransaction = $stripeTransactionInBase;
+        } else {
+            $stripeTransactionMg->add($stripeTransaction);
+        }
 
         $charge = $stripe_prof->retrieve_source_charge_of_transaction($transaction->id);
         if ($charge) {
@@ -121,7 +121,19 @@ foreach ($payouts as $payout) {
                 'invoice' => $charge->invoice
             ));
 
-            $stripeChargeManagerMg->add($stripeCharge);
+            $stripeChargeInBase = $stripeChargeManagerMg->get(array(
+                'key' => 'ref_stripe',
+                'params' => array(
+                    'ref_stripe' => $stripeCharge->getRef_stripe()
+                )
+            ));
+
+            if ($stripeChargeInBase) {
+
+                $stripeCharge = $stripeChargeInBase;
+            } else {
+                $stripeCharge = $stripeChargeManagerMg->add($stripeCharge);
+            }
 
             $stripeTransaction->setRef_charge($stripeCharge->getRef());
             $stripeTransactionMg->update_ref_charge($stripeTransaction);

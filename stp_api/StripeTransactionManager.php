@@ -63,6 +63,48 @@ class StripeTransactionManager
         $q->execute();
     }
 
+    
+    
+    public function get($info = false, $constructor = false)
+    {
+        $q = false;
+        if (is_array($info)) {
+            
+            if (array_key_exists('key', $info)) {
+                $key = $info['key'];
+                $params = false;
+                if (array_key_exists('params', $info)) {
+                    $params = $info['params'];
+                }
+                
+                
+                if ($key == 'transaction_id') {
+                    
+                    $transaction_id = $params['transaction_id'];
+                    
+                    $q = $this->_db->prepare("select * from stripe_transaction
+                where transaction_id = :transaction_id");
+                    
+                    
+                    $q->bindValue(':transaction_id', $transaction_id);
+                }
+            }
+        }
+        
+        $q->execute();
+        
+        $data = $q->fetch(\PDO::FETCH_ASSOC);
+        
+        $charge = false;
+        if ($data) {
+            $charge = new \spamtonprof\stp_api\StripeTransaction($data);
+        }
+        
+        return ($charge);
+    }
+    
+    
+    
     public function getAll($info = false, $constructor = false)
     {
         $q = $this->_db->prepare("select * from stripe_transaction");
