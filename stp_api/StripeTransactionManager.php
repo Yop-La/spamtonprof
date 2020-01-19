@@ -124,6 +124,15 @@ class StripeTransactionManager
 
                     $q->bindValue(':ref_payout', $params['ref_payout']);
                 }
+
+                if ($key == 'ref_charge_is_null') {
+                    
+                    $q = $this->_db->prepare("select * from stripe_transaction
+                        where ref_charge is null and type != 'payout' limit 50");
+                    
+                }
+                
+                
             }
         }
 

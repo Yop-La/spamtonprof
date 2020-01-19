@@ -11,6 +11,31 @@ class StripeChargeManager
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
 
+    
+    public function update_updated(\spamtonprof\stp_api\StripeCharge $charge)
+    {
+        $q = $this->_db->prepare("update stripe_charge set updated = :updated where ref = :ref");
+        $q->bindValue(":ref", $charge->getRef());
+        $q->bindValue(":updated", $charge->getUpdated(),\PDO::PARAM_BOOL);
+        $q->execute();
+    }
+    
+    public function update_nom_formule(\spamtonprof\stp_api\StripeCharge $charge)
+    {
+        $q = $this->_db->prepare("update stripe_charge set nom_formule = :nom_formule where ref = :ref");
+        $q->bindValue(":ref", $charge->getRef());
+        $q->bindValue(":nom_formule", $charge->getNom_formule());
+        $q->execute();
+    }
+    
+    public function update_ref_abo(\spamtonprof\stp_api\StripeCharge $charge)
+    {
+        $q = $this->_db->prepare("update stripe_charge set ref_abo = :ref_abo where ref = :ref");
+        $q->bindValue(":ref", $charge->getRef());
+        $q->bindValue(":ref_abo", $charge->getRef_abo());
+        $q->execute();
+    }
+
     const not_referenced_by_stripe_transaction = 'not_referenced_by_stripe_transaction';
 
     public function deleteAll($info = false)
@@ -33,6 +58,48 @@ class StripeChargeManager
         }
 
         $q->execute();
+    }
+
+    public function getAll($info = false, $constructor = false)
+    {
+        $q = $this->_db->prepare("select * from stripe_transaction");
+        if (is_array($info)) {
+
+            if (array_key_exists('key', $info)) {
+                $key = $info['key'];
+                $params = false;
+                if (array_key_exists('params', $info)) {
+                    $params = $info['params'];
+                }
+
+                if ($key == 'ref_abo_is_null') {
+
+                    $q = $this->_db->prepare("select * from stripe_charge
+                        where ref_abo is null limit 70");
+                }
+                
+                if ($key == 'updated_is_null') {
+                    
+                    $q = $this->_db->prepare('select * from stripe_charge
+                        where updated is null order by "ref" limit 150 ');
+                }
+            }
+        }
+
+        $q->execute();
+
+        $transactions = [];
+        while ($data = $q->fetch(\PDO::FETCH_ASSOC)) {
+            $interrup = new \spamtonprof\stp_api\StripeCharge($data);
+
+            // if ($constructor) {
+            // $constructor["objet"] = $interrup;
+            // $this->construct($constructor);
+            // }
+
+            $transactions[] = $interrup;
+        }
+        return ($transactions);
     }
 
     public function add(stripeCharge $stripeCharge)

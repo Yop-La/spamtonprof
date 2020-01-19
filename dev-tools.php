@@ -1065,6 +1065,10 @@ function toPgArray(array $elements, $parenthese = false)
 
     $nbElem = count($elements);
     $arrayPar = "";
+    
+    if($nbElem == 0){
+        return($lBracket. "0" . $rBracket);
+    }
 
     for ($i = 0; $i < $nbElem; $i ++) {
         $element = $elements[$i];

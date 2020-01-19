@@ -966,10 +966,12 @@ class StpAbonnementManager
                     $procheMg = new \spamtonprof\stp_api\StpProcheManager();
 
                     $proches = $procheMg->getAll(array(
-                        "email" => "yopla"
+                        "email" => $email
                     ));
+                    
+                    
                     $eleves = $eleveMg->getAll(array(
-                        "email" => "yopla"
+                        "email" => $email
                     ));
 
                     $refEleves = extractAttribute($eleves, "ref_eleve");

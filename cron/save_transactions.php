@@ -107,42 +107,13 @@ foreach ($payouts as $payout) {
             $stripeTransactionMg->add($stripeTransaction);
         }
 
-        $charge = $stripe_prof->retrieve_source_charge_of_transaction($transaction->id);
-        if ($charge) {
-
-            $created = new \DateTime();
-            $created->setTimestamp($charge->created);
-
-            $stripeCharge = new \spamtonprof\stp_api\StripeCharge(array(
-                "ref_stripe" => $charge->id,
-                "amount" => $charge->amount,
-                "created" => $created->format(PG_DATETIME_FORMAT),
-                "customer" => $charge->customer,
-                'invoice' => $charge->invoice
-            ));
-
-            $stripeChargeInBase = $stripeChargeManagerMg->get(array(
-                'key' => 'ref_stripe',
-                'params' => array(
-                    'ref_stripe' => $stripeCharge->getRef_stripe()
-                )
-            ));
-
-            if ($stripeChargeInBase) {
-
-                $stripeCharge = $stripeChargeInBase;
-            } else {
-                $stripeCharge = $stripeChargeManagerMg->add($stripeCharge);
-            }
-
-            $stripeTransaction->setRef_charge($stripeCharge->getRef());
-            $stripeTransactionMg->update_ref_charge($stripeTransaction);
-        }
     }
 
     $payout->setTransactions_status($payout::transactions_retrieved);
     $stripePayoutMg->update_transactions_status($payout);
 }
+
+
 
 $slack->sendMessages('stripe_transactions', array(
     'Fin de récupération des transations'

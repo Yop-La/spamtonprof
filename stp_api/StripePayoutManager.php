@@ -12,7 +12,7 @@ class StripePayoutManager
     {
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
-    
+
     public function update_transactions_status(\spamtonprof\stp_api\StripePayout $payout)
     {
         $q = $this->_db->prepare("update stripe_payout set transactions_status = :transactions_status where ref = :ref");
@@ -20,7 +20,6 @@ class StripePayoutManager
         $q->bindValue(":transactions_status", $payout->getTransactions_status());
         $q->execute();
     }
-    
 
     public function add(stripePayout $stripePayout)
     {
@@ -34,10 +33,9 @@ class StripePayoutManager
         $q->bindValue(':test_mode', $stripePayout->getTest_mode(), \PDO::PARAM_BOOL);
         $q->execute();
 
-        
-//         if ($q->errorCode() != "00000") {
-//             prettyPrint($q->errorInfo());
-//         }
+        // if ($q->errorCode() != "00000") {
+        // prettyPrint($q->errorInfo());
+        // }
 
         $stripePayout->setRef($this->_db->lastInsertId());
 
@@ -62,15 +60,20 @@ class StripePayoutManager
                     $q = $this->_db->prepare("select * from stripe_payout where ref_prof = :ref_prof order by created desc limit 1");
                     $q->bindValue('ref_prof', $ref_prof);
                 }
-                
-                
+
                 if ($key == 'first_payout_of_prof') {
-                    
+
                     $ref_prof = $params['ref_prof'];
                     $q = $this->_db->prepare("select * from stripe_payout where ref_prof = :ref_prof order by created limit 1");
                     $q->bindValue('ref_prof', $ref_prof);
                 }
-                
+
+                if ($key == 'ref') {
+
+                    $ref = $params['ref'];
+                    $q = $this->_db->prepare("select * from stripe_payout where ref = :ref");
+                    $q->bindValue('ref', $ref);
+                }
             }
         }
 
@@ -109,11 +112,9 @@ class StripePayoutManager
                     $q->bindValue(':year', $params['year']);
                     $q->bindValue(':ref_prof', $params['ref_prof']);
                 }
-                
+
                 if ($key == 'no_transactions_status') {
-                    
-                    $q = $this->_db->prepare("select * from stripe_payout where (transactions_status is null or transactions_status like '" . \spamtonprof\stp_api\StripePayout::not_all_transactions_retrieved ."')order by ref desc limit 25");
-                    
+                    $q = $this->_db->prepare("select * from stripe_payout where (transactions_status is null or transactions_status like '" . \spamtonprof\stp_api\StripePayout::not_all_transactions_retrieved . "') order by ref desc limit 20");
                 }
             }
         }
