@@ -11,15 +11,14 @@ class StripeChargeManager
         $this->_db = \spamtonprof\stp_api\PdoManager::getBdd();
     }
 
-    
     public function update_updated(\spamtonprof\stp_api\StripeCharge $charge)
     {
         $q = $this->_db->prepare("update stripe_charge set updated = :updated where ref = :ref");
         $q->bindValue(":ref", $charge->getRef());
-        $q->bindValue(":updated", $charge->getUpdated(),\PDO::PARAM_BOOL);
+        $q->bindValue(":updated", $charge->getUpdated(), \PDO::PARAM_BOOL);
         $q->execute();
     }
-    
+
     public function update_nom_formule(\spamtonprof\stp_api\StripeCharge $charge)
     {
         $q = $this->_db->prepare("update stripe_charge set nom_formule = :nom_formule where ref = :ref");
@@ -27,7 +26,15 @@ class StripeChargeManager
         $q->bindValue(":nom_formule", $charge->getNom_formule());
         $q->execute();
     }
-    
+
+    public function update_ref_invoice(\spamtonprof\stp_api\StripeCharge $charge)
+    {
+        $q = $this->_db->prepare("update stripe_charge set ref_invoice = :ref_invoice where ref = :ref");
+        $q->bindValue(":ref", $charge->getRef());
+        $q->bindValue(":ref_invoice", $charge->getRef_invoice());
+        $q->execute();
+    }
+
     public function update_ref_abo(\spamtonprof\stp_api\StripeCharge $charge)
     {
         $q = $this->_db->prepare("update stripe_charge set ref_abo = :ref_abo where ref = :ref");
@@ -77,9 +84,15 @@ class StripeChargeManager
                     $q = $this->_db->prepare("select * from stripe_charge
                         where ref_abo is null limit 70");
                 }
-                
+
+                if ($key == 'ref_invoice_is_null') {
+
+                    $q = $this->_db->prepare("select * from stripe_charge
+                        where ref_invoice is null limit 150");
+                }
+
                 if ($key == 'updated_is_null') {
-                    
+
                     $q = $this->_db->prepare('select * from stripe_charge
                         where updated is null order by "ref" limit 150 ');
                 }
@@ -139,6 +152,16 @@ class StripeChargeManager
 
                     $q->bindValue(':ref_stripe', $ref_stripe);
                 }
+
+                if ($key == 'ref') {
+
+                    $ref = $params['ref'];
+
+                    $q = $this->_db->prepare("select * from stripe_charge
+                where ref = :ref");
+
+                    $q->bindValue(':ref', $ref);
+                }
             }
         }
 
@@ -149,8 +172,47 @@ class StripeChargeManager
         $charge = false;
         if ($data) {
             $charge = new \spamtonprof\stp_api\StripeCharge($data);
+
+            if ($constructor) {
+                $constructor["objet"] = $charge;
+                $this->construct($constructor);
+            }
         }
 
         return ($charge);
+    }
+
+    public function cast(\spamtonprof\stp_api\StripeCharge $object)
+    {
+        return ($object);
+    }
+
+    public function construct($constructor)
+    {
+        $charge = $this->cast($constructor["objet"]);
+
+        $constructOrders = $constructor["construct"];
+
+        foreach ($constructOrders as $constructOrder) {
+
+            switch ($constructOrder) {
+
+                case "ref_abo":
+
+                    $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
+                    $constructorAbo = false;
+
+                    if (array_key_exists("ref_abo", $constructor)) {
+                        $constructorAbo = $constructor["ref_abo"];
+                    }
+
+                    $abo = $aboMg->get(array(
+                        'ref_abonnement' => $charge->getRef_abo()
+                    ), $constructorAbo);
+                    $charge->setAbo($abo);
+
+                    break;
+            }
+        }
     }
 }

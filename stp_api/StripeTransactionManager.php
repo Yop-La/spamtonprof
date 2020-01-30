@@ -63,48 +63,42 @@ class StripeTransactionManager
         $q->execute();
     }
 
-    
-    
     public function get($info = false, $constructor = false)
     {
         $q = false;
         if (is_array($info)) {
-            
+
             if (array_key_exists('key', $info)) {
                 $key = $info['key'];
                 $params = false;
                 if (array_key_exists('params', $info)) {
                     $params = $info['params'];
                 }
-                
-                
+
                 if ($key == 'transaction_id') {
-                    
+
                     $transaction_id = $params['transaction_id'];
-                    
+
                     $q = $this->_db->prepare("select * from stripe_transaction
                 where transaction_id = :transaction_id");
-                    
-                    
+
                     $q->bindValue(':transaction_id', $transaction_id);
                 }
             }
         }
-        
+
         $q->execute();
-        
+
         $data = $q->fetch(\PDO::FETCH_ASSOC);
-        
+
         $charge = false;
         if ($data) {
             $charge = new \spamtonprof\stp_api\StripeTransaction($data);
         }
-        
+
         return ($charge);
     }
-    
-    
-    
+
     public function getAll($info = false, $constructor = false)
     {
         $q = $this->_db->prepare("select * from stripe_transaction");
@@ -126,13 +120,10 @@ class StripeTransactionManager
                 }
 
                 if ($key == 'ref_charge_is_null') {
-                    
+
                     $q = $this->_db->prepare("select * from stripe_transaction
                         where ref_charge is null and type != 'payout' limit 50");
-                    
                 }
-                
-                
             }
         }
 
@@ -140,15 +131,56 @@ class StripeTransactionManager
 
         $transactions = [];
         while ($data = $q->fetch(\PDO::FETCH_ASSOC)) {
-            $interrup = new \spamtonprof\stp_api\StripeTransaction($data);
+            $transaction = new \spamtonprof\stp_api\StripeTransaction($data);
 
-            // if ($constructor) {
-            // $constructor["objet"] = $interrup;
-            // $this->construct($constructor);
-            // }
+            if ($constructor) {
+                $constructor["objet"] = $transaction;
+                $this->construct($constructor);
+            }
 
-            $transactions[] = $interrup;
+            $transactions[] = $transaction;
         }
         return ($transactions);
     }
+    
+    public function cast(\spamtonprof\stp_api\StripeTransaction $object)
+    {
+        return ($object);
+    }
+    
+    public function construct($constructor)
+    {
+        $transaction = $this->cast($constructor["objet"]);
+        
+        $constructOrders = $constructor["construct"];
+        
+        
+        foreach ($constructOrders as $constructOrder) {
+            
+            switch ($constructOrder) {
+                
+                case "ref_charge":
+                    
+                    $chargeMg = new \spamtonprof\stp_api\StripeChargeManager();
+                    $constructorCharge = false;
+                    
+                    if (array_key_exists("ref_charge", $constructor)) {
+                        $constructorCharge = $constructor["ref_charge"];
+                    }
+                    
+                    $charge = $chargeMg->get(array('key' => 'ref','params' => array('ref' => $transaction->getRef_charge())),$constructorCharge);
+                    
+                    
+                    $transaction->setCharge($charge);
+                    
+                    break;
+            }
+        }
+    }
+    
+    
+    
+    
+    
+    
 }

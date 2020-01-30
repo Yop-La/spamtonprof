@@ -4,9 +4,28 @@ namespace spamtonprof\stp_api;
 class StripeTransaction implements \JsonSerializable
 {
 
-    protected $ref, $transaction_id, $transaction_amount, $ref_payout, $test_mode, $available_on, $type, $ref_charge;
+    protected $ref, $transaction_id, $transaction_amount, $ref_payout, $test_mode, $available_on, $type, $ref_charge, $charge;
 
     /**
+     *
+     * @return mixed
+     */
+    public function getCharge()
+    {
+        return $this->charge;
+    }
+
+    /**
+     *
+     * @param mixed $charge
+     */
+    public function setCharge($charge)
+    {
+        $this->charge = $charge;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getRef_charge()
@@ -15,6 +34,7 @@ class StripeTransaction implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $ref_charge
      */
     public function setRef_charge($ref_charge)
@@ -36,8 +56,6 @@ class StripeTransaction implements \JsonSerializable
             }
         }
     }
-    
-    
 
     public function getRef()
     {

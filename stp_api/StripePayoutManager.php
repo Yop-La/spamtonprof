@@ -42,7 +42,7 @@ class StripePayoutManager
         return ($stripePayout);
     }
 
-    public function get($info = false)
+    public function get($info = false, $constructor = false)
     {
         $q = false;
         if (is_array($info)) {
@@ -84,6 +84,11 @@ class StripePayoutManager
         $payout = false;
         if ($data) {
             $payout = new \spamtonprof\stp_api\StripePayout($data);
+
+            if ($constructor) {
+                $constructor["objet"] = $payout;
+                $this->construct($constructor);
+            }
         }
 
         return ($payout);
@@ -123,15 +128,53 @@ class StripePayoutManager
 
         $payouts = [];
         while ($data = $q->fetch(\PDO::FETCH_ASSOC)) {
-            $interrup = new \spamtonprof\stp_api\StripePayout($data);
+            $payout = new \spamtonprof\stp_api\StripePayout($data);
 
-            // if ($constructor) {
-            // $constructor["objet"] = $interrup;
-            // $this->construct($constructor);
-            // }
+            if ($constructor) {
+                $constructor["objet"] = $payout;
+                $this->construct($constructor);
+            }
 
-            $payouts[] = $interrup;
+            $payouts[] = $payout;
         }
         return ($payouts);
+    }
+
+    public function cast(\spamtonprof\stp_api\StripePayout $object)
+    {
+        return ($object);
+    }
+
+    public function construct($constructor)
+    {
+        $payout = $this->cast($constructor["objet"]);
+
+        $constructOrders = $constructor["construct"];
+
+        foreach ($constructOrders as $constructOrder) {
+
+            switch ($constructOrder) {
+
+                case "transactions":
+
+                    $transactionMg = new \spamtonprof\stp_api\StripeTransactionManager();
+                    $constructorTransaction = false;
+
+                    if (array_key_exists("transactions", $constructor)) {
+                        $constructorTransaction = $constructor["transactions"];
+                    }
+                    
+
+                    $transactions = $transactionMg->getAll(array(
+                        'key' => 'by_ref_payout',
+                        'params' => array(
+                            "ref_payout" => $payout->getRef()
+                        )
+                    ), $constructorTransaction);
+
+                    $payout->setTransactions($transactions);
+                    break;
+            }
+        }
     }
 }

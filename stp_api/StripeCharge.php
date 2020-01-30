@@ -4,11 +4,46 @@ namespace spamtonprof\stp_api;
 class StripeCharge implements \JsonSerializable
 {
 
-    protected $ref, $ref_stripe, $amount, $created, $customer, $invoice, $ref_abo, $nom_formule, $updated;
+    protected $ref, $ref_stripe, $amount, $created, $customer, $invoice, $ref_abo, $nom_formule, $updated, $abo, $ref_invoice;
 
-    
-    
     /**
+     *
+     * @return mixed
+     */
+    public function getRef_invoice()
+    {
+        return $this->ref_invoice;
+    }
+
+    /**
+     *
+     * @param mixed $ref_invoice
+     */
+    public function setRef_invoice($ref_invoice)
+    {
+        $this->ref_invoice = $ref_invoice;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getAbo()
+    {
+        return $this->abo;
+    }
+
+    /**
+     *
+     * @param mixed $abo
+     */
+    public function setAbo($abo)
+    {
+        $this->abo = $abo;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getUpdated()
@@ -17,6 +52,7 @@ class StripeCharge implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $updated
      */
     public function setUpdated($updated)

@@ -4,11 +4,30 @@ namespace spamtonprof\stp_api;
 class StripePayout implements \JsonSerializable
 {
 
-    protected $ref, $ref_stripe, $ref_prof, $amount, $date_versement, $test_mode, $created, $transactions_status;
-    
-    const cant_retrieve_transactions = 'cant_retrieve_transactions',transactions_retrieved = 'transactions_retrieved',not_all_transactions_retrieved = 'not_all_transactions_retrieved';
+    protected $ref, $ref_stripe, $ref_prof, $amount, $date_versement, $test_mode, $created, $transactions_status, $transactions;
+
+    const cant_retrieve_transactions = 'cant_retrieve_transactions', transactions_retrieved = 'transactions_retrieved', not_all_transactions_retrieved = 'not_all_transactions_retrieved';
 
     /**
+     *
+     * @return mixed
+     */
+    public function getTransactions()
+    {
+        return $this->transactions;
+    }
+
+    /**
+     *
+     * @param mixed $transactions
+     */
+    public function setTransactions($transactions)
+    {
+        $this->transactions = $transactions;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getTransactions_status()
@@ -17,6 +36,7 @@ class StripePayout implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $transactions_status
      */
     public function setTransactions_status($transactions_status)
@@ -25,6 +45,7 @@ class StripePayout implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getCreated()
@@ -33,6 +54,7 @@ class StripePayout implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $created
      */
     public function setCreated($created)
