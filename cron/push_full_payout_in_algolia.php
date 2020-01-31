@@ -19,103 +19,150 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
+
 define('PROBLEME_CLIENT', true);
 
 $slack = new \spamtonprof\slack\Slack();
-$slack->sendMessages('stripe_charges', array(
+$slack->sendMessages('push_full_payout', array(
     '------',
-    'Debut de récupération des charges'
+    'Start to get 10 full payouts'
 ));
 
-$test_mode = false;
+$algolia = new \spamtonprof\stp_api\AlgoliaManager();
+
+$constructor = array(
+    "construct" => array(
+        'transactions'
+    ),
+    "transactions" => array(
+        "construct" => array(
+            'ref_charge'
+        ),
+        'ref_charge' => array(
+            "construct" => array(
+                'ref_abo',
+                'ref_invoice'
+            ),
+            'ref_abo' => array(
+                "construct" => array(
+                    'ref_eleve',
+                    'ref_parent'
+                )
+            )
+        )
+    )
+);
 
 $stripePayoutMg = new \spamtonprof\stp_api\StripePayoutManager();
 $stripeTransactionMg = new \spamtonprof\stp_api\StripeTransactionManager();
 $stripeChargeManagerMg = new \spamtonprof\stp_api\StripeChargeManager();
-
+$stripeInvoiceManagerMg = new \spamtonprof\stp_api\StripeInvoiceManager();
 $profMg = new \spamtonprof\stp_api\StpProfManager();
 
-$transactions = $stripeTransactionMg->getAll(array(
-    'key' => 'ref_charge_is_null'
-));
-
-if (count($transactions) == 0) {
-    $slack->sendMessages('stripe_charges', array(
-        'Aucune transactions à traiter ...'
-    ));
-}
+$aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
 
 $messages = [];
 
-foreach ($transactions as $transaction) {
+$nb_transactions = 0;
 
+for ($i = 0; $i < 5; $i ++) {
+    
     if (count($messages) == 10) {
-
-        $slack->sendMessages('stripe_charges', $messages);
+        
+        $slack->sendMessages('push_full_payout', $messages);
         $messages = [];
     }
-
+    
     $payout = $stripePayoutMg->get(array(
-        'key' => 'ref',
-        'params' => array(
-            'ref' => $transaction->getRef_payout()
-        )
-    ));
-
+        'key' => 'payout_to_push_in_algolia'
+    ), $constructor);
+    
     $prof = $profMg->get(array(
         'ref_prof' => $payout->getRef_prof()
     ));
-
-    $stripe_prof = new \spamtonprof\stp_api\StripeManager($test_mode, $prof->getEmail_stp());
-
-    $charge = $stripe_prof->retrieve_source_charge_of_transaction($transaction->getTransaction_id());
-
-    $messages[] = 'Traitement de la transaction : ' . $transaction->getTransaction_id();
-
-    if ($charge) {
-
-        $created = new \DateTime();
-        $created->setTimestamp($charge->created);
-
-        $stripeCharge = new \spamtonprof\stp_api\StripeCharge(array(
-            "ref_stripe" => $charge->id,
-            "amount" => $charge->amount,
-            "created" => $created->format(PG_DATETIME_FORMAT),
-            "customer" => $charge->customer,
-            'invoice' => $charge->invoice
-        ));
-
-        $stripeChargeInBase = $stripeChargeManagerMg->get(array(
-            'key' => 'ref_stripe',
-            'params' => array(
-                'ref_stripe' => $stripeCharge->getRef_stripe()
-            )
-        ));
-
-        if ($stripeChargeInBase) {
-
-            $stripeCharge = $stripeChargeInBase;
-        } else {
-            $stripeCharge = $stripeChargeManagerMg->add($stripeCharge);
+    
+    $payout->setTransactions_status("pushing_to_algolia");
+    $stripePayoutMg->update_transactions_status($payout);
+    
+    $messages[] = '--';
+    $messages[] = 'Payout ' . $payout->getRef_stripe() . ' récupéré';
+    
+    $transactions = $payout->getTransactions();
+    
+    $fullTransaction = new \stdClass();
+    
+    foreach ($transactions as $transaction) {
+        
+        $transaction = $stripeTransactionMg->cast($transaction);
+        
+        $charge = $transaction->getCharge();
+        $charge = $stripeChargeManagerMg->cast($charge);
+        
+        $invoice = $charge->getInvoice();
+        $invoice = $stripeInvoiceManagerMg->cast($invoice);
+        
+        $abo = $charge->getAbo();
+        
+        $emails = [];
+        if ($abo) {
+            
+            $abo = $aboMg->cast($abo);
+            $eleve = $abo->getEleve();
+            
+            $proche = $abo->getProche();
+            
+            $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
+            $proche = \spamtonprof\stp_api\StpProche::cast($proche);
+            
+            $emails[] = $eleve->getEmail();
+            if ($proche) {
+                $emails[] = $proche->getEmail();
+            }
         }
-
-        $transaction->setRef_charge($stripeCharge->getRef());
-        $stripeTransactionMg->update_ref_charge($transaction);
-    } else {
-
-        $messages[] = '->> Aucune charge pour cette transaction: ' . $transaction->getTransaction_id() . '<<-';
+        
+        $emails[] = $invoice->getCustomer_email();
+        $emails = array_unique($emails);
+        
+        $fullTransaction->payout_date = $payout->getDate_versement();
+        $fullTransaction->payout_amount = $payout->getAmount();
+        
+        $fullTransaction->emails = $emails;
+        $fullTransaction->eleve = $eleve->getPrenom() . ' ' . $eleve->getNom();
+        $fullTransaction->transaction_type = $transaction->getType();
+        
+        $fullTransaction->start_week = $invoice->getPeriod_start();
+        $fullTransaction->end_week = $invoice->getPeriod_end();
+        
+        $fullTransaction->total_amount = $charge->getAmount();
+        $fullTransaction->paid_amount = $transaction->getTransaction_amount();
+        $fullTransaction->commission_amount = intval($charge->getAmount()) - intval($transaction->getTransaction_amount());
+        
+        $fullTransaction->formule_name = $invoice->getDescription();
+        
+        $fullTransaction->email_prof = $prof->getEmail_stp();
+        
+        $objectId = $payout->getRef_stripe() . "_" . $transaction->getTransaction_id();
+        $algolia->addTransaction($fullTransaction, $objectId);
+        
+        $nb_transactions = $nb_transactions + 1;
+        
+        $messages[] = 'Transaction ' . $objectId . ' pushed in algolia';
     }
+    
+    $payout->setTransactions_status("full_payout_in_algolia");
+    $stripePayoutMg->update_transactions_status($payout);
 }
-
 
 if (count($messages) != 0) {
     
-    $slack->sendMessages('stripe_charges', $messages);
+    $slack->sendMessages('push_full_payout', $messages);
     $messages = [];
 }
-$slack->sendMessages('stripe_charges', array(
+$slack->sendMessages('push_full_payout', array(
     '------',
-    'Fin de récupération des charges'
+    $nb_transactions . ' transactions pushed in algolia',
+    'End of pushing full payout',
 ));
 
 exit();
+
