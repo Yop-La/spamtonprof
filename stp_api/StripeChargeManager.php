@@ -212,6 +212,24 @@ class StripeChargeManager
                     $charge->setAbo($abo);
 
                     break;
+                case "ref_invoice":
+
+                    $invoiceMg = new \spamtonprof\stp_api\StripeInvoiceManager();
+                    $constructorInvoice = false;
+
+                    if (array_key_exists("ref_invoice", $constructor)) {
+                        $constructorAbo = $constructor["ref_invoice"];
+                    }
+
+                    $invoice = $invoiceMg->get(array(
+                        'key' => 'ref',
+                        'params' => array(
+                            'ref' => $charge->getRef_invoice()
+                        )
+                    ), $constructorInvoice);
+                    $charge->setInvoice($invoice);
+
+                    break;
             }
         }
     }

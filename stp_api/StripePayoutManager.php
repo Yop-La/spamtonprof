@@ -57,7 +57,7 @@ class StripePayoutManager
                 if ($key == 'last_payout_of_prof') {
 
                     $ref_prof = $params['ref_prof'];
-                    $q = $this->_db->prepare("select * from stripe_payout where ref_prof = :ref_prof order by created desc limit 1");
+                    $q = $this->_db->prepare("select * from stripe_payout where ref_prof = :ref_prof and transactions_status in ('transactions_retrieved','pushing_to_algolia') order by created desc limit 1");
                     $q->bindValue('ref_prof', $ref_prof);
                 }
 
@@ -66,6 +66,12 @@ class StripePayoutManager
                     $ref_prof = $params['ref_prof'];
                     $q = $this->_db->prepare("select * from stripe_payout where ref_prof = :ref_prof order by created limit 1");
                     $q->bindValue('ref_prof', $ref_prof);
+                }
+                
+                if ($key == 'payout_to_push_in_algolia') {
+                    
+                    $q = $this->_db->prepare("select * from stripe_payout where transactions_status in ('transactions_retrieved','pushing_to_algolia') order by ref limit 1");
+                    
                 }
 
                 if ($key == 'ref') {

@@ -30,4 +30,49 @@ class StripeInvoiceManager
 
         return ($stripeInvoice);
     }
+
+    public function get($info = false, $constructor = false)
+    {
+        $q = false;
+        if (is_array($info)) {
+
+            if (array_key_exists('key', $info)) {
+                $key = $info['key'];
+                $params = false;
+                if (array_key_exists('params', $info)) {
+                    $params = $info['params'];
+                }
+
+                if ($key == 'ref') {
+
+                    $ref = $params['ref'];
+
+                    $q = $this->_db->prepare("select * from stripe_invoice
+                where ref = :ref");
+                    $q->bindValue(':ref', $ref);
+                }
+            }
+        }
+
+        $q->execute();
+
+        $data = $q->fetch(\PDO::FETCH_ASSOC);
+
+        $invoice = false;
+        if ($data) {
+            $invoice = new \spamtonprof\stp_api\StripeInvoice($data);
+
+            if ($constructor) {
+                $constructor["objet"] = $invoice;
+                $this->construct($constructor);
+            }
+        }
+
+        return ($invoice);
+    }
+
+    public function cast(\spamtonprof\stp_api\StripeInvoice $object)
+    {
+        return ($object);
+    }
 }

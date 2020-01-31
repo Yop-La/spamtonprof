@@ -157,6 +157,19 @@ class AlgoliaManager
 
         $index->addObjects($comptes);
     }
+    
+    public function addTransaction(\stdClass $transaction, $objectId){
+        
+
+        
+        $index = $this->client->initIndex('stripe_transaction');
+        
+        
+        $index->addObject($transaction,$objectId);
+        
+        
+        
+    }
 
     public function addAbonnement($refAbo)
     {
