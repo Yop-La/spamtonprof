@@ -27,7 +27,7 @@ class PageManager
         $this->domain = $host_split[0];
 
         $this->pagesVariables['domain'] = $this->domain;
-        
+
         $_SESSION["domain"] = $this->domain;
 
         $this->loadVariablesOnPages();
@@ -353,8 +353,15 @@ class PageManager
         }
 
         if ($this->pageSlug == 'back-office') {
-
             $this->backOffice();
+        }
+
+//         if ($this->pageSlug == 'back-office') {
+//             $this->backOffice();
+//         }
+
+        if ($this->pageSlug == 'virement') {
+            $this->virement();
         }
 
         if ($this->pageSlug == 'formule') {
@@ -689,8 +696,7 @@ class PageManager
         wp_enqueue_script('stripe_main_js', 'https://js.stripe.com/v3/');
 
         wp_enqueue_style('ds_eleve_css', get_stylesheet_directory_uri() . '/css/pages/dashboard-eleve.css');
-        
-        
+
         $interruptionMg = new \spamtonprof\stp_api\StpInterruptionManager();
 
         $stpAct = $this->stpAccount;
@@ -716,7 +722,7 @@ class PageManager
                     'ref_compte' => $stpAct->getRef_compte()
                 ]
             ), $constructor);
-            
+
             foreach ($interruptions as $interruption) {
 
                 $debut = $interruption->getDebut();
@@ -731,18 +737,55 @@ class PageManager
                 $interruption->setFin($fin);
             }
 
-
             $this->pagesVariables['interruptions'] = json_decode(json_encode($interruptions), true);
-            
-            
+
             $onglet = "0";
-            if(array_key_exists('onglet', $_GET)){
+            if (array_key_exists('onglet', $_GET)) {
                 $onglet = $_GET['onglet'];
-                
             }
             $this->pagesVariables['onglet'] = $onglet;
-            
         }
+    }
+
+    public function virement()
+
+    {
+        wp_enqueue_style('algolia_css', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.3/dist/instantsearch.min.css');
+
+        wp_enqueue_style('virement_css', get_stylesheet_directory_uri() . '/css/pages/virement.css');
+
+        wp_enqueue_style('calendar_css', get_stylesheet_directory_uri() . '/css/pages/calendar.css');
+        
+        
+        // wp_enqueue_script('helper_js', "https://cdn.jsdelivr.net/npm/algoliasearch-helper@2.26.1/dist/algoliasearch.helper.min.js");
+
+        
+        wp_enqueue_script('instant_seach_js', 'https://cdn.jsdelivr.net/npm/instantsearch.js@4.0.0/dist/instantsearch.production.min.js');
+        
+        wp_enqueue_script('moment_js', 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js');
+        
+        
+        
+
+//         wp_enqueue_script('algolia_js', 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js');
+        
+        
+        wp_enqueue_script('calendar_js', 'https://unpkg.com/BaremetricsCalendar@1.0.11/public/js/Calendar.js');
+
+        
+        
+        
+//         wp_enqueue_script('algolia_js_cal', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.4.1/dist/instantsearch.min.js');
+        
+        
+        wp_enqueue_script('algolia_js', 'https://cdn.jsdelivr.net/npm/algoliasearch@3.35.1/dist/algoliasearchLite.min.js');
+        
+        wp_enqueue_script('instant_seach_js', 'https://cdn.jsdelivr.net/npm/instantsearch.js@4.0.0/dist/instantsearch.production.min.js');
+
+        wp_enqueue_script('dashboard', plugins_url() . '/spamtonprof/js/virement.js', array(
+
+            'nf-front-end'
+        ), time());
     }
 
     public function backOffice()

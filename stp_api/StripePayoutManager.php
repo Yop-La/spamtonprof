@@ -84,6 +84,7 @@ class StripePayoutManager
         }
 
         $q->execute();
+        
 
         $data = $q->fetch(\PDO::FETCH_ASSOC);
 

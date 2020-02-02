@@ -38,7 +38,7 @@ jQuery( document ).ready( function( $ ) {
 		search.addWidget(
 				instantsearch.widgets.searchBox({
 					container: '#search-input',
-					placeholder: 'Rechercher des abonnements',
+					placeholder: 'Checher des abonnements',
 					searchAsYouType: true,
 					 queryHook(query, search) {
 						console.log(query);
