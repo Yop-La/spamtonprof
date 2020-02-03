@@ -1,14 +1,14 @@
 
 const ONE_DAY_IN_MS = 3600 * 24 * 1000;
 
+
+var profLogged = false;
+var  email_prof = loggedProf.email_stp;
+
+
 moment.locale('fr-ch');
 jQuery( document ).ready( function( $ ) {
 
-
-	var profLogged = false;
-	if (typeof loggedProf !== 'undefined') {
-		var profLogged = true;
-	}
 
 
 	const search = instantsearch({
@@ -16,13 +16,18 @@ jQuery( document ).ready( function( $ ) {
 		searchClient: algoliasearch('3VXJH73YCI', '679e64fbe87fa37d0d43e1fbb19e45d8')
 	});
 
-	search.addWidget(
-			instantsearch.widgets.searchBox({
-				container: '#search-input',
-				placeholder: "Rechercher des transactions"
-			}),
 
-	);
+	if (typeof loggedProf !== 'undefined') {
+		var profLogged = true;
+
+		search.addWidget(
+				instantsearch.widgets.configure({
+					filters: 'email_prof:'.concat(email_prof)
+				})
+		);
+	}
+
+
 
 
 
@@ -42,7 +47,6 @@ jQuery( document ).ready( function( $ ) {
 		}
 
 	});
-
 
 
 
@@ -100,7 +104,8 @@ jQuery( document ).ready( function( $ ) {
 						},
 					},
 					transformItems(items) {
-						return items.filter(item => !profLogged  || item.email_prof == 'sebastien@spamtonprof.com').map(item => ({
+
+						return items.map(item => ({
 							...item,
 							payout_amount: item.payout_amount / 100,
 							paid_amount: item.paid_amount / 100,
