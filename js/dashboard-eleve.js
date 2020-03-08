@@ -652,17 +652,21 @@ jQuery( document ).ready( function( $ ) {
 			jQuery('.updatecb').click(function(e) {
 
 
+				if(sessionidCb === "false"){
+					showMessage("Veuillez d'abord faire un premier paiement avant de mettre à jour votre carte")
+				}else{
 
-				var stripe = Stripe(publicStripeKey);
+					var stripe = Stripe(publicStripeKey);
 
 
-				stripe.redirectToCheckout({
+					stripe.redirectToCheckout({
 
-					sessionId: sessionidCb
-				}).then(function (result) {
-					result.error.message = 'Il y a une erreur. Veuillez recommencer.'
-				});
+						sessionId: sessionidCb
+					}).then(function (result) {
+						result.error.message = 'Il y a une erreur. Veuillez recommencer.'
+					});
 
+				}
 
 
 			});

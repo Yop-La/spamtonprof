@@ -31,11 +31,20 @@ class PageManager
         $_SESSION["domain"] = $this->domain;
 
         $this->loadVariablesOnPages();
+        
     }
 
     public function loadVariablesOnPages()
     {
         foreach ($this->pagesVariables as $key => $value) {
+            
+            if(is_bool($value)){
+                $value = $value ? 'true' : 'false';
+            }
+            
+            
+            
+            
             wp_localize_script('functions_js', $key, $value);
         }
     }
@@ -50,6 +59,14 @@ class PageManager
         $TestModeManager->initDebuger();
         $testMode = $testMode ? 'true' : 'false';
         
+        /* pour afficher un message */
+        $this->pagesVariables["message"] = false;
+        if(isset($_GET['info'])){
+            
+            $this->pagesVariables["message"]=$_GET['info'];
+            
+        }
+        
         $this->testMode=$testMode;
 
         // wp_localize_script('functions_js', 'testMode', $testMode);
@@ -58,7 +75,7 @@ class PageManager
         $this->pagesVariables['testMode'] = $testMode;
         $this->pagesVariables['publicStripeKey'] = $TestModeManager->getPublicStripeKey();
 
-        /* pour savoir si le user est logg� */
+        /* pour savoir si le user est loggué */
         $isLogged = is_user_logged_in();
 
         $isLogged = ($isLogged) ? 'true' : 'false';
@@ -248,6 +265,8 @@ class PageManager
 
         wp_enqueue_script('log_out_js', plugins_url() . '/spamtonprof/js/log_out.js');
 
+        wp_enqueue_script('show_message', plugins_url() . '/spamtonprof/js/show_message.js');
+        
         wp_localize_script('functions_js', 'homeUrl', get_home_url());
 
         wp_localize_script('functions_js', 'ajaxurl', admin_url('admin-ajax.php'));
@@ -754,8 +773,6 @@ class PageManager
             $sess = $stripe ->create_checkout_session_to_update_payment_method($stpAct->getStripe_client());
             
             $this->pagesVariables['sessionidCb'] = $sess;
-            
-            
             
         }
     }
