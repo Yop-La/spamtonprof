@@ -653,7 +653,7 @@ jQuery( document ).ready( function( $ ) {
 
 
 				if(sessionidCb === "false"){
-					showMessage("Veuillez d'abord faire un premier paiement avant de mettre à jour votre carte")
+					showMessage("Impossible de mettre à jour votre carte: le client stripe existe pas. Contactez nous ! ")
 				}else{
 
 					var stripe = Stripe(publicStripeKey);

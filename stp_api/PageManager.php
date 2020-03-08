@@ -31,20 +31,16 @@ class PageManager
         $_SESSION["domain"] = $this->domain;
 
         $this->loadVariablesOnPages();
-        
     }
 
     public function loadVariablesOnPages()
     {
         foreach ($this->pagesVariables as $key => $value) {
-            
-            if(is_bool($value)){
+
+            if (is_bool($value)) {
                 $value = $value ? 'true' : 'false';
             }
-            
-            
-            
-            
+
             wp_localize_script('functions_js', $key, $value);
         }
     }
@@ -58,16 +54,15 @@ class PageManager
         $testMode = $TestModeManager->testMode();
         $TestModeManager->initDebuger();
         $testMode = $testMode ? 'true' : 'false';
-        
+
         /* pour afficher un message */
         $this->pagesVariables["message"] = false;
-        if(isset($_GET['info'])){
-            
-            $this->pagesVariables["message"]=$_GET['info'];
-            
+        if (isset($_GET['info'])) {
+
+            $this->pagesVariables["message"] = $_GET['info'];
         }
-        
-        $this->testMode=$testMode;
+
+        $this->testMode = $testMode;
 
         // wp_localize_script('functions_js', 'testMode', $testMode);
         // wp_localize_script('functions_js', 'publicStripeKey', $TestModeManager->getPublicStripeKey());
@@ -266,7 +261,7 @@ class PageManager
         wp_enqueue_script('log_out_js', plugins_url() . '/spamtonprof/js/log_out.js');
 
         wp_enqueue_script('show_message', plugins_url() . '/spamtonprof/js/show_message.js');
-        
+
         wp_localize_script('functions_js', 'homeUrl', get_home_url());
 
         wp_localize_script('functions_js', 'ajaxurl', admin_url('admin-ajax.php'));
@@ -377,9 +372,9 @@ class PageManager
             $this->backOffice();
         }
 
-//         if ($this->pageSlug == 'back-office') {
-//             $this->backOffice();
-//         }
+        // if ($this->pageSlug == 'back-office') {
+        // $this->backOffice();
+        // }
 
         if ($this->pageSlug == 'virement') {
             $this->virement();
@@ -765,15 +760,12 @@ class PageManager
                 $onglet = $_GET['onglet'];
             }
             $this->pagesVariables['onglet'] = $onglet;
-            
-            
-            
+
             // création d'un checkout session id pour mise à jour de la cb
             $stripe = new \spamtonprof\stp_api\StripeManager($this->testMode);
-            $sess = $stripe ->create_checkout_session_to_update_payment_method($stpAct->getStripe_client());
-            
+            $sess = $stripe->create_checkout_session_to_update_payment_method($stpAct->getStripe_client());
+
             $this->pagesVariables['sessionidCb'] = $sess;
-            
         }
     }
 
@@ -785,31 +777,21 @@ class PageManager
         wp_enqueue_style('virement_css', get_stylesheet_directory_uri() . '/css/pages/virement.css');
 
         wp_enqueue_style('calendar_css', get_stylesheet_directory_uri() . '/css/pages/calendar.css');
-        
-        
+
         // wp_enqueue_script('helper_js', "https://cdn.jsdelivr.net/npm/algoliasearch-helper@2.26.1/dist/algoliasearch.helper.min.js");
 
-        
         wp_enqueue_script('instant_seach_js', 'https://cdn.jsdelivr.net/npm/instantsearch.js@4.0.0/dist/instantsearch.production.min.js');
-        
-        wp_enqueue_script('moment_js', 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js');
-        
-        
-        
 
-//         wp_enqueue_script('algolia_js', 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js');
-        
-        
+        wp_enqueue_script('moment_js', 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js');
+
+        // wp_enqueue_script('algolia_js', 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js');
+
         wp_enqueue_script('calendar_js', 'https://unpkg.com/BaremetricsCalendar@1.0.11/public/js/Calendar.js');
 
-        
-        
-        
-//         wp_enqueue_script('algolia_js_cal', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.4.1/dist/instantsearch.min.js');
-        
-        
+        // wp_enqueue_script('algolia_js_cal', 'https://cdn.jsdelivr.net/npm/instantsearch.js@2.4.1/dist/instantsearch.min.js');
+
         wp_enqueue_script('algolia_js', 'https://cdn.jsdelivr.net/npm/algoliasearch@3.35.1/dist/algoliasearchLite.min.js');
-        
+
         wp_enqueue_script('instant_seach_js', 'https://cdn.jsdelivr.net/npm/instantsearch.js@4.0.0/dist/instantsearch.production.min.js');
 
         wp_enqueue_script('dashboard', plugins_url() . '/spamtonprof/js/virement.js', array(
