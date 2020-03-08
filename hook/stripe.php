@@ -27,6 +27,12 @@ $input = @file_get_contents("php://input");
 
 $event_json = json_decode($input);
 
+$slack = new \spamtonprof\slack\Slack();
+
+$slack->sendMessages('log-stripe', array(
+    $event_json->type
+));
+
 if ($event_json->type == "invoice.payment_succeeded") {
 
     $stripeMg = new \spamtonprof\stp_api\StripeManager($test_mode);
@@ -49,9 +55,6 @@ if ($event_json->type == "invoice.payment_succeeded") {
 
 // pour mettre fin à l'interruption
 if ($event_json->type == "customer.subscription.updated") {
-
-    $slack = new \spamtonprof\slack\Slack();
-
 
     $interruptionMg = new \spamtonprof\stp_api\StpInterruptionManager();
 
@@ -83,7 +86,31 @@ if ($event_json->type == "customer.subscription.updated") {
     }
 }
 
+// pour mettre à jour la cb
+if ($event_json->type == "checkout.session.completed") {
 
+    $session_id = $event_json->data->object->id;
+
+    $test_mode = ! $event_json->livemode;
+
+    $stripeMg = new \spamtonprof\stp_api\StripeManager($test_mode);
+
+    $session = $stripeMg->retrieve_session($session_id);
+    
+    $setup_intent_id = $session->setup_intent;
+
+    $setup_intent = $stripeMg->retrieve_setup_intent($setup_intent_id);
+
+    $customer = $setup_intent->metadata['customer_id'];
+    $payment_method = $setup_intent->payment_method;
+
+    $stripeMg->attach_payment_method($payment_method, $customer);
+    $stripeMg->set_default_payment_method($payment_method, $customer);
+
+    $slack->sendMessages('log-stripe', array(
+        'Mise à jour du moyen de paiement de ' . $customer
+    ));
+}
 
 
 

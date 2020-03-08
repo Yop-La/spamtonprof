@@ -22,171 +22,171 @@ if(domain != 'spamtonprof'){
 	popProlongerInterruption= 24793;
 	popFinInterruption= 24885;
 
-	
+
 }
 
 
 
 
 jQuery( document ).ready( function( $ ) {
-	
-	
-		goToTab(onglet);
-
-		$(".prolonger").click(function(){
-			
-			console.log("click prolonger");
-
-			rowBreak = jQuery(this).parents(".row-break");//.find(".ref-abo").val();
-			
-			
-			
-			
-			ref_interruption = jQuery(rowBreak).find(".ref_interruption").val();
-			
-			$(".ref_interruption_nf").val( ref_interruption ).trigger( 'change' );
-			
-			console.log("ref_interruption");
-			console.log(ref_interruption);
-
-			PUM.open(popProlongerInterruption);
-			
-
-			
-			
-		});
-			
-		$(".btn-end-interruption").click(function(){
-			
-			jQuery("#loading_screen").removeClass("hide");
-			jQuery(".hide_loading").addClass("hide");
-
-			PUM.close(popFinInterruption);
-			
-			
-			// soumission ajax des champs du form pour création inscription
-			ajaxEnCours++;
-			jQuery.post(
-					ajaxurl,
-					{
-						'action' : 'stopInterruption',
-						'ref_interruption' : currentInterruption.ref_interruption,
-					})
-					.done(function(retour){ 
-
-						console.log(retour);
-
-						error = retour.error;
-						message = retour.message;
-
-						if(error){
 
 
-							ajaxEnCours--;
-							if(ajaxEnCours == 0){
-								
-								
-							}
+	goToTab(onglet);
 
-						}else{
+	$(".prolonger").click(function(){
 
-															
-							
-							redirectTo('dashboard-eleve?onglet=2',message);
-						
-						}
+		console.log("click prolonger");
+
+		rowBreak = jQuery(this).parents(".row-break");//.find(".ref-abo").val();
 
 
-					})
-					.fail(function(err){
-						
+
+
+		ref_interruption = jQuery(rowBreak).find(".ref_interruption").val();
+
+		$(".ref_interruption_nf").val( ref_interruption ).trigger( 'change' );
+
+		console.log("ref_interruption");
+		console.log(ref_interruption);
+
+		PUM.open(popProlongerInterruption);
+
+
+
+
+	});
+
+	$(".btn-end-interruption").click(function(){
+
+		jQuery("#loading_screen").removeClass("hide");
+		jQuery(".hide_loading").addClass("hide");
+
+		PUM.close(popFinInterruption);
+
+
+		// soumission ajax des champs du form pour création inscription
+		ajaxEnCours++;
+		jQuery.post(
+				ajaxurl,
+				{
+					'action' : 'stopInterruption',
+					'ref_interruption' : currentInterruption.ref_interruption,
+				})
+				.done(function(retour){ 
+
+					console.log(retour);
+
+					error = retour.error;
+					message = retour.message;
+
+					if(error){
+
+
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
-							jQuery("#loading_screen").addClass("hide");
-							jQuery(".hide_loading").removeClass("hide");
+
+
 						}
-						
-						console.log("erreur ajax");
-						console.log(err);
-						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
 
-					});
-			
-				
-		});
-		
-		$(".stop").click(function(){
-			
-			console.log("click stop");
+					}else{
 
-			rowBreak = jQuery(this).parents(".row-break");//.find(".ref-abo").val();
-			
-			
-			
-			
-			ref_interruption = jQuery(rowBreak).find(".ref_interruption").val();
-			
-			$(".ref_interruption_nf").val( ref_interruption ).trigger( 'change' );
-			
-			console.log("ref_interruption");
-			console.log(ref_interruption);
 
-		
-			
-			interruptions.forEach(function(el){
-				if(el.ref_interruption == ref_interruption){
-					currentInterruption=el;
-				}
-			})
 
-			$('.delete-interruption').addClass('hide');
-			$('.fin-interruption').addClass('hide');
-			
-			if(currentInterruption.statut=='running'){
-				$('.fin-interruption').removeClass('hide');
-				$(".btn-end-interruption").text("Arrêter maintenant l'interruption");
-			}else{
-				$('.delete-interruption').removeClass('hide');
-				$(".btn-end-interruption").text("Supprimer maintenant l'interruption");
+						redirectTo('dashboard-eleve?onglet=2',message);
+
+					}
+
+
+				})
+				.fail(function(err){
+
+					ajaxEnCours--;
+					if(ajaxEnCours == 0){
+						jQuery("#loading_screen").addClass("hide");
+						jQuery(".hide_loading").removeClass("hide");
+					}
+
+					console.log("erreur ajax");
+					console.log(err);
+					showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
+
+				});
+
+
+	});
+
+	$(".stop").click(function(){
+
+		console.log("click stop");
+
+		rowBreak = jQuery(this).parents(".row-break");//.find(".ref-abo").val();
+
+
+
+
+		ref_interruption = jQuery(rowBreak).find(".ref_interruption").val();
+
+		$(".ref_interruption_nf").val( ref_interruption ).trigger( 'change' );
+
+		console.log("ref_interruption");
+		console.log(ref_interruption);
+
+
+
+		interruptions.forEach(function(el){
+			if(el.ref_interruption == ref_interruption){
+				currentInterruption=el;
 			}
-			
-			PUM.open(popFinInterruption);
-			
-			
-			
-			
-		});
+		})
+
+		$('.delete-interruption').addClass('hide');
+		$('.fin-interruption').addClass('hide');
+
+		if(currentInterruption.statut=='running'){
+			$('.fin-interruption').removeClass('hide');
+			$(".btn-end-interruption").text("Arrêter maintenant l'interruption");
+		}else{
+			$('.delete-interruption').removeClass('hide');
+			$(".btn-end-interruption").text("Supprimer maintenant l'interruption");
+		}
+
+		PUM.open(popFinInterruption);
+
+
+
+
+	});
 
 	waitForEl(".row-break-template",function(){
-		
+
 //		$(".row-break-template").addClass('hide');
-		
+
 
 		interruptions.forEach(function(interruption){
 
 			rowBreak = jQuery(".row-break-template").clone(true);
 			rowBreak.insertAfter(".row-break-template");
 			jQuery(rowBreak).removeClass("row-break-template");
-			
+
 			jQuery(rowBreak).find(".date_debut").text(interruption.debut);
 			jQuery(rowBreak).find(".date_fin").text(interruption.fin);
 			jQuery(rowBreak).find(".ref_interruption").val(interruption.ref_interruption);
 			jQuery(rowBreak).find(".abonnement").text(interruption.abo.eleve.prenom.concat('-',interruption.abo.formule.formule));
 //			jQuery(rowEssai).find().text(coupon.description);
 
-			
+
 			statutInterruption="erreur";
 			classStatutInterruption="bg-red";
 			removeCmdButtons = false;
-			
+
 			if(interruption.statut == 'scheduled'){
-				
+
 				classStatutInterruption="bg-orange";
 				statutInterruption='programmé';
 				jQuery(rowBreak).find(".stop").text('Supprimer');
-				
+
 			}
-			
+
 			if(interruption.statut == 'running'){
 				classStatutInterruption="bg-blue";
 				statutInterruption='en cours';
@@ -197,39 +197,39 @@ jQuery( document ).ready( function( $ ) {
 				statutInterruption='terminé';
 				removeCmdButtons = true;
 			}
-			
+
 			if(interruption.statut == 'stopping'){
 				statutInterruption="En cours d'arrêt";
 				classStatutInterruption="bg-red";
 				removeCmdButtons = true;
 			}
-			
+
 			jQuery(rowBreak).find(".statut").text(statutInterruption);
 			jQuery(rowBreak).find(".statut").removeClass().addClass("statut").addClass("simple-button").addClass(classStatutInterruption);
-			
+
 			if(removeCmdButtons){
-				
+
 				jQuery(rowBreak).find('.cmd').addClass("hide");
-				
+
 			}
-			
-			
-			
+
+
+
 		});
-		
-		
+
+
 		$(".row-break-template").addClass('hide');
-		
+
 
 	});
 
 
-	
-	
-	
+
+
+
 	console.log('jquery');
-	
-	
+
+
 	var mySubmitController = Marionette.Object.extend( {
 
 		initialize: function() {
@@ -237,11 +237,11 @@ jQuery( document ).ready( function( $ ) {
 		},
 
 		actionSubmit: function( response ) {
-			
-			
-			
+
+
+
 			console.log('soumis');
-			
+
 			jQuery("#loading_screen").removeClass("hide");
 			jQuery(".hide_loading").addClass("hide");
 			jQuery("#res_recherche").addClass('hide');
@@ -271,10 +271,10 @@ jQuery( document ).ready( function( $ ) {
 
 			// pour ajouter une interruption
 			if(response.data.form_id == idFormInterruption){
-	
+
 				hideMessage();
 				console.log('add interruption');
-				
+
 				// soumission ajax des champs du form pour création inscription
 				ajaxEnCours++;
 				jQuery.post(
@@ -295,40 +295,40 @@ jQuery( document ).ready( function( $ ) {
 
 								ajaxEnCours--;
 								if(ajaxEnCours == 0){
-									
-									
+
+
 								}
 
 							}else{
 
-																
-								
+
+
 								redirectTo('dashboard-eleve?onglet=2',message);
-							
+
 							}
 
 
 						})
 						.fail(function(err){
-							
+
 							ajaxEnCours--;
 							if(ajaxEnCours == 0){
 								jQuery("#loading_screen").addClass("hide");
 								jQuery(".hide_loading").removeClass("hide");
 							}
-							
+
 							console.log("erreur ajax");
 							console.log(err);
 							showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
 
 						});
-				
-					
+
+
 			}
-			
-			
+
+
 			if(response.data.form_id == idFormProlongerInterruption){
-				
+
 				PUM.close(popProlongerInterruption);
 				hideMessage();
 
@@ -345,7 +345,7 @@ jQuery( document ).ready( function( $ ) {
 							console.log(retour);
 
 							ajaxEnCours--;
-							
+
 							error = retour.error;
 							message = retour.message;
 
@@ -353,49 +353,49 @@ jQuery( document ).ready( function( $ ) {
 
 
 								if(ajaxEnCours == 0){
-									
-									
+
+
 								}
 
 							}else{
 
-								
+
 								redirectTo('dashboard-eleve?onglet=2',message);
-							
+
 
 							}
 
 
 						})
 						.fail(function(err){
-							
+
 							ajaxEnCours--;
 							if(ajaxEnCours == 0){
 								jQuery("#loading_screen").addClass("hide");
 								jQuery(".hide_loading").removeClass("hide");
 							}
-							
+
 							console.log("erreur ajax");
 							console.log(err);
 							showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
 
 						});
-				
-					
+
+
 			}
 
 
 		}
 
 	});
-	
-	
-	
-	
+
+
+
+
 	new mySubmitController();
 
-	
-	
+
+
 
 
 	waitForEl('#table_1', function() {
@@ -529,13 +529,13 @@ jQuery( document ).ready( function( $ ) {
 
 			console.log("indiceAbo:");
 			console.log(indiceAbo);
-			
+
 			abo = aboClique;
-			
+
 			console.log('abo pour le paiement');	
 			console.log(abo);
 
-			
+
 			jQuery("#loading_screen").removeClass("hide");
 			jQuery(".hide_loading").addClass("hide");
 
@@ -641,52 +641,34 @@ jQuery( document ).ready( function( $ ) {
 		}
 
 
-		/** début formulaire de paiement stripe **/
-
-		var handler2 = StripeCheckout.configure({
-			key: publicStripeKey,
-			image: 'https://spamtonprof.com/wp-content/uploads/2018/03/logo-stripe.png',
-			locale: 'auto',
-			allowRememberMe: false,
-			token: function(token) {
+		/** début de mise à jour de de cb **/
 
 
 
-				updateCb(compte.ref_compte, token.id, testMode);
-
-			}
-		});
 
 		waitForEl(".updatecb", function() {
 
 
 			jQuery('.updatecb').click(function(e) {
-				var emailCb; 
-				if (typeof proche !== 'undefined') {
-					emailCb = proche.email;
-				}else{
-					emailCb = loggedEleve.email;
-				}
 
 
-				// Open Checkout with further options:
-				handler2.open({
-					name: 'SpamTonProf',
-					description: 'Mise à jour de la carte bancaire',
-					zipCode: false,
-					email: emailCb,
-					panelLabel: "Mettre à jour la CB"
+
+				var stripe = Stripe(publicStripeKey);
+
+
+				stripe.redirectToCheckout({
+
+					sessionId: sessionidCb
+				}).then(function (result) {
+					result.error.message = 'Il y a une erreur. Veuillez recommencer.'
 				});
-				e.preventDefault();
+
 
 
 			});
 		});
 
-		// Close Checkout on page navigation:
-		window.addEventListener('popstate', function() {
-			handler2.close();
-		});
+
 
 
 		// pour attacher la popup d'annulation ou d'interruption au bouton d'annulation
@@ -964,35 +946,35 @@ jQuery( document ).ready( function( $ ) {
 
 
 	function goToTab(num){
-		
+
 
 		selector = ".wpb_tabs_nav a:nth(".concat(num,")");
 
-		
-		
+
+
 		setTimeout(function(){
 
 			console.log(selector);	
 			jQuery(selector).click();
-			
+
 			tabActivated = jQuery(selector).hasClass("active-tab");
 			if(!tabActivated){
 				console.log("retry")
 				goToTab(num);
 			}
-			
-		}, 500); 
-		
 
-		
+		}, 500); 
+
+
+
 
 //		window.addEventListener('load', function () {
-//			
+
 //		});
 
-		
 
-		
+
+
 	}
 
 

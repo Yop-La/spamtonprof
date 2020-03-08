@@ -11,7 +11,7 @@ class PageManager
 
 {
 
-    private $pageSlug, $domain, $stpAccount = false, $pagesVariables = [];
+    private $pageSlug, $domain, $stpAccount = false, $pagesVariables = [], $testMode;
 
     public function __construct($pageSlug)
 
@@ -49,6 +49,8 @@ class PageManager
         $testMode = $TestModeManager->testMode();
         $TestModeManager->initDebuger();
         $testMode = $testMode ? 'true' : 'false';
+        
+        $this->testMode=$testMode;
 
         // wp_localize_script('functions_js', 'testMode', $testMode);
         // wp_localize_script('functions_js', 'publicStripeKey', $TestModeManager->getPublicStripeKey());
@@ -744,6 +746,17 @@ class PageManager
                 $onglet = $_GET['onglet'];
             }
             $this->pagesVariables['onglet'] = $onglet;
+            
+            
+            
+            // création d'un checkout session id pour mise à jour de la cb
+            $stripe = new \spamtonprof\stp_api\StripeManager($this->testMode);
+            $sess = $stripe ->create_checkout_session_to_update_payment_method($stpAct->getStripe_client());
+            
+            $this->pagesVariables['sessionidCb'] = $sess;
+            
+            
+            
         }
     }
 

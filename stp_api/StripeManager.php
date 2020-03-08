@@ -468,6 +468,31 @@ class StripeManager
         return ($session->id);
     }
 
+    public function create_checkout_session_to_update_payment_method($cus_id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        if (! $cus_id) {
+            return (false);
+        }
+
+        $session = \Stripe\Checkout\Session::create([
+            'payment_method_types' => [
+                'card'
+            ],
+            'mode' => 'setup',
+            'setup_intent_data' => [
+                'metadata' => [
+                    'customer_id' => $cus_id
+                ]
+            ],
+            'success_url' => domain_to_url() . '/dashboard-eleve/?info=' . urlencode("Carte mise à jour"),
+            'cancel_url' => domain_to_url() . '/dashboard-eleve/?info=' . urlencode("Oups, la mise à jour de la carte a échoué,  veuillez réssayer ou contactez nous ! ")
+        ]);
+
+        return ($session->id);
+    }
+
     public function create_customer($email, $metadata)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
@@ -482,11 +507,72 @@ class StripeManager
         return ($customer);
     }
 
+    public function add_customer($email)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $customers = \Stripe\Customer::all([
+            'limit' => 3,
+            'email' => $email
+        ]);
+
+        $customers = $customers->data;
+
+        if (count($customers) == 1) {
+            return ($customers[0]);
+        }
+
+        if (count($customers) > 1) {
+            return (false);
+        }
+
+        $cus = \Stripe\Customer::create([
+            'email' => $email
+        ]);
+
+        return ($cus);
+    }
+
     public function retrieve_customer($stripe_id)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $cus = \Stripe\Customer::retrieve($stripe_id);
         return ($cus);
+    }
+
+    public function retrieve_setup_intent($id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        $setupIntent = \Stripe\SetupIntent::retrieve($id);
+        return ($setupIntent);
+    }
+
+    public function attach_payment_method($payment_method_id, $cus_id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $payment_method = \Stripe\PaymentMethod::retrieve($payment_method_id);
+        $payment_method->attach([
+            'customer' => $cus_id
+        ]);
+    }
+
+    public function set_default_payment_method($payment_method_id, $cus_id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        \Stripe\Customer::update($cus_id, [
+            'invoice_settings' => [
+                'default_payment_method' => $payment_method_id
+            ]
+        ]);
+    }
+
+    public function retrieve_session($session_id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        $session = \Stripe\Checkout\Session::retrieve($session_id);
+        return ($session);
     }
 
     public function retrieve_act($stripe_id)
@@ -646,8 +732,6 @@ class StripeManager
             $all_transactions = \Stripe\BalanceTransaction::all($params, [
                 'stripe_account' => $this->stripe_account
             ]);
-            
-            
         } else {
             $all_transactions = \Stripe\BalanceTransaction::all();
         }
@@ -657,7 +741,6 @@ class StripeManager
         } catch (\Exception $e) {
             return (false);
         }
-        
 
         return ($all_transactions);
     }
@@ -701,12 +784,9 @@ class StripeManager
 
         if ($this->stripe_account) {
 
-            
             $payouts = \Stripe\Payout::all($params, [
                 'stripe_account' => $this->stripe_account
             ]);
-
-            
         } else {
             $payouts = \Stripe\Payout::all($params);
         }
@@ -854,6 +934,24 @@ class StripeManager
         $ret = \Stripe\Event::retrieve($id);
 
         return ($ret);
+    }
+
+    public function delete_all_pending_invoice_items()
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $items = \Stripe\InvoiceItem::all([
+            'limit' => 100,
+            'pending' => true
+        ]);
+
+        $items = $items->data;
+
+        foreach ($items as $item) {
+
+            $invoice_item = \Stripe\InvoiceItem::retrieve($item->id);
+            $invoice_item->delete();
+        }
     }
 
     public function retrieveAllInvoice($email)
@@ -1694,36 +1792,62 @@ class StripeManager
         ]);
     }
 
-    public function sendInvoice($customer_id, $after)
+    public function createInvoice($cus, $des, $metadata = false)
     {
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
 
-        $after = \DateTime::createFromFormat('j/m/Y', $after);
-        $after = $after->getTimestamp();
+        $params = [
+            'customer' => $cus,
+            'collection_method' => 'send_invoice',
+            'days_until_due' => 1,
+            'description' => $des
+        ];
 
-        $invoices = \Stripe\Invoice::all([
-            "customer" => $customer_id,
-            "date" => array(
-                "gt" => $after
-            ),
-            "limit" => 50
+        if ($metadata) {
+            $params['metadata'] = $metadata;
+        }
+
+        $invoice = \Stripe\Invoice::create($params);
+
+        return ($invoice);
+    }
+
+    public function createInvoiceItem($cus, $amnt, $description, $currency = 'eur')
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $invoiceItem = \Stripe\InvoiceItem::create([
+            'customer' => $cus,
+            'amount' => $amnt,
+            'currency' => $currency,
+            'description' => $description
         ]);
 
-        $invoices = $invoices->data;
+        return ($invoiceItem);
+    }
 
-        foreach ($invoices as $invoice) {
+    public function createProfInvoice()
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
 
-            echo ($invoice->invoice_pdf . "<br>");
-        }
+        \Stripe\Invoice::create();
+    }
 
-        echo ('<br><br><br><br> Link to pay <br><br>');
+    public function sendInvoice($invoice_id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
 
-        foreach ($invoices as $invoice) {
+        $invoice = \Stripe\Invoice::retrieve($invoice_id);
 
-            echo ($invoice->hosted_invoice_url . "<br>");
-        }
+        $invoice->sendInvoice();
+    }
 
-        // $invoice = \Stripe\Invoice::retrieve("in_1CFfetIcMMHYXO986qA1Rhuu");
-        //
+    public function markUncollectible($invoice_id)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
+        $invoice = \Stripe\Invoice::retrieve($invoice_id);
+
+        $invoice->markUncollectible();
     }
 }
