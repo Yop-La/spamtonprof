@@ -475,7 +475,18 @@ class StripeManager
         if (! $cus_id) {
             return (false);
         }
+        
+        
+        try {
+            $cus = \Stripe\Customer::retrieve($cus_id);
+            
+        } catch (\Exception $e) {
+            return(false);
+        }
+        
 
+        
+        
         $session = \Stripe\Checkout\Session::create([
             'payment_method_types' => [
                 'card'
