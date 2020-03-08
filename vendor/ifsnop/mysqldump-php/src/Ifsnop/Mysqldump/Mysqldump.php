@@ -38,6 +38,7 @@ class Mysqldump
     const GZIP  = 'Gzip';
     const BZIP2 = 'Bzip2';
     const NONE  = 'None';
+    const GZIPSTREAM = 'Gzipstream';
 
     // List of available connection strings.
     const UTF8    = 'utf8';
@@ -72,6 +73,7 @@ class Mysqldump
     private $views = array();
     private $triggers = array();
     private $procedures = array();
+    private $functions = array();
     private $events = array();
     private $dbHandler = null;
     private $dbType = "";
@@ -423,12 +425,13 @@ class Mysqldump
             }
         }
 
-        // Get table, view, trigger, procedures and events structures from
+        // Get table, view, trigger, procedures, functions and events structures from
         // database.
         $this->getDatabaseStructureTables();
         $this->getDatabaseStructureViews();
         $this->getDatabaseStructureTriggers();
         $this->getDatabaseStructureProcedures();
+        $this->getDatabaseStructureFunctions();
         $this->getDatabaseStructureEvents();
 
         if ($this->dumpSettings['databases']) {
@@ -448,8 +451,9 @@ class Mysqldump
 
         $this->exportTables();
         $this->exportTriggers();
-        $this->exportViews();
+        $this->exportFunctions();
         $this->exportProcedures();
+        $this->exportViews();
         $this->exportEvents();
 
         // Restore saved parameters.
@@ -604,6 +608,23 @@ class Mysqldump
     }
 
     /**
+     * Reads functions names from database.
+     * Fills $this->tables array so they will be dumped later.
+     *
+     * @return null
+     */
+    private function getDatabaseStructureFunctions()
+    {
+        // Listing all functions from database
+        if ($this->dumpSettings['routines']) {
+            foreach ($this->dbHandler->query($this->typeAdapter->show_functions($this->dbName)) as $row) {
+                array_push($this->functions, $row['function_name']);
+            }
+        }
+        return;
+    }
+
+    /**
      * Reads event names from database.
      * Fills $this->tables array so they will be dumped later.
      *
@@ -714,6 +735,19 @@ class Mysqldump
         // Exporting triggers one by one
         foreach ($this->procedures as $procedure) {
             $this->getProcedureStructure($procedure);
+        }
+    }
+
+    /**
+     * Exports all the functions found in database
+     *
+     * @return null
+     */
+    private function exportFunctions()
+    {
+        // Exporting triggers one by one
+        foreach ($this->functions as $function) {
+            $this->getFunctionStructure($function);
         }
     }
 
@@ -923,6 +957,29 @@ class Mysqldump
     }
 
     /**
+     * Function structure extractor
+     *
+     * @param string $functionName  Name of function to export
+     * @return null
+     */
+    private function getFunctionStructure($functionName)
+    {
+        if (!$this->dumpSettings['skip-comments']) {
+            $ret = "--".PHP_EOL.
+                "-- Dumping routines for database '".$this->dbName."'".PHP_EOL.
+                "--".PHP_EOL.PHP_EOL;
+            $this->compressManager->write($ret);
+        }
+        $stmt = $this->typeAdapter->show_create_function($functionName);
+        foreach ($this->dbHandler->query($stmt) as $r) {
+            $this->compressManager->write(
+                $this->typeAdapter->create_function($r)
+            );
+            return;
+        }
+    }
+
+    /**
      * Event structure extractor
      *
      * @param string $eventName  Name of event to export
@@ -1124,7 +1181,7 @@ class Mysqldump
             $this->dbHandler->exec($this->typeAdapter->start_transaction());
         }
 
-        if ($this->dumpSettings['lock-tables']) {
+        if ($this->dumpSettings['lock-tables'] && !$this->dumpSettings['single-transaction']) {
             $this->typeAdapter->lock_table($tableName);
         }
 
@@ -1176,7 +1233,7 @@ class Mysqldump
             $this->dbHandler->exec($this->typeAdapter->commit_transaction());
         }
 
-        if ($this->dumpSettings['lock-tables']) {
+        if ($this->dumpSettings['lock-tables'] && !$this->dumpSettings['single-transaction']) {
             $this->typeAdapter->unlock_table($tableName);
         }
 
@@ -1254,9 +1311,10 @@ class Mysqldump
 abstract class CompressMethod
 {
     public static $enums = array(
-        "None",
-        "Gzip",
-        "Bzip2"
+        Mysqldump::NONE,
+        Mysqldump::GZIP,
+        Mysqldump::BZIP2,
+        Mysqldump::GZIPSTREAM,
     );
 
     /**
@@ -1314,7 +1372,8 @@ class CompressBzip2 extends CompressManagerFactory
 
     public function write($str)
     {
-        if (false === ($bytesWritten = bzwrite($this->fileHandler, $str))) {
+        $bytesWritten = bzwrite($this->fileHandler, $str);
+        if (false === $bytesWritten) {
             throw new Exception("Writting to file failed! Probably, there is no more free space left?");
         }
         return $bytesWritten;
@@ -1352,7 +1411,8 @@ class CompressGzip extends CompressManagerFactory
 
     public function write($str)
     {
-        if (false === ($bytesWritten = gzwrite($this->fileHandler, $str))) {
+        $bytesWritten = gzwrite($this->fileHandler, $str);
+        if (false === $bytesWritten) {
             throw new Exception("Writting to file failed! Probably, there is no more free space left?");
         }
         return $bytesWritten;
@@ -1383,7 +1443,8 @@ class CompressNone extends CompressManagerFactory
 
     public function write($str)
     {
-        if (false === ($bytesWritten = fwrite($this->fileHandler, $str))) {
+        $bytesWritten = fwrite($this->fileHandler, $str);
+        if (false === $bytesWritten) {
             throw new Exception("Writting to file failed! Probably, there is no more free space left?");
         }
         return $bytesWritten;
@@ -1393,6 +1454,43 @@ class CompressNone extends CompressManagerFactory
     {
         return fclose($this->fileHandler);
     }
+}
+
+class CompressGzipstream extends CompressManagerFactory
+{
+  private $fileHandler = null;
+
+  private $compressContext;
+
+  /**
+   * @param string $filename
+   */
+  public function open($filename)
+  {
+    $this->fileHandler = fopen($filename, "wb");
+    if (false === $this->fileHandler) {
+      throw new Exception("Output file is not writable");
+    }
+
+    $this->compressContext = deflate_init(ZLIB_ENCODING_GZIP, array('level' => 9));
+    return true;
+  }
+
+  public function write($str)
+  {
+
+    $bytesWritten = fwrite($this->fileHandler, deflate_add($this->compressContext, $str, ZLIB_NO_FLUSH));
+    if (false === $bytesWritten) {
+      throw new Exception("Writting to file failed! Probably, there is no more free space left?");
+    }
+    return $bytesWritten;
+  }
+
+  public function close()
+  {
+    fwrite($this->fileHandler, deflate_add($this->compressContext, '', ZLIB_FINISH));
+    return fclose($this->fileHandler);
+  }
 }
 
 /**
@@ -1513,6 +1611,15 @@ abstract class TypeAdapterFactory
         return "";
     }
 
+    /**
+     * function create_function Modify function code, add delimiters, etc
+     * @todo make it do something with sqlite
+     */
+    public function create_function($functionName)
+    {
+        return "";
+    }
+
     public function show_tables()
     {
         return "SELECT tbl_name FROM sqlite_master WHERE type='table'";
@@ -1540,6 +1647,11 @@ abstract class TypeAdapterFactory
     }
 
     public function show_procedures()
+    {
+        return "";
+    }
+
+    public function show_functions()
     {
         return "";
     }
@@ -1742,6 +1854,11 @@ class TypeAdapterMysql extends TypeAdapterFactory
         return "SHOW CREATE PROCEDURE `$procedureName`";
     }
 
+    public function show_create_function($functionName)
+    {
+        return "SHOW CREATE FUNCTION `$functionName`";
+    }
+
     public function show_create_event($eventName)
     {
         return "SHOW CREATE EVENT `$eventName`";
@@ -1825,6 +1942,16 @@ class TypeAdapterMysql extends TypeAdapterFactory
                 "Please check 'https://bugs.mysql.com/bug.php?id=14564'");
         }
         $procedureStmt = $row['Create Procedure'];
+        if ( $this->dumpSettings['skip-definer'] ) {
+            if ($procedureStmtReplaced = preg_replace(
+                '/^(CREATE)\s+('.self::DEFINER_RE.')?\s+(PROCEDURE\s.*)$/s',
+                '\1 \3',
+                $procedureStmt,
+                1
+            )) {
+                $procedureStmt = $procedureStmtReplaced;
+            }
+        }
 
         $ret .= "/*!50003 DROP PROCEDURE IF EXISTS `".
             $row['Procedure']."` */;".PHP_EOL.
@@ -1834,6 +1961,53 @@ class TypeAdapterMysql extends TypeAdapterFactory
             $procedureStmt." ;;".PHP_EOL.
             "DELIMITER ;".PHP_EOL.
             "/*!40101 SET character_set_client = @saved_cs_client */;".PHP_EOL.PHP_EOL;
+
+        return $ret;
+    }
+
+    public function create_function($row)
+    {
+        $ret = "";
+        if (!isset($row['Create Function'])) {
+            throw new Exception("Error getting function code, unknown output. ".
+                "Please check 'https://bugs.mysql.com/bug.php?id=14564'");
+        }
+        $functionStmt = $row['Create Function'];
+        $characterSetClient = $row['character_set_client'];
+        $collationConnection = $row['collation_connection'];
+        $sqlMode = $row['sql_mode'];
+        if ( $this->dumpSettings['skip-definer'] ) {
+            if ($functionStmtReplaced = preg_replace(
+                '/^(CREATE)\s+('.self::DEFINER_RE.')?\s+(FUNCTION\s.*)$/s',
+                '\1 \3',
+                $functionStmt,
+                1
+            )) {
+                $functionStmt = $functionStmtReplaced;
+            }
+        }
+
+        $ret .= "/*!50003 DROP FUNCTION IF EXISTS `".
+            $row['Function']."` */;".PHP_EOL.
+            "/*!40101 SET @saved_cs_client     = @@character_set_client */;".PHP_EOL.
+            "/*!50003 SET @saved_cs_results     = @@character_set_results */ ;".PHP_EOL.
+            "/*!50003 SET @saved_col_connection = @@collation_connection */ ;".PHP_EOL.
+            "/*!40101 SET character_set_client = ".$characterSetClient." */;".PHP_EOL.
+            "/*!40101 SET character_set_results = ".$characterSetClient." */;".PHP_EOL.
+            "/*!50003 SET collation_connection  = ".$collationConnection." */ ;".PHP_EOL.
+            "/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;;".PHP_EOL.
+            "/*!50003 SET sql_mode              = '".$sqlMode."' */ ;;".PHP_EOL.
+            "/*!50003 SET @saved_time_zone      = @@time_zone */ ;;".PHP_EOL.
+            "/*!50003 SET time_zone             = 'SYSTEM' */ ;;".PHP_EOL.
+            "DELIMITER ;;".PHP_EOL.
+            $functionStmt." ;;".PHP_EOL.
+            "DELIMITER ;".PHP_EOL.
+            "/*!50003 SET sql_mode              = @saved_sql_mode */ ;".PHP_EOL.
+            "/*!50003 SET character_set_client  = @saved_cs_client */ ;".PHP_EOL.
+            "/*!50003 SET character_set_results = @saved_cs_results */ ;".PHP_EOL.
+            "/*!50003 SET collation_connection  = @saved_col_connection */ ;".PHP_EOL.
+            "/*!50106 SET TIME_ZONE= @saved_time_zone */ ;".PHP_EOL.PHP_EOL;
+
 
         return $ret;
     }
@@ -1927,6 +2101,15 @@ class TypeAdapterMysql extends TypeAdapterFactory
             "WHERE ROUTINE_TYPE='PROCEDURE' AND ROUTINE_SCHEMA='${args[0]}'";
     }
 
+    public function show_functions()
+    {
+        $this->check_parameters(func_num_args(), $expected_num_args = 1, __METHOD__);
+        $args = func_get_args();
+        return "SELECT SPECIFIC_NAME AS function_name ".
+            "FROM INFORMATION_SCHEMA.ROUTINES ".
+            "WHERE ROUTINE_TYPE='FUNCTION' AND ROUTINE_SCHEMA='${args[0]}'";
+    }
+
     /**
      * Get query string to ask for names of events from current database.
      *
@@ -1949,8 +2132,10 @@ class TypeAdapterMysql extends TypeAdapterFactory
 
     public function start_transaction()
     {
-        return "START TRANSACTION";
+        return "START TRANSACTION " .
+            "/*!40100 WITH CONSISTENT SNAPSHOT */";
     }
+
 
     public function commit_transaction()
     {

@@ -29,14 +29,14 @@ class Google_Service_SecurityCommandCenter_Resource_OrganizationsSourcesFindings
    * Creates a finding. The corresponding source must exist for finding creation
    * to succeed. (findings.create)
    *
-   * @param string $parent Resource name of the new finding's parent. Its format
-   * should be "organizations/[organization_id]/sources/[source_id]".
+   * @param string $parent Required. Resource name of the new finding's parent.
+   * Its format should be "organizations/[organization_id]/sources/[source_id]".
    * @param Google_Service_SecurityCommandCenter_Finding $postBody
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string findingId Unique identifier provided by the client within
-   * the parent scope. It must be alphanumeric and less than or equal to 32
-   * characters and greater than 0 characters in length.
+   * @opt_param string findingId Required. Unique identifier provided by the
+   * client within the parent scope. It must be alphanumeric and less than or
+   * equal to 32 characters and greater than 0 characters in length.
    * @return Google_Service_SecurityCommandCenter_Finding
    */
   public function create($parent, Google_Service_SecurityCommandCenter_Finding $postBody, $optParams = array())
@@ -50,11 +50,12 @@ class Google_Service_SecurityCommandCenter_Resource_OrganizationsSourcesFindings
    * specified properties.
    *
    * To group across all sources provide a `-` as the source id. Example:
-   * /v1/organizations/123/sources/-/findings (findings.group)
+   * /v1/organizations/{organization_id}/sources/-/findings (findings.group)
    *
-   * @param string $parent Name of the source to groupBy. Its format is
+   * @param string $parent Required. Name of the source to groupBy. Its format is
    * "organizations/[organization_id]/sources/[source_id]". To groupBy across all
-   * sources provide a source_id of `-`. For example: organizations/123/sources/-
+   * sources provide a source_id of `-`. For example:
+   * organizations/{organization_id}/sources/-
    * @param Google_Service_SecurityCommandCenter_GroupFindingsRequest $postBody
    * @param array $optParams Optional parameters.
    * @return Google_Service_SecurityCommandCenter_GroupFindingsResponse
@@ -69,14 +70,48 @@ class Google_Service_SecurityCommandCenter_Resource_OrganizationsSourcesFindings
    * Lists an organization or source's findings.
    *
    * To list across all sources provide a `-` as the source id. Example:
-   * /v1/organizations/123/sources/-/findings
+   * /v1/organizations/{organization_id}/sources/-/findings
    * (findings.listOrganizationsSourcesFindings)
    *
-   * @param string $parent Name of the source the findings belong to. Its format
-   * is "organizations/[organization_id]/sources/[source_id]". To list across all
-   * sources provide a source_id of `-`. For example: organizations/123/sources/-
+   * @param string $parent Required. Name of the source the findings belong to.
+   * Its format is "organizations/[organization_id]/sources/[source_id]". To list
+   * across all sources provide a source_id of `-`. For example:
+   * organizations/{organization_id}/sources/-
    * @param array $optParams Optional parameters.
    *
+   * @opt_param string filter Expression that defines the filter to apply across
+   * findings. The expression is a list of one or more restrictions combined via
+   * logical operators `AND` and `OR`. Parentheses are supported, and `OR` has
+   * higher precedence than `AND`.
+   *
+   * Restrictions have the form `  ` and may have a `-` character in front of them
+   * to indicate negation. Examples include:
+   *
+   * name source_properties.a_property security_marks.marks.marka
+   *
+   * The supported operators are:
+   *
+   * * `=` for all value types. * `>`, `<`, `>=`, `<=` for integer values. * `:`,
+   * meaning substring matching, for strings.
+   *
+   * The supported value types are:
+   *
+   * * string literals in quotes. * integer literals without quotes. * boolean
+   * literals `true` and `false` without quotes.
+   *
+   * The following field and operator combinations are supported:
+   *
+   * name: `=` parent: `=`, `:` resource_name: `=`, `:` state: `=`, `:` category:
+   * `=`, `:` external_uri: `=`, `:` event_time: `=`, `>`, `<`, `>=`, `<=`
+   *
+   *   Usage: This should be milliseconds since epoch or an RFC3339 string.
+   * Examples:     "event_time = \"2019-06-10T16:07:18-07:00\""     "event_time =
+   * 1560208038000"
+   *
+   * security_marks.marks: `=`, `:` source_properties: `=`, `:`, `>`, `<`, `>=`,
+   * `<=`
+   *
+   * For example, `source_properties.size = 100` is a valid filter string.
    * @opt_param string fieldMask Optional. A field mask to specify the Finding
    * fields to be listed in the response. An empty field mask will list all
    * fields.
@@ -124,39 +159,6 @@ class Google_Service_SecurityCommandCenter_Resource_OrganizationsSourcesFindings
    * If compare_duration is not specified, then the only possible state_change is
    * "UNUSED", which will be the state_change set for all findings present at
    * read_time.
-   * @opt_param string filter Expression that defines the filter to apply across
-   * findings. The expression is a list of one or more restrictions combined via
-   * logical operators `AND` and `OR`. Parentheses are supported, and `OR` has
-   * higher precedence than `AND`.
-   *
-   * Restrictions have the form `  ` and may have a `-` character in front of them
-   * to indicate negation. Examples include:
-   *
-   * name source_properties.a_property security_marks.marks.marka
-   *
-   * The supported operators are:
-   *
-   * * `=` for all value types. * `>`, `<`, `>=`, `<=` for integer values. * `:`,
-   * meaning substring matching, for strings.
-   *
-   * The supported value types are:
-   *
-   * * string literals in quotes. * integer literals without quotes. * boolean
-   * literals `true` and `false` without quotes.
-   *
-   * The following field and operator combinations are supported:
-   *
-   * name: `=` parent: `=`, `:` resource_name: `=`, `:` state: `=`, `:` category:
-   * `=`, `:` external_uri: `=`, `:` event_time: `=`, `>`, `<`, `>=`, `<=`
-   *
-   *   Usage: This should be milliseconds since epoch or an RFC3339 string.
-   * Examples:     "event_time = \"2019-06-10T16:07:18-07:00\""     "event_time =
-   * 1560208038000"
-   *
-   * security_marks.marks: `=`, `:` source_properties: `=`, `:`, `>`, `<`, `>=`,
-   * `<=`
-   *
-   * For example, `source_properties.size = 100` is a valid filter string.
    * @return Google_Service_SecurityCommandCenter_ListFindingsResponse
    */
   public function listOrganizationsSourcesFindings($parent, $optParams = array())
@@ -171,7 +173,8 @@ class Google_Service_SecurityCommandCenter_Resource_OrganizationsSourcesFindings
    *
    * @param string $name The relative resource name of this finding. See:
    * https://cloud.google.com/apis/design/resource_names#relative_resource_name
-   * Example: "organizations/123/sources/456/findings/789"
+   * Example:
+   * "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}"
    * @param Google_Service_SecurityCommandCenter_Finding $postBody
    * @param array $optParams Optional parameters.
    *
@@ -192,9 +195,10 @@ class Google_Service_SecurityCommandCenter_Resource_OrganizationsSourcesFindings
   /**
    * Updates the state of a finding. (findings.setState)
    *
-   * @param string $name The relative resource name of the finding. See:
+   * @param string $name Required. The relative resource name of the finding. See:
    * https://cloud.google.com/apis/design/resource_names#relative_resource_name
-   * Example: "organizations/123/sources/456/finding/789".
+   * Example:
+   * "organizations/{organization_id}/sources/{source_id}/finding/{finding_id}".
    * @param Google_Service_SecurityCommandCenter_SetFindingStateRequest $postBody
    * @param array $optParams Optional parameters.
    * @return Google_Service_SecurityCommandCenter_Finding
@@ -210,8 +214,9 @@ class Google_Service_SecurityCommandCenter_Resource_OrganizationsSourcesFindings
    *
    * @param string $name The relative resource name of the SecurityMarks. See:
    * https://cloud.google.com/apis/design/resource_names#relative_resource_name
-   * Examples: "organizations/123/assets/456/securityMarks"
-   * "organizations/123/sources/456/findings/789/securityMarks".
+   * Examples: "organizations/{organization_id}/assets/{asset_id}/securityMarks" "
+   * organizations/{organization_id}/sources/{source_id}/findings/{finding_id}/sec
+   * urityMarks".
    * @param Google_Service_SecurityCommandCenter_SecurityMarks $postBody
    * @param array $optParams Optional parameters.
    *

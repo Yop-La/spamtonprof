@@ -162,26 +162,26 @@
     },
     {
         "name": "firebase/php-jwt",
-        "version": "v5.0.0",
-        "version_normalized": "5.0.0.0",
+        "version": "v5.1.0",
+        "version_normalized": "5.1.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/firebase/php-jwt.git",
-            "reference": "9984a4d3a32ae7673d6971ea00bae9d0a1abba0e"
+            "reference": "4566062c68f76f43d44f1643f4970fe89757d4c6"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/firebase/php-jwt/zipball/9984a4d3a32ae7673d6971ea00bae9d0a1abba0e",
-            "reference": "9984a4d3a32ae7673d6971ea00bae9d0a1abba0e",
+            "url": "https://api.github.com/repos/firebase/php-jwt/zipball/4566062c68f76f43d44f1643f4970fe89757d4c6",
+            "reference": "4566062c68f76f43d44f1643f4970fe89757d4c6",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.0"
         },
         "require-dev": {
-            "phpunit/phpunit": " 4.8.35"
+            "phpunit/phpunit": "^4.8|^5"
         },
-        "time": "2017-06-27T22:17:23+00:00",
+        "time": "2020-02-24T23:15:03+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -210,17 +210,17 @@
     },
     {
         "name": "google/apiclient",
-        "version": "v2.2.4",
-        "version_normalized": "2.2.4.0",
+        "version": "v2.4.0",
+        "version_normalized": "2.4.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/googleapis/google-api-php-client.git",
-            "reference": "d6c7563bdf88d6a0719ea63e21c74dc86032364e"
+            "reference": "cd3c37998020d91ae4eafca4f26a92da4dabba83"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/googleapis/google-api-php-client/zipball/d6c7563bdf88d6a0719ea63e21c74dc86032364e",
-            "reference": "d6c7563bdf88d6a0719ea63e21c74dc86032364e",
+            "url": "https://api.github.com/repos/googleapis/google-api-php-client/zipball/cd3c37998020d91ae4eafca4f26a92da4dabba83",
+            "reference": "cd3c37998020d91ae4eafca4f26a92da4dabba83",
             "shasum": ""
         },
         "require": {
@@ -229,7 +229,7 @@
             "google/auth": "^1.0",
             "guzzlehttp/guzzle": "~5.3.1||~6.0",
             "guzzlehttp/psr7": "^1.2",
-            "monolog/monolog": "^1.17",
+            "monolog/monolog": "^1.17|^2.0",
             "php": ">=5.4",
             "phpseclib/phpseclib": "~0.3.10||~2.0"
         },
@@ -245,7 +245,7 @@
         "suggest": {
             "cache/filesystem-adapter": "For caching certs and tokens (using Google_Client::setCache)"
         },
-        "time": "2019-08-19T18:09:46+00:00",
+        "time": "2019-09-11T17:38:10+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -273,26 +273,26 @@
     },
     {
         "name": "google/apiclient-services",
-        "version": "v0.111",
-        "version_normalized": "0.111.0.0",
+        "version": "v0.127",
+        "version_normalized": "0.127.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/googleapis/google-api-php-client-services.git",
-            "reference": "3bdb4e5be7fe49f8737f7b3a8a3a32ca68ff8f97"
+            "reference": "19eacad739807e522891bf3f911ffab4a4c29869"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/3bdb4e5be7fe49f8737f7b3a8a3a32ca68ff8f97",
-            "reference": "3bdb4e5be7fe49f8737f7b3a8a3a32ca68ff8f97",
+            "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/19eacad739807e522891bf3f911ffab4a4c29869",
+            "reference": "19eacad739807e522891bf3f911ffab4a4c29869",
             "shasum": ""
         },
         "require": {
             "php": ">=5.4"
         },
         "require-dev": {
-            "phpunit/phpunit": "~4.8"
+            "phpunit/phpunit": "^4.8|^5"
         },
-        "time": "2019-08-25T00:23:03+00:00",
+        "time": "2020-02-17T00:24:19+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -312,17 +312,17 @@
     },
     {
         "name": "google/auth",
-        "version": "v1.5.2",
-        "version_normalized": "1.5.2.0",
+        "version": "v1.7.1",
+        "version_normalized": "1.7.1.0",
         "source": {
             "type": "git",
             "url": "https://github.com/googleapis/google-auth-library-php.git",
-            "reference": "2ee962e5df3e9427fda859f1b0515d6d62c4afa5"
+            "reference": "39e243a7d8320b1889ab8bb4cd6f98f7af83c582"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/googleapis/google-auth-library-php/zipball/2ee962e5df3e9427fda859f1b0515d6d62c4afa5",
-            "reference": "2ee962e5df3e9427fda859f1b0515d6d62c4afa5",
+            "url": "https://api.github.com/repos/googleapis/google-auth-library-php/zipball/39e243a7d8320b1889ab8bb4cd6f98f7af83c582",
+            "reference": "39e243a7d8320b1889ab8bb4cd6f98f7af83c582",
             "shasum": ""
         },
         "require": {
@@ -336,14 +336,15 @@
         "require-dev": {
             "friendsofphp/php-cs-fixer": "^1.11",
             "guzzlehttp/promises": "0.1.1|^1.3",
+            "kelvinmo/simplejwt": "^0.2.5",
             "phpseclib/phpseclib": "^2",
             "phpunit/phpunit": "^4.8.36|^5.7",
             "sebastian/comparator": ">=1.2.3"
         },
         "suggest": {
-            "phpseclib/phpseclib": "May be used in place of OpenSSL for signing strings. Please require version ^2."
+            "phpseclib/phpseclib": "May be used in place of OpenSSL for signing strings or for token management. Please require version ^2."
         },
-        "time": "2019-07-22T21:01:31+00:00",
+        "time": "2020-02-12T20:54:50+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -464,47 +465,49 @@
     },
     {
         "name": "guzzlehttp/guzzle",
-        "version": "6.3.3",
-        "version_normalized": "6.3.3.0",
+        "version": "6.5.2",
+        "version_normalized": "6.5.2.0",
         "source": {
             "type": "git",
             "url": "https://github.com/guzzle/guzzle.git",
-            "reference": "407b0cb880ace85c9b63c5f9551db498cb2d50ba"
+            "reference": "43ece0e75098b7ecd8d13918293029e555a50f82"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/guzzle/guzzle/zipball/407b0cb880ace85c9b63c5f9551db498cb2d50ba",
-            "reference": "407b0cb880ace85c9b63c5f9551db498cb2d50ba",
+            "url": "https://api.github.com/repos/guzzle/guzzle/zipball/43ece0e75098b7ecd8d13918293029e555a50f82",
+            "reference": "43ece0e75098b7ecd8d13918293029e555a50f82",
             "shasum": ""
         },
         "require": {
+            "ext-json": "*",
             "guzzlehttp/promises": "^1.0",
-            "guzzlehttp/psr7": "^1.4",
+            "guzzlehttp/psr7": "^1.6.1",
             "php": ">=5.5"
         },
         "require-dev": {
             "ext-curl": "*",
             "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.4 || ^7.0",
-            "psr/log": "^1.0"
+            "psr/log": "^1.1"
         },
         "suggest": {
+            "ext-intl": "Required for Internationalized Domain Name (IDN) support",
             "psr/log": "Required for using the Log middleware"
         },
-        "time": "2018-04-22T15:46:56+00:00",
+        "time": "2019-12-23T11:57:10+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "6.3-dev"
+                "dev-master": "6.5-dev"
             }
         },
         "installation-source": "dist",
         "autoload": {
-            "files": [
-                "src/functions_include.php"
-            ],
             "psr-4": {
                 "GuzzleHttp\\": "src/"
-            }
+            },
+            "files": [
+                "src/functions_include.php"
+            ]
         },
         "notification-url": "https://packagist.org/downloads/",
         "license": [
@@ -716,17 +719,17 @@
     },
     {
         "name": "ifsnop/mysqldump-php",
-        "version": "v2.7",
-        "version_normalized": "2.7.0.0",
+        "version": "v2.8",
+        "version_normalized": "2.8.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/ifsnop/mysqldump-php.git",
-            "reference": "30f07f4f0b0fdfcd74e6e57de933248d47f2dd61"
+            "reference": "b6919eff87c36b18fe0d4b3a53635df03c8a3b38"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/30f07f4f0b0fdfcd74e6e57de933248d47f2dd61",
-            "reference": "30f07f4f0b0fdfcd74e6e57de933248d47f2dd61",
+            "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/b6919eff87c36b18fe0d4b3a53635df03c8a3b38",
+            "reference": "b6919eff87c36b18fe0d4b3a53635df03c8a3b38",
             "shasum": ""
         },
         "require": {
@@ -736,7 +739,7 @@
             "phpunit/phpunit": "4.8.36",
             "squizlabs/php_codesniffer": "1.*"
         },
-        "time": "2019-02-18T23:38:33+00:00",
+        "time": "2019-10-29T23:13:43+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -827,22 +830,22 @@
     },
     {
         "name": "monolog/monolog",
-        "version": "1.24.0",
-        "version_normalized": "1.24.0.0",
+        "version": "2.0.2",
+        "version_normalized": "2.0.2.0",
         "source": {
             "type": "git",
             "url": "https://github.com/Seldaek/monolog.git",
-            "reference": "bfc9ebb28f97e7a24c45bdc3f0ff482e47bb0266"
+            "reference": "c861fcba2ca29404dc9e617eedd9eff4616986b8"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/Seldaek/monolog/zipball/bfc9ebb28f97e7a24c45bdc3f0ff482e47bb0266",
-            "reference": "bfc9ebb28f97e7a24c45bdc3f0ff482e47bb0266",
+            "url": "https://api.github.com/repos/Seldaek/monolog/zipball/c861fcba2ca29404dc9e617eedd9eff4616986b8",
+            "reference": "c861fcba2ca29404dc9e617eedd9eff4616986b8",
             "shasum": ""
         },
         "require": {
-            "php": ">=5.3.0",
-            "psr/log": "~1.0"
+            "php": "^7.2",
+            "psr/log": "^1.0.1"
         },
         "provide": {
             "psr/log-implementation": "1.0.0"
@@ -850,34 +853,37 @@
         "require-dev": {
             "aws/aws-sdk-php": "^2.4.9 || ^3.0",
             "doctrine/couchdb": "~1.0@dev",
-            "graylog2/gelf-php": "~1.0",
-            "jakub-onderka/php-parallel-lint": "0.9",
+            "elasticsearch/elasticsearch": "^6.0",
+            "graylog2/gelf-php": "^1.4.2",
+            "jakub-onderka/php-parallel-lint": "^0.9",
             "php-amqplib/php-amqplib": "~2.4",
             "php-console/php-console": "^3.1.3",
-            "phpunit/phpunit": "~4.5",
-            "phpunit/phpunit-mock-objects": "2.3.0",
+            "phpspec/prophecy": "^1.6.1",
+            "phpunit/phpunit": "^8.3",
+            "predis/predis": "^1.1",
+            "rollbar/rollbar": "^1.3",
             "ruflin/elastica": ">=0.90 <3.0",
-            "sentry/sentry": "^0.13",
             "swiftmailer/swiftmailer": "^5.3|^6.0"
         },
         "suggest": {
             "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",
             "doctrine/couchdb": "Allow sending log messages to a CouchDB server",
+            "elasticsearch/elasticsearch": "Allow sending log messages to an Elasticsearch server via official client",
             "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
-            "ext-mongo": "Allow sending log messages to a MongoDB server",
+            "ext-mbstring": "Allow to work properly with unicode symbols",
+            "ext-mongodb": "Allow sending log messages to a MongoDB server (via driver)",
             "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
-            "mongodb/mongodb": "Allow sending log messages to a MongoDB server via PHP Driver",
+            "mongodb/mongodb": "Allow sending log messages to a MongoDB server (via library)",
             "php-amqplib/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib",
             "php-console/php-console": "Allow sending log messages to Google Chrome",
             "rollbar/rollbar": "Allow sending log messages to Rollbar",
-            "ruflin/elastica": "Allow sending log messages to an Elastic Search server",
-            "sentry/sentry": "Allow sending log messages to a Sentry server"
+            "ruflin/elastica": "Allow sending log messages to an Elastic Search server"
         },
-        "time": "2018-11-05T09:00:11+00:00",
+        "time": "2019-12-20T14:22:59+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "2.0.x-dev"
+                "dev-master": "2.x-dev"
             }
         },
         "installation-source": "dist",
@@ -1047,17 +1053,17 @@
     },
     {
         "name": "php-http/client-common",
-        "version": "1.9.1",
-        "version_normalized": "1.9.1.0",
+        "version": "1.10.0",
+        "version_normalized": "1.10.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/php-http/client-common.git",
-            "reference": "0e156a12cc3e46f590c73bf57592a2252fc3dc48"
+            "reference": "c0390ae3c8f2ae9d50901feef0127fb9e396f6b4"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/php-http/client-common/zipball/0e156a12cc3e46f590c73bf57592a2252fc3dc48",
-            "reference": "0e156a12cc3e46f590c73bf57592a2252fc3dc48",
+            "url": "https://api.github.com/repos/php-http/client-common/zipball/c0390ae3c8f2ae9d50901feef0127fb9e396f6b4",
+            "reference": "c0390ae3c8f2ae9d50901feef0127fb9e396f6b4",
             "shasum": ""
         },
         "require": {
@@ -1065,7 +1071,7 @@
             "php-http/httplug": "^1.1",
             "php-http/message": "^1.6",
             "php-http/message-factory": "^1.0",
-            "symfony/options-resolver": "^2.6 || ^3.0 || ^4.0"
+            "symfony/options-resolver": "^2.6 || ^3.0 || ^4.0 || ^5.0"
         },
         "require-dev": {
             "guzzlehttp/psr7": "^1.4",
@@ -1076,11 +1082,11 @@
             "php-http/logger-plugin": "PSR-3 Logger plugin",
             "php-http/stopwatch-plugin": "Symfony Stopwatch plugin"
         },
-        "time": "2019-02-02T07:03:15+00:00",
+        "time": "2019-11-18T08:54:36+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.9.x-dev"
+                "dev-master": "1.10.x-dev"
             }
         },
         "installation-source": "dist",
@@ -1168,17 +1174,17 @@
     },
     {
         "name": "php-http/discovery",
-        "version": "1.7.0",
-        "version_normalized": "1.7.0.0",
+        "version": "1.7.4",
+        "version_normalized": "1.7.4.0",
         "source": {
             "type": "git",
             "url": "https://github.com/php-http/discovery.git",
-            "reference": "e822f86a6983790aa17ab13aa7e69631e86806b6"
+            "reference": "82dbef649ccffd8e4f22e1953c3a5265992b83c0"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/php-http/discovery/zipball/e822f86a6983790aa17ab13aa7e69631e86806b6",
-            "reference": "e822f86a6983790aa17ab13aa7e69631e86806b6",
+            "url": "https://api.github.com/repos/php-http/discovery/zipball/82dbef649ccffd8e4f22e1953c3a5265992b83c0",
+            "reference": "82dbef649ccffd8e4f22e1953c3a5265992b83c0",
             "shasum": ""
         },
         "require": {
@@ -1198,7 +1204,7 @@
             "php-http/message": "Allow to use Guzzle, Diactoros or Slim Framework factories",
             "puli/composer-plugin": "Sets up Puli which is recommended for Discovery to work. Check http://docs.php-http.org/en/latest/discovery.html for more details."
         },
-        "time": "2019-06-30T09:04:27+00:00",
+        "time": "2020-01-03T11:25:47+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1531,17 +1537,17 @@
     },
     {
         "name": "phpmailer/phpmailer",
-        "version": "v6.0.7",
-        "version_normalized": "6.0.7.0",
+        "version": "v6.1.4",
+        "version_normalized": "6.1.4.0",
         "source": {
             "type": "git",
             "url": "https://github.com/PHPMailer/PHPMailer.git",
-            "reference": "0c41a36d4508d470e376498c1c0c527aa36a2d59"
+            "reference": "c5e61d0729507049cec9673aa1a679f9adefd683"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/0c41a36d4508d470e376498c1c0c527aa36a2d59",
-            "reference": "0c41a36d4508d470e376498c1c0c527aa36a2d59",
+            "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/c5e61d0729507049cec9673aa1a679f9adefd683",
+            "reference": "c5e61d0729507049cec9673aa1a679f9adefd683",
             "shasum": ""
         },
         "require": {
@@ -1550,13 +1556,9 @@
             "php": ">=5.5.0"
         },
         "require-dev": {
-            "doctrine/annotations": "1.2.*",
+            "doctrine/annotations": "^1.2",
             "friendsofphp/php-cs-fixer": "^2.2",
-            "phpdocumentor/phpdocumentor": "2.*",
-            "phpunit/phpunit": "^4.8 || ^5.7",
-            "zendframework/zend-eventmanager": "3.0.*",
-            "zendframework/zend-i18n": "2.7.3",
-            "zendframework/zend-serializer": "2.7.*"
+            "phpunit/phpunit": "^4.8 || ^5.7"
         },
         "suggest": {
             "ext-mbstring": "Needed to send email in multibyte encoding charset",
@@ -1566,7 +1568,7 @@
             "stevenmaguire/oauth2-microsoft": "Needed for Microsoft XOAUTH2 authentication",
             "symfony/polyfill-mbstring": "To support UTF-8 if the Mbstring PHP extension is not enabled (^1.2)"
         },
-        "time": "2019-02-01T15:04:28+00:00",
+        "time": "2019-12-10T11:17:38+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1576,16 +1578,16 @@
         },
         "notification-url": "https://packagist.org/downloads/",
         "license": [
-            "LGPL-2.1"
+            "LGPL-2.1-only"
         ],
         "authors": [
             {
-                "name": "Jim Jagielski",
-                "email": "jimjag@gmail.com"
-            },
-            {
                 "name": "Marcus Bointon",
                 "email": "phpmailer@synchromedia.co.uk"
+            },
+            {
+                "name": "Jim Jagielski",
+                "email": "jimjag@gmail.com"
             },
             {
                 "name": "Andy Prevost",
@@ -1599,17 +1601,17 @@
     },
     {
         "name": "phpseclib/phpseclib",
-        "version": "2.0.23",
-        "version_normalized": "2.0.23.0",
+        "version": "2.0.25",
+        "version_normalized": "2.0.25.0",
         "source": {
             "type": "git",
             "url": "https://github.com/phpseclib/phpseclib.git",
-            "reference": "c78eb5058d5bb1a183133c36d4ba5b6675dfa099"
+            "reference": "c18159618ed7cd7ff721ac1a8fec7860a475d2f0"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/c78eb5058d5bb1a183133c36d4ba5b6675dfa099",
-            "reference": "c78eb5058d5bb1a183133c36d4ba5b6675dfa099",
+            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/c18159618ed7cd7ff721ac1a8fec7860a475d2f0",
+            "reference": "c18159618ed7cd7ff721ac1a8fec7860a475d2f0",
             "shasum": ""
         },
         "require": {
@@ -1627,7 +1629,7 @@
             "ext-mcrypt": "Install the Mcrypt extension in order to speed up a few other cryptographic operations.",
             "ext-openssl": "Install the OpenSSL extension in order to speed up a wide variety of cryptographic operations."
         },
-        "time": "2019-09-17T03:41:22+00:00",
+        "time": "2020-02-25T04:16:50+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1847,27 +1849,27 @@
     },
     {
         "name": "psr/log",
-        "version": "1.1.0",
-        "version_normalized": "1.1.0.0",
+        "version": "1.1.2",
+        "version_normalized": "1.1.2.0",
         "source": {
             "type": "git",
             "url": "https://github.com/php-fig/log.git",
-            "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd"
+            "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/php-fig/log/zipball/6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
-            "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
+            "url": "https://api.github.com/repos/php-fig/log/zipball/446d54b4cb6bf489fc9d75f55843658e6f25d801",
+            "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2018-11-20T15:27:04+00:00",
+        "time": "2019-11-01T11:05:21+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.0.x-dev"
+                "dev-master": "1.1.x-dev"
             }
         },
         "installation-source": "dist",
@@ -2099,27 +2101,27 @@
     },
     {
         "name": "symfony/options-resolver",
-        "version": "v4.3.4",
-        "version_normalized": "4.3.4.0",
+        "version": "v5.0.5",
+        "version_normalized": "5.0.5.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/options-resolver.git",
-            "reference": "81c2e120522a42f623233968244baebd6b36cb6a"
+            "reference": "b1ab86ce52b0c0abe031367a173005a025e30e04"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/options-resolver/zipball/81c2e120522a42f623233968244baebd6b36cb6a",
-            "reference": "81c2e120522a42f623233968244baebd6b36cb6a",
+            "url": "https://api.github.com/repos/symfony/options-resolver/zipball/b1ab86ce52b0c0abe031367a173005a025e30e04",
+            "reference": "b1ab86ce52b0c0abe031367a173005a025e30e04",
             "shasum": ""
         },
         "require": {
-            "php": "^7.1.3"
+            "php": "^7.2.5"
         },
-        "time": "2019-08-08T09:29:19+00:00",
+        "time": "2020-01-04T14:08:26+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "4.3-dev"
+                "dev-master": "5.0-dev"
             }
         },
         "installation-source": "dist",
@@ -2155,17 +2157,17 @@
     },
     {
         "name": "symfony/polyfill-ctype",
-        "version": "v1.12.0",
-        "version_normalized": "1.12.0.0",
+        "version": "v1.14.0",
+        "version_normalized": "1.14.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/polyfill-ctype.git",
-            "reference": "550ebaac289296ce228a706d0867afc34687e3f4"
+            "reference": "fbdeaec0df06cf3d51c93de80c7eb76e271f5a38"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/550ebaac289296ce228a706d0867afc34687e3f4",
-            "reference": "550ebaac289296ce228a706d0867afc34687e3f4",
+            "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/fbdeaec0df06cf3d51c93de80c7eb76e271f5a38",
+            "reference": "fbdeaec0df06cf3d51c93de80c7eb76e271f5a38",
             "shasum": ""
         },
         "require": {
@@ -2174,11 +2176,11 @@
         "suggest": {
             "ext-ctype": "For best performance"
         },
-        "time": "2019-08-06T08:03:45+00:00",
+        "time": "2020-01-13T11:15:53+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.12-dev"
+                "dev-master": "1.14-dev"
             }
         },
         "installation-source": "dist",
@@ -2215,33 +2217,31 @@
     },
     {
         "name": "webmozart/assert",
-        "version": "1.5.0",
-        "version_normalized": "1.5.0.0",
+        "version": "1.7.0",
+        "version_normalized": "1.7.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/webmozart/assert.git",
-            "reference": "88e6d84706d09a236046d686bbea96f07b3a34f4"
+            "reference": "aed98a490f9a8f78468232db345ab9cf606cf598"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/webmozart/assert/zipball/88e6d84706d09a236046d686bbea96f07b3a34f4",
-            "reference": "88e6d84706d09a236046d686bbea96f07b3a34f4",
+            "url": "https://api.github.com/repos/webmozart/assert/zipball/aed98a490f9a8f78468232db345ab9cf606cf598",
+            "reference": "aed98a490f9a8f78468232db345ab9cf606cf598",
             "shasum": ""
         },
         "require": {
             "php": "^5.3.3 || ^7.0",
             "symfony/polyfill-ctype": "^1.8"
         },
+        "conflict": {
+            "vimeo/psalm": "<3.6.0"
+        },
         "require-dev": {
             "phpunit/phpunit": "^4.8.36 || ^7.5.13"
         },
-        "time": "2019-08-24T08:43:50+00:00",
+        "time": "2020-02-14T12:15:55+00:00",
         "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.3-dev"
-            }
-        },
         "installation-source": "dist",
         "autoload": {
             "psr-4": {

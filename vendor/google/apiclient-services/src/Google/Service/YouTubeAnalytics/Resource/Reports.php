@@ -54,9 +54,6 @@ class Google_Service_YouTubeAnalytics_Resource_Reports extends Google_Service_Re
    * reports that you can retrieve and the metrics available in each report, and
    * see the [Metrics](/youtube/analytics/v2/dimsmets/mets) document for
    * definitions of those metrics. required: true, pattern: [0-9a-zA-Z,]+
-   * @opt_param bool includeHistoricalChannelData If set to true historical data
-   * (i.e. channel data from before the linking of the channel to the content
-   * owner) will be retrieved.",
    * @opt_param string ids Identifies the YouTube channel or content owner for
    * which you are retrieving YouTube Analytics data.
    *
@@ -66,6 +63,9 @@ class Google_Service_YouTubeAnalytics_Resource_Reports extends Google_Service_Re
    * parameter   value to `contentOwner==OWNER_NAME`, where `OWNER_NAME` is the
    * CMS name   of the content owner. required: true, pattern:
    * [a-zA-Z]+==[a-zA-Z0-9_+-]+
+   * @opt_param bool includeHistoricalChannelData If set to true historical data
+   * (i.e. channel data from before the linking of the channel to the content
+   * owner) will be retrieved.",
    * @opt_param string currency The currency to which financial metrics should be
    * converted. The default is US Dollar (USD). If the result contains no
    * financial metrics, this flag will be ignored. Responds with an error if the

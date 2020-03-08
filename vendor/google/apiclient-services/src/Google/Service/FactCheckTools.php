@@ -62,10 +62,6 @@ class Google_Service_FactCheckTools extends Google_Service
               'path' => 'v1alpha1/claims:search',
               'httpMethod' => 'GET',
               'parameters' => array(
-                'languageCode' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'maxAgeDays' => array(
                   'location' => 'query',
                   'type' => 'integer',
@@ -87,6 +83,10 @@ class Google_Service_FactCheckTools extends Google_Service
                   'type' => 'integer',
                 ),
                 'query' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'languageCode' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),
