@@ -33,19 +33,12 @@ function redirectTo(slug ,info = "" ){
 	});
 }
 
-function showMessage(message, nb_message = 0){
-
-	if(nb_message == 0){
-
-		waitForEl("#top-message", function() {
-			jQuery("#band-message").html(message);
-			jQuery("#top-message").removeClass("hide");
-			window.scrollTo(0, 0);
-		});
-
-	}
-	nb_message = nb_message + 1;
-	return(nb_message);
+function showMessage(message){
+	waitForEl("#top-message", function() {
+		jQuery("#band-message").html(message);
+		jQuery("#top-message").removeClass("hide");
+		window.scrollTo(0, 0);
+	});
 }
 
 function hideMessage(){

@@ -26,8 +26,6 @@ var popEssaiId = 20795;
 var niveau = null;
 var matiere = null;
 
-var nb_message = 0;
-
 var searching = false;
 
 var idFormEssai = 80;
@@ -143,7 +141,7 @@ var mySubmitController = Marionette.Object.extend( {
 					.fail(function(err){
 						console.log("erreur ajax");
 						console.log(err);
-						nb_message = showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
+						showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
 						ajaxEnCours--;
 						if(ajaxEnCours == 0){
 							jQuery("#loading_screen").addClass("hide");
@@ -358,7 +356,7 @@ function formInit(){
 jQuery( document ).ready( function( jQuery ) {
 
 
-showMessage("Hop, hop, pas si vite. Inscrits toi avec un de tes parents pour être sûr d'avoir un prof.", nb_message);
+//showMessage("Hop, hop, pas si vite. Inscrits toi avec un de tes parents pour être sûr d'avoir un prof.");
 
 
 
@@ -575,7 +573,7 @@ showMessage("Hop, hop, pas si vite. Inscrits toi avec un de tes parents pour êt
 						if(nbFormule == 0){ //si pas de formules
 
 
-							nb_message = showMessage("Aucune formule ne correspond à la matière et au niveau demandé");
+							showMessage("Aucune formule ne correspond à la matière et au niveau demandé");
 
 							jQuery('#keyword').text(getMatiereFieldValue().concat(' - ',getNiveauFieldValue()));
 
@@ -656,7 +654,7 @@ showMessage("Hop, hop, pas si vite. Inscrits toi avec un de tes parents pour êt
 						}
 
 					}else{
-						nb_message = showMessage(retour.message);
+						showMessage(retour.message);
 
 						jQuery("#loading_screen").addClass("hide");
 						jQuery(".content").removeClass("hide");
@@ -672,7 +670,7 @@ showMessage("Hop, hop, pas si vite. Inscrits toi avec un de tes parents pour êt
 				.fail(function(err){
 					console.log("erreur ajax");
 					console.log(err);
-					nb_message = showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
+					showMessage("Il y a un problème. Veuillez raffraichir la page et contacter l'équipe si le problème persiste");
 				})
 				.always(function() {
 					ajaxEnCours--;
@@ -841,7 +839,7 @@ showMessage("Hop, hop, pas si vite. Inscrits toi avec un de tes parents pour êt
 		}
 
 		if(message != ""){
-			nb_message = showMessage(message);
+			showMessage(message);
 		}
 
 	}
