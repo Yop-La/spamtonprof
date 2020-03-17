@@ -76,6 +76,14 @@ var mySubmitController = Marionette.Object.extend( {
 			console.log('champs')
 			console.log(champs)
 
+			cookies_to_send = ["utm_source_stp","utm_medium_stp","utm_campaign_stp"];
+			
+			cookies_to_send.forEach(function(field){
+				cookie = getCookie(field);
+				champs[field] = cookie;
+			});
+			
+
 			// soumission ajax des champs du form pour création inscription
 			ajaxEnCours++;
 			jQuery.post(

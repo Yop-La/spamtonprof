@@ -28,8 +28,6 @@ function inscriptionEssai()
     $fields = $_POST['fields'];
     $fields = json_decode(stripslashes($fields));
 
-    serializeTemp($fields);
-
     $choix_eleve = $fields->choix_eleve; // vaut false si prospect ou nouveau ou ref_eleve (si !prospect )
     $prenom_eleve = $fields->prenom_eleve;
     $nom_eleve = $fields->nom_eleve;
@@ -58,6 +56,10 @@ function inscriptionEssai()
     $code_promo = $fields->code_promo;
     $source_traffic = $fields->source_traffic;
     $parent_required = boolval($fields->parent_required);
+
+    $utm_source_stp = $fields->utm_source_stp;
+    $utm_medium_stp = $fields->utm_medium_stp;
+    $utm_campaign_stp = $fields->utm_campaign_stp;
 
     $matiere = json_decode(stripslashes($fields->matiere));
     $niveau = json_decode(stripslashes($fields->niveau));
@@ -534,6 +536,24 @@ function inscriptionEssai()
 
     // etape 9 - envoi d'un message dans slack pour dire qu'il y a une attribution de prof en attente
     $messages;
+
+    $utm_source_stp = $fields->utm_source_stp;
+    $utm_medium_stp = $fields->utm_medium_stp;
+    $utm_campaign_stp = $fields->utm_campaign_stp;
+
+    $source_trafic_app = [];
+    if ($utm_source_stp) {
+        $source_trafic_app["utm_source_stp"] = $utm_source_stp;
+    }
+    if ($utm_medium_stp) {
+        $source_trafic_app["utm_medium_stp"] = $utm_medium_stp;
+    }
+    if ($utm_campaign_stp) {
+        $source_trafic_app["utm_campaign_stp"] = $utm_campaign_stp;
+    }
+
+    $source_trafic_app = json_encode($source_trafic_app);
+
     if ($proche) {
 
         $messages = array(
@@ -551,7 +571,8 @@ function inscriptionEssai()
             "Nom parent : " . utf8_encode($proche->getNom()),
             "Téléphone parent :" . $proche->getTelephone(),
             "Remarque :" . $abonnement->getRemarque_inscription(),
-            "Source traffic : " . $source_traffic,
+            "Source trafic client: " . $source_traffic,
+            "Source trafic app: " . $source_trafic_app,
             "Coupon : " . $code_promo,
             "Date de démarrage : " . $begin->format(FR_DATE_FORMAT)
         );
@@ -566,7 +587,8 @@ function inscriptionEssai()
             "Téléphone :" . $eleve->getTelephone(),
             "Formule : " . $formule->getFormule(),
             "Remarque :" . $abonnement->getRemarque_inscription(),
-            "Source traffic : " . $source_traffic,
+            "Source trafic client: " . $source_traffic,
+            "Source trafic app: " . $source_trafic_app,
             "Coupon : " . $code_promo,
             "Date de démarrage : " . $begin->format(FR_DATE_FORMAT)
         );
