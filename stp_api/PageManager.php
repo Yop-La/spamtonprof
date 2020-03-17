@@ -260,7 +260,7 @@ class PageManager
 
         wp_enqueue_script('log_out_js', plugins_url() . '/spamtonprof/js/log_out.js');
 
-        wp_enqueue_script('show_message', plugins_url() . '/spamtonprof/js/show_message.js');
+        wp_enqueue_script('show_message', plugins_url() . '/spamtonprof/js/main.js');
 
         wp_localize_script('functions_js', 'homeUrl', get_home_url());
 
