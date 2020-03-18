@@ -25,8 +25,6 @@ class StripeManager
 
     public function stopSubscription($subscriptionId)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $subscription = \Stripe\Subscription::retrieve($subscriptionId);
 
         if ($subscription->status == "canceled") {
@@ -38,8 +36,6 @@ class StripeManager
 
     public function updateStripeProfId(string $subId, string $stripeProdId)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $sub = \Stripe\Subscription::retrieve($subId);
 
         $sub->metadata["stripe_prof_id"] = $stripeProdId;
@@ -49,8 +45,6 @@ class StripeManager
 
     public function new_prof_invoice($email_client, $email_prof = 'sebastien@spamtonprof.com', $amount = '2000', $description = 'test')
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $customers = \Stripe\Customer::all([
             "limit" => 3,
             "email" => $email_client
@@ -133,8 +127,6 @@ class StripeManager
 
     public function transfert_custom_facture($event_json, $email_prof)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $slack = new \spamtonprof\slack\Slack();
 
         $messages = [];
@@ -235,8 +227,6 @@ class StripeManager
     {
         serializeTemp($event_json);
         $slack = new \spamtonprof\slack\Slack();
-
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
 
         $discount = false;
         $str_abo = false;
@@ -437,8 +427,6 @@ class StripeManager
 
     public function create_subscription_checkout_session($plan_strp_id, $customer_id, $meta_sub = false, $trial_end = 'now')
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $params_session = [
             'customer' => $customer_id,
             'payment_method_types' => [
@@ -470,23 +458,16 @@ class StripeManager
 
     public function create_checkout_session_to_update_payment_method($cus_id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         if (! $cus_id) {
             return (false);
         }
-        
-        
+
         try {
             $cus = \Stripe\Customer::retrieve($cus_id);
-            
         } catch (\Exception $e) {
-            return(false);
+            return (false);
         }
-        
 
-        
-        
         $session = \Stripe\Checkout\Session::create([
             'payment_method_types' => [
                 'card'
@@ -506,8 +487,6 @@ class StripeManager
 
     public function create_customer($email, $metadata)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $customer = \Stripe\Customer::create(array(
 
             'email' => $email,
@@ -520,8 +499,6 @@ class StripeManager
 
     public function add_customer($email)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $customers = \Stripe\Customer::all([
             'limit' => 3,
             'email' => $email
@@ -546,22 +523,18 @@ class StripeManager
 
     public function retrieve_customer($stripe_id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $cus = \Stripe\Customer::retrieve($stripe_id);
         return ($cus);
     }
 
     public function retrieve_setup_intent($id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $setupIntent = \Stripe\SetupIntent::retrieve($id);
         return ($setupIntent);
     }
 
     public function attach_payment_method($payment_method_id, $cus_id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $payment_method = \Stripe\PaymentMethod::retrieve($payment_method_id);
         $payment_method->attach([
             'customer' => $cus_id
@@ -570,8 +543,6 @@ class StripeManager
 
     public function set_default_payment_method($payment_method_id, $cus_id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         \Stripe\Customer::update($cus_id, [
             'invoice_settings' => [
                 'default_payment_method' => $payment_method_id
@@ -581,28 +552,24 @@ class StripeManager
 
     public function retrieve_session($session_id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $session = \Stripe\Checkout\Session::retrieve($session_id);
         return ($session);
     }
 
     public function retrieve_act($stripe_id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $act = \Stripe\Account::retrieve($stripe_id);
         return ($act);
     }
 
     public function retrieve_sub($sub_id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $sub = \Stripe\Subscription::retrieve($sub_id);
         return ($sub);
     }
 
     public function retrieve_payout($id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $payout = false;
         if ($this->stripe_account) {
 
@@ -618,7 +585,6 @@ class StripeManager
 
     public function retrieve_balance_transaction($id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $charge = false;
         if ($this->stripe_account) {
 
@@ -634,7 +600,6 @@ class StripeManager
 
     public function retrieve_transfer($transfer_id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $transfer = false;
         if ($this->stripe_account) {
 
@@ -686,7 +651,6 @@ class StripeManager
 
     public function retrieve_refund($refund_id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $refund = false;
         if ($this->stripe_account) {
 
@@ -702,7 +666,6 @@ class StripeManager
 
     public function retrieve_charge($charge_id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $charge = false;
         if ($this->stripe_account) {
 
@@ -718,7 +681,6 @@ class StripeManager
 
     public function retrieve_invoice($invoice_id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $invoice = \Stripe\Invoice::retrieve($invoice_id);
         return ($invoice);
     }
@@ -726,7 +688,6 @@ class StripeManager
     public function list_balance_transaction($payout, int $limit = 100, $starting_after = false)
     {
         $all_transactions = [];
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
 
         $params = [
             'limit' => $limit,
@@ -759,7 +720,6 @@ class StripeManager
     public function list_payouts($starting_after = false, $ending_before = false, $arrival_gte = false, $arrival_lte = false, int $limit = 100)
     {
         $all_payouts = [];
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
 
         $params = [
             'limit' => $limit,
@@ -828,7 +788,6 @@ class StripeManager
     public function list_invoices(int $limit = 100, $starting_after = false)
     {
         $all_invoices = [];
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
 
         $params = [
             'limit' => $limit,
@@ -924,6 +883,9 @@ class StripeManager
 
         $this->testMode = $testMode;
 
+        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+        \Stripe\Stripe::setApiVersion("2020-03-02");
+
         if ($prof_email) {
 
             $profMg = new \spamtonprof\stp_api\StpProfManager();
@@ -940,8 +902,6 @@ class StripeManager
 
     public function retrieve_event($id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $ret = \Stripe\Event::retrieve($id);
 
         return ($ret);
@@ -949,8 +909,6 @@ class StripeManager
 
     public function delete_all_pending_invoice_items()
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $items = \Stripe\InvoiceItem::all([
             'limit' => 100,
             'pending' => true
@@ -967,8 +925,6 @@ class StripeManager
 
     public function retrieveAllInvoice($email)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $customers = \Stripe\Customer::all([
             "email" => $email
         ]);
@@ -989,15 +945,12 @@ class StripeManager
 
     public function retrieveInvoice()
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         $invoice = \Stripe\Invoice::retrieve("in_1DqhYrIcMMHYXO98PryWln1j");
         prettyPrint($invoice);
     }
 
     public function getUnpaidInvoicesOfCancelSub()
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $invoices = \Stripe\Invoice::all([
             "limit" => 3
         ]);
@@ -1095,8 +1048,6 @@ class StripeManager
 
     public function getObjectId($id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $ret = \Stripe\Event::retrieve($id);
 
         return ($ret->data->object->id);
@@ -1104,8 +1055,6 @@ class StripeManager
 
     public function is_in_trial($sub_id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $sub = \Stripe\Subscription::retrieve($sub_id);
 
         return ($sub->status == 'trialing');
@@ -1113,8 +1062,6 @@ class StripeManager
 
     public function listActiveSubs(int $limit, $starting_after = false)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $params = [
             'limit' => $limit,
             'status' => 'active'
@@ -1132,8 +1079,6 @@ class StripeManager
     public function addInstallmentPlan($emailClient, $source, $planStripeId, $stripeProfId, \spamtonprof\stp_api\StpCompte $compte)
     {
         $slack = new \spamtonprof\slack\Slack();
-
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
 
         $plan_stripe = \Stripe\Plan::retrieve($planStripeId);
 
@@ -1221,8 +1166,6 @@ class StripeManager
     public function addConnectSubscription($emailClient, $source, $refCompte, $planStripeId, $stripeProfId, $refAbonnement, \spamtonprof\stp_api\StpCompte $compte, $trialEnd = 'now', \spamtonprof\stp_api\StpCoupon $coupon = null)
     {
         $slack = new \spamtonprof\slack\Slack();
-
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
 
         try {
 
@@ -1324,7 +1267,7 @@ class StripeManager
         }
 
         // mise à jour de l'abonnement stripe
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
+
         $sub = \Stripe\Subscription::retrieve($subId);
 
         \Stripe\Subscription::update($subId, [
@@ -1367,10 +1310,9 @@ class StripeManager
     public function resetStripePlans()
 
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey()); // ------------ test key ----------
+        // ------------ test key ----------
 
         // /*********** suprrimer tous les produits et tous les plans ********** //
-
         $plans = \Stripe\Plan::all(array(
 
             "limit" => 100
@@ -1472,8 +1414,6 @@ class StripeManager
 
     public function getAllSusbscriptions()
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $subscriptions = \Stripe\Subscription::all(array(
 
             "limit" => 500
@@ -1486,8 +1426,6 @@ class StripeManager
     {
 
         // faire la crÃ©ation du compte stripe
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         try {
 
             $acct = \Stripe\Account::create(array(
@@ -1511,8 +1449,6 @@ class StripeManager
     {
 
         // faire la crÃ©ation du compte stripe
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         try {
 
             $acct = \Stripe\Account::retrieve($accoundId);
@@ -1530,8 +1466,6 @@ class StripeManager
     {
 
         // faire la crÃ©ation du compte stripe
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         try {
 
             $account = \Stripe\Account::retrieve($accoundId);
@@ -1552,8 +1486,6 @@ class StripeManager
 
     public function deleteAllProductsAndPlans()
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $subs = \Stripe\Subscription::all(array(
             'limit' => 100
         ));
@@ -1592,8 +1524,6 @@ class StripeManager
     /* pour faire des transferts manuels vers le compte d'un prof */
     public function manualTransfert($emailProf, $amount, $description)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $profMg = new \spamtonprof\stp_api\StpProfManager();
         $prof = $profMg->get(array(
             'email_stp' => $emailProf
@@ -1612,9 +1542,8 @@ class StripeManager
     // pour avoir les charges pas traités ( qui n'ont pas fait l'objet d'un transfert et/ou d'une régularisation de solde
     public function getUnhandledCharge($nb_iter)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-        // $slack = new \spamtonprof\slack\Slack();
 
+        // $slack = new \spamtonprof\slack\Slack();
         $charge_ids = [];
         $params = [
             "limit" => 20
@@ -1649,8 +1578,6 @@ class StripeManager
     /* pour mettre Ã  jour la cb d'un compte stripe */
     public function updateCb($refCompte, $testMode, $token)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $compteMg = new \spamtonprof\stp_api\StpCompteManager();
         $compte = $compteMg->get(array(
             'ref_compte' => $refCompte
@@ -1668,8 +1595,6 @@ class StripeManager
 
     public function update_installment_plan($ref_plan)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $planMg = new \spamtonprof\stp_api\StpPlanManager();
         $plan = $planMg->get(array(
             'ref_plan' => $ref_plan
@@ -1696,8 +1621,6 @@ class StripeManager
     /* $query = array('custom' => ' where ref_formule >= 150' ) */
     public function createProductsAndPlans($query, $formules_exits = true)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $formuleMg = new \spamtonprof\stp_api\StpFormuleManager();
         $planMg = new \spamtonprof\stp_api\StpPlanManager();
 
@@ -1746,7 +1669,7 @@ class StripeManager
 
                 $ref_plan_stripe = $plan->getRef_plan_stripe();
                 if ($this->testMode) {
-                    $$ref_plan_stripe = $plan->getRef_plan_stripe_test();
+                    $ref_plan_stripe = false;
                 }
 
                 if (! $ref_plan_stripe) {
@@ -1772,8 +1695,6 @@ class StripeManager
 
     public function addTrialTest($subId, $endDay, $prorate = false)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $endDay = \DateTime::createFromFormat(PG_DATETIME_FORMAT, $endDay);
 
         \Stripe\Subscription::update($subId, [
@@ -1784,8 +1705,6 @@ class StripeManager
 
     public function stopTrial($subId)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         \Stripe\Subscription::update($subId, [
             'trial_end' => 'now'
         ]);
@@ -1793,8 +1712,6 @@ class StripeManager
 
     public function addTrial($subId, $endDay, $prorate = true)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $endDay = \DateTime::createFromFormat(PG_DATE_FORMAT, $endDay);
 
         \Stripe\Subscription::update($subId, [
@@ -1805,8 +1722,6 @@ class StripeManager
 
     public function createInvoice($cus, $des, $metadata = false)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $params = [
             'customer' => $cus,
             'collection_method' => 'send_invoice',
@@ -1825,8 +1740,6 @@ class StripeManager
 
     public function createInvoiceItem($cus, $amnt, $description, $currency = 'eur')
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $invoiceItem = \Stripe\InvoiceItem::create([
             'customer' => $cus,
             'amount' => $amnt,
@@ -1839,15 +1752,11 @@ class StripeManager
 
     public function createProfInvoice()
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         \Stripe\Invoice::create();
     }
 
     public function sendInvoice($invoice_id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $invoice = \Stripe\Invoice::retrieve($invoice_id);
 
         $invoice->sendInvoice();
@@ -1855,8 +1764,6 @@ class StripeManager
 
     public function markUncollectible($invoice_id)
     {
-        \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
-
         $invoice = \Stripe\Invoice::retrieve($invoice_id);
 
         $invoice->markUncollectible();
