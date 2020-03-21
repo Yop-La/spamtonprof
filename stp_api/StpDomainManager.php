@@ -106,6 +106,43 @@ class StpDomainManager
         return (new \spamtonprof\stp_api\MailForLead($data));
     }
 
+    public function getStatsOnValidDomain()
+    {
+        
+        $this->_db->exec("create or replace view valid_domain as(
+            select * from stp_domain where mail_provider like 'mailgun' and in_black_list is false and mx_ok is true and disabled is false
+            );
+            
+            create or replace view stat_domain as(
+                select split_part(mail, '@', 2) as domain, count(split_part(mail, '@', 2)) as nb_use  from compte_lbc group by split_part(mail, '@', 2) order by nb_use desc
+            );
+            
+            create or replace view stat_valid_domain as(
+                SELECT name, ref_domain,mail_provider,in_black_list,mx_ok, disabled, coalesce(nb_use, 0) as nb_use
+                FROM valid_domain
+                LEFT OUTER JOIN stat_domain
+                ON valid_domain.name  = stat_domain.domain
+            
+            );");
+        
+        $q = $this->_db->prepare("
+
+            select * from stat_valid_domain order by nb_use desc;
+        ");
+
+        $q->execute();
+
+        
+        $domains = [];
+        while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
+            
+
+            $domains[] = new \spamtonprof\stp_api\StpDomain($data);
+        }
+
+        return ($domains);
+    }
+
     public function updateMxOk(\spamtonprof\stp_api\StpDomain $domain)
     {
         $q = $this->_db->prepare("update stp_domain set mx_ok = :mx_ok where ref_domain = :ref_domain");

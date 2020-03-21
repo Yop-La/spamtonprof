@@ -56,8 +56,15 @@ if ($matches) {
 
 $i = $number + 1;
 $exist = true;
+
+$domainMg = new \spamtonprof\stp_api\StpDomainManager();
+
+$domains = $domainMg->getStatsOnValidDomain();
+
+$domain = array_pop($domains);
+
 while ($exist) {
-    $newEmail = $radical . $i . "@" . $client->getDomain();
+    $newEmail = $radical . $i . "@" . $domain->getName();
     $exist = $lbcAccountMg->get(array(
         "mail" => $newEmail
     ));

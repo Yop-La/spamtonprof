@@ -4,7 +4,25 @@ namespace spamtonprof\stp_api;
 class StpDomain implements \JsonSerializable
 {
 
-    protected $name, $ref_domain, $mail_provider, $mx_ok, $in_black_list, $root, $subdomain, $disabled;
+    protected $name, $ref_domain, $mail_provider, $mx_ok, $in_black_list, $root, $subdomain, $disabled, $nb_use;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getNb_use()
+    {
+        return $this->nb_use;
+    }
+
+    /**
+     *
+     * @param mixed $nb_use
+     */
+    public function setNb_use($nb_use)
+    {
+        $this->nb_use = $nb_use;
+    }
 
     public function __construct(array $donnees = array())
     {
