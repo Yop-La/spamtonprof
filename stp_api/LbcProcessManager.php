@@ -626,47 +626,37 @@ class LbcProcessManager
         // step 3 : recuperation des annonces via api leboncoin
         $ads = false;
 
-        
-        
         if ($cookie) {
-            
 
             if (! $user_id) {
 
                 $lbcApi = new \spamtonprof\stp_api\LbcApi();
                 $user_id = $lbcApi->getUserId($cookie);
-                
-                
 
-                if(!$user_id){
-                    
+                if (! $user_id) {
+
                     $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
                     $lbcAccount->setControle_date($now);
                     $lbcAccountMg->updateControleDate($lbcAccount);
-                    
-                    
+
                     $lbcAccount->setUncheckable(true);
                     $lbcAccountMg->update_uncheckable($lbcAccount);
-                    
+
                     $msgs[] = 'impossible de récupérer le user_id';
                     // on va libérer les annonces d'un compte impossible à checker
-
                 }
-                
+
                 $lbcAccount->setUser_id($user_id);
                 $lbcAccountMg->updateUserId($lbcAccount);
-                
             }
-            
-            if($user_id){
-                
+
+            if ($user_id) {
+
                 $ads = $lbcApi->getAdds(array(
                     'user_id' => $user_id
                 ));
             }
 
-            
-            
             $msgs[] = "User_id : " . $user_id;
         } else if (! is_null($codePromo)) {
             $ads = $lbcApi->getAdds(array(
@@ -734,21 +724,19 @@ class LbcProcessManager
 
                 $nbAnnonce ++;
             }
-            
-            // 4-1-2: on va virer ( statut = bloque ), les annonces sans correspondance. On part du principe qu'il n'y pas d'annonces en attente de modération 
+
+            // 4-1-2: on va virer ( statut = bloque ), les annonces sans correspondance. On part du principe qu'il n'y pas d'annonces en attente de modération
             // ( ie le contrôle se fait au moins deux heures après la publication )
             $ads_to_block = $adTempoMg->getAll(array(
                 "key" => $adTempoMg::get_ads_to_block_during_check,
                 "ref_compte" => $lbcAccount->getRef_compte()
             ));
-            
-            foreach ($ads_to_block as $ad_to_block){
-                
+
+            foreach ($ads_to_block as $ad_to_block) {
+
                 $ad_to_block->setStatut($adTempoMg::bloque);
                 $adTempoMg->update_statut($ad_to_block);
-                
             }
-            
 
             // 4-1-3 : on va mettre a jour la ref_commune de adds_tempo car la commune saisi ne correspond pas forcément à la commune en ligne
             $adsTemp = $adTempoMg->getAll(array(
@@ -756,18 +744,16 @@ class LbcProcessManager
                 "ref_compte" => $lbcAccount->getRef_compte()
             ));
 
-            
             $adTempoMg->updateAllRefCommune($adsTemp);
         } else {
             $disabled = true;
             $nbAnnonce = 0;
-            
-            //toutes les annonces de ce compte se voient attribuer le statut bloqué
+
+            // toutes les annonces de ce compte se voient attribuer le statut bloqué
             $adTempoMg->update_all(array(
                 'key' => $adTempoMg::block_ads_of_act,
                 'ref_compte' => $lbcAccount->getRef_compte()
             ));
-            
         }
 
         // les annonces avec le statut publié se voit attribuer le statut refusé
@@ -1048,14 +1034,13 @@ class LbcProcessManager
         // step 1 :recuperer les comptes ages d'au moins 2h.
         $lbcAccounts = $lbcAccountMg->getAccountToScrap($nbCompte);
 
-        
         $i = 0;
         $msgs = [];
         $nb_acts = count($lbcAccounts);
         foreach ($lbcAccounts as $lbcAccount) {
 
-            echo($lbcAccount->getRef_compte() . '<br>');
-            
+            echo ($lbcAccount->getRef_compte() . '<br>');
+
             try {
                 $msgs_inter = $this->check_account($lbcAccount);
             } catch (\Exception $e) {
@@ -1075,54 +1060,94 @@ class LbcProcessManager
     public function generateAds($refClient, $nbAds, $phone, $lock = false, $ref_compte = 0, \spamtonprof\stp_api\LbcCampaign $campaign = null, $category = false)
     {
         $clientMg = new \spamtonprof\stp_api\LbcClientManager();
-        // on recupere le client
-        $client = $clientMg->get(array(
-            'ref_client' => $refClient
-        ));
-
-        // si il y a une seule annonce c'est que c'est une premire annonce sur un compte vierge. On doit mettre une annonce qui passe ( celle de Valentin )
-        $ref_client_content = $refClient;
-        $client_content = $client;
-
-        $random_ad = false;
-
-        if (false && $nbAds == 1) {
-
-            // $ref_client_content = 12;
-            // $client_content = $clientMg->get(array(
-            // 'ref_client' => $ref_client_content
-            // ));
-            $random_ad = true;
-        }
-
-        // on recupere les titres non déjà utilisés sur ce compte
         $hasTypeTitleMg = new \spamtonprof\stp_api\HasTitleTypeManager();
         $lbcTitleMg = new \spamtonprof\stp_api\LbcTitleManager();
         $communeMg = new \spamtonprof\stp_api\LbcCommuneManager();
         $adMg = new \spamtonprof\stp_api\AddsTempoManager();
         $actMg = new \spamtonprof\stp_api\LbcAccountManager();
-
-        $hasTypeTitle = $hasTypeTitleMg->get(array(
-            "ref_client_defaut" => $ref_client_content
-        ));
-        $titles = $lbcTitleMg->getAll(array(
-            "ref_type_titre" => $hasTypeTitle->getRef_type_titre(),
-            "not_that_title" => $ref_compte
+        
+        
+        // on recupere le client
+        $client = $clientMg->get(array(
+            'ref_client' => $refClient
         ));
 
-        shuffle($titles);
+        $nbTitles = 0;
+        $nbTextes = 0;
+        $lbcAdsMg = new \spamtonprof\stp_api\LbcAdManager();
+        $ads_from_lbc = false;
+        if ($client->getAds_from_lbc_ad()) {
 
-        // on recupere les textes non déjà potentiellement en ligne ou en ligne sur ce compte
-        $hasTypeTexteMg = new \spamtonprof\stp_api\HasTextTypeManager();
-        $hasTypeTexte = $hasTypeTexteMg->get_next($ref_client_content);
+            $ads_from_lbc = $lbcAdsMg->getAll(array(
+                'key' => 'is_ready'
+            ));
+            
+            
+            shuffle($ads_from_lbc);
 
-        $lbcTexteMg = new \spamtonprof\stp_api\LbcTexteManager();
-        $textes = $lbcTexteMg->getAll(array(
-            "key" => $lbcTexteMg::texte_not_in_that_act,
-            "ref_type_texte" => $hasTypeTexte->getRef_type(),
-            "ref_compte" => $ref_compte
-        ));
-        shuffle($textes);
+            
+            
+            $nbTitles = count($ads_from_lbc);
+            $nbTextes = count($ads_from_lbc);
+        }
+
+        $random_ad = false;
+        
+        // pas besoin de récupérer des textes à nouveau
+        if (! $client->getAds_from_lbc_ad()) {
+
+            // si il y a une seule annonce c'est que c'est une premire annonce sur un compte vierge. On doit mettre une annonce qui passe ( celle de Valentin )
+            $ref_client_content = $refClient;
+            $client_content = $client;
+
+
+            if (false && $nbAds == 1) {
+
+                // $ref_client_content = 12;
+                // $client_content = $clientMg->get(array(
+                // 'ref_client' => $ref_client_content
+                // ));
+                $random_ad = true;
+            }
+
+            // on recupere les titres non déjà utilisés sur ce compte
+            $hasTypeTitle = $hasTypeTitleMg->get(array(
+                "ref_client_defaut" => $ref_client_content
+            ));
+
+            $titles = $lbcTitleMg->getAll(array(
+                "ref_type_titre" => $hasTypeTitle->getRef_type_titre(),
+                "not_that_title" => $ref_compte
+            ));
+
+            shuffle($titles);
+
+            $nbTitles = count($titles);
+
+            // on recupere les textes non déjà potentiellement en ligne ou en ligne sur ce compte
+            $hasTypeTexteMg = new \spamtonprof\stp_api\HasTextTypeManager();
+            $hasTypeTexte = $hasTypeTexteMg->get_next($ref_client_content);
+
+            $lbcTexteMg = new \spamtonprof\stp_api\LbcTexteManager();
+            $textes = $lbcTexteMg->getAll(array(
+                "key" => $lbcTexteMg::texte_not_in_that_act,
+                "ref_type_texte" => $hasTypeTexte->getRef_type(),
+                "ref_compte" => $ref_compte
+            ));
+            shuffle($textes);
+
+            $nbTextes = count($textes);
+
+            // recuperation des images
+            $images = scandir(ABSPATH . 'wp-content/uploads/lbc_images/' . $client_content->getImg_folder());
+
+            unset($images[0]);
+            unset($images[1]);
+
+            shuffle($images);
+
+            $nbImages = count($images);
+        }
 
         // on recupere le compte lbc pour avoir le prenom a mettre dans les annonces
         $prenom = '[prenom]';
@@ -1144,28 +1169,24 @@ class LbcProcessManager
         }
 
         // on recupere les communes
-        
+
         $target_big_city = true;
-        if($nbAds == 1){
+        if ($nbAds == 1) {
             $target_big_city = false;
         }
-        
+
         $communes = $communeMg->getAll(array(
             "ref_client" => $refClient,
             'target_big_city' => $target_big_city
         ));
-        
-        if(count($communes) == 0){
+
+        if (count($communes) == 0) {
             $communes = $communeMg->getAll(array(
                 "ref_client" => $refClient,
                 'target_big_city' => false
             ));
         }
 
-        // on constitue les annonces ( en verouillant les communes de ces annonces)
-
-        $nbTitles = count($titles);
-        $nbTextes = count($textes);
         $nbCommunes = count($communes);
 
         $nbAds = min(array(
@@ -1181,43 +1202,35 @@ class LbcProcessManager
             prettyPrint($ret);
         }
 
-        // recuperation des images
-        $images = scandir(ABSPATH . 'wp-content/uploads/lbc_images/' . $client_content->getImg_folder());
-
-        unset($images[0]);
-        unset($images[1]);
-
-        shuffle($images);
-
-        $nbImages = count($images);
-
+        // on constitue les annonces ( en verouillant les communes de ces annonces)
         $ads = [];
         for ($i = 0; $i < $nbAds; $i ++) {
 
             $univers = false;
 
-            // recuperation du titre
-            $title = $titles[$i % $nbTitles];
-            $title_str = $title->getTitre();
+            if (! $client->getAds_from_lbc_ad()) {
+                // recuperation du titre
+                $title = $titles[$i % $nbTitles];
+                $title_str = $title->getTitre();
 
-            // recuperation du texte
-            $texte = $textes[$i % $nbTextes];
+                // recuperation du texte
+                $texte = $textes[$i % $nbTextes];
 
-            $texte->setTexte(str_replace(array(
-                'Alexandre',
-                'alexandre',
-                'Anahyse',
-                'anahyse',
-                'Martin',
-                'martin'
-            ), $prenom, $texte->getTexte()));
+                $texte->setTexte(str_replace(array(
+                    'Alexandre',
+                    'alexandre',
+                    'Anahyse',
+                    'anahyse',
+                    'Martin',
+                    'martin'
+                ), $prenom, $texte->getTexte()));
 
-//             prettyPrint($nbImages);
-            
-            // recuperation de l'image
-            $image = 'https://spamtonprof.com/wp-content/uploads/lbc_images/' . $client_content->getImg_folder() . '/' . $images[($i % $nbImages) ];
+                // prettyPrint($nbImages);
 
-            
+                // recuperation de l'image
+                $image = 'https://spamtonprof.com/wp-content/uploads/lbc_images/' . $client_content->getImg_folder() . '/' . $images[($i % $nbImages)];
+            }
+
             // recuperation de la commune
             $commune = $communes[$i % $nbCommunes];
             $nomCommune = $commune->getLibelle() . " " . $commune->getCode_postal();
@@ -1233,27 +1246,27 @@ class LbcProcessManager
                 $params = array(
                     "ref_compte" => $ref_compte,
                     "ref_commune" => $commune->getRef_commune(),
-                    "ref_titre" => $title->getRef_titre(),
-                    "ref_texte" => $texte->getRef_texte(),
+                    "ref_titre" => null,
+                    "ref_texte" => null,
                     "statut" => $adMg::publie,
                     "ref_campaign" => $ref_campaign
                 );
 
+                if (! $client->getAds_from_lbc_ad()) {
+
+                    $params = array(
+                        "ref_compte" => $ref_compte,
+                        "ref_commune" => $commune->getRef_commune(),
+                        "ref_titre" => $title->getRef_titre(),
+                        "ref_texte" => $texte->getRef_texte(),
+                        "statut" => $adMg::publie,
+                        "ref_campaign" => $ref_campaign
+                    );
+                }
+
                 $adTempo = new \spamtonprof\stp_api\AddsTempo($params);
                 $adMg->add($adTempo);
             }
-
-            $symbols = [
-                '-',
-                '_',
-                '/',
-                '=',
-                '.',
-                '*'
-            ];
-            $symbol = $symbols[rand(0, count($symbols) - 1)];
-            $symbols_line = str_repeat($symbol, rand(10, 50));
-            $texte->setTexte($symbols_line . PHP_EOL . PHP_EOL . $texte->getTexte() . PHP_EOL . PHP_EOL . $symbols_line);
 
             $ad = new \stdClass();
 
@@ -1286,6 +1299,31 @@ class LbcProcessManager
                 $image = 'http://' . DOMAIN . $ad->image;
             }
 
+            if ($client->getAds_from_lbc_ad()) {
+
+                $texte = new \spamtonprof\stp_api\LbcTexte();
+                
+                $ad_from_lbc = array_pop($ads_from_lbc);
+
+                $ad_from_lbc = $lbcAdsMg->cast($ad_from_lbc);
+
+                $title_str = $ad_from_lbc->getSubject();
+                $texte->setTexte($ad_from_lbc->getBody());
+                $image = $ad_from_lbc->getImage_url();
+            }
+            
+            $symbols = [
+                '-',
+                '_',
+                '/',
+                '=',
+                '.',
+                '*'
+            ];
+            $symbol = $symbols[rand(0, count($symbols) - 1)];
+            $symbols_line = str_repeat($symbol, rand(10, 50));
+            $texte->setTexte($symbols_line . PHP_EOL . PHP_EOL . $texte->getTexte() . PHP_EOL . PHP_EOL . $symbols_line);
+
             $ad->title = $title_str;
             $ad->text = $texte;
             $ad->image = $image;
@@ -1296,6 +1334,8 @@ class LbcProcessManager
                 $ad->univers = $univers;
             }
 
+         
+            
             $ads[] = $ad;
         }
         return ($ads);
