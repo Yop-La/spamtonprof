@@ -629,14 +629,12 @@ class LbcApi implements \JsonSerializable
 
     function get_page($url)
     {
-        
         $curl = curl_init();
 
-        
-        if(!substr($url, -1) == "/"){
+        if (! substr($url, - 1) == "/") {
             $url = $url . "/";
         }
-        
+
         $headers = array();
         $headers[] = 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:69.0) Gecko/20100101 Firefox/69.0';
         $headers[] = 'Accept: */*';
@@ -681,8 +679,7 @@ class LbcApi implements \JsonSerializable
         $most_recent_ad = false;
         $most_recent_ad = $ads_immo_mg->get_most_recent_ad($target, $category);
 
-        
-//         prettyPrint($most_recent_ad);
+        // prettyPrint($most_recent_ad);
         $last_index_date = false;
         if ($most_recent_ad) {
             $last_index_date = $most_recent_ad->getIndex_date();
@@ -777,15 +774,12 @@ class LbcApi implements \JsonSerializable
                 if ($category == $this::coloc) {
 
                     $url = $row["url"] . "/";
-                    
+
                     $output = $this->get_page($url);
-                    
 
                     $url = explode("/", $url);
                     array_pop($url);
-                    
-                    
-                    
+
                     $filename = array_pop($url);
 
                     $filename = ABSPATH . 'wp-content/plugins/spamtonprof/downloads/' . $filename;
@@ -890,24 +884,30 @@ class LbcApi implements \JsonSerializable
         $err = false;
         $curl = curl_init();
 
-        $headers = array();
-        $headers[] = 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:69.0) Gecko/20100101 Firefox/69.0';
-        $headers[] = 'Accept: */*';
-        $headers[] = 'Accept-Language: fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3';
-        $headers[] = 'Referer: https://www.leboncoin.fr/recherche/?text=nike&locations=r_7';
-        $headers[] = 'Api_key: ba0c2dad52b3ec';
-        $headers[] = 'Content-Type: application/json';
-        $headers[] = 'Origin: https://www.leboncoin.fr';
-        $headers[] = 'Connection: keep-alive';
-        $headers[] = 'Cookie: _ENV["datadome=' . $this->cookie_datadome . '; ABTasty=uid%3D19100614412715504%26fst%3D1570365687435%26pst%3Dnull%26cst%3D1570365687435%26ns%3D1%26pvt%3D5%26pvis%3D5%26th%3D; ABTastySession=sen%3D21__referrer%3D__landingPage%3Dhttps%3A//www.leboncoin.fr/; cikneeto_uuid=id:fd4738ba-e7af-4a0f-a228-eefaf5a6c99e; _gcl_au=1.1.2037802551.1570365687; cikneeto=date:1570366905871; consent_allpurpose=cDE9MTtwMj0xO3AzPTE7cDQ9MTtwNT0x; cookieBanner=1; utag_main=v_id:016da116cbf20014cc52dc40d7dd0004c001900900bd0_sn:1_ss:0_pn:2%3Bexp-session_st:1570368705660ses_id:1570365688818%3Bexp-session; xtvrn=562498; xtan562498=-undefined; xtant562498=1; cto_lwid=40b20c18-da25-456e-9177-902a4da85224; _pulse2data=9af27d9e-a067-40f3-b6c3-887214ecca21%2Cv%2C%2C1570367689490%2CeyJpc3N1ZWRBdCI6IjIwMTktMTAtMDZUMTI6NDE6MjlaIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImFsZyI6ImRpciIsImtpZCI6IjIifQ..JdkB3pM_kc30lX5VMP54Uw.8jawGme9E4jVcDobZb55Mqr96j6CKMu-2_C9-AxkeY7w-catWdCBt35_dtmbyqZV9Bru9zl2RDjhs2oNRWzpMfy5aTdwfGjKIdM9yDLh89A4bTgmY2EGgqcBR9Nb2pKD3DqWPgggKhboDbyTFuZ61NmyLsyKSd1_ze-TrJYYKtQA9CSvtqC-HTE_ziirqUOznsK_4yckfv4lKav3QZxrVg.ufWfitkciGAAYt3PCKo0NQ%2C%2C0%2Ctrue%2C%2CeyJraWQiOiIyIiwiYWxnIjoiSFMyNTYifQ..QqnxKllfRSukjfpazBiVeXEOIMYPKeLteyUJoUfNTbA; _fbp=fb.1.1570365690280.1099195613; cto_bundle=y2JxzF9xaExQZ1NpUiUyRkR6SkJKZFRXMDc2NDZETTNZalZTb0JXc1RIVSUyQlN2Y2FBcE5HMUZnQWpxSTNvdWNXOUFtYnNuQ2ttbVNjV2s5a0VobjFHVEhxeDFzMyUyQnlKek1JOVVNV2dqYlVtaWVoY2VZQktKQjNLcUgxRnZqMEh0M0hVSmVsNQ; sq=ca=7_s; shippableOnboarding=1; saveOnboarding=1"]';
-
-        curl_setopt($curl, CURLOPT_URL, 'https://api.leboncoin.fr/finder/search');
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt($curl, CURLOPT_ENCODING, 'gzip, deflate');
-        curl_setopt($curl, CURLOPT_HEADER, 1);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_VERBOSE, 1);
+        $headers = array(
+            CURLOPT_URL => "https://api.leboncoin.fr/finder/search",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => "{\"filters\":{\"category\":{},\"enums\":{\"ad_type\":[\"offer\"]},\"keywords\":{\"text\":\"maths\"},\"location\":{},\"ranges\":{}},\"limit\":35,\"limit_alu\":3}",
+            CURLOPT_HTTPHEADER => array(
+                "User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:74.0) Gecko/20100101 Firefox/74.0",
+                "Accept: */*",
+                "Accept-Language: fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3",
+                "Referer: https://www.leboncoin.fr/recherche/?text=maths",
+                "api_key: ba0c2dad52b3ec",
+                "Content-Type: application/json",
+                "Origin: https://www.leboncoin.fr",
+                "Connection: keep-alive",
+                'Cookie: datadome=' . $this->cookie_datadome . '; _gcl_au=1.1.1971705584.1584649563; cikneeto_uuid=id:0d927f34-2c9c-4bd4-873f-1a6e2e1c7bd4; cikneeto=date:1584649893094; didomi_token=eyJ1c2VyX2lkIjoiMTcwZjQ3OTYtYjM1ZS02MDMxLThmMjAtODY3ZGIxN2VkZWM0IiwiY3JlYXRlZCI6IjIwMjAtMDMtMTlUMjA6MjY6MDIuOTgyWiIsInVwZGF0ZWQiOiIyMDIwLTAzLTE5VDIwOjI2OjAyLjk4M1oiLCJ2ZW5kb3JzIjp7ImVuYWJsZWQiOltdLCJkaXNhYmxlZCI6W119LCJwdXJwb3NlcyI6eyJlbmFibGVkIjpbXSwiZGlzYWJsZWQiOltdfX0=; utag_main=v_id:0170f47977d30002e50ed622a4e50004c002900900bd0$_sn:1$_ss:0$_pn:2%3Bexp-session$_st:1584651692637$ses_id:1584649566163%3Bexp-session; xtvrn=$562498$; xtan562498=-undefined; xtant562498=1; _pulse2data=bb7cc792-4b1d-45a4-887f-c5468d9f0b00%2Cv%2C%2C1584650468500%2CeyJpc3N1ZWRBdCI6IjIwMjAtMDMtMTlUMjA6MjY6MDhaIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImFsZyI6ImRpciIsImtpZCI6IjIifQ..fsOIbFdaH7elpARlGKvkZA.WvTss-jocR7HU1yk9-Hu89v1VPlLfTWEYchHalKxiEaVu66guh9kIZotFvNe4x-almXTaxgwqHPXPAqbYvJ_WXBBliDALbJrekK46I22kq9PVZcREmUjUexy15JXaYaBsIyDENzYbaRUSb3CIRwLLjnEyitlYIZw6OnZV3D7n3a8rDAoLnef2A9iL1C4pbBUh4rQHMNjpx11ZQyAh51g4w.94CFR0g2Vjp7cgabAgc06g%2C%2C0%2Ctrue%2C%2CeyJraWQiOiIyIiwiYWxnIjoiSFMyNTYifQ..3ZFHXf184noaaA-4wSGHFWXWyDfxOFawY1k_0UnTk28; ry_ry-l3b0nco_realytics=eyJpZCI6InJ5Xzg3NTcwN0RGLTdERTUtNEQ3NC1CNjRFLTFGOUUyMzZCQzQ3NCIsImNpZCI6bnVsbCwiZXhwIjoxNjE2MTg1NTY4NTM3LCJjcyI6bnVsbH0%3D; ry_ry-l3b0nco_so_realytics=eyJpZCI6InJ5Xzg3NTcwN0RGLTdERTUtNEQ3NC1CNjRFLTFGOUUyMzZCQzQ3NCIsImNpZCI6bnVsbCwib3JpZ2luIjpmYWxzZSwicmVmIjpudWxsLCJjb250IjpudWxsLCJucyI6ZmFsc2V9; __gads=ID=1f14a1b2d6b2221c:T=1584649570:S=ALNI_MbZWNFi_MAAr-l0KwRJV2DM8_lIAw; cto_bundle=zVpJx18lMkJJU3Jub2xkZUpIMUlxS0w0cTNLYXBSRSUyRk1nN2s2NUdPNVh0dXBzSDd6RHF3bTBGRzZQdnZZTTZ0Q2puZWlWNmFyWEV4ZERKUkxSOXBJT2VJRTdUZkV2RWdMWUVyNFZuTDJBdHNIOFMwRVlNejUwdENzNlg3OWRibDlzYjd1UlRXVHVTTjFEN1B6V0MlMkZ2THQlMkZNa0VKUSUzRCUzRA; saveOnboarding=1',
+                "Pragma: no-cache",
+                "Cache-Control: no-cache"
+            )
+        );
 
         if (array_key_exists('key', $info)) {
 
@@ -926,37 +926,24 @@ class LbcApi implements \JsonSerializable
 
                 $code_promo = "";
 
-                curl_setopt($curl, CURLOPT_POSTFIELDS, "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"" . $category . "\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $code_promo . "\"},\"ranges\":{}}}");
+                $headers[CURLOPT_POSTFIELDS] = "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"" . $category . "\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $code_promo . "\"},\"ranges\":{}}}";
             }
+
+            if ($key == 'cours_particuliers') {
+
+                $category = $this::cat_cours_particuliers;
+
+                $kw = "maths";
+
+                $headers[CURLOPT_POSTFIELDS] = "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"" . $category . "\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $kw . "\"},\"ranges\":{}}}";
+            }
+
+            curl_setopt_array($curl, $headers);
         }
 
-        if (array_key_exists('nike', $info)) {
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_HEADER, 1);
 
-            $category = $this::chaussure;
-
-            $code_promo = $info['nike'];
-
-            $offset = random_int(0, 5000);
-
-            curl_setopt($curl, CURLOPT_POSTFIELDS, "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"" . $category . "\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $code_promo . "\"},\"ranges\":{\"price\":{\"min\":50,\"max\":250}}}}");
-        }
-
-        if (array_key_exists('code_promo', $info) && array_key_exists('category', $info)) {
-
-            $code_promo = $info['code_promo'];
-            $category = $info['category'];
-
-            curl_setopt($curl, CURLOPT_POSTFIELDS, "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"" . $category . "\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $code_promo . "\"},\"ranges\":{}}}");
-        }
-
-        if (array_key_exists('user_id', $info)) {
-
-            $user_id = $info['user_id'];
-
-            curl_setopt($curl, CURLOPT_POSTFIELDS, "{\"limit\":100, \"offset\":" . $offset . ", \"filters\":{\"owner\":{\"user_id\":\"" . $user_id . "\"},\"enums\":{\"ad_type\":[\"offer\"]}},\"limit\":100}");
-        }
-
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         $response = curl_exec($curl);
 
         $err = curl_error($curl);
