@@ -12,9 +12,9 @@ use PayPal\Api\Currency;
 
 /*
  *
- * Cette classe sert à gérér ( CRUD ) les plans de paiement stripe
+ * Cette classe sert ï¿½ gï¿½rï¿½r ( CRUD ) les plans de paiement stripe
  *
- * Elle sert aussi à créer des abonnements, des clients, des paiements, etc
+ * Elle sert aussi ï¿½ crï¿½er des abonnements, des clients, des paiements, etc
  *
  *
  *
@@ -41,6 +41,29 @@ class MailGunManager
         $this->mg = Mailgun::create(mailGunKey);
     }
 
+    public function deleteDomain($name)
+    {
+        $this->mg->domains()->delete($name);
+    }
+
+    public function isValid($name)
+    {
+        $res = $this->mg->domains()->verify($name);
+
+        $dns_ar = $res->getOutboundDNSRecords();
+        $dns_ar = array_merge($res->getInboundDNSRecords(), $dns_ar);
+
+        foreach ($dns_ar as $dns) {
+            $dns->getValidity();
+
+            if ($dns->getValidity() != 'valid') {
+                return (false);
+            }
+        }
+
+        return (true);
+    }
+
     public function deleteAllDomains()
     {
         $domains = $this->mg->domains()
@@ -48,8 +71,20 @@ class MailGunManager
             ->getDomains();
 
         foreach ($domains as $domain) {
-            $this->mg->domains()->delete($domain->getName());
+            $this->deleteDomain($domain->getName());
         }
+    }
+
+    public function listDomains()
+    {
+        $ret = [];
+        $domains = $this->mg->domains()->index();
+
+        foreach ($domains as $domain) {
+            $ret[] = $domain->getName();
+        }
+
+        return ($ret);
     }
 
     public function addDomain($name)

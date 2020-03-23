@@ -245,6 +245,7 @@ class LbcAccountManager
         return ($ret);
     }
 
+
     public function updateDisabled(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
         $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
@@ -254,8 +255,7 @@ class LbcAccountManager
         $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
         $q->execute();
     }
-    
-    
+
     public function update_uncheckable(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
         $q = $this->_db->prepare("update compte_lbc set uncheckable = :uncheckable where ref_compte = :ref_compte");
@@ -324,7 +324,6 @@ class LbcAccountManager
 
     public function add(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
-
         $q = $this->_db->prepare("insert into compte_lbc(mail, password, nb_annonces_online, disabled, ref_client, telephone, date_creation, open, nb_successful_campaigns, nb_failed_campaigns) 
             values(:mail, :password, 0, false, :ref_client, :telephone, NOW(),true, 0, 0)");
         $q->bindValue(":mail", $lbcAccount->getMail());

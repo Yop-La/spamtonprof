@@ -97,6 +97,18 @@ class StpDomainManager
             }
 
             return ($domains);
+        } else if (in_array("domains_to_validate", $info)) {
+
+            $q = $this->_db->prepare("select * from stp_domain where mx_ok is true and ( ready is null or ready is false )");
+
+            $q->execute();
+
+            while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
+
+                $domains[] = new \spamtonprof\stp_api\StpDomain($data);
+            }
+
+            return ($domains);
         }
 
         if (! $data) {
@@ -108,9 +120,8 @@ class StpDomainManager
 
     public function getStatsOnValidDomain()
     {
-        
         $this->_db->exec("create or replace view valid_domain as(
-            select * from stp_domain where mail_provider like 'mailgun' and in_black_list is false and mx_ok is true and disabled is false
+            select * from stp_domain where mail_provider like 'mailgun' and in_black_list is false and ready is true and disabled is false
             );
             
             create or replace view stat_domain as(
@@ -118,13 +129,13 @@ class StpDomainManager
             );
             
             create or replace view stat_valid_domain as(
-                SELECT name, ref_domain,mail_provider,in_black_list,mx_ok, disabled, coalesce(nb_use, 0) as nb_use
+                SELECT name, ref_domain,mail_provider,in_black_list,mx_ok,ready, disabled, coalesce(nb_use, 0) as nb_use
                 FROM valid_domain
                 LEFT OUTER JOIN stat_domain
                 ON valid_domain.name  = stat_domain.domain
             
             );");
-        
+
         $q = $this->_db->prepare("
 
             select * from stat_valid_domain order by nb_use desc;
@@ -132,10 +143,8 @@ class StpDomainManager
 
         $q->execute();
 
-        
         $domains = [];
         while ($data = $q->fetch(PDO::FETCH_ASSOC)) {
-            
 
             $domains[] = new \spamtonprof\stp_api\StpDomain($data);
         }
@@ -148,6 +157,14 @@ class StpDomainManager
         $q = $this->_db->prepare("update stp_domain set mx_ok = :mx_ok where ref_domain = :ref_domain");
         $q->bindValue(":ref_domain", $domain->getRef_domain());
         $q->bindValue(":mx_ok", $domain->getMx_ok(), PDO::PARAM_BOOL);
+        $q->execute();
+    }
+
+    public function updateReady(\spamtonprof\stp_api\StpDomain $domain)
+    {
+        $q = $this->_db->prepare("update stp_domain set ready = :ready where ref_domain = :ref_domain");
+        $q->bindValue(":ref_domain", $domain->getRef_domain());
+        $q->bindValue(":ready", $domain->getReady(), PDO::PARAM_BOOL);
         $q->execute();
     }
 

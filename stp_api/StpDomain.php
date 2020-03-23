@@ -4,7 +4,25 @@ namespace spamtonprof\stp_api;
 class StpDomain implements \JsonSerializable
 {
 
-    protected $name, $ref_domain, $mail_provider, $mx_ok, $in_black_list, $root, $subdomain, $disabled, $nb_use;
+    protected $name, $ref_domain, $mail_provider, $mx_ok, $in_black_list, $root, $subdomain, $disabled, $nb_use, $ready;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getReady()
+    {
+        return $this->ready;
+    }
+
+    /**
+     *
+     * @param mixed $ready
+     */
+    public function setReady($ready)
+    {
+        $this->ready = $ready;
+    }
 
     /**
      *

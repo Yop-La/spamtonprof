@@ -653,7 +653,10 @@ class LbcProcessManager
             if ($user_id) {
 
                 $ads = $lbcApi->getAdds(array(
-                    'user_id' => $user_id
+                    'key' => 'by_user_id',
+                    'params' => [
+                        'user_id' => $user_id
+                    ]
                 ));
             }
 
@@ -1065,8 +1068,7 @@ class LbcProcessManager
         $communeMg = new \spamtonprof\stp_api\LbcCommuneManager();
         $adMg = new \spamtonprof\stp_api\AddsTempoManager();
         $actMg = new \spamtonprof\stp_api\LbcAccountManager();
-        
-        
+
         // on recupere le client
         $client = $clientMg->get(array(
             'ref_client' => $refClient
@@ -1075,31 +1077,32 @@ class LbcProcessManager
         $nbTitles = 0;
         $nbTextes = 0;
         $lbcAdsMg = new \spamtonprof\stp_api\LbcAdManager();
+
+        if ($nbAds == 1) {
+            $client->setAds_from_lbc_ad(true);
+        }
+
         $ads_from_lbc = false;
         if ($client->getAds_from_lbc_ad()) {
 
             $ads_from_lbc = $lbcAdsMg->getAll(array(
                 'key' => 'is_ready'
             ));
-            
-            
+
             shuffle($ads_from_lbc);
 
-            
-            
             $nbTitles = count($ads_from_lbc);
             $nbTextes = count($ads_from_lbc);
         }
 
         $random_ad = false;
-        
+
         // pas besoin de récupérer des textes à nouveau
         if (! $client->getAds_from_lbc_ad()) {
 
             // si il y a une seule annonce c'est que c'est une premire annonce sur un compte vierge. On doit mettre une annonce qui passe ( celle de Valentin )
             $ref_client_content = $refClient;
             $client_content = $client;
-
 
             if (false && $nbAds == 1) {
 
@@ -1302,16 +1305,17 @@ class LbcProcessManager
             if ($client->getAds_from_lbc_ad()) {
 
                 $texte = new \spamtonprof\stp_api\LbcTexte();
-                
+
                 $ad_from_lbc = array_pop($ads_from_lbc);
 
                 $ad_from_lbc = $lbcAdsMg->cast($ad_from_lbc);
 
                 $title_str = $ad_from_lbc->getSubject();
                 $texte->setTexte($ad_from_lbc->getBody());
-                $image = $ad_from_lbc->getImage_url();
+                $image = 'no-picture';
+//                 $image = $ad_from_lbc->getImage_url();
             }
-            
+
             $symbols = [
                 '-',
                 '_',
@@ -1334,8 +1338,6 @@ class LbcProcessManager
                 $ad->univers = $univers;
             }
 
-         
-            
             $ads[] = $ad;
         }
         return ($ads);

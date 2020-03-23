@@ -7,18 +7,16 @@ use Ovh\Api;
 class DomainProcessMg
 
 {
-    
-    
+
     /**
-     *  utilisation 
-     *  1) ajouter avec addNewDomains() 
-     *  
-     *  
-     *  
-     *  2) preparer $domainPsMg->addMailGunDns(); dans wd2.php
-     *  3) executer : http://localhost/spamtonprof/wp-content/plugins/spamtonprof/hook/ovhAuthentification.php 
-     *      pour recuperer credential ovh ( attention wd2.php sera excute apres )
-     * 
+     * utilisation
+     * 1) ajouter avec addNewDomains()
+     *
+     *
+     *
+     * 2) preparer $domainPsMg->addMailGunDns(); dans wd2.php
+     * 3) executer : http://localhost/spamtonprof/wp-content/plugins/spamtonprof/hook/ovhAuthentification.php
+     * pour recuperer credential ovh ( attention wd2.php sera excute apres )
      */
 
     /*
@@ -38,7 +36,12 @@ class DomainProcessMg
         foreach ($subdomains as $subdomain) {
 
             $domain = $subdomain . '.' . $root;
-            echo($domain . '<br>');
+
+            if (! $subdomain) {
+                $domain = $root;
+            }
+
+            echo ($domain . '<br>');
             $stpDomain = $domainMg->get(array(
                 'name' => $domain
             ));
@@ -211,21 +214,93 @@ class DomainProcessMg
         return ($result);
     }
 
+    function validateDomains()
+    {
+        $slack = new \spamtonprof\slack\Slack();
+
+        $domainMg = new \spamtonprof\stp_api\StpDomainManager();
+        $domains = $domainMg->getAll(array(
+            "domains_to_validate"
+        ));
+
+        if (count($domains) == 0) {
+            $slack->sendMessages('domain-log', array(
+                'Aucun domaine à valider ...'
+            ));
+            exit();
+        }
+
+        $valid = [];
+        $not_valid = [];
+
+        $i = 0;
+
+        foreach ($domains as $domain) {
+
+            $domain_name = $domain->getName();
+
+            $mg = new \spamtonprof\stp_api\MailGunManager();
+            $validated = $mg->isValid($domain_name);
+
+            if ($validated) {
+                $domain->setReady(true);
+                $domainMg->updateReady($domain);
+                $valid[] = $domain_name;
+            } else {
+                $domain->setMx_ok(false);
+                $domainMg->updateMxOk($domain);
+                $not_valid[] = $domain_name;
+            }
+            $i = $i + 1;
+            if ($i > 20) {
+                break;
+            }
+        }
+
+        $slack->sendMessages('domain-log', array(
+            'valid domain: ' . json_encode($valid)
+        ));
+        $slack->sendMessages('domain-log', array(
+            'not valid domain: ' . json_encode($not_valid)
+        ));
+    }
+
     function addMailGunDns()
     {
+        $slack = new \spamtonprof\slack\Slack();
+        $i = 0;
+        $msgs = [];
+
+        $msgs[] = "Begin ...";
+
         $domainMg = new \spamtonprof\stp_api\StpDomainManager();
         $domains = $domainMg->getAll(array(
             'mx_ok' => 'false'
         ));
-        $mg = new \spamtonprof\stp_api\MailGunManager();
 
+        if (count($domains) == 0) {
+            $msgs[] = 'No more domains to process';
+            $slack->sendMessages('domain-log', $msgs);
+            return;
+        }
+
+        if (count($domains) != 1) {
+
+            array_shift($domains);
+        }
+
+        $mg = new \spamtonprof\stp_api\MailGunManager();
+        $internetBsMg = new \spamtonprof\stp_api\InternetBsMg(false);
         foreach ($domains as $domain) {
+
+            $internetBsMg->removeAllDnsRecord($domain->getName());
             $domainName = $domain->getName();
-            echo ('----------' . $domainName . '----------' . '<br>');
+            $msgs[] = '----------' . $domainName . '----------';
             $root = $domain->getRoot();
             $subdomain = $domain->getSubdomain();
 
             $dns = $mg->getOutBoundDns($domain->getName());
+            $msgs[] = 'Processing outbound-dns';
             foreach ($dns as $dn) {
                 $dns_subdomain = str_replace('.' . $root, '', $dn->getName());
                 $target = $dn->getValue();
@@ -233,29 +308,81 @@ class DomainProcessMg
                 if ($type == 'CNAME') {
                     $target = $target . '.';
                 }
-                echo ('root : ' . $root . '<br>');
-                echo ('type : ' . $type . '<br>');
-                echo ('name : ' . $dns_subdomain . '<br>');
-                echo ('target : ' . $target . '<br>');
-                $this->addDnsOvh($root, $dns_subdomain, $target, $type);
+                $msgs[] = 'root : ' . $root;
+                $msgs[] = 'type : ' . $type;
+                $msgs[] = 'name : ' . $dns_subdomain;
+                $msgs[] = 'target : ' . $target;
+
+                if ($type == 'MX') {
+                    $target = explode(" ", $target)[1];
+                }
+
+                $full_domain = $root;
+                if ($dns_subdomain != "" && $dns_subdomain != $root) {
+                    $full_domain = $dns_subdomain . '.' . $root;
+                }
+
+                $ret = $internetBsMg->addDnsRecord($full_domain, $type, $target);
+                $ret = print_r($ret, true);
+                $msgs[] = $ret;
+
+                if (strpos($ret, 'SUCCESS') === false) {
+                    $msgs[] = 'Erreur. End of running ...';
+
+                    $slack->sendMessages('domain-log', $msgs);
+                    exit();
+                }
             }
-            
+
             $dns = $mg->getInBoundDns($domain->getName());
+            $msgs[] = 'Processing inbound-dns';
             foreach ($dns as $dn) {
                 $target = $dn->getValue() . '.';
                 $type = $dn->getType();
                 $prio = $dn->getPriority();
                 $dns_subdomain = $subdomain;
                 $target = $prio . ' ' . $target;
-                echo ('root : ' . $root . '<br>');
-                echo ('type : ' . $type . '<br>');
-                echo ('name : ' . $dns_subdomain . '<br>');
-                echo ('target : ' . $target . '<br>' . '<br>');
-                $this->addDnsOvh($root, $dns_subdomain, $target, $type);
+                $msgs[] = 'root : ' . $root;
+                $msgs[] = 'type : ' . $type;
+                $msgs[] = 'name : ' . $dns_subdomain;
+                $msgs[] = 'target : ' . $target;
+                // $this->addDnsOvh($root, $dns_subdomain, $target, $type);
+
+                if ($type == 'MX') {
+                    $target = explode(" ", $target)[1];
+                }
+
+                $full_domain = $root;
+                if ($dns_subdomain != "" && $dns_subdomain != $root) {
+                    $full_domain = $dns_subdomain . '.' . $root;
+                }
+
+                $ret = $internetBsMg->addDnsRecord($full_domain, $type, $target);
+                $ret = print_r($ret, true);
+                $msgs[] = $ret;
+
+                if (strpos($ret, 'SUCCESS') === false) {
+                    $msgs[] = 'Erreur. End of running ...';
+                    $slack->sendMessages('domain-log', $msgs);
+                    exit();
+                }
             }
+
             $domain->setMx_ok(true);
             $domainMg->updateMxOk($domain);
+
+            if (count($msgs) > 20) {
+
+                $slack->sendMessages('domain-log', $msgs);
+                $msgs = [];
+            }
+            $i = $i + 1;
+            if ($i > 10) {
+                break;
+            }
         }
+
+        $slack->sendMessages('domain-log', $msgs);
     }
 }
 

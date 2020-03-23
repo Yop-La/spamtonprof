@@ -913,6 +913,11 @@ class LbcApi implements \JsonSerializable
 
             $key = $info['key'];
 
+            $params = false;
+            if (array_key_exists('params', $info)) {
+                $params = $info['params'];
+            }
+
             if ($key == 'random_cat') {
 
                 $cats = [
@@ -936,6 +941,13 @@ class LbcApi implements \JsonSerializable
                 $kw = "maths";
 
                 $headers[CURLOPT_POSTFIELDS] = "{\"limit\":100, \"offset\":" . $offset . ", \"limit_alu\":3,\"filters\":{\"category\":{\"id\":\"" . $category . "\"},\"enums\":{\"ad_type\":[\"offer\"]},\"location\":{},\"keywords\":{\"text\":\"" . $kw . "\"},\"ranges\":{}}}";
+            }
+
+            if ($key == 'by_user_id') {
+
+                $user_id = $params['user_id'];
+
+                $headers[CURLOPT_POSTFIELDS] = "{\"filters\":{\"owner\":{\"user_id\":\"" . $user_id . "\"},\"enums\":{\"ad_type\":[\"offer\"]}},\"limit\":35}";
             }
 
             curl_setopt_array($curl, $headers);
