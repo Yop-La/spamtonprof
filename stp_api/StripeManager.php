@@ -71,8 +71,8 @@ class StripeManager
         ]);
 
         $invoice = \Stripe\Invoice::create([
+            "collection_method" => "send_invoice",
             "customer" => $customer_id,
-            "billing" => "send_invoice",
             "custom_fields" => array(
                 array(
                     'name' => 'email_prof',
@@ -326,7 +326,7 @@ class StripeManager
                     if ($percent_off >= 100) {
                         $slack->sendMessages('log', array(
                             "Event id : " . $event_json->id,
-                            "Nouveau paiement rÃ©ussi",
+                            "Nouveau paiement réussi",
                             "chargeId : " . $chargeId,
                             'Promo de 100% : pas de transfert'
                         ));
@@ -472,6 +472,7 @@ class StripeManager
             'payment_method_types' => [
                 'card'
             ],
+            'customer' => $cus_id,
             'mode' => 'setup',
             'setup_intent_data' => [
                 'metadata' => [
@@ -883,9 +884,11 @@ class StripeManager
 
         $this->testMode = $testMode;
 
+
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         \Stripe\Stripe::setApiVersion("2020-03-02");
-
+        
+        
         if ($prof_email) {
 
             $profMg = new \spamtonprof\stp_api\StpProfManager();
@@ -898,6 +901,8 @@ class StripeManager
                 $this->stripe_account = $prof->getStripe_id_test();
             }
         }
+        
+        
     }
 
     public function retrieve_event($id)
