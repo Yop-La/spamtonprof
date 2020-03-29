@@ -30,6 +30,8 @@ class GoogleManager
 
         if (! $this->client) {
 
+            echo ("Authentification impossible ...<br>");
+
             $this->slack->sendMessages('google-log', array(
                 "Authentification google de : " . $gmail_adress . " à faire ..."
             ));
@@ -53,8 +55,8 @@ class GoogleManager
         $client = new Google_Client();
         $client->setApplicationName('Stp Tracker');
 
-        $client->setClientId('212972533763-bj01ep43ms4us6e0st5fq3chvr6e8j9s.apps.googleusercontent.com');
-        $client->setClientSecret('sqoxFLytdYNa4wjfDi-PJLc0');
+        $client->setClientId(GOOGLE_APP_CLIENT_ID);
+        $client->setClientSecret(GOOGLE_APP_CLIENT_SECRET);
         $client->setAccessType('offline');
 
         // $params_url = http_build_query(array('email_prof' => $gmailAdress));
@@ -107,7 +109,8 @@ class GoogleManager
 
                         $credentials = $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
 
-                        if (! (array_key_exists('error', $credentials) && $credentials['error'] == 'invalid_grant')) {
+                        if (! (array_key_exists('error', $credentials) && strlen($credentials['error']) > 0)) {
+
                             $this->account->setCredential(json_encode($client->getAccessToken()));
                             $this->accountMg->updateCredential($this->account);
                             $need_new_authen = false;
@@ -135,6 +138,9 @@ class GoogleManager
 
         $dateUrlSent = $this->account->getDate_url_sent();
 
+        echo ("Envoi de l'email d'authentification en cours...<br>");
+        
+        
         if ($dateUrlSent) {
 
             $dateUrlSent = \DateTime::createFromFormat(PG_DATETIME_FORMAT, $dateUrlSent);
@@ -148,6 +154,8 @@ class GoogleManager
                 exit();
             }
         }
+        
+        
 
         $profMg = new \spamtonprof\stp_api\StpProfManager();
         $prof = $profMg->get(array(
@@ -158,6 +166,7 @@ class GoogleManager
         if ($prof) {
             $name = ucfirst($prof->getPrenom());
         }
+        
 
         $email = new \SendGrid\Mail\Mail();
         $email->setFrom("alexandre@spamtonprof.com", "Alexandre de SpamTonProf");
@@ -179,6 +188,9 @@ class GoogleManager
             $this->slack->sendMessages('google-log', array(
                 "Url d'authentification envoyé à: " . $this->adress
             ));
+            
+            print($response->body());
+            
         } catch (\Exception $e) {
 
             $this->slack->sendMessages('google-log', array(
@@ -188,6 +200,8 @@ class GoogleManager
 
         $this->account->setDate_url_sent($now);
         $this->accountMg->updateDateUrlSent($this->account);
+        
+        print('email envoyé à ' . $this->adress);
     }
 
     public function getClient($gmailAdress)
@@ -545,7 +559,9 @@ class GoogleManager
                 $histories = array_merge($histories, $historyResponse->getHistory());
                 // $pageToken = $historyResponse->getNextPageToken();
                 // }
-            } catch (Exception $e) {}
+            } catch (Exception $e) {
+                print 'An error occurred in list history function : ' . $e->getMessage();
+            }
         } while ($pageToken);
 
         return $histories;
@@ -572,8 +588,6 @@ class GoogleManager
     function getHeader(\Google_Service_Gmail_Message $message, $headerName)
     {
         $headers = $message->getPayload()->getHeaders();
-
-        prettyPrint($headers);
 
         foreach ($headers as $header) {
 
