@@ -6,8 +6,8 @@ use spamtonprof\slack\Slack;
  *
  *
  * ce script sert :
- * - � enregistrer les messages de prospects dans la bdd
- * - � attribuer des libell�es aux emails
+ * - à enregistrer les messages de prospects dans la bdd
+ * - à attribuer des libellés aux emails
  *
  *
  * il tourne tous les 5 minutes et il est en prod
