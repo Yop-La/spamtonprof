@@ -140,7 +140,7 @@ class GoogleManager
             $dateUrlSent = \DateTime::createFromFormat(PG_DATETIME_FORMAT, $dateUrlSent);
             $dateUrlSent = $dateUrlSent->format(PG_DATE_FORMAT);
 
-            if (false && $dateUrlSent == $now) {
+            if ($dateUrlSent == $now) {
                 $this->slack->sendMessages('google-log', array(
                     "Déjà un mail d'authentification envoyé dans la journée à : " . $this->adress
                 ));
