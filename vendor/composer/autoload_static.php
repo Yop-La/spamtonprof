@@ -16,6 +16,7 @@ class ComposerStaticInit0ed64792fce90d099800fc7a244567d8
         'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
         '383eaff206634a77a1be54e64e6459c7' => __DIR__ . '/..' . '/sabre/uri/lib/functions.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
+        '3f8bdd3b35094c73a26f0106e3c0f8b2' => __DIR__ . '/..' . '/sendgrid/sendgrid/lib/SendGrid.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -37,6 +38,10 @@ class ComposerStaticInit0ed64792fce90d099800fc7a244567d8
             'Symfony\\Polyfill\\Ctype\\' => 23,
             'Symfony\\Component\\OptionsResolver\\' => 34,
             'Stripe\\' => 7,
+            'SendGrid\\Stats\\' => 15,
+            'SendGrid\\Mail\\' => 14,
+            'SendGrid\\Contacts\\' => 18,
+            'SendGrid\\' => 9,
             'Sabre\\Uri\\' => 10,
         ),
         'P' => 
@@ -114,6 +119,22 @@ class ComposerStaticInit0ed64792fce90d099800fc7a244567d8
         'Stripe\\' => 
         array (
             0 => __DIR__ . '/..' . '/stripe/stripe-php/lib',
+        ),
+        'SendGrid\\Stats\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/sendgrid/sendgrid/lib/stats',
+        ),
+        'SendGrid\\Mail\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/sendgrid/sendgrid/lib/mail',
+        ),
+        'SendGrid\\Contacts\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/sendgrid/sendgrid/lib/contacts',
+        ),
+        'SendGrid\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/sendgrid/php-http-client/lib',
         ),
         'Sabre\\Uri\\' => 
         array (
@@ -238,6 +259,10 @@ class ComposerStaticInit0ed64792fce90d099800fc7a244567d8
         ),
         'G' => 
         array (
+            'Gufy\\CpanelPhp\\' => 
+            array (
+                0 => __DIR__ . '/..' . '/gufy/cpanel-php/src',
+            ),
             'Gregwar\\Image' => 
             array (
                 0 => __DIR__ . '/..' . '/gregwar/image',
