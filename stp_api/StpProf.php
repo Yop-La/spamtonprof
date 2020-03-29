@@ -4,7 +4,52 @@ namespace spamtonprof\stp_api;
 class StpProf implements \JsonSerializable
 {
 
-    protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $user_id_wp, $onboarding_step, $sexe, $stripe_id_test, $ref_gmail_account, $inbox_ready, $processing_date, $description, $image_url, $phrase_responsable, $gmailAcc, $gr_id;
+    protected $email_perso, $prenom, $nom, $telephone, $ref_prof, $email_stp, $code_postal, $ville, $pays, $adresse, $date_naissance, $stripe_id, $user_id_wp, $onboarding_step, $sexe, $stripe_id_test, $ref_gmail_account, $inbox_ready, $processing_date, $description, $image_url, $phrase_responsable, $gmailAcc, $gr_id, $cus, $cus_test;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getCus()
+    {
+        return $this->cus;
+    }
+
+    public function getCustomer($test_mode)
+    {
+        if ($test_mode) {
+            return ($this->getCus_test());
+        }
+
+        return ($this->getCus());
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getCus_test()
+    {
+        return $this->cus_test;
+    }
+
+    /**
+     *
+     * @param mixed $cus
+     */
+    public function setCus($cus)
+    {
+        $this->cus = $cus;
+    }
+
+    /**
+     *
+     * @param mixed $cus_test
+     */
+    public function setCus_test($cus_test)
+    {
+        $this->cus_test = $cus_test;
+    }
 
     /**
      *
@@ -322,6 +367,15 @@ class StpProf implements \JsonSerializable
     public function getStripe_id()
     {
         return $this->stripe_id;
+    }
+
+    public function setCustomer($cus_id, $test_mode)
+    {
+        if ($test_mode) {
+            $this->setCus_test($cus_id);
+        }
+
+        $this->setCus($cus_id);
     }
 
     public function setStripe_id($stripe_id)

@@ -36,6 +36,15 @@ class StpProfManager
     {
         $q = null;
 
+        if (array_key_exists('ref_gmail_account', $info)) {
+
+            $refGmailAccount = $info['ref_gmail_account'];
+
+            $q = $this->_db->prepare('select * from stp_prof where ref_gmail_account = :ref_gmail_account');
+
+            $q->bindValue(':ref_gmail_account', $refGmailAccount);
+        }
+
         if (array_key_exists('email_perso', $info)) {
 
             $emailPerso = $info['email_perso'];
@@ -209,6 +218,39 @@ class StpProfManager
         $q->execute();
 
         return ($prof);
+    }
+
+    public function updateCusIdTest(\spamtonprof\stp_api\StpProf $prof)
+    {
+        $q = $this->_db->prepare('update stp_prof set cus_test = :cus_test where ref_prof = :ref_prof');
+
+        $q->bindValue(':cus_test', $prof->getCus_test());
+        $q->bindValue(':ref_prof', $prof->getRef_prof());
+
+        $q->execute();
+
+        return ($prof);
+    }
+
+    public function updateCusId(\spamtonprof\stp_api\StpProf $prof)
+    {
+        $q = $this->_db->prepare('update stp_prof set cus = :cus where ref_prof = :ref_prof');
+
+        $q->bindValue(':cus', $prof->getCus());
+        $q->bindValue(':ref_prof', $prof->getRef_prof());
+
+        $q->execute();
+
+        return ($prof);
+    }
+
+    public function updateCustomer(\spamtonprof\stp_api\StpProf $prof, $test_mode)
+    {
+        if ($test_mode) {
+            $this->updateCusIdTest($prof);
+        }
+
+        $this->updateCusId($prof);
     }
 
     public function updateStripeId(\spamtonprof\stp_api\StpProf $prof)
