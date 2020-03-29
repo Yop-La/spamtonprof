@@ -50,6 +50,8 @@ class CpanelMg
 
         $dbs = $res->data;
 
+        
+        
         $ret = [];
         foreach ($dbs as $db) {
             $ret[] = $db->database;
@@ -167,6 +169,25 @@ class CpanelMg
         return ($ret);
     }
 
+    public function add_dns_record($domain)
+    {
+        $module = "ZoneEdit";
+        $function = "add_zone_record";
+        
+        $params = array(
+            'domain' => $domain,
+            'name' => "",
+            'type' => 'TXT',
+            'txtdata' => 'test'
+        );
+        
+        $params = http_build_query($params);
+        
+        $ret = $this->call($module, $function, $params);
+        
+        return ($ret);
+    }
+    
     public function ad_sub_domain($domain, $rootdomain)
     {
         $module = "SubDomain";

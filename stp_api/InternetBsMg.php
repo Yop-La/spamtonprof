@@ -8,7 +8,7 @@ class InternetBsMg
     private $api_url = "http://testapi.internet.bs/", $api_key = "testapi", $password = "testpass", $call_url = "", $command, $base_url;
 
     // Instance de PDO
-    public function __construct($test_mode = true)
+    public function __construct($test_mode)
 
     {
         if (! $test_mode) {
@@ -20,18 +20,25 @@ class InternetBsMg
         $this->base_url = $this->api_url . "[command]?apikey=" . $this->api_key . '&password=' . urlencode($this->password);
     }
 
-    public function set_planet_hoster_ns($domains)
+    public function set_planet_hoster_ns($domains, $vps = true)
     {
         $datas = [];
         foreach ($domains as $domain) {
 
-            $datas[] = $this->DomainUpdate($domain, array(
-                "hybrid2313.fr.ns.planethoster.net",
-                "hybrid2313-1.fr.ns.planethoster.net"
-            ));
-        }
+            if ($vps) {
 
-        prettyPrint($datas);
+                $datas[] = $this->DomainUpdate($domain, array(
+                    "hybrid2313.fr.ns.planethoster.net",
+                    "hybrid2313-1.fr.ns.planethoster.net"
+                ));
+            } else {
+                $datas[] = $this->DomainUpdate($domain, array(
+                    "nsa.planethoster.net",
+                    "nsb.planethoster.net",
+                    "nsc.planethoster.net"
+                ));
+            }
+        }
     }
 
     public function DomainUpdate($domain, $ns_list = [])
@@ -67,13 +74,13 @@ class InternetBsMg
     public function removeAllDnsRecord($domain)
     {
         $allDns = $this->listAllDns($domain);
-        
+
         $total_records = $allDns->total_records;
-        
-        if($total_records == 0){
+
+        if ($total_records == 0) {
             return;
         }
-        
+
         $allDns = $allDns->records;
         foreach ($allDns as $dns) {
 
@@ -81,18 +88,11 @@ class InternetBsMg
             $value = $dns->value;
             $type = $dns->type;
 
-            if ($type != 'NS') {
+            $ret = $this->removeDnsRecord($domain, $type, $value);
 
-                
-                $ret = $this->removeDnsRecord($domain, $type, $value);
-                
-                
-                $ret = json_decode($ret);
-                
-                print_r($ret);
-                
-                
-            }
+            $ret = json_decode($ret);
+
+            print_r($ret);
         }
     }
 
@@ -100,17 +100,16 @@ class InternetBsMg
     {
         $command = "Domain/DnsRecord/Remove";
 
-        
         $params = [];
-        
+
         $params['FullRecordName'] = $domain;
-        
-            $params['Type'] = $type;
-        
-        if($value){
+
+        $params['Type'] = $type;
+
+        if ($value) {
             $params['Value'] = $value;
         }
-        
+
         $ret = $this->call($command, $params);
 
         return ($ret);
@@ -154,7 +153,6 @@ class InternetBsMg
         $data = curl_exec($ch);
         curl_close($ch);
 
-        
         return ($data);
     }
 }

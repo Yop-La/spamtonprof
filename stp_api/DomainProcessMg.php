@@ -18,6 +18,30 @@ class DomainProcessMg
      * 3) executer : http://localhost/spamtonprof/wp-content/plugins/spamtonprof/hook/ovhAuthentification.php
      * pour recuperer credential ovh ( attention wd2.php sera excute apres )
      */
+    private $cpanel_credentials, $vps = true;
+
+    public function __construct($vps = true)
+    {
+        $CPANEL_MUTU_CREDENTIALS = [];
+        $CPANEL_MUTU_CREDENTIALS['host'] = CPANEL_MUTU_HOST; // ip or domain complete with its protocol and port
+        $CPANEL_MUTU_CREDENTIALS['username'] = CPANEL_MUTU_USERNAME; // username of your server, it usually root.
+        $CPANEL_MUTU_CREDENTIALS['auth_type'] = CPANEL_MUTU_AUTH_TYPE; // set 'hash' or 'password'
+        $CPANEL_MUTU_CREDENTIALS['password'] = CPANEL_MUTU_PASSWORD; // long hash or your user's password
+
+        $CPANEL_VPS_CREDENTIALS = [];
+        $CPANEL_VPS_CREDENTIALS['host'] = CPANEL_VPS_HOST; // ip or domain complete with its protocol and port
+        $CPANEL_VPS_CREDENTIALS['username'] = CPANEL_VPS_USERNAME; // username of your server, it usually root.
+        $CPANEL_VPS_CREDENTIALS['auth_type'] = CPANEL_VPS_AUTH_TYPE; // set 'hash' or 'password'
+        $CPANEL_VPS_CREDENTIALS['password'] = CPANEL_VPS_PASSWORD; // long hash or your user's password
+
+        if ($vps) {
+            $this->cpanel_credentials = $CPANEL_VPS_CREDENTIALS;
+            $this->vps = true;
+        } else {
+            $this->cpanel_credentials = $CPANEL_MUTU_CREDENTIALS;
+            $this->vps = false;
+        }
+    }
 
     /*
      * pour ajouter des nouveaux domaines a Stp
@@ -265,6 +289,151 @@ class DomainProcessMg
         ));
     }
 
+    function move_to_planethost_from_internet_bs_and_set_mail_gun_dns($domain)
+    {
+        $slack = new \spamtonprof\slack\Slack();
+        $slack->sendMessages('domain-log', array(
+            'migration de ' . $domain . ' vers vps + ajout dns mailgun'
+        ));
+
+        $cpanel = new \Gufy\CpanelPhp\Cpanel($this->cpanel_credentials);
+
+        $internet_bs_api = new \spamtonprof\stp_api\InternetBsMg(false);
+
+        $rets = $this->delete_mail_dns_for_mail_gun($domain);
+
+        $dns_records = $this->getMailGunDns($domain);
+
+        foreach ($dns_records as $dns_record) {
+
+            $domain = $dns_record['domain'];
+            $name = $dns_record['name'];
+            $type = $dns_record['type'];
+            $value = $dns_record['value'];
+            $priority = $dns_record['priority'];
+
+            if ($name == $domain) {
+                $name = $name . ".";
+            } else {
+                $name = str_replace("." . $domain, "", $name);
+            }
+
+            if ($type == 'MX') {
+                $rets[] = $dns_record;
+                $rets[] = $cpanel->execute_action(3, 'Email', 'add_mx', 'yopla', array(
+                    'domain' => $domain,
+                    'exchanger' => $value,
+                    'priority' => $priority
+                ));
+            } else if ($type == 'CNAME') {
+                $rets[] = $dns_record;
+                $rets[] = $cpanel->execute_action(2, 'ZoneEdit', 'add_zone_record', 'yopla', array(
+                    'domain' => $domain,
+                    'name' => $name,
+                    'type' => $type,
+                    'cname' => $value
+                ));
+            } else {
+                $rets[] = $dns_record;
+                $rets[] = $cpanel->execute_action(2, 'ZoneEdit', 'add_zone_record', 'yopla', array(
+                    'domain' => $domain,
+                    'name' => $name,
+                    'type' => $type,
+                    'txtdata' => $value,
+                    'target' => $domain
+                ));
+            }
+        }
+
+        $internet_bs_api->removeAllDnsRecord($domain);
+
+        $internet_bs_api->set_planet_hoster_ns([
+            $domain
+        ], $this->vps);
+
+        return ($rets);
+    }
+
+    function delete_mail_dns_for_mail_gun($domain)
+    {
+        $rets = [];
+
+        $cpanel = new \Gufy\CpanelPhp\Cpanel($this->cpanel_credentials);
+
+        $mxRecords = $cpanel->execute_action(2, 'ZoneEdit', 'fetchzone_records', 'yopla', array(
+            'domain' => $domain,
+            'type' => 'MX'
+        ));
+
+        
+        
+        $mxRecords = $mxRecords['cpanelresult']['data'];
+
+        
+        do {
+
+            foreach ($mxRecords as $mxRecord) {
+
+                $rets[] = $cpanel->execute_action(3, 'Email', 'delete_mx', 'yopla', array(
+                    'domain' => $domain,
+                    'exchanger' => $mxRecord['exchange'],
+                    'priority' => (int) $mxRecord['preference']
+                ));
+            }
+
+            $dnsRecords = $cpanel->execute_action(2, 'ZoneEdit', 'fetchzone_records', 'yopla', array(
+                'domain' => $domain
+            ));
+
+            $dnsRecords = $dnsRecords['cpanelresult']['data'];
+            
+            $dns_with_mail_in_name = [];
+
+            foreach ($dnsRecords as $dnsRecord) {
+
+                if (array_key_exists('name', $dnsRecord) && strpos($dnsRecord['name'], 'mail') !== false) {
+                    $dns_with_mail_in_name[] = $dnsRecord;
+                }
+            }
+
+            foreach ($dns_with_mail_in_name as $dns) {
+
+                $rets[] = $dns;
+                $rets[] = $cpanel->execute_action(2, 'ZoneEdit', 'remove_zone_record', 'yopla', array(
+                    'domain' => $domain,
+                    'line' => $dns['line']
+                ));
+            }
+        } while (count($dns_with_mail_in_name) != 0);
+
+        return ($rets);
+    }
+
+    function getMailGunDns($domain)
+    {
+        $mg = new \spamtonprof\stp_api\MailGunManager();
+
+        $all_dns = [];
+
+        $dnss = array_merge($mg->getOutBoundDns($domain), $mg->getInBoundDns($domain));
+
+        foreach ($dnss as $dns) {
+
+            $dns_ar = [];
+
+            $dns_ar['name'] = $dns->getName();
+            $dns_ar['value'] = $dns->getValue();
+            $dns_ar['type'] = $dns->getType();
+            $dns_ar['priority'] = $dns->getPriority();
+            $dns_ar['validity'] = $dns->getValidity();
+            $dns_ar['domain'] = $domain;
+
+            $all_dns[] = $dns_ar;
+        }
+
+        return ($all_dns);
+    }
+
     function addMailGunDns()
     {
         $slack = new \spamtonprof\slack\Slack();
@@ -284,10 +453,7 @@ class DomainProcessMg
             return;
         }
 
-        if (count($domains) != 1) {
-
-            array_shift($domains);
-        }
+        shuffle($domains);
 
         $mg = new \spamtonprof\stp_api\MailGunManager();
         $internetBsMg = new \spamtonprof\stp_api\InternetBsMg(false);
