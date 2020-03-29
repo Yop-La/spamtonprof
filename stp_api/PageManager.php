@@ -22,13 +22,9 @@ class PageManager
 
         $this->loadScripts();
 
-        $host_split = explode('.', $_SERVER['HTTP_HOST']);
-
-        $this->domain = $host_split[0];
+        $this->domain = getCurrentDomain();
 
         $this->pagesVariables['domain'] = $this->domain;
-
-        $_SESSION["domain"] = $this->domain;
 
         $this->loadVariablesOnPages();
     }
@@ -464,6 +460,26 @@ class PageManager
         wp_enqueue_script('acceuil_js', plugins_url() . '/spamtonprof/js/acceuil.js', array(
             'nf-front-end'
         ), time());
+
+        $slack = new \spamtonprof\slack\Slack();
+
+        $slack->sendMessages('google-log', array(
+            'Sur page home'
+        ));
+        
+        if (isset($_GET['state']) && isset($_GET['code'])) {
+
+            $email_prof = $_GET['state'];
+            $code = $_GET['code'];
+
+            $slack->sendMessages('google-log', array(
+                'code d\'authentification reçu !',
+                $email_prof,
+                $code
+            ));
+
+            $gmailManager = new \spamtonprof\googleMg\GoogleManager($email_prof, $code);
+        }
     }
 
     public function temoignages()

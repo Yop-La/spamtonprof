@@ -8,15 +8,25 @@ function str_to_bool($bool_str)
     return (false);
 }
 
+function getCurrentDomain(){
+    
+    $host_split = explode('.', $_SERVER['HTTP_HOST']);
+    
+    $domain = $host_split[0];
+    
+    return($domain);
+    
+}
+
 function domain_to_url()
 {
-    $domain = $_SESSION["domain"];
+    $domain = getCurrentDomain();
     if ($domain == "localhost") {
         return ("http://$domain/spamtonprof");
     }
 
     if ($domain = 'spamtonprof.com') {
-        return ("http://$domain");
+        return ("https://$domain");
     }
 
     return (false);

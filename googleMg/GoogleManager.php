@@ -12,11 +12,33 @@ use spamtonprof\stp_api\GmailLabelManager;
 class GoogleManager
 {
 
-    private $client, $service, $userId;
+    private $client, $service, $userId, $authUrl = false, $slack, $adress, $account, $accountMg;
 
-    public function __construct($gmail_adress)
+    public function __construct($gmail_adress, $code = false)
     {
-        $this->client = $this->getClient($gmail_adress);
+
+        // $this->getClient2();
+        // exit();
+        $this->adress = $gmail_adress;
+
+        $this->accountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
+        $this->account = $this->accountMg->get($this->adress);
+
+        $this->client = $this->getClient2($gmail_adress, $code);
+
+        $this->slack = new \spamtonprof\slack\Slack();
+
+        if (! $this->client) {
+
+            $this->slack->sendMessages('google-log', array(
+                "Authentification google de : " . $gmail_adress . " à faire ..."
+            ));
+
+            $this->sendAuthUrl();
+
+            exit();
+        }
+
         $this->service = new Google_Service_Gmail($this->client);
         $this->userId = 'me';
     }
@@ -26,74 +48,252 @@ class GoogleManager
      *
      * @return Google_Client the authorized client object
      */
-    public function getClient($gmailAdress)
+    public function getClient2($gmailAdress, $code = false)
     {
-        $accountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
-        
-        $keyMg = new \spamtonprof\stp_api\KeyManager();
-        
-        $key = $keyMg->get($keyMg::GMAIL_KEY);
-        
-        $account = $accountMg->get($gmailAdress);
-        
         $client = new Google_Client();
-        $client->setApplicationName('Gmail API PHP Quickstart');
-        
+        $client->setApplicationName('Stp Tracker');
+
+        $client->setClientId('212972533763-bj01ep43ms4us6e0st5fq3chvr6e8j9s.apps.googleusercontent.com');
+        $client->setClientSecret('sqoxFLytdYNa4wjfDi-PJLc0');
+        $client->setAccessType('offline');
+
+        // $params_url = http_build_query(array('email_prof' => $gmailAdress));
+
+        $client->setState($gmailAdress);
+
+        $client->setRedirectUri(domain_to_url());
+
         $client->setScopes(array(
             Google_Service_Sheets::SPREADSHEETS,
             Google_Service_Gmail::GMAIL_MODIFY
         ));
-        
-        $authConfig = json_decode($key->getKey(), true);
-        
-        $client->setAuthConfig($authConfig);
-        $client->setAccessType('offline');
-        
-        $accessToken;
-        
-        if (! $account) {
+
+        if (! $this->account) {
             echo ("ajouté : " . $gmailAdress . " à la table prof <br><br><br>");
             exit(0);
         }
-        
-        if ( $account->getCredential() != "" && ! is_null($account->getCredential())) {
-            
+
+        if ($code) {
+
+            $credentials = $client->fetchAccessTokenWithAuthCode($code);
+            $this->account->setCredential(json_encode($client->getAccessToken()));
+            $this->accountMg->updateCredential($this->account);
+            $redirect = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+
+            header('Location: ' . filter_var($redirect, FILTER_SANITIZE_URL));
+        }
+
+        $need_new_authen = true;
+        $credentials_in_db = json_decode($this->account->getCredential(), true);
+        $credentials = false;
+        if (($credentials_in_db != "" && ! is_null($credentials_in_db) && ! array_key_exists('error', $credentials_in_db))) {
+
+            $credentials = $credentials_in_db;
+        }
+
+        if ($credentials) {
+
+            try {
+
+                $client->setAccessToken($credentials);
+
+                // If there is no previous token or it's expired.
+                $need_new_authen = false;
+                if ($client->isAccessTokenExpired()) {
+
+                    // Refresh the token if possible, else fetch a new one.
+                    $need_new_authen = true;
+                    if ($client->getRefreshToken()) {
+
+                        $credentials = $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
+
+                        if (! (array_key_exists('error', $credentials) && $credentials['error'] == 'invalid_grant')) {
+                            $this->account->setCredential(json_encode($client->getAccessToken()));
+                            $this->accountMg->updateCredential($this->account);
+                            $need_new_authen = false;
+                        }
+                    }
+                }
+            } catch (Exception $e) {}
+        }
+
+        if ($need_new_authen) {
+
+            // Request authorization from the user.
+
+            $this->authUrl = $client->createAuthUrl();
+            return (false);
+        }
+
+        return ($client);
+    }
+
+    public function sendAuthUrl()
+    {
+        $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+        $now = $now->format(PG_DATE_FORMAT);
+
+        $dateUrlSent = $this->account->getDate_url_sent();
+
+        if ($dateUrlSent) {
+
+            $dateUrlSent = \DateTime::createFromFormat(PG_DATETIME_FORMAT, $dateUrlSent);
+            $dateUrlSent = $dateUrlSent->format(PG_DATE_FORMAT);
+
+            if (false && $dateUrlSent == $now) {
+                $this->slack->sendMessages('google-log', array(
+                    "Déjà un mail d'authentification envoyé dans la journée à : " . $this->adress
+                ));
+
+                exit();
+            }
+        }
+
+        $profMg = new \spamtonprof\stp_api\StpProfManager();
+        $prof = $profMg->get(array(
+            'ref_gmail_account' => $this->account->getRef_gmail_account()
+        ));
+
+        $name = 'Monsieur/Madame';
+        if ($prof) {
+            $name = ucfirst($prof->getPrenom());
+        }
+
+        $email = new \SendGrid\Mail\Mail();
+        $email->setFrom("alexandre@spamtonprof.com", "Alexandre de SpamTonProf");
+
+        $email->addTo($this->adress, $name, [
+
+            "name" => $name,
+            "name_lower" => strtolower($name),
+            "lien" => $this->authUrl
+        ], 0);
+
+        $email->addCc('alexandre@spamtonprof.com');
+
+        $email->setTemplateId("d-bd9ea3e114814f03892b8fd1e4992d1d");
+        $sendgrid = new \SendGrid(SEND_GRID_API_KEY);
+        try {
+            $response = $sendgrid->send($email);
+
+            $this->slack->sendMessages('google-log', array(
+                "Url d'authentification envoyé à: " . $this->adress
+            ));
+        } catch (\Exception $e) {
+
+            $this->slack->sendMessages('google-log', array(
+                'Caught exception: ' . $e->getMessage()
+            ));
+        }
+
+        $this->account->setDate_url_sent($now);
+        $this->accountMg->updateDateUrlSent($this->account);
+    }
+
+    public function getClient($gmailAdress)
+    {
+        $accountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
+
+        $keyMg = new \spamtonprof\stp_api\KeyManager();
+
+        $key = $keyMg->get($keyMg::GMAIL_KEY);
+
+        $account = $accountMg->get($gmailAdress);
+
+        $client = new Google_Client();
+
+        $authConfig = json_decode($key->getKey(), true);
+
+        $client->setApplicationName('Gmail API PHP Quickstart');
+
+        $client->setClientId('212972533763-bj01ep43ms4us6e0st5fq3chvr6e8j9s.apps.googleusercontent.com');
+        $client->setClientSecret('sqoxFLytdYNa4wjfDi-PJLc0');
+        $client->setAccessType('offline');
+
+        $client->setRedirectUri('https://spamtonprof.com');
+
+        // $client->setAuthConfig($authConfig);
+
+        $client->setScopes(array(
+            Google_Service_Sheets::SPREADSHEETS,
+            Google_Service_Gmail::GMAIL_MODIFY
+        ));
+        $url = $client->createAuthUrl();
+
+        echo ($url);
+        exit();
+
+        $accessToken;
+
+        if ($account->getCredential() != "" && ! is_null($account->getCredential())) {
+
             $accessToken = json_decode($account->getCredential(), true);
         } else {
             // Request authorization from the user.
             $authUrl = $client->createAuthUrl();
-            
+
             $authCode = "4/IQFqEXkLBaVBs2Sa3IITdJZ9c_YlgW_llhyGDGakKDWm3Er6FaySYpw"; // a remplir par ce qui sera donne par $authUrl
-            
+
             if ($authCode == "") {
                 echo ("la2");
                 header('Location: ' . filter_var($authUrl, FILTER_SANITIZE_URL));
             }
-            
+
             // Exchange authorization code for an access token.
             $accessToken = $client->fetchAccessTokenWithAuthCode($authCode);
-            
+
             echo (json_encode($accessToken));
-            
+
             echo ('<br><br><br>');
-            
+
             echo ($account->getRef_gmail_account());
-            
+
             echo ('<br><br><br>');
-            
+
             // $account->setCredential(json_encode($accessToken));
             $account->setCredential(json_encode($accessToken));
             $accountMg->updateCredential($account);
         }
-        
+
         $client->setAccessToken($accessToken);
-        
-        // Refresh the token if it's expired.
+
+        // If there is no previous token or it's expired.
         if ($client->isAccessTokenExpired()) {
-            $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
-            $account->setCredential(json_encode($client->getAccessToken()));
-            $accountMg->updateCredential($account);
+            // Refresh the token if possible, else fetch a new one.
+
+            $need_new_authen = true;
+            if ($client->getRefreshToken()) {
+
+                $ret = $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
+
+                if (array_key_exists('error', $ret) && $ret['error'] == 'invalid_grant') {
+
+                    $need_new_authen = true;
+                } else {
+                    $need_new_authen = false;
+                    $account->setCredential(json_encode($client->getAccessToken()));
+                    $accountMg->updateCredential($account);
+                }
+            }
+
+            if ($need_new_authen) {
+
+                // Request authorization from the user.
+
+                $authUrl = $client->createAuthUrl();
+                echo ($authUrl);
+
+                exit();
+                printf("Open the following link in your browser:\n%s\n", $authUrl);
+                print 'Enter verification code: ';
+                $authCode = trim(fgets(STDIN));
+
+                // Exchange authorization code for an access token.
+                $accessToken = $client->fetchAccessTokenWithAuthCode($authCode);
+                $client->setAccessToken($accessToken);
+            }
         }
+
         return $client;
     }
 
@@ -115,9 +315,9 @@ class GoogleManager
             "q" => utf8_encode($searchOperator),
             "maxResults" => $maxResults
         );
-        
+
         $indexPage = 0;
-        
+
         do {
             try {
                 if ($pageToken) {
@@ -127,9 +327,9 @@ class GoogleManager
                 if ($messagesResponse->getMessages()) {
                     $messages = array_merge($messages, $messagesResponse->getMessages());
                     $pageToken = $messagesResponse->getNextPageToken();
-                    
+
                     $indexPage = $indexPage + 1;
-                    
+
                     if ($indexPage == $nbPage) {
                         return ($messages);
                     }
@@ -138,16 +338,15 @@ class GoogleManager
                 print 'An error occurred: ' . $e->getMessage();
             }
         } while ($pageToken);
-        
+
         return $messages;
     }
 
-    
     // ['format' => 'full']
     public function getMessage($messageId, $format = ['format' => 'metadata', 'metadataHeaders' => ['From','Date']])
     {
         try {
-            
+
             $message = $this->service->users_messages->get($this->userId, $messageId, $format);
             return $message;
         } catch (\Exception $e) {
@@ -187,14 +386,14 @@ class GoogleManager
     {
         $label = new \Google_Service_Gmail_Label();
         $label->setName($new_label_name);
-        
+
         $color = new \Google_Service_Gmail_LabelColor();
-        
+
         $color->setBackgroundColor($bgColor);
         $color->setTextColor("#434343");
-        
+
         $label->setColor($color);
-        
+
         try {
             $label = $this->service->users_labels->create($this->userId, $label);
         } catch (\Exception $e) {
@@ -206,13 +405,13 @@ class GoogleManager
     function createStpLabels()
     {
         $gmailLabelMg = new GmailLabelManager();
-        
+
         $labels = $gmailLabelMg->getAll();
-        
+
         foreach ($labels as $label) {
-            
+
             echo ($label->getNom_label() . "de couleur : " . $label->getColor_label() . "<br>");
-            
+
             $this->createLabel($label->getNom_label(), $label->getColor_label());
         }
     }
@@ -220,7 +419,7 @@ class GoogleManager
     function resetStpLabels()
     {
         $this->deleteStpLabels();
-        
+
         $this->createStpLabels();
     }
 
@@ -247,15 +446,15 @@ class GoogleManager
     function deleteStpLabels()
     {
         $gmailLabelMg = new GmailLabelManager();
-        
+
         $stpLabels = $gmailLabelMg->getAllLabelName();
-        
+
         $existingLabels = $this->getLabelsList();
-        
+
         foreach ($existingLabels as $existingLabel) {
-            
+
             if (in_array($existingLabel->getName(), $stpLabels)) {
-                
+
                 $this->deleteLabel($existingLabel->getId());
             }
         }
@@ -274,49 +473,49 @@ class GoogleManager
     function getLabelsList()
     {
         $labels = array();
-        
+
         try {
             $labelsResponse = $this->service->users_labels->listUsersLabels($this->userId);
-            
+
             if ($labelsResponse->getLabels()) {
                 $labels = array_merge($labels, $labelsResponse->getLabels());
             }
-            
+
             return ($labels);
         } catch (Exception $e) {
             print 'An error occurred: ' . $e->getMessage();
         }
-        
+
         return $labels;
     }
 
     public function getLabelsIds(array $labelNames)
     {
         $labels = $this->getLabelsList();
-        
+
         foreach ($labels as $label) {
-            
+
             if (in_array($label->getName(), $labelNames)) {
                 $labelsIds[] = $label->getId();
             }
         }
-        
+
         return ($labelsIds);
     }
 
     public function getCustomLabelsToAdd($labelsNameToAdd)
     {
         $labelsIdToAdd = [];
-        
+
         $labels = $this->getLabelsList();
-        
+
         foreach ($labels as $label) {
-            
+
             if (in_array($label->getName(), $labelsNameToAdd)) {
                 $labelsIdToAdd[] = $label->getId();
             }
         }
-        
+
         return ($labelsIdToAdd);
     }
 
@@ -330,28 +529,25 @@ class GoogleManager
             'maxResults' => '1000',
             'labelId' => $labelId
         );
-        
+
         $pageToken = NULL;
         $histories = array();
-        
+
         do {
             try {
                 if ($pageToken) {
                     $opt_param['pageToken'] = $pageToken;
                 }
-                
-                
+
                 $historyResponse = $service->users_history->listUsersHistory($userId, $opt_param);
                 $pageToken = false; // a enlever si on veut iterer sur plusieurs pages et decommenter en dessous aussi
                                     // if ($historyResponse->getHistory()) {
                 $histories = array_merge($histories, $historyResponse->getHistory());
                 // $pageToken = $historyResponse->getNextPageToken();
                 // }
-            } catch (Exception $e) {
-                print 'An error occurred in list history function : ' . $e->getMessage();
-            }
+            } catch (Exception $e) {}
         } while ($pageToken);
-        
+
         return $histories;
     }
 
@@ -364,7 +560,7 @@ class GoogleManager
                 $gmailIds[] = $message->id;
             }
         }
-        
+
         return ($gmailIds);
     }
 
@@ -376,11 +572,13 @@ class GoogleManager
     function getHeader(\Google_Service_Gmail_Message $message, $headerName)
     {
         $headers = $message->getPayload()->getHeaders();
-        
+
+        prettyPrint($headers);
+
         foreach ($headers as $header) {
-            
+
             if ($header->name == $headerName) {
-                
+
                 return ($header->value);
             }
         }
@@ -390,7 +588,7 @@ class GoogleManager
     function hasLabel($message, $label)
     {
         $labelIds = $message->labelIds;
-        
+
         if (in_array($label, $labelIds)) {
             return (true);
         } else {
@@ -400,38 +598,38 @@ class GoogleManager
 
     function getNewMessages($lastHistoryId, $label = "INBOX")
     {
-        $histories = $this->listHistory($lastHistoryId, $historyTypes = "messageAdded");
-        
+        $histories = $this->listHistory($lastHistoryId, "messageAdded");
+
         $indexMessage = 0;
         $messageLimit = 20;
-        
+
         $messages = [];
-        
+
         foreach ($histories as $history) {
-            
+
             $message = $history->messages[0];
-            
+
             $message = $this->getMessage($message->id, [
                 'format' => 'full'
             ]);
-            
+
             if ($message) {
-                
+
                 if ($this->hasLabel($message, "INBOX")) {
-                    
+
                     $messages[] = $message;
-                    
+
                     $indexMessage ++;
                 }
             }
-            
+
             $lastHistoryId = $history->id;
-            
+
             if ($indexMessage == $messageLimit) {
                 break;
             }
         }
-        
+
         return (array(
             "messages" => $messages,
             "lastHistoryId" => $lastHistoryId
@@ -446,17 +644,17 @@ class GoogleManager
     {
         $mail = new PHPMailer();
         $mail->CharSet = "UTF-8";
-        
+
         $mail->From = $from;
         $mail->FromName = $fromName;
-        
+
         $mail->AddAddress($to);
         $mail->addReplyTo($replyTo);
-        
+
         $mail->isHTML(true);
         $mail->Subject = $subject;
         $mail->Body = $body;
-        
+
         $mail->preSend();
         $mime = $mail->getSentMIMEMessage();
         $gMessage = new Google_Service_Gmail_Message();
@@ -471,7 +669,7 @@ class GoogleManager
             ''
         ), $data); // url safe
         $gMessage->setRaw($data);
-        
+
         return $gMessage;
     }
 
@@ -490,11 +688,11 @@ class GoogleManager
     function sendMessage($body, $subject, $to, $replyTo, $from, $fromName, $threadId = false)
     {
         $gMessage = $this->createMessage($body, $subject, $to, $replyTo, $from, $fromName);
-        
+
         if ($threadId) {
             $gMessage->threadId = $threadId;
         }
-        
+
         try {
             $gMessage = $this->service->users_messages->send($this->userId, $gMessage);
             print 'Message with ID: ' . $gMessage->getId() . ' sent.<br>';
@@ -520,7 +718,7 @@ class GoogleManager
         $body = "";
         $message_array = json_decode(json_encode($message), True);
         $datas = $this->getDatas($message_array);
-        
+
         if (array_key_exists("text/html", $datas) && $type == "html") {
             return ($this->decodeBody($datas["text/html"]));
         } else {
@@ -531,15 +729,15 @@ class GoogleManager
     function getDatas(array $message_part, $mimeType = "text/html")
     {
         $values = [];
-        
+
         foreach ($message_part as $key => $value) {
-            
+
             if ($key === "data") {
                 if ($value) {
                     $values[$mimeType] = $value;
                 }
             } elseif ($key === "mimeType") {
-                
+
                 if ($value === "text/html") {
                     $mimeType = "text/html";
                 } elseif ($value === "text/plain") {
@@ -555,10 +753,10 @@ class GoogleManager
     function readSheet($sheetId = '1dUtoN7GsgfPtWJcoanlwYn1o83i9ABaxZeefz6aOfts', $sheetName = 'prog-new-act')
     {
         $service = new \Google_Service_Sheets($this->client);
-        
+
         $response = $service->spreadsheets_values->get($sheetId, $sheetName);
         $values = $response->getValues();
-        
+
         if (empty($values)) {
             print "No data found.\n";
         } else {
@@ -569,14 +767,14 @@ class GoogleManager
     function test()
     {
         $service = new \Google_Service_Sheets($this->client);
-        
+
         // Prints the names and majors of students in a sample spreadsheet:
         // https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
         $spreadsheetId = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms';
         $range = 'Class Data';
         $response = $service->spreadsheets_values->get($spreadsheetId, $range);
         $values = $response->getValues();
-        
+
         if (empty($values)) {
             print "No data found.\n";
         } else {
@@ -593,7 +791,7 @@ class GoogleManager
         $gMessage = $this->getMessage($gmailId, [
             "format" => "full"
         ]);
-        
+
         $subject = $this->getHeader($gMessage, "Subject");
         $body = $this->getBody($gMessage);
         $this->sendMessage($body, $subject, $to, $replyTo, "mailsfromlbc@gmail.com", "lbcBot");
@@ -602,9 +800,9 @@ class GoogleManager
     public function forwardMessages($query, $nbPage = 1, $to, $replyTo)
     {
         $msgs = $this->listMessages($query, $nbPage);
-        
+
         foreach ($msgs as $msg) {
-            
+
             $this->forwardMessage($msg->id, $to, $replyTo);
         }
     }

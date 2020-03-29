@@ -25,16 +25,16 @@ class StpGmailAccountManager
 
         return ($StpGmailAccount);
     }
-    
+
     public function get($info)
     {
         if (is_int($info)) {
             $q = $this->_db->prepare('SELECT * FROM stp_gmail_account WHERE ref_gmail_account = :ref_gmail_account');
-            
+
             $q->bindValue(":ref_gmail_account", $info);
-            
+
             $q->execute();
-            
+
             if ($q->rowCount() <= 0) {
                 return (false);
             } else {
@@ -53,34 +53,43 @@ class StpGmailAccountManager
             }
         }
     }
-    
+
     public function updateCredential(StpGmailAccount $StpGmailAccount)
-    
+
     {
         $q = $this->_db->prepare('UPDATE stp_gmail_account set credential=:credential
             WHERE ref_gmail_account = :ref_gmail_account');
-        
+
         $q->bindValue(':credential', $StpGmailAccount->getCredential());
-        
+
         $q->bindValue(':ref_gmail_account', $StpGmailAccount->getRef_gmail_account());
         
         $q->execute();
-        
     }
-    
+
+    public function updateDateUrlSent(StpGmailAccount $StpGmailAccount)
+
+    {
+        $q = $this->_db->prepare('UPDATE stp_gmail_account set date_url_sent=:date_url_sent
+            WHERE ref_gmail_account = :ref_gmail_account');
+
+        $q->bindValue(':date_url_sent', $StpGmailAccount->getDate_url_sent());
+
+        $q->bindValue(':ref_gmail_account', $StpGmailAccount->getRef_gmail_account());
+        
+        $q->execute();
+    }
+
     public function updateHistoryId(StpGmailAccount $StpGmailAccount)
-    
+
     {
         $q = $this->_db->prepare('UPDATE stp_gmail_account SET last_history_id =:last_history_id
             WHERE ref_gmail_account = :ref_gmail_account');
-        
+
         $q->bindValue(':last_history_id', $StpGmailAccount->getLast_history_id());
-        
+
         $q->bindValue(':ref_gmail_account', $StpGmailAccount->getRef_gmail_account());
-        
+
         $q->execute();
-        
     }
-    
-    
 }

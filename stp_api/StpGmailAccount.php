@@ -4,7 +4,25 @@ namespace spamtonprof\stp_api;
 class StpGmailAccount implements \JsonSerializable
 {
 
-    protected $ref_gmail_account, $email, $credential, $last_history_id;
+    protected $ref_gmail_account, $email, $credential, $last_history_id, $date_url_sent;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getDate_url_sent()
+    {
+        return $this->date_url_sent;
+    }
+
+    /**
+     *
+     * @param mixed $date_url_sent
+     */
+    public function setDate_url_sent($date_url_sent)
+    {
+        $this->date_url_sent = $date_url_sent;
+    }
 
     public function __construct(array $donnees = array())
     {
@@ -52,6 +70,7 @@ class StpGmailAccount implements \JsonSerializable
     }
 
     /**
+     *
      * @return mixed
      */
     public function getLast_history_id()
@@ -60,6 +79,7 @@ class StpGmailAccount implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $last_history_id
      */
     public function setLast_history_id($last_history_id)
