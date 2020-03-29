@@ -53,7 +53,7 @@ class AddsTempoManager
 
                     $q = $this->_db->prepare("
                     delete from adds_tempo where
-                    ref_commune in (select ref_commune from lbc_commune where population >= 20)
+                    ref_commune in (select ref_commune from lbc_commune where population >= 20 and population <= 40)
                     and statut = 'online' 
                     and first_publication_date < ( now() - interval '7 days' )
                     and first_publication_date is not null
