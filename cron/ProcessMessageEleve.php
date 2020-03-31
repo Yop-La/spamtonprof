@@ -33,6 +33,8 @@ $slack = new \spamtonprof\slack\Slack();
 $profMg = new \spamtonprof\stp_api\StpProfManager();
 $prof = $profMg->getNextInboxToProcess();
 
+// $prof = $profMg->get(array('email_stp' => 'arnaud@spamtonprof.com'));
+
 
 echo ('<br>');
 echo ($prof->getPrenom());
@@ -63,13 +65,11 @@ $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
 $messages = $gmailAccountMg->getLastMessage($gmailAccount->getEmail());
 
 foreach ($messages as $message) {
-
-    $gmailId = $message->id;
-
-    $message = $gmailManager->getMessage($gmailId);
-
+    
+    $gmailId  = $message->id;
+    
     $from = extractFirstMail($gmailManager->getHeader($message, "From"));
-
+    
     $timeStamp = $message->internalDate / 1000;
     $dateReception = new DateTime();
     $dateReception->setTimestamp($timeStamp);

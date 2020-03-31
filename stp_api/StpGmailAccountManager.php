@@ -46,15 +46,24 @@ class StpGmailAccountManager
 
         $timeStampAfter = $timeStamp;
 
+        $slack = new \spamtonprof\slack\Slack();
+
+        $slack->sendMessages('google-log', array(
+            'Récupération des messages de ' . $gmailAdress, 'timeStampAfter: ' . $timeStampAfter
+        ));
+
         $nbDays = 1;
         do {
+
+            $slack->sendMessages('google-log', array(
+                'Largueur de la fenêtre ' . $nbDays . ' jour(s)'
+            ));
 
             $timeStampBefore = $timeStampAfter + $nbDays * 24 * 60 * 60;
 
             $msgs = $gmailManager->listMessages('after:' . $timeStampAfter . ' before:' . $timeStampBefore, 100, 100);
-            
-            $nbDays = $nbDays + 1;
-            
+
+            $nbDays = $nbDays * 10;
         } while (! (count($msgs) > $nbMessage || $timeStampBefore >= $timeStampNow));
 
         $nbMessage = min($nbMessage, count($msgs));
@@ -93,7 +102,11 @@ class StpGmailAccountManager
         $stpGmailAccount->setLast_timestamp($newTimeStamp);
         $this->updateLastTimestamp($stpGmailAccount);
 
-        return (array_slice($msgs, 0, $nbMessage));
+        $slack->sendMessages('google-log', array(
+            'Emails retrieved '
+        ));
+
+        return (array_slice($all_msgs, 0, $nbMessage));
     }
 
     public function get($info)
