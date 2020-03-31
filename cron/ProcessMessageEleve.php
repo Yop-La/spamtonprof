@@ -5,10 +5,10 @@ use spamtonprof\slack\Slack;
  * il ne traque les emails des �l�ve de des �tudiants ( pas des parents )
  *
  * ce script sert :
- * - � stocker dans mail eleve - les messages des �l�ves
- * - � attribuer des libell�es aux emails
+ * - à stocker dans mail eleve - les messages des élèves
+ * - à attribuer des libellées aux emails
  * - il tourne tous les 5 minutes
- * - � mettre � jour la date de dernier contact
+ * - à mettre à jour la date de dernier contact
  *
  * en prod
  */
@@ -31,7 +31,7 @@ header("Pragma: no-cache");
 $slack = new \spamtonprof\slack\Slack();
 
 $profMg = new \spamtonprof\stp_api\StpProfManager();
-$prof = $profMg->getNextInboxToProcess();
+$profMg->getNextInboxToProcess();
 
 
 echo ('<br>');

@@ -46,9 +46,14 @@ class StpGmailAccountManager
 
         $timeStampAfter = $timeStamp;
 
-        $timeStampBefore = $timeStampAfter + 24 * 60 * 60;
+        do {
 
-        $msgs = $gmailManager->listMessages('after:' . $timeStampAfter . ' before:' . $timeStampBefore, 100, 100);
+            $timeStampBefore = $timeStampAfter + 24 * 60 * 60;
+
+            $msgs = $gmailManager->listMessages('after:' . $timeStampAfter . ' before:' . $timeStampBefore, 100, 100);
+        } while (! (count($msgs) > $nbMessage || $timeStampBefore >= $timeStampNow));
+
+        $nbMessage = min($nbMessage, count($msgs));
 
         $msgs = array_reverse($msgs);
 
@@ -69,20 +74,16 @@ class StpGmailAccountManager
                 ]);
             }
 
-            $msg = $all_msgs[$nbMessage];
+            if (array_key_exists($nbMessage, $all_msgs)) {
 
-            $newTimeStamp = $msg->internalDate / 1000;
+                $msg = $all_msgs[$nbMessage];
+                $newTimeStamp = $msg->internalDate / 1000;
+            }
         }
 
         if (! $newTimeStamp) {
 
-            if ($timeStampBefore >= $timeStampNow) {
-
-                $newTimeStamp = $timeStampNow;
-            } else {
-
-                $newTimeStamp = $timeStampBefore;
-            }
+            $newTimeStamp = $timeStampNow;
         }
 
         $stpGmailAccount->setLast_timestamp($newTimeStamp);
