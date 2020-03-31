@@ -46,11 +46,15 @@ class StpGmailAccountManager
 
         $timeStampAfter = $timeStamp;
 
+        $nbDays = 1;
         do {
 
-            $timeStampBefore = $timeStampAfter + 24 * 60 * 60;
+            $timeStampBefore = $timeStampAfter + $nbDays * 24 * 60 * 60;
 
             $msgs = $gmailManager->listMessages('after:' . $timeStampAfter . ' before:' . $timeStampBefore, 100, 100);
+            
+            $nbDays = $nbDays + 1;
+            
         } while (! (count($msgs) > $nbMessage || $timeStampBefore >= $timeStampNow));
 
         $nbMessage = min($nbMessage, count($msgs));
