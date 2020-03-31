@@ -4,7 +4,25 @@ namespace spamtonprof\stp_api;
 class StpGmailAccount implements \JsonSerializable
 {
 
-    protected $ref_gmail_account, $email, $credential, $last_history_id, $date_url_sent;
+    protected $ref_gmail_account, $email, $credential, $last_history_id, $date_url_sent, $last_timestamp;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getLast_timestamp()
+    {
+        return $this->last_timestamp;
+    }
+
+    /**
+     *
+     * @param mixed $last_timestamp
+     */
+    public function setLast_timestamp($last_timestamp)
+    {
+        $this->last_timestamp = $last_timestamp;
+    }
 
     /**
      *

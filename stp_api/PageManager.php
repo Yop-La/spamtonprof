@@ -462,10 +462,6 @@ class PageManager
         ), time());
 
         $slack = new \spamtonprof\slack\Slack();
-
-        $slack->sendMessages('google-log', array(
-            'Sur page home'
-        ));
         
         if (isset($_GET['state']) && isset($_GET['code'])) {
 

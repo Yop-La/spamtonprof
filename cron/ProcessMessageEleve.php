@@ -31,8 +31,8 @@ header("Pragma: no-cache");
 $slack = new \spamtonprof\slack\Slack();
 
 $profMg = new \spamtonprof\stp_api\StpProfManager();
-
 $prof = $profMg->getNextInboxToProcess();
+
 
 echo ('<br>');
 echo ($prof->getPrenom());
@@ -46,21 +46,7 @@ $profMg->updateProcessingDate($prof);
 $gmailAccountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
 $gmailAccount = $gmailAccountMg->get($prof->getRef_gmail_account());
 
-try {
-
-    $gmailManager = new spamtonprof\googleMg\GoogleManager($gmailAccount->getEmail());
-} catch (\Exception $e) {
-
-    $smtpServerMg = new \spamtonprof\stp_api\SmtpServerManager();
-
-    $smtpServer = $smtpServerMg->get(array(
-        'ref_smtp_server' => $smtpServerMg::smtp2Go
-    ));
-
-    $smtpServer->sendEmail('Erreur connexion gmail ', 'alexandre@spamtonprof.com', "Vient de ProcessMessageEleve.php - Impossible de se connecter � la boite : " . $gmailAccount->getEmail() . "Debug message : " . $e->getMessage(), 'alexandre@spamtonprof.com');
-
-    exit(0);
-}
+$gmailManager = new spamtonprof\googleMg\GoogleManager($gmailAccount->getEmail());
 
 $slack->sendMessages("message_eleve", array(
     " ----- ",
@@ -74,32 +60,22 @@ $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
 
 // gestion last history id
 
-$lastHistoryId = $gmailAccount->getLast_history_id();
-
-$retour = $gmailManager->getNewMessages($lastHistoryId);
-
-$messages = $retour["messages"];
-$lastHistoryId = $retour["lastHistoryId"];
-
-$gmailAccount->setLast_history_id($lastHistoryId);
-$gmailAccountMg->updateHistoryId($gmailAccount);
+$messages = $gmailAccountMg->getLastMessage($gmailAccount->getEmail());
 
 foreach ($messages as $message) {
 
     $gmailId = $message->id;
 
+    $message = $gmailManager->getMessage($gmailId);
+
     $from = extractFirstMail($gmailManager->getHeader($message, "From"));
-    $snippet = $message->snippet;
-    $subject = $gmailManager->getHeader($message, "Subject");
-    $date = $gmailManager->getHeader($message, "Date");
-    // $body = $gmailManager->getBody($message, "html");
 
     $timeStamp = $message->internalDate / 1000;
     $dateReception = new DateTime();
-    $dateReception -> setTimestamp($timeStamp);
-    
+    $dateReception->setTimestamp($timeStamp);
+
     $dateReception->setTimezone(new \DateTimeZone('Europe/Paris'));
-    
+
     $eleve = false;
     $eleve = $eleveMg->get(array(
         "email" => $from
@@ -168,7 +144,6 @@ foreach ($messages as $message) {
                 if ($abo->isTrialOver() && $abo->getRef_statut_abonnement() == $abo::ESSAI) {
                     $labelsNameToAdd[] = 'test-over';
                 }
-                
 
                 $labelsNameToAdd[] = $niveau->getSigle();
                 $labelsNameToAdd[] = $statut->getStatut_abonnement();
@@ -184,12 +159,12 @@ foreach ($messages as $message) {
                 break;
             default:
                 $slack->sendMessages("log", array(
-                    "Nb d'abonnements incoh�rent au moment du tracking des �l�ves. Voir ProcessMessageEleve.php"
+                    "Nb d'abonnements incohérent au moment du tracking des élèves. Voir ProcessMessageEleve.php"
                 ));
                 exit(0);
         }
 
-        // attribuer les libell�s s
+        // attribuer les libellées
         $labelsToAdd = $gmailManager->getCustomLabelsToAdd($labelsNameToAdd);
 
         $gmailManager->modifyMessage($gmailId, $labelsToAdd, array());

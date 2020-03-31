@@ -26,6 +26,71 @@ class StpGmailAccountManager
         return ($StpGmailAccount);
     }
 
+    public function getLastMessage($gmailAdress, $nbMessage = 10)
+    {
+        $gmailManager = new \spamtonprof\googleMg\GoogleManager($gmailAdress);
+
+        $stpGmailAccount = $this->get($gmailAdress);
+
+        $timeStamp = $stpGmailAccount->getLast_timestamp();
+
+        $now = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+        $timeStampNow = $now->getTimestamp();
+
+        $now->sub(new \DateInterval('P30D'));
+        $timeStamp30DaysBefore = $now->getTimestamp();
+
+        if (! $timeStamp) {
+            $timeStamp = $timeStamp30DaysBefore;
+        }
+
+        $timeStampAfter = $timeStamp;
+
+        $timeStampBefore = $timeStampAfter + 24 * 60 * 60;
+
+        $msgs = $gmailManager->listMessages('after:' . $timeStampAfter . ' before:' . $timeStampBefore, 100, 100);
+
+        $msgs = array_reverse($msgs);
+
+        $msgs = array_slice($msgs, 0, $nbMessage + 1);
+
+        $newTimeStamp = false;
+        if (count($msgs) != 0) { // si pas de message reçu ou si pas de message dans le passé
+
+            $all_msgs = [];
+            foreach ($msgs as $msg) {
+                $all_msgs[] = $gmailManager->getMessage($msg->id, [
+                    'format' => 'metadata',
+                    'metadataHeaders' => [
+                        'From',
+                        'Date',
+                        'Subject'
+                    ]
+                ]);
+            }
+
+            $msg = $all_msgs[$nbMessage];
+
+            $newTimeStamp = $msg->internalDate / 1000;
+        }
+
+        if (! $newTimeStamp) {
+
+            if ($timeStampBefore >= $timeStampNow) {
+
+                $newTimeStamp = $timeStampNow;
+            } else {
+
+                $newTimeStamp = $timeStampBefore;
+            }
+        }
+
+        $stpGmailAccount->setLast_timestamp($newTimeStamp);
+        $this->updateLastTimestamp($stpGmailAccount);
+
+        return (array_slice($msgs, 0, $nbMessage));
+    }
+
     public function get($info)
     {
         if (is_int($info)) {
@@ -63,7 +128,20 @@ class StpGmailAccountManager
         $q->bindValue(':credential', $StpGmailAccount->getCredential());
 
         $q->bindValue(':ref_gmail_account', $StpGmailAccount->getRef_gmail_account());
-        
+
+        $q->execute();
+    }
+
+    public function updateLastTimestamp(StpGmailAccount $StpGmailAccount)
+
+    {
+        $q = $this->_db->prepare('UPDATE stp_gmail_account set last_timestamp=:last_timestamp
+            WHERE ref_gmail_account = :ref_gmail_account');
+
+        $q->bindValue(':last_timestamp', $StpGmailAccount->getLast_timestamp());
+
+        $q->bindValue(':ref_gmail_account', $StpGmailAccount->getRef_gmail_account());
+
         $q->execute();
     }
 
@@ -76,7 +154,7 @@ class StpGmailAccountManager
         $q->bindValue(':date_url_sent', $StpGmailAccount->getDate_url_sent());
 
         $q->bindValue(':ref_gmail_account', $StpGmailAccount->getRef_gmail_account());
-        
+
         $q->execute();
     }
 

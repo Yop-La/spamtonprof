@@ -97,14 +97,20 @@ class GoogleManager
 
             try {
 
-                $client->setAccessToken($credentials);
+                $ret = $client->setAccessToken($credentials);
+
+                // prettyPrint(array($credentials,$ret,gettype($credentials)));
 
                 // If there is no previous token or it's expired.
                 $need_new_authen = false;
+
+                // prettyPrint($client->isAccessTokenExpired());
+
                 if ($client->isAccessTokenExpired()) {
 
                     // Refresh the token if possible, else fetch a new one.
                     $need_new_authen = true;
+
                     if ($client->getRefreshToken()) {
 
                         $credentials = $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
@@ -117,7 +123,10 @@ class GoogleManager
                         }
                     }
                 }
-            } catch (Exception $e) {}
+            } catch (Exception $e) {
+
+                echo ($e->getMessage() . '<br>');
+            }
         }
 
         if ($need_new_authen) {
@@ -139,8 +148,7 @@ class GoogleManager
         $dateUrlSent = $this->account->getDate_url_sent();
 
         echo ("Envoi de l'email d'authentification en cours...<br>");
-        
-        
+
         if ($dateUrlSent) {
 
             $dateUrlSent = \DateTime::createFromFormat(PG_DATETIME_FORMAT, $dateUrlSent);
@@ -154,8 +162,6 @@ class GoogleManager
                 exit();
             }
         }
-        
-        
 
         $profMg = new \spamtonprof\stp_api\StpProfManager();
         $prof = $profMg->get(array(
@@ -166,7 +172,6 @@ class GoogleManager
         if ($prof) {
             $name = ucfirst($prof->getPrenom());
         }
-        
 
         $email = new \SendGrid\Mail\Mail();
         $email->setFrom("alexandre@spamtonprof.com", "Alexandre de SpamTonProf");
@@ -188,9 +193,8 @@ class GoogleManager
             $this->slack->sendMessages('google-log', array(
                 "Url d'authentification envoyé à: " . $this->adress
             ));
-            
-            print($response->body());
-            
+
+            echo ($response->body());
         } catch (\Exception $e) {
 
             $this->slack->sendMessages('google-log', array(
@@ -200,7 +204,7 @@ class GoogleManager
 
         $this->account->setDate_url_sent($now);
         $this->accountMg->updateDateUrlSent($this->account);
-        
+
         print('email envoyé à ' . $this->adress);
     }
 
@@ -610,9 +614,9 @@ class GoogleManager
         }
     }
 
-    function getNewMessages($lastHistoryId, $label = "INBOX")
+    function getNewMessages($lastHistoryId, $label = "INBOX", $format = ['format' => 'full'], $historyTypes = "messageAdded")
     {
-        $histories = $this->listHistory($lastHistoryId, "messageAdded");
+        $histories = $this->listHistory($lastHistoryId, $historyTypes,$label);
 
         $indexMessage = 0;
         $messageLimit = 20;
@@ -623,9 +627,7 @@ class GoogleManager
 
             $message = $history->messages[0];
 
-            $message = $this->getMessage($message->id, [
-                'format' => 'full'
-            ]);
+            $message = $this->getMessage($message->id, $format);
 
             if ($message) {
 
