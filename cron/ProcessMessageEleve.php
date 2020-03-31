@@ -31,7 +31,7 @@ header("Pragma: no-cache");
 $slack = new \spamtonprof\slack\Slack();
 
 $profMg = new \spamtonprof\stp_api\StpProfManager();
-$profMg->getNextInboxToProcess();
+$prof = $profMg->getNextInboxToProcess();
 
 
 echo ('<br>');
