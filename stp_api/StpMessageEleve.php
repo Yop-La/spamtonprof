@@ -4,7 +4,43 @@ namespace spamtonprof\stp_api;
 class StpMessageEleve implements \JsonSerializable
 {
 
-    protected $ref_abonnement, $date_message, $ref_message, $ref_gmail, $mail_expe;
+    protected $ref_abonnement, $date_message, $ref_message, $ref_gmail, $mail_expe, $ref_prof, $ref_gmail_account;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getRef_prof()
+    {
+        return $this->ref_prof;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getRef_gmail_account()
+    {
+        return $this->ref_gmail_account;
+    }
+
+    /**
+     *
+     * @param mixed $ref_prof
+     */
+    public function setRef_prof($ref_prof)
+    {
+        $this->ref_prof = $ref_prof;
+    }
+
+    /**
+     *
+     * @param mixed $ref_gmail_account
+     */
+    public function setRef_gmail_account($ref_gmail_account)
+    {
+        $this->ref_gmail_account = $ref_gmail_account;
+    }
 
     public function __construct(array $donnees = array())
     {

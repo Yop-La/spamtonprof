@@ -33,9 +33,6 @@ $slack = new \spamtonprof\slack\Slack();
 $profMg = new \spamtonprof\stp_api\StpProfManager();
 $prof = $profMg->getNextInboxToProcess();
 
-// $prof = $profMg->get(array('email_stp' => 'arnaud@spamtonprof.com'));
-
-
 echo ('<br>');
 echo ($prof->getPrenom());
 echo ('<br>');
@@ -62,15 +59,24 @@ $eleveMg = new \spamtonprof\stp_api\StpEleveManager();
 
 // gestion last history id
 
-$messages = $gmailAccountMg->getLastMessage($gmailAccount->getEmail());
+$historyId = $gmailAccount->getLast_history_id();
+$ret = $gmailManager->getLastMessage($historyId);
+
+$messages = $ret['msgs'];
+$historyId = $ret['historyId'];
 
 foreach ($messages as $message) {
-    
-    $gmailId  = $message->id;
-    
+
+    if (! $message) {
+        continue;
+    }
+
+    $gmailId = $message->id;
+
     $from = extractFirstMail($gmailManager->getHeader($message, "From"));
-    
+
     $timeStamp = $message->internalDate / 1000;
+
     $dateReception = new DateTime();
     $dateReception->setTimestamp($timeStamp);
 
@@ -121,7 +127,9 @@ foreach ($messages as $message) {
                     'ref_abonnement' => $abo->getRef_abonnement(),
                     'date_message' => $dateReception->format(PG_DATETIME_FORMAT),
                     'ref_gmail' => $gmailId,
-                    'mail_expe' => $from
+                    'mail_expe' => $from,
+                    'ref_prof' => $prof->getRef_prof(),
+                    'ref_gmail_account' => $gmailAccount->getRef_gmail_account()
                 )));
 
                 // attribuer les libellées
@@ -158,10 +166,10 @@ foreach ($messages as $message) {
 
                 break;
             default:
-                $slack->sendMessages("log", array(
+                $slack->sendMessages("message_eleve", array(
                     "Nb d'abonnements incohérent au moment du tracking des élèves. Voir ProcessMessageEleve.php"
                 ));
-                exit(0);
+                continue;
         }
 
         // attribuer les libellées
@@ -170,6 +178,9 @@ foreach ($messages as $message) {
         $gmailManager->modifyMessage($gmailId, $labelsToAdd, array());
     }
 }
+
+$gmailAccount->setLast_history_id($historyId);
+$gmailAccountMg->updateHistoryId($gmailAccount);
 
 exit(0);
 

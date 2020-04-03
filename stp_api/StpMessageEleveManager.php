@@ -12,12 +12,21 @@ class StpMessageEleveManager
     }
 
     public function add(StpMessageEleve $StpMessageEleve)
+    
     {
-        $q = $this->_db->prepare('insert into stp_message_eleve(ref_abonnement, date_message, ref_gmail, mail_expe) values(:ref_abonnement, :date_message, :ref_gmail, :mail_expe)');
-        $q->bindValue(':ref_abonnement', $StpMessageEleve->getRef_abonnement());
+        
+//         prettyPrint($StpMessageEleve);
+        
+        $q = $this->_db->prepare('insert into stp_message_eleve(ref_gmail, ref_prof, ref_gmail_account, ref_abonnement, mail_expe,date_message) values(:ref_gmail, :ref_prof, :ref_gmail_account, :ref_abonnement, :mail_expe,:date_message)');
+
         $q->bindValue(':ref_gmail', $StpMessageEleve->getRef_gmail());
-        $q->bindValue(':date_message', $StpMessageEleve->getDate_message());
+        $q->bindValue(':ref_prof', $StpMessageEleve->getRef_prof());
+        $q->bindValue(':ref_gmail_account', $StpMessageEleve->getRef_gmail_account());
+
+        $q->bindValue(':ref_abonnement', $StpMessageEleve->getRef_abonnement());
         $q->bindValue(':mail_expe', $StpMessageEleve->getMail_expe());
+        $q->bindValue(':date_message', $StpMessageEleve->getDate_message());
+
         $q->execute();
 
         $StpMessageEleve->setRef_message($this->_db->lastInsertId());

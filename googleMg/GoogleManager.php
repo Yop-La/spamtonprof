@@ -315,6 +315,94 @@ class GoogleManager
         return $client;
     }
 
+    public function getLastMessage($historyId, $batchSize = 10)
+    {
+        $histories = [];
+        if (! $historyId) {
+            $nbDay = 20;
+            do {
+                ;
+                $msg = $this->findSingleMessageInPast($nbDay);
+                $historyId = $msg->historyId;
+                $histories = $this->listHistory(strval($historyId), "messageadded", false, 100);
+                $nbDay = $nbDay - 1;
+            } while (! $histories);
+        } else {
+            $histories = $this->listHistory(strval($historyId), "messageadded", false, 100);
+        }
+
+        $msgs = [];
+
+        $lastHistoryId = false;
+
+        foreach ($histories as $historie) {
+
+            $lastHistoryId = $historie->id;
+
+            $messagesAdded = $historie->messagesAdded;
+            $messageAdded = $messagesAdded[0];
+            $msg = $messageAdded->message;
+
+            $labelIds = $msg->labelIds;
+
+            if (isset($labelIds)) {
+
+                if (in_array("SENT", $labelIds)) {
+                    continue;
+                }
+
+                if (in_array("DRAFT", $labelIds)) {
+                    continue;
+                }
+            }
+
+            $msg = $this->getMessage($msg->id);
+
+            $msgs[] = $msg;
+
+            if (count($msgs) == $batchSize) {
+                break;
+            }
+        }
+        return (array(
+            'msgs' => $msgs,
+            'historyId' => $lastHistoryId
+        ));
+    }
+
+    public function findSingleMessageInPast($nbDaysInPaste = 20, $nbPage = 1, $maxResults = 50)
+    {
+        $pastDate = new \DateTime(null, new \DateTimeZone('Europe/Paris'));
+        $pastDate->sub(new \DateInterval('P' . $nbDaysInPaste . 'D'));
+
+        $messages = $this->listMessages("before:" . $pastDate->format(GMAIL_DATE_FORMAT), $nbPage, $maxResults);
+
+        $winner_msg = false;
+
+        foreach ($messages as $msg) {
+
+            $msgId = $msg->id;
+
+            if ($msgId == $msg->threadId) {
+
+                $msg = $this->getMessage($msgId);
+
+                if (($msg->internalDate / 1000) <= $pastDate->getTimestamp()) {
+
+                    if (! $winner_msg) {
+                        $winner_msg = $msg;
+                    }
+
+                    if ($winner_msg->internalDate > $msg->internalDate) {
+                        $winner_msg = $msg;
+                    }
+                }
+            }
+        }
+
+        return ($winner_msg);
+    }
+
     /**
      * Get list of Messages in user's mailbox.
      *
@@ -537,16 +625,22 @@ class GoogleManager
         return ($labelsIdToAdd);
     }
 
-    function listHistory($startHistoryId, $historyTypes = "messageAdded", $labelId = "INBOX")
+    function listHistory($startHistoryId, $historyTypes = "messageAdded", $labelId = "INBOX", $maxResults = 1000)
     {
         $userId = $this->userId;
         $service = $this->service;
         $opt_param = array(
             'startHistoryId' => $startHistoryId,
-            'historyTypes' => $historyTypes,
-            'maxResults' => '1000',
-            'labelId' => $labelId
+            'maxResults' => $maxResults
         );
+
+        if ($historyTypes) {
+            $opt_param['historyTypes'] = $historyTypes;
+        }
+
+        if ($labelId) {
+            $opt_param['labelId'] = $labelId;
+        }
 
         $pageToken = NULL;
         $histories = array();
@@ -565,6 +659,7 @@ class GoogleManager
                 // }
             } catch (Exception $e) {
                 print 'An error occurred in list history function : ' . $e->getMessage();
+                return (false);
             }
         } while ($pageToken);
 
@@ -616,7 +711,7 @@ class GoogleManager
 
     function getNewMessages($lastHistoryId, $label = "INBOX", $format = ['format' => 'full'], $historyTypes = "messageAdded")
     {
-        $histories = $this->listHistory($lastHistoryId, $historyTypes,$label);
+        $histories = $this->listHistory($lastHistoryId, $historyTypes, $label);
 
         $indexMessage = 0;
         $messageLimit = 20;
