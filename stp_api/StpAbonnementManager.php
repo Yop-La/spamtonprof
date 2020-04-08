@@ -9,7 +9,7 @@ class StpAbonnementManager
 
     private $_db, $eleveMg;
 
-    const abos_en_cours_dun_prof = 'abos_en_cours_dun_prof',all_actif_abos_of_account = 'all_actif_abos_of_account';
+    const abos_en_cours_dun_prof = 'abos_en_cours_dun_prof', all_actif_abos_of_account = 'all_actif_abos_of_account', to_relaunch = 'to_relaunch';
 
     public function __construct()
     {
@@ -268,7 +268,7 @@ class StpAbonnementManager
             }
         }
     }
-    
+
     public function get_full_abo($refAbo)
     {
         $constructor = array(
@@ -292,11 +292,11 @@ class StpAbonnementManager
                 )
             )
         );
-        
+
         $stpAbo = $this->get(array(
             "ref_abonnement" => $refAbo
         ), $constructor);
-        
+
         return ($stpAbo);
     }
 
@@ -507,6 +507,22 @@ class StpAbonnementManager
         $q = $this->_db->prepare("update stp_abonnement set relance_date = :relance_date where ref_abonnement = :ref_abonnement");
         $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
         $q->bindValue(":relance_date", $abonnement->getRelance_date());
+        $q->execute();
+    }
+
+    public function updateToRelaunch(\spamtonprof\stp_api\StpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set to_relaunch = :to_relaunch where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->bindValue(":to_relaunch", $abonnement->getTo_relaunch(), \PDO::PARAM_BOOL);
+        $q->execute();
+    }
+
+    public function updateNbRelanceSinceNoNews(\spamtonprof\stp_api\StpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set nb_relance_since_no_news = :nb_relance_since_no_news where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->bindValue(":nb_relance_since_no_news", $abonnement->getNb_relance_since_no_news());
         $q->execute();
     }
 
@@ -847,6 +863,77 @@ class StpAbonnementManager
         return (false);
     }
 
+    public function updateAll($info)
+    {
+        $q = null;
+
+        if (is_array($info)) {
+
+            if (array_key_exists('key', $info)) {
+
+                $q = false;
+
+                $key = $info['key'];
+
+                if ($key == "trial_sub_not_relaunched_to_relaunch") {
+
+                    $days_since_last_contact = $info['days_since_last_contact'];
+
+                    $q = $this->_db->prepare("
+                    update stp_abonnement set to_relaunch = true
+                    where (((dernier_contact + interval '" . $days_since_last_contact . " days') <= now()) or dernier_contact is null)
+                        and ref_statut_abonnement = 2
+                        and ((date_attribution_prof + interval '1 days' <= now()))
+                        and (nb_relance_since_no_news is null or nb_relance_since_no_news = 0)
+                    ");
+                    $q->execute();
+                }
+
+                if ($key == "actif_sub_not_relaunched_to_relaunch") {
+
+                    $days_since_last_contact = $info['days_since_last_contact'];
+
+                    $q = $this->_db->prepare("
+                    update stp_abonnement set to_relaunch = true
+                    where (((dernier_contact + interval '" . $days_since_last_contact . " days') <= now()) or dernier_contact is null)
+                        and ref_statut_abonnement = 1
+                        and (nb_relance_since_no_news is null or nb_relance_since_no_news = 0)
+                    ");
+
+                    $q->execute();
+                }
+
+                if ($key == "actif_sub_relaunched_to_relaunch") {
+
+                    $days_since_last_relaunch = $info['days_since_last_relaunch'];
+
+                    $q = $this->_db->prepare("
+                    update stp_abonnement set to_relaunch = true
+                    where (((relance_date + interval '" . $days_since_last_relaunch . " days') <= now()))
+                        and ref_statut_abonnement = 1
+                        and (nb_relance_since_no_news > 0)
+                    ");
+
+                    $q->execute();
+                }
+
+                if ($key == "trial_sub_relaunched_to_relaunch") {
+
+                    $days_since_last_relaunch = $info['days_since_last_relaunch'];
+
+                    $q = $this->_db->prepare("
+                    update stp_abonnement set to_relaunch = true
+                    where (((relance_date + interval '" . $days_since_last_relaunch . " days') <= now()))
+                        and ref_statut_abonnement = 2
+                        and (nb_relance_since_no_news > 0)
+                    ");
+
+                    $q->execute();
+                }
+            }
+        }
+    }
+
     public function getAll($info, $constructor = false)
     {
         $abonnements = [];
@@ -866,17 +953,21 @@ class StpAbonnementManager
                     $q->bindValue(":ref_prof", $ref_prof);
                     $q->execute();
                 }
-                
+
                 if ($key == $this::all_actif_abos_of_account) {
-                    
+
                     $ref_compte = $info['ref_compte'];
-                    
+
                     $q = $this->_db->prepare('select * from stp_abonnement where ref_compte = :ref_compte and ref_statut_abonnement = 1');
                     $q->bindValue(":ref_compte", $ref_compte);
                     $q->execute();
                 }
-                
-                
+
+                if ($key == "abo_to_relaunch") {
+
+                    $q = $this->_db->prepare('select * from stp_abonnement where to_relaunch is true order by dernier_contact limit 5 ');
+                    $q->execute();
+                }
             } else {
 
                 if (array_key_exists("ref_abonnement_lower_with_prof", $info)) {
@@ -968,8 +1059,7 @@ class StpAbonnementManager
                     $proches = $procheMg->getAll(array(
                         "email" => $email
                     ));
-                    
-                    
+
                     $eleves = $eleveMg->getAll(array(
                         "email" => $email
                     ));

@@ -4,14 +4,48 @@ namespace spamtonprof\stp_api;
 class StpAbonnement implements \JsonSerializable
 {
 
-    const ACTIF = 1, ESSAI = 2, TERMINE = 3, DESACTIVE = 4,ATTENTE_DEMARRAGE = 5,REFUSE = 6;
+    const ACTIF = 1, ESSAI = 2, TERMINE = 3, DESACTIVE = 4, ATTENTE_DEMARRAGE = 5, REFUSE = 6;
 
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage, $objectID, $teleprospection, $compte, $interruption, $ref_coupon, $coupon, $relance_date, $test;
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage, $objectID, $teleprospection, $compte, $interruption, $ref_coupon, $coupon, $relance_date, $test, $to_relaunch, $nb_relance_since_no_news;
 
-    
-    
-    
     /**
+     *
+     * @return mixed
+     */
+    public function getTo_relaunch()
+    {
+        return $this->to_relaunch;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getNb_relance_since_no_news()
+    {
+        return $this->nb_relance_since_no_news;
+    }
+
+    /**
+     *
+     * @param mixed $to_relaunch
+     */
+    public function setTo_relaunch($to_relaunch)
+    {
+        $this->to_relaunch = $to_relaunch;
+    }
+
+    /**
+     *
+     * @param mixed $nb_relance_since_no_news
+     */
+    public function setNb_relance_since_no_news($nb_relance_since_no_news)
+    {
+        $this->nb_relance_since_no_news = $nb_relance_since_no_news;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getTest()
@@ -20,6 +54,7 @@ class StpAbonnement implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $test
      */
     public function setTest($test)
@@ -415,7 +450,6 @@ class StpAbonnement implements \JsonSerializable
      */
     public function getEleve()
     {
-        
         return $this->eleve;
     }
 
@@ -626,39 +660,34 @@ class StpAbonnement implements \JsonSerializable
             return (false);
         }
     }
-    
-    public function __toString(){
-        
-        
+
+    public function __toString()
+    {
         $return = "Abonnement " . strval($this->ref_abonnement) . "\n--\n";
-        
-        
-        
+
         $eleve = $this->eleve;
-        if($eleve){
+        if ($eleve) {
             $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
             $return = $return . "<div class='eleve'>" . $eleve->__toString() . "--\n</div>";
         }
-        
+
         $proche = $this->proche;
-        if($proche){
+        if ($proche) {
             $proche = \spamtonprof\stp_api\StpProche::cast($proche);
-            $return = $return . "<div class='proche'>" .  $proche->__toString(). "--\n</div>";
+            $return = $return . "<div class='proche'>" . $proche->__toString() . "--\n</div>";
         }
-        
+
         $formule = $this->formule;
-        if($formule){
+        if ($formule) {
             $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
-            $return = $return . "<div class='proche'>" . $formule ->__toString(). "</div>";
+            $return = $return . "<div class='proche'>" . $formule->__toString() . "</div>";
         }
-        
+
         $plan = $this->plan;
-        if($plan){
+        if ($plan) {
             $plan = \spamtonprof\stp_api\StpPlan::cast($plan);
-            $return = $return . "<div class='plan'>" . $plan ->__toString(). "</div>";
+            $return = $return . "<div class='plan'>" . $plan->__toString() . "</div>";
         }
-        return($return);
+        return ($return);
     }
-    
-    
 }
