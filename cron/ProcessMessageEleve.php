@@ -160,6 +160,9 @@ foreach ($messages as $message) {
                 $abo->setDernier_contact($dateReception->format(PG_DATETIME_FORMAT));
                 $aboMg->updateDernierContact($abo);
 
+                $abo->setNb_relance_since_no_news(0);
+                $aboMg->updateNbRelanceSinceNoNews($abo);
+
                 // mise à jour de l'index
                 $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
                 $algoliaMg->updateAbonnement($abo->getRef_abonnement(), false);
