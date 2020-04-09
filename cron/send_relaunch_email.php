@@ -98,13 +98,15 @@ foreach ($abos as $abo) {
             "eleve_firstname" => ucfirst($eleve->getPrenom())
         ], 0);
 
-        $email->setReplyTo($eleve->getEmail());
-
-        $email->addCc('alexandre@spamtonprof.com');
-
-        $email->setTemplateId("d-b65aa9d6d4a94aeca3a24ea250f90506");
-        $sendgrid = new \SendGrid(SEND_GRID_API_KEY);
         try {
+
+            $email->setReplyTo($eleve->getEmail());
+
+            $email->addCc('alexandre@spamtonprof.com');
+
+            $email->setTemplateId("d-b65aa9d6d4a94aeca3a24ea250f90506");
+            $sendgrid = new \SendGrid(SEND_GRID_API_KEY);
+
             $response = $sendgrid->send($email);
 
             echo ($response->body());
@@ -140,13 +142,15 @@ foreach ($abos as $abo) {
             "eleve_firstname" => ucfirst($eleve->getPrenom())
         ], 0);
 
-        $email->setReplyTo($eleve->getEmail());
-
-        $email->addCc('alexandre@spamtonprof.com');
-
-        $email->setTemplateId("d-7010626a9fdf47199bf028c5549f5bad");
-        $sendgrid = new \SendGrid(SEND_GRID_API_KEY);
         try {
+
+            $email->setReplyTo($eleve->getEmail());
+
+            $email->addCc('alexandre@spamtonprof.com');
+
+            $email->setTemplateId("d-7010626a9fdf47199bf028c5549f5bad");
+            $sendgrid = new \SendGrid(SEND_GRID_API_KEY);
+
             $response = $sendgrid->send($email);
 
             echo ($response->body());
