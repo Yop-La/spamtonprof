@@ -119,7 +119,7 @@ foreach ($abos as $abo) {
         }
 
         $nbRelance = $abo->getNb_relance_since_no_news();
-        $abo->setNb_relance_since_no_news(0);
+        $abo->setNb_relance_since_no_news(1);
         if ($nbRelance) {
 
             $abo->setNb_relance_since_no_news($nbRelance + 1);
@@ -166,7 +166,7 @@ foreach ($abos as $abo) {
         }
 
         $nbRelance = $abo->getNb_relance_since_no_news();
-        $abo->setNb_relance_since_no_news(0);
+        $abo->setNb_relance_since_no_news(1);
         if ($nbRelance) {
 
             $abo->setNb_relance_since_no_news($nbRelance + 1);
