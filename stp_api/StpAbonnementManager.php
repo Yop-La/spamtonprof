@@ -965,7 +965,7 @@ class StpAbonnementManager
 
                 if ($key == "abo_to_relaunch") {
 
-                    $q = $this->_db->prepare('select * from stp_abonnement where to_relaunch is true order by dernier_contact limit 5 ');
+                    $q = $this->_db->prepare('select * from stp_abonnement where to_relaunch is true and ref_statut_abonnement in (1,2) order by dernier_contact limit 5 ');
                     $q->execute();
                 }
             } else {

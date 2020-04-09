@@ -163,6 +163,9 @@ foreach ($messages as $message) {
                 $abo->setNb_relance_since_no_news(0);
                 $aboMg->updateNbRelanceSinceNoNews($abo);
 
+                $abo->setTo_relaunch(false);
+                $aboMg->updateToRelaunch($abo);
+                
                 // mise à jour de l'index
                 $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
                 $algoliaMg->updateAbonnement($abo->getRef_abonnement(), false);
