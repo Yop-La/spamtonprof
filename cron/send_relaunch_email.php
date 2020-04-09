@@ -123,6 +123,9 @@ foreach ($abos as $abo) {
 
     if ($abo->getRef_statut_abonnement() == $abo::ACTIF) {
 
+        $email = new \SendGrid\Mail\Mail();
+        $email->setFrom("alexandre@spamtonprof.com", "Alexandre de SpamTonProf");
+
         $to = $prof->getEmail_stp();
         // $to = 'alexandre@spamtonprof.com';
 
