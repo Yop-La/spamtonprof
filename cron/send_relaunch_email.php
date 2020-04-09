@@ -33,8 +33,6 @@ $abos = $aboMg->getAll(array(
     "key" => "abo_to_relaunch"
 ), $constructor);
 
-
-
 foreach ($abos as $abo) {
 
     $eleve = $abo->getEleve();
@@ -73,7 +71,6 @@ foreach ($abos as $abo) {
         $phrase_fin_essai = 'l\'essai est déjà terminé mais on peut le prolonger si il faut';
     }
 
-    
     /*
      *
      * envoi du mail
@@ -86,8 +83,8 @@ foreach ($abos as $abo) {
         $email->setFrom("alexandre@spamtonprof.com", "Alexandre de SpamTonProf");
 
         $to = $prof->getEmail_stp();
-//         $to = 'alexandre@spamtonprof.com';
-        
+        // $to = 'alexandre@spamtonprof.com';
+
         $email->addTo($to, $prof->getPrenom(), [
 
             "prof_name" => ucfirst($prof->getPrenom()),
@@ -116,17 +113,21 @@ foreach ($abos as $abo) {
             $slack->sendMessages('relance', 'Erreur d\envoi du mail de relance', 'Caught exception: ' . $e->getMessage());
         }
 
-        $abo->setNb_relance_since_no_news(1);
+        $nbRelance = $abo->getNb_relance_since_no_news();
+        $abo->setNb_relance_since_no_news(0);
+        if ($nbRelance) {
+
+            $abo->setNb_relance_since_no_news($nbRelance + 1);
+        }
     }
 
     if ($abo->getRef_statut_abonnement() == $abo::ACTIF) {
 
-        
         $to = $prof->getEmail_stp();
-//         $to = 'alexandre@spamtonprof.com';
-        
+        // $to = 'alexandre@spamtonprof.com';
+
         $email->addTo($to, $prof->getPrenom(), [
-            
+
             "prof_name" => ucfirst($prof->getPrenom()),
             "eleve_name" => ucfirst($eleve->getPrenom()) . ' ' . ucfirst($eleve->getNom()),
             "date_attribution_prof" => $date_attribution_prof->format(FR_DATETIME_FORMAT),
@@ -150,7 +151,13 @@ foreach ($abos as $abo) {
 
             $slack->sendMessages('relance', 'Erreur d\envoi du mail de relance', 'Caught exception: ' . $e->getMessage());
         }
-        $abo->setNb_relance_since_no_news($abo->getNb_relance_since_no_news() + 1);
+
+        $nbRelance = $abo->getNb_relance_since_no_news();
+        $abo->setNb_relance_since_no_news(0);
+        if ($nbRelance) {
+
+            $abo->setNb_relance_since_no_news($nbRelance + 1);
+        }
     }
 
     /*

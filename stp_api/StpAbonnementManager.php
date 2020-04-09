@@ -879,6 +879,8 @@ class StpAbonnementManager
 
                     $q = $this->_db->prepare("update stp_abonnement set to_relaunch = false");
                     $q->execute();
+                    
+                    
                 }
 
                 if ($key == "trial_sub_not_relaunched_to_relaunch") {
