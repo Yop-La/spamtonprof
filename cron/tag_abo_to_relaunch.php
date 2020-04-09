@@ -1,5 +1,4 @@
 <?php
-
 require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . "/wp-config.php");
 $wp->init();
 $wp->parse_request();
@@ -20,9 +19,11 @@ header("Pragma: no-cache");
  * cron de détermination des abos à relancer
  */
 
-
-
 $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
+
+$aboMg->updateAll(array(
+    "key" => "relaunch_to_false"
+));
 
 $aboMg->updateAll(array(
     "key" => "trial_sub_not_relaunched_to_relaunch",
