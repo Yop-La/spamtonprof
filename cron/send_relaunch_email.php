@@ -112,7 +112,10 @@ foreach ($abos as $abo) {
             echo ($response->body());
         } catch (\Exception $e) {
 
-            $slack->sendMessages('relance', 'Erreur d\envoi du mail de relance', 'Caught exception: ' . $e->getMessage());
+            $slack->sendMessages('relance', array(
+                'Erreur d\envoi du mail de relance',
+                'Caught exception: ' . $e->getMessage()
+            ));
         }
 
         $nbRelance = $abo->getNb_relance_since_no_news();
@@ -156,7 +159,10 @@ foreach ($abos as $abo) {
             echo ($response->body());
         } catch (\Exception $e) {
 
-            $slack->sendMessages('relance', 'Erreur d\envoi du mail de relance', 'Caught exception: ' . $e->getMessage());
+            $slack->sendMessages('relance', array(
+                'Erreur d\envoi du mail de relance',
+                'Caught exception: ' . $e->getMessage()
+            ));
         }
 
         $nbRelance = $abo->getNb_relance_since_no_news();
