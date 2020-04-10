@@ -4,7 +4,25 @@ namespace spamtonprof\stp_api;
 class StripeChargeFailed implements \JsonSerializable
 {
 
-    protected $evt_id, $ref_abo, $cus_email, $email_prof, $ref_charge_failed;
+    protected $evt_id, $ref_abo, $cus_email, $email_prof, $ref_charge_failed, $sent;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getSent()
+    {
+        return $this->sent;
+    }
+
+    /**
+     *
+     * @param mixed $sent
+     */
+    public function setSent($sent)
+    {
+        $this->sent = $sent;
+    }
 
     public function __construct(array $donnees = array())
     {
