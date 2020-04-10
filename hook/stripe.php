@@ -33,9 +33,11 @@ $slack->sendMessages('log-stripe', array(
     $event_json->type
 ));
 
-if ($event_json->type == "invoice.payment_succeeded") {
+$test_mode = ! $event_json->livemode;
 
-    $stripeMg = new \spamtonprof\stp_api\StripeManager($test_mode);
+$stripeMg = new \spamtonprof\stp_api\StripeManager($test_mode);
+
+if ($event_json->type == "invoice.payment_succeeded") {
 
     $custom_fields = $event_json->data->object->custom_fields;
     $email_prof = false;
@@ -55,6 +57,8 @@ if ($event_json->type == "invoice.payment_succeeded") {
 
 // pour mettre fin à l'interruption
 if ($event_json->type == "customer.subscription.updated") {
+
+    $test_mode = ! $event_json->livemode;
 
     $interruptionMg = new \spamtonprof\stp_api\StpInterruptionManager();
 
@@ -91,12 +95,8 @@ if ($event_json->type == "checkout.session.completed") {
 
     $session_id = $event_json->data->object->id;
 
-    $test_mode = ! $event_json->livemode;
-
-    $stripeMg = new \spamtonprof\stp_api\StripeManager($test_mode);
-
     $session = $stripeMg->retrieve_session($session_id);
-    
+
     $setup_intent_id = $session->setup_intent;
 
     $setup_intent = $stripeMg->retrieve_setup_intent($setup_intent_id);
@@ -110,6 +110,60 @@ if ($event_json->type == "checkout.session.completed") {
     $slack->sendMessages('log-stripe', array(
         'Mise à jour du moyen de paiement de ' . $customer
     ));
+}
+
+if ($event_json->type == 'invoice.payment_failed') {
+    $id_event = $event_json->id;
+
+    $test_mode = ! $event_json->livemode;
+
+    $stripeMg = new \spamtonprof\stp_api\StripeManager($test_mode);
+
+    $data = $event_json->data->object;
+
+    // get email prof for manual invoice
+    $email_prof = null;
+    if (isset($data->custom_fields)) {
+
+        $custom_fields = $data->custom_fields;
+        foreach ($custom_fields as $custom_field) {
+
+            if ($custom_field->name == "email_prof") {
+                $email_prof = $custom_field->value;
+            }
+        }
+    }
+
+    // get customer email
+    $cus_email = $data->customer_email;
+
+    // get ref abo if exists
+    $ref_abonnement = null;
+    if (isset($data->lines)) {
+
+        $lines = $data->lines;
+
+        if (isset($lines->data)) {
+
+            $datas = $lines->data;
+            $data = $datas[0];
+
+            if (isset($data->metadata)) {
+                $metadata = $data->metadata;
+                if (isset($metadata->ref_abonnement)) {
+                    $ref_abonnement = $metadata->ref_abonnement;
+                }
+            }
+        }
+    }
+
+    $stripeChargeFailedMg = new \spamtonprof\stp_api\StripeChargeFailedManager();
+    $stripeChargeFailedMg->add(new \spamtonprof\stp_api\StripeChargeFailed(array(
+        'evt_id' => $id_event,
+        'cus_email' => $cus_email,
+        'email_prof' => $email_prof,
+        'ref_abo' => $ref_abonnement
+    )));
 }
 
 
