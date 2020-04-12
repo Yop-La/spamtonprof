@@ -34,7 +34,31 @@ class StripeChargeFailedManager
         $q->bindValue(":sent", $stripeChargeFailed->getSent(), \PDO::PARAM_BOOL);
         $q->bindValue(":ref_charge_failed", $stripeChargeFailed->getRef_charge_failed());
         $q->execute();
+    }
 
+    public function get($info = false, $constructor = false)
+    {
+        $q = $this->_db->prepare("select * from stripe_charge_failed  where ref_charge_failed = :ref_charge_failed");
+        $q->bindValue(":ref_charge_failed", $info);
+
+        if (is_array($info)) {
+
+            if (array_key_exists('key', $info)) {
+                $key = $info['key'];
+                $params = false;
+                if (array_key_exists('params', $info)) {
+                    $params = $info['params'];
+                }
+            }
+        }
+
+        $q->execute();
+
+        $data = $q->fetch(\PDO::FETCH_ASSOC);
+
+        $charge_failed = new \spamtonprof\stp_api\StripeChargeFailed($data);
+
+        return ($charge_failed);
     }
 
     public function getAll($info = false, $constructor = false)

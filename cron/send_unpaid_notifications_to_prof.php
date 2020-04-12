@@ -14,18 +14,18 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-// en prod. Toutes les heures à 42 
+// en prod. Toutes les heures à 42
 /*
  * pour envoyer une notification au prof en cas d'impayés
  */
 
 /*
- * todo: 
+ * todo:
  * - inserer invoice id dans la table et mettre une unique constraint pour éviter les doublons
  * - lister dans le mail le nombre de facture impayés avec une liste si possible ?
- * - voir pourquoi ref abo pas inséré dans certains cas 
- * 
- * 
+ * - voir pourquoi ref abo pas inséré dans certains cas
+ *
+ *
  */
 
 $stripeChargeFailedMg = new \spamtonprof\stp_api\StripeChargeFailedManager();
@@ -46,6 +46,9 @@ $constructor = array(
 $charges = $stripeChargeFailedMg->getAll(array(
     'key' => 'to_send'
 ));
+
+// $charges = [];
+// $charges[] = $stripeChargeFailedMg->get(237);
 
 foreach ($charges as $charge) {
 
@@ -142,7 +145,7 @@ foreach ($charges as $charge) {
         'invoice_id' => $invoice_id,
         "prof_name" => $prof_name,
         "email_client" => $email_client,
-        "montant_facture" => $montant_facture,
+        "montant_facture" => "" . $montant_facture,
         "date_begin" => $date_begin,
         "date_end" => $date_end,
         "description" => $description,
@@ -154,11 +157,9 @@ foreach ($charges as $charge) {
         "dernier_contact" => $dernier_contact
     ];
 
-
     try {
 
         $email->addTo($to, $prof_name, $params, 0);
-        
 
         $email->addCc('alexandre@spamtonprof.com');
 
@@ -178,8 +179,11 @@ foreach ($charges as $charge) {
         echo ($response->body());
     } catch (\Exception $e) {
 
+        echo ($e->getMessage());
+
         $slack->sendMessages('log_unpaid_invoice', array(
             'Erreur d\envoi du mail de relance',
+            'evt id: ' . $charge->getEvt_id(),
             'Caught exception: ' . $e->getMessage()
         ));
     }
