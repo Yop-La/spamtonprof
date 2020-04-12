@@ -786,7 +786,34 @@ class StripeManager
         return ($all_payouts);
     }
 
-    public function list_invoices(int $limit = 100, $starting_after = false)
+    public function list_events(int $limit = 100, $starting_after = false, $type = false)
+    {
+        $all_events = [];
+
+        $params = [
+            'limit' => $limit
+        ];
+
+        if ($type) {
+            $params['type'] = $type;
+        }
+
+        if ($starting_after) {
+            $params['starting_after'] = $starting_after;
+        }
+
+        $events = \Stripe\Event::all($params);
+
+        try {
+            $all_events = $events->data;
+        } catch (\Exception $e) {
+            return ($all_events);
+        }
+
+        return ($all_events);
+    }
+
+    public function list_invoices(int $limit = 100, $starting_after = false, $status = false)
     {
         $all_invoices = [];
 
@@ -794,6 +821,10 @@ class StripeManager
             'limit' => $limit,
             'status' => 'paid'
         ];
+        
+        if($status){
+            $params['status'] = $status;
+        }
 
         if ($starting_after) {
             $params['starting_after'] = $starting_after;
@@ -884,11 +915,9 @@ class StripeManager
 
         $this->testMode = $testMode;
 
-
         \Stripe\Stripe::setApiKey($this->getSecretStripeKey());
         \Stripe\Stripe::setApiVersion("2020-03-02");
-        
-        
+
         if ($prof_email) {
 
             $profMg = new \spamtonprof\stp_api\StpProfManager();
@@ -901,8 +930,6 @@ class StripeManager
                 $this->stripe_account = $prof->getStripe_id_test();
             }
         }
-        
-        
     }
 
     public function retrieve_event($id)
