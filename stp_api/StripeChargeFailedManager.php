@@ -35,12 +35,11 @@ class StripeChargeFailedManager
         $q->bindValue(":ref_charge_failed", $stripeChargeFailed->getRef_charge_failed());
         $q->execute();
 
-        prettyPrint($q->errorInfo());
     }
 
     public function getAll($info = false, $constructor = false)
     {
-        $q = $this->_db->prepare("select * from stripe_charge_failed ");
+        $q = $this->_db->prepare("select * from stripe_charge_failed order by invoice_created desc ");
         if (is_array($info)) {
 
             if (array_key_exists('key', $info)) {
