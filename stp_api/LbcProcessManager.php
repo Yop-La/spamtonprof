@@ -1078,6 +1078,7 @@ class LbcProcessManager
         $nbTextes = 0;
         $lbcAdsMg = new \spamtonprof\stp_api\LbcAdManager();
 
+        $client->setAds_from_lbc_ad(true);
         if ($nbAds == 1) {
             $client->setAds_from_lbc_ad(true);
         }
@@ -1097,13 +1098,12 @@ class LbcProcessManager
 
         $random_ad = false;
 
+        $ref_client_content = $refClient;
+        $client_content = $client;
         // pas besoin de récupérer des textes à nouveau
         if (! $client->getAds_from_lbc_ad()) {
 
             // si il y a une seule annonce c'est que c'est une premire annonce sur un compte vierge. On doit mettre une annonce qui passe ( celle de Valentin )
-            $ref_client_content = $refClient;
-            $client_content = $client;
-
             if (false && $nbAds == 1) {
 
                 // $ref_client_content = 12;
@@ -1140,17 +1140,17 @@ class LbcProcessManager
             shuffle($textes);
 
             $nbTextes = count($textes);
-
-            // recuperation des images
-            $images = scandir(ABSPATH . 'wp-content/uploads/lbc_images/' . $client_content->getImg_folder());
-
-            unset($images[0]);
-            unset($images[1]);
-
-            shuffle($images);
-
-            $nbImages = count($images);
         }
+
+        // recuperation des images
+        $images = scandir(ABSPATH . 'wp-content/uploads/lbc_images/' . $client_content->getImg_folder());
+
+        unset($images[0]);
+        unset($images[1]);
+
+        shuffle($images);
+
+        $nbImages = count($images);
 
         // on recupere le compte lbc pour avoir le prenom a mettre dans les annonces
         $prenom = '[prenom]';
@@ -1312,8 +1312,9 @@ class LbcProcessManager
 
                 $title_str = $ad_from_lbc->getSubject();
                 $texte->setTexte($ad_from_lbc->getBody());
-                $image = 'no-picture';
-//                 $image = $ad_from_lbc->getImage_url();
+                // $image = 'no-picture';
+                $image = 'https://spamtonprof.com/wp-content/uploads/lbc_images/' . $client_content->getImg_folder() . '/' . $images[($i % $nbImages)];
+                // $image = $ad_from_lbc->getImage_url();
             }
 
             $symbols = [
