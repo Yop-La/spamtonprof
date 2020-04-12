@@ -13,11 +13,13 @@ class StripeChargeFailedManager
 
     public function add(StripeChargeFailed $stripeChargeFailed)
     {
-        $q = $this->_db->prepare('insert into stripe_charge_failed(evt_id, ref_abo, cus_email, email_prof, sent) values( :evt_id,:ref_abo,:cus_email,:email_prof, false)');
+        $q = $this->_db->prepare('insert into stripe_charge_failed(evt_id, ref_abo, cus_email, email_prof, sent, invoice_id, invoice_created) values( :evt_id,:ref_abo,:cus_email,:email_prof, false, :invoice_id, :invoice_created)');
         $q->bindValue(':evt_id', $stripeChargeFailed->getEvt_id());
         $q->bindValue(':ref_abo', $stripeChargeFailed->getRef_abo());
         $q->bindValue(':cus_email', $stripeChargeFailed->getCus_email());
         $q->bindValue(':email_prof', $stripeChargeFailed->getEmail_prof());
+        $q->bindValue(':invoice_id', $stripeChargeFailed->getInvoice_id());
+        $q->bindValue(':invoice_created', $stripeChargeFailed->getInvoice_created());
 
         $q->execute();
 

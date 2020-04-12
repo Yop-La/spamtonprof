@@ -136,6 +136,11 @@ if ($event_json->type == 'invoice.payment_failed') {
 
     // get customer email
     $cus_email = $data->customer_email;
+    $created = $data->created;
+    $invoice_id = $data->id;
+
+    $date_created = new \DateTime(null, new \DateTimeZone("Europe/Paris"));
+    $date_created->setTimestamp($created);
 
     // get ref abo if exists
     $ref_abonnement = null;
@@ -146,12 +151,14 @@ if ($event_json->type == 'invoice.payment_failed') {
         if (isset($lines->data)) {
 
             $datas = $lines->data;
-            $data = $datas[0];
 
-            if (isset($data->metadata)) {
-                $metadata = $data->metadata;
-                if (isset($metadata->ref_abonnement)) {
-                    $ref_abonnement = $metadata->ref_abonnement;
+            foreach ($datas as $data) {
+
+                if (isset($data->metadata)) {
+                    $metadata = $data->metadata;
+                    if (isset($metadata->ref_abonnement)) {
+                        $ref_abonnement = $metadata->ref_abonnement;
+                    }
                 }
             }
         }
@@ -162,7 +169,9 @@ if ($event_json->type == 'invoice.payment_failed') {
         'evt_id' => $id_event,
         'cus_email' => $cus_email,
         'email_prof' => $email_prof,
-        'ref_abo' => $ref_abonnement
+        'ref_abo' => $ref_abonnement,
+        'invoice_id' => $invoice_id,
+        'invoice_created' => $date_created->format(PG_DATETIME_FORMAT)
     )));
 }
 
