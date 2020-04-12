@@ -19,38 +19,53 @@ header("Pragma: no-cache");
  * pour donner des kpis sur les impayés au gestionnaire
  */
 
-$stripeChargeFailedMg = new \spamtonprof\stp_api\StripeChargeFailedManager();
-$stripeMg = new \spamtonprof\stp_api\StripeManager(false);
+$lbcActMg = new \spamtonprof\stp_api\LbcAccountManager();
 
-$all_invoices = [];
+$ref_clients = [
+    24,
+    25
+];
 
-$starting_after = false;
-for ($i = 0; $i < 5; $i ++) {
+$nb_valid_accounts = [];
 
-    $invoices = $stripeMg->list_invoices(100, $starting_after, "open");
-    if (count($invoices) != 0) {
-        $starting_after = $invoices[count($invoices) - 1]->id;
-        $all_invoices = array_merge($all_invoices, $invoices);
-    }
+$nb_free_cities = [];
+
+foreach ($ref_clients as $ref_client) {
+
+    $acts = $lbcActMg->getAll(array(
+        'key' => 'valid_lbc_act',
+        'ref_client' => $ref_client
+    ));
+
+    $communeMg = new \spamtonprof\stp_api\LbcCommuneManager();
+
+    $communes = $communeMg->getAll(array(
+        "ref_client" => $ref_client,
+        'target_big_city' => true
+    ));
+
+    $nb_valid_accounts[$ref_client] = count($acts);
+    $nb_free_cities[$ref_client] = count($communes);
 }
 
-$nb_unpaid_invoice = count($all_invoices);
+$params = [];
 
-$nb_unpaid_notif = count($stripeChargeFailedMg->getAll());
+foreach ($nb_valid_accounts as $key => $value) {
+    $params["nb_valid_account_" . $key] = "" . $value;
+}
+
+foreach ($nb_free_cities as $key => $value) {
+    $params["nb_town_" . $key] = "" . $value;
+}
 
 $email = new \SendGrid\Mail\Mail();
 $email->setFrom("alexandre@spamtonprof.com", "Alexandre de SpamTonProf");
-
-$params = [
-    'nb_charge_failed' => "" . $nb_unpaid_notif,
-    'nb_unpaid_invoice' => "" . $nb_unpaid_invoice
-];
 
 try {
 
     $email->addTo("alexandre@spamtonprof.com", "Alexandre", $params, 0);
 
-    $email->setTemplateId("d-5d4c23bdff0f45b3996715208aa620b7");
+    $email->setTemplateId("d-856c14976351439880614746290d9463");
     $sendgrid = new \SendGrid(SEND_GRID_API_KEY);
 
     $response = $sendgrid->send($email);
@@ -61,6 +76,7 @@ try {
     echo ($e->getMessage());
 }
 
+exit();
 
 
 

@@ -126,6 +126,25 @@ class LbcAccountManager
                     $q = $this->_db->prepare("select * from compte_lbc where disabled is false and open is true and nb_failed_campaigns != 0 order by nb_failed_campaigns desc");
                     $q->execute();
                 }
+
+                if ($key == "valid_lbc_act") {
+                    $ref_client = $info["ref_client"];
+
+                    
+                    $query = "select * from compte_lbc
+                            where (controle_date > date_publication and date_publication is not null and controle_date is not null)
+                                 and nb_annonces_online != 0
+                                 and disabled is false
+						         and ref_client = :ref_client
+                                 and open is true
+                                 and user_id is not null
+                            order by nb_annonces_online, nb_failed_campaigns, date_publication desc";
+
+                    $q = $this->_db->prepare($query);
+                    $q->execute(array(
+                        ":ref_client" => $ref_client
+                    ));
+                }
             } else {
 
                 if (array_key_exists("refComptes", $info)) {
@@ -244,7 +263,6 @@ class LbcAccountManager
 
         return ($ret);
     }
-
 
     public function updateDisabled(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {

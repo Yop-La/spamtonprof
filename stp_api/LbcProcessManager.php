@@ -782,7 +782,7 @@ class LbcProcessManager
 
         if ($send_msg) {
             $slack = new \spamtonprof\slack\Slack();
-            $slack->sendMessages("log-lbc", $msgs);
+            $slack->sendMessages("log-lbc-check", $msgs);
         }
 
         return ($msgs);
@@ -1045,14 +1045,14 @@ class LbcProcessManager
             echo ($lbcAccount->getRef_compte() . '<br>');
 
             try {
-                $msgs_inter = $this->check_account($lbcAccount);
+                $msgs_inter = $this->check_account($lbcAccount,true);
             } catch (\Exception $e) {
                 echo ($e->getMessage());
             }
             $msgs = array_merge($msgs_inter, $msgs);
 
             if ($i % 20 == 0 || $i == ($nb_acts - 1)) {
-                $slack->sendMessages("log", $msgs);
+                $slack->sendMessages("log-lbc-check", $msgs);
                 $msgs = [];
             }
             $i ++;
