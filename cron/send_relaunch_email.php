@@ -102,7 +102,7 @@ foreach ($abos as $abo) {
 
             $email->setReplyTo($eleve->getEmail());
 
-            $email->addCc('alexandre@spamtonprof.com');
+//             $email->addCc('alexandre@spamtonprof.com');
 
             $email->setTemplateId("d-b65aa9d6d4a94aeca3a24ea250f90506");
             $sendgrid = new \SendGrid(SEND_GRID_API_KEY);
