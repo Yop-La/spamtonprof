@@ -19,6 +19,15 @@ header("Pragma: no-cache");
  * pour envoyer une notification au prof en cas d'impayés
  */
 
+/*
+ * todo: 
+ * - inserer invoice id dans la table et mettre une unique constraint pour éviter les doublons
+ * - lister dans le mail le nombre de facture impayés avec une liste si possible ?
+ * - voir pourquoi ref abo pas inséré dans certains cas 
+ * 
+ * 
+ */
+
 $stripeChargeFailedMg = new \spamtonprof\stp_api\StripeChargeFailedManager();
 $stripeMg = new \spamtonprof\stp_api\StripeManager(false);
 
@@ -145,11 +154,11 @@ foreach ($charges as $charge) {
         "dernier_contact" => $dernier_contact
     ];
 
-    $email->addTo($to, $prof_name, $params, 0);
 
     try {
 
-        // $email->setReplyTo($email_eleve);
+        $email->addTo($to, $prof_name, $params, 0);
+        
 
         $email->addCc('alexandre@spamtonprof.com');
 

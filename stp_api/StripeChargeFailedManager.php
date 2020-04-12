@@ -39,7 +39,7 @@ class StripeChargeFailedManager
 
     public function getAll($info = false, $constructor = false)
     {
-        $q = $this->_db->prepare("select * from stripe_charge_failed order by invoice_created desc ");
+        $q = $this->_db->prepare("select * from stripe_charge_failed  ");
         if (is_array($info)) {
 
             if (array_key_exists('key', $info)) {
@@ -52,7 +52,7 @@ class StripeChargeFailedManager
                 if ($key == 'to_send') {
 
                     $q = $this->_db->prepare("select * from stripe_charge_failed
-                        where sent is null or sent is false");
+                        where sent is null or sent is false order by invoice_created desc limit 5");
                 }
             }
         }
