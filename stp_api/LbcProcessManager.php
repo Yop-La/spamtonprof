@@ -1078,8 +1078,7 @@ class LbcProcessManager
         $nbTextes = 0;
         $lbcAdsMg = new \spamtonprof\stp_api\LbcAdManager();
 
-        $client->setAds_from_lbc_ad(true);
-        if ($nbAds == 1) {
+        if ($nbAds == 1 || $refClient == 25) {
             $client->setAds_from_lbc_ad(true);
         }
 
