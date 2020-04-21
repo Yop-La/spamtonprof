@@ -1045,7 +1045,7 @@ class LbcProcessManager
             echo ($lbcAccount->getRef_compte() . '<br>');
 
             try {
-                $msgs_inter = $this->check_account($lbcAccount,true);
+                $msgs_inter = $this->check_account($lbcAccount, true);
             } catch (\Exception $e) {
                 echo ($e->getMessage());
             }
@@ -1226,6 +1226,12 @@ class LbcProcessManager
                     'Martin',
                     'martin'
                 ), $prenom, $texte->getTexte()));
+
+                $texte->setTexte(str_replace(array(
+                    'spamtonprof',
+                    'Spamtonprof',
+                    'SpamTonProf'
+                ), 'spamprof', $texte->getTexte()));
 
                 // prettyPrint($nbImages);
 
