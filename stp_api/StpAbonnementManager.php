@@ -892,6 +892,7 @@ class StpAbonnementManager
                         and ((date_attribution_prof + interval '1 days' <= now()))
                         and (nb_relance_since_no_news is null or nb_relance_since_no_news = 0)
                         and first_prof_assigned = true
+                        and ( interruption is false or interruption is null )
                     ");
                     $q->execute();
                 }
@@ -906,6 +907,7 @@ class StpAbonnementManager
                         and ref_statut_abonnement = 1
                         and (nb_relance_since_no_news is null or nb_relance_since_no_news = 0)
                         and first_prof_assigned = true
+                        and ( interruption is false or interruption is null )
                     ");
 
                     $q->execute();
@@ -921,6 +923,7 @@ class StpAbonnementManager
                         and ref_statut_abonnement = 1
                         and (nb_relance_since_no_news > 0)
                         and first_prof_assigned = true
+                        and ( interruption is false or interruption is null )
                     ");
 
                     $q->execute();
@@ -936,6 +939,7 @@ class StpAbonnementManager
                         and ref_statut_abonnement = 2
                         and (nb_relance_since_no_news > 0)
                         and first_prof_assigned = true
+                        and ( interruption is false or interruption is null )
                     ");
 
                     $q->execute();
