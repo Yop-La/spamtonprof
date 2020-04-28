@@ -1078,7 +1078,7 @@ class LbcProcessManager
         $nbTextes = 0;
         $lbcAdsMg = new \spamtonprof\stp_api\LbcAdManager();
 
-        if ($nbAds == 1 || $refClient == 25) {
+        if (false && $nbAds == 1) {
             $client->setAds_from_lbc_ad(true);
         }
 
@@ -1302,8 +1302,11 @@ class LbcProcessManager
                 $lbcApi = new \spamtonprof\stp_api\LbcApi();
                 $ad = $lbcApi->get_local_ad($client->getImg_folder());
 
+                
                 $title_str = $ad->subject;
                 $texte->setTexte($ad->body);
+
+                
                 $image = 'http://' . DOMAIN . $ad->image;
             }
 
