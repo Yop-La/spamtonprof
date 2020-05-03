@@ -534,6 +534,14 @@ class StpAbonnementManager
         $q->execute();
     }
 
+    public function updateSentToAffiliate(\spamtonprof\stp_api\StpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set sent_to_affiliate = :sent_to_affiliate where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->bindValue(":sent_to_affiliate", $abonnement->getSent_to_affiliate(), \PDO::PARAM_BOOL);
+        $q->execute();
+    }
+
     public function updateToRelaunch(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set to_relaunch = :to_relaunch where ref_abonnement = :ref_abonnement");
@@ -1004,6 +1012,12 @@ class StpAbonnementManager
                 if ($key == "abo_to_relaunch") {
 
                     $q = $this->_db->prepare('select * from stp_abonnement where to_relaunch is true and ref_statut_abonnement in (1,2) order by dernier_contact limit 5 ');
+                    $q->execute();
+                }
+
+                if ($key == "notify_to_affiliate") {
+
+                    $q = $this->_db->prepare('select * from stp_abonnement where ( sent_to_affiliate is false or sent_to_affiliate is null ) and utm_campaign_stp is not null limit 5');
                     $q->execute();
                 }
             } else {

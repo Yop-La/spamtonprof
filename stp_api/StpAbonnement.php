@@ -6,7 +6,26 @@ class StpAbonnement implements \JsonSerializable
 
     const ACTIF = 1, ESSAI = 2, TERMINE = 3, DESACTIVE = 4, ATTENTE_DEMARRAGE = 5, REFUSE = 6;
 
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage, $objectID, $teleprospection, $compte, $interruption, $ref_coupon, $coupon, $relance_date, $test, $to_relaunch, $nb_relance_since_no_news, $utm_source_stp, $utm_medium_stp, $utm_campaign_stp;
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage, $objectID, $teleprospection, $compte, $interruption, $ref_coupon, $coupon, $relance_date, $test, $to_relaunch, $nb_relance_since_no_news, $utm_source_stp, $utm_medium_stp, $utm_campaign_stp, $sent_to_affiliate;
+
+    
+    
+    
+    /**
+     * @return mixed
+     */
+    public function getSent_to_affiliate()
+    {
+        return $this->sent_to_affiliate;
+    }
+
+    /**
+     * @param mixed $sent_to_affiliate
+     */
+    public function setSent_to_affiliate($sent_to_affiliate)
+    {
+        $this->sent_to_affiliate = $sent_to_affiliate;
+    }
 
     /**
      *
