@@ -6,7 +6,61 @@ class StpAbonnement implements \JsonSerializable
 
     const ACTIF = 1, ESSAI = 2, TERMINE = 3, DESACTIVE = 4, ATTENTE_DEMARRAGE = 5, REFUSE = 6;
 
-    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage, $objectID, $teleprospection, $compte, $interruption, $ref_coupon, $coupon, $relance_date, $test, $to_relaunch, $nb_relance_since_no_news;
+    protected $ref_eleve, $ref_formule, $ref_statut_abonnement, $ref_abonnement, $date_creation, $remarque_inscription, $ref_plan, $eleve, $ref_prof, $formule, $prof, $date_attribution_prof, $first_prof_assigned, $ref_proche, $proche, $plan, $ref_compte, $debut_essai, $fin_essai, $subs_Id, $statut, $dateDernierStatut, $dernier_contact, $nb_message, $remarquesMatieres, $nbJourSansMessage, $objectID, $teleprospection, $compte, $interruption, $ref_coupon, $coupon, $relance_date, $test, $to_relaunch, $nb_relance_since_no_news, $utm_source_stp, $utm_medium_stp, $utm_campaign_stp;
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getUtm_source_stp()
+    {
+        return $this->utm_source_stp;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getUtm_medium_stp()
+    {
+        return $this->utm_medium_stp;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getUtm_campaign_stp()
+    {
+        return $this->utm_campaign_stp;
+    }
+
+    /**
+     *
+     * @param mixed $utm_source_stp
+     */
+    public function setUtm_source_stp($utm_source_stp)
+    {
+        $this->utm_source_stp = $utm_source_stp;
+    }
+
+    /**
+     *
+     * @param mixed $utm_medium_stp
+     */
+    public function setUtm_medium_stp($utm_medium_stp)
+    {
+        $this->utm_medium_stp = $utm_medium_stp;
+    }
+
+    /**
+     *
+     * @param mixed $utm_campaign_stp
+     */
+    public function setUtm_campaign_stp($utm_campaign_stp)
+    {
+        $this->utm_campaign_stp = $utm_campaign_stp;
+    }
 
     /**
      *

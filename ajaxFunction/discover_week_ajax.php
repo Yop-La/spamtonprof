@@ -26,6 +26,8 @@ function inscriptionEssai()
     $slack = new \spamtonprof\slack\Slack();
 
     $fields = $_POST['fields'];
+
+    
     $fields = json_decode(stripslashes($fields));
 
     $choix_eleve = $fields->choix_eleve; // vaut false si prospect ou nouveau ou ref_eleve (si !prospect )
@@ -472,6 +474,15 @@ function inscriptionEssai()
         $abonnementMg->updateRefProche($abonnement);
     }
 
+    $abonnement->setUtm_campaign_stp($utm_campaign_stp);
+    $abonnementMg->updateUtmCampaignStp($abonnement);
+
+    $abonnement->setUtm_medium_stp($utm_medium_stp);
+    $abonnementMg->updateUtmMediumStp($abonnement);
+
+    $abonnement->setUtm_source_stp($utm_source_stp);
+    $abonnementMg->updateUtmSourceStp($abonnement);
+
     $abonnement->setFirst_prof_assigned(false);
     $abonnementMg->updateFirstProfAssigned($abonnement);
 
@@ -536,10 +547,6 @@ function inscriptionEssai()
 
     // etape 9 - envoi d'un message dans slack pour dire qu'il y a une attribution de prof en attente
     $messages;
-
-    $utm_source_stp = $fields->utm_source_stp;
-    $utm_medium_stp = $fields->utm_medium_stp;
-    $utm_campaign_stp = $fields->utm_campaign_stp;
 
     $source_trafic_app = [];
     if ($utm_source_stp) {

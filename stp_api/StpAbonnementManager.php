@@ -494,6 +494,30 @@ class StpAbonnementManager
         $q->execute();
     }
 
+    public function updateUtmSourceStp(\spamtonprof\stp_api\StpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set utm_source_stp = :utm_source_stp where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->bindValue(":utm_source_stp", $abonnement->getUtm_source_stp());
+        $q->execute();
+    }
+
+    public function updateUtmMediumStp(\spamtonprof\stp_api\StpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set utm_medium_stp = :utm_medium_stp where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->bindValue(":utm_medium_stp", $abonnement->getUtm_medium_stp());
+        $q->execute();
+    }
+
+    public function updateUtmCampaignStp(\spamtonprof\stp_api\StpAbonnement $abonnement)
+    {
+        $q = $this->_db->prepare("update stp_abonnement set utm_campaign_stp = :utm_campaign_stp where ref_abonnement = :ref_abonnement");
+        $q->bindValue(":ref_abonnement", $abonnement->getRef_abonnement());
+        $q->bindValue(":utm_campaign_stp", $abonnement->getUtm_campaign_stp());
+        $q->execute();
+    }
+
     public function updateRefProche(\spamtonprof\stp_api\StpAbonnement $abonnement)
     {
         $q = $this->_db->prepare("update stp_abonnement set ref_proche = :ref_proche where ref_abonnement = :ref_abonnement");
