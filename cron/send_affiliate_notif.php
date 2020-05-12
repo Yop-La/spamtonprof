@@ -60,7 +60,7 @@ foreach ($abos as $abo) {
 
     if ($utm_source == 'bhm') {
 
-        $affiliate_email = 'martin.gaucher@gmail.com';
+        $affiliate_email = 'gaucher_martin@yahoo.fr';
         $affiliate_name = 'Martin';
     }
 
