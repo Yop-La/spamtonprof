@@ -12,7 +12,7 @@ use spamtonprof\stp_api\GmailLabelManager;
 class GoogleManager
 {
 
-    private $client, $service, $userId, $authUrl = false, $slack, $adress, $account, $accountMg;
+    private $client, $service, $userId, $authUrl = false, $slack, $adress, $account, $accountMg, $service_webamster, $site_verfication;
 
     public function __construct($gmail_adress, $code = false)
     {
@@ -24,7 +24,13 @@ class GoogleManager
         $this->accountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
         $this->account = $this->accountMg->get($this->adress);
 
+        // $this->account->setCredential(null);
+
         $this->client = $this->getClient2($gmail_adress, $code);
+
+        // $this->client = $this->getClientV0($gmail_adress);
+
+        // exit();
 
         $this->slack = new \spamtonprof\slack\Slack();
 
@@ -42,7 +48,60 @@ class GoogleManager
         }
 
         $this->service = new Google_Service_Gmail($this->client);
+
+        $this->service_webamster = new \Google_Service_Webmasters($this->client);
+
+        $this->site_verfication = new \Google_Service_SiteVerification($this->client);
+
         $this->userId = 'me';
+    }
+
+//     public function webResourceGetToken()
+//     {
+//         try {
+//             $ret = $this->site_verfication->webResource->(, array(
+//                 "site" => array(
+//                     'type' => 'SITE',
+//                     "identifier" => 'maitrepain.fr'
+//                 ),
+//                 "verificationMethod" => "DNS_TXT"
+//             ));
+//             prettyPrint($ret);
+//         } catch (Exception $e) {
+
+//             echo ($e->getMessage());
+//         }
+//     }
+
+    public function webResourceList()
+    {
+        try {
+            $ret = $this->site_verfication->webResource->listWebResource();
+            prettyPrint($ret);
+        } catch (Exception $e) {
+
+            echo ($e->getMessage());
+        }
+    }
+
+    public function testSearchConsole($siteUrl, $feedpath = false)
+    {
+        try {
+            $ret = $this->service_webamster->sites->prettyPrint($ret);
+        } catch (Exception $e) {
+
+            echo ($e->getMessage());
+        }
+    }
+
+    public function addSiteMap($siteUrl, $feedpath)
+    {
+        try {
+            $this->service_webamster->sitemaps->submit($siteUrl, $feedpath);
+        } catch (Exception $e) {
+
+            echo ($e->getMessage());
+        }
     }
 
     /**
@@ -58,6 +117,7 @@ class GoogleManager
         $client->setClientId(GOOGLE_APP_CLIENT_ID);
         $client->setClientSecret(GOOGLE_APP_CLIENT_SECRET);
         $client->setAccessType('offline');
+        $client->setPrompt('select_account consent');
 
         // $params_url = http_build_query(array('email_prof' => $gmailAdress));
 
@@ -67,7 +127,9 @@ class GoogleManager
 
         $client->setScopes(array(
             Google_Service_Sheets::SPREADSHEETS,
-            Google_Service_Gmail::GMAIL_MODIFY
+            Google_Service_Gmail::GMAIL_MODIFY,
+            \Google_Service_Webmasters::WEBMASTERS,
+            \Google_Service_SiteVerification::SITEVERIFICATION
         ));
 
         if (! $this->account) {
@@ -78,8 +140,10 @@ class GoogleManager
         if ($code) {
 
             $credentials = $client->fetchAccessTokenWithAuthCode($code);
+
             $this->account->setCredential(json_encode($client->getAccessToken()));
             $this->accountMg->updateCredential($this->account);
+
             $redirect = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
 
             header('Location: ' . filter_var($redirect, FILTER_SANITIZE_URL));
@@ -134,10 +198,94 @@ class GoogleManager
             // Request authorization from the user.
 
             $this->authUrl = $client->createAuthUrl();
+
             return (false);
         }
 
         return ($client);
+    }
+
+    public function getClientV0($gmailAdress)
+    {
+        $accountMg = new \spamtonprof\stp_api\StpGmailAccountManager();
+
+        $keyMg = new \spamtonprof\stp_api\KeyManager();
+
+        $key = $keyMg->get($keyMg::GMAIL_KEY);
+
+        $account = $accountMg->get($gmailAdress);
+
+        $client = new Google_Client();
+        $client->setApplicationName('Gmail API PHP Quickstart');
+
+        $client->setApplicationName('Stp Tracker');
+
+        $client->setClientId(GOOGLE_APP_CLIENT_ID);
+        $client->setClientSecret(GOOGLE_APP_CLIENT_SECRET);
+        $client->setAccessType('offline');
+        $client->setRedirectUri(domain_to_url());
+
+        $client->setScopes(array(
+            Google_Service_Sheets::SPREADSHEETS,
+            Google_Service_Gmail::GMAIL_MODIFY
+        ));
+
+        // $authConfig = json_decode($key->getKey(), true);
+
+        // $client->setAuthConfig($authConfig);
+        $client->setAccessType('offline');
+        $client->setPrompt('select_account consent');
+
+        $accessToken;
+
+        if (! $account) {
+            echo ("ajouté : " . $gmailAdress . " à la table prof <br><br><br>");
+            exit(0);
+        }
+
+        if (false && $account->getCredential() != "" && ! is_null($account->getCredential())) {
+
+            $accessToken = json_decode($account->getCredential(), true);
+        } else {
+            // Request authorization from the user.
+            $authUrl = $client->createAuthUrl();
+
+            // echo($authUrl);
+
+            // exit();
+
+            $authCode = ""; // a remplir par ce qui sera donne par $authUrl
+
+            if ($authCode == "") {
+                echo ("la2");
+                header('Location: ' . filter_var($authUrl, FILTER_SANITIZE_URL));
+            }
+
+            // Exchange authorization code for an access token.
+            $accessToken = $client->fetchAccessTokenWithAuthCode($authCode);
+
+            echo (json_encode($accessToken));
+
+            echo ('<br><br><br>');
+
+            echo ($account->getRef_gmail_account());
+
+            echo ('<br><br><br>');
+
+            // $account->setCredential(json_encode($accessToken));
+            $account->setCredential(json_encode($accessToken));
+            $accountMg->updateCredential($account);
+        }
+
+        $client->setAccessToken($accessToken);
+
+        // Refresh the token if it's expired.
+        if ($client->isAccessTokenExpired()) {
+            $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
+            $account->setCredential(json_encode($client->getAccessToken()));
+            $accountMg->updateCredential($account);
+        }
+        return $client;
     }
 
     public function sendAuthUrl()
@@ -222,10 +370,13 @@ class GoogleManager
 
         $authConfig = json_decode($key->getKey(), true);
 
-        $client->setApplicationName('Gmail API PHP Quickstart');
+        $client = new Google_Client();
+        $client->setApplicationName('Stp Tracker');
 
-        $client->setClientId('212972533763-bj01ep43ms4us6e0st5fq3chvr6e8j9s.apps.googleusercontent.com');
-        $client->setClientSecret('sqoxFLytdYNa4wjfDi-PJLc0');
+        $client->setClientId(GOOGLE_APP_CLIENT_ID);
+        $client->setClientSecret(GOOGLE_APP_CLIENT_SECRET);
+        $client->setAccessType('offline');
+
         $client->setAccessType('offline');
 
         $client->setRedirectUri('https://spamtonprof.com');
@@ -238,8 +389,8 @@ class GoogleManager
         ));
         $url = $client->createAuthUrl();
 
-        echo ($url);
-        exit();
+        // echo ($url);
+        // exit();
 
         $accessToken;
 
@@ -250,7 +401,7 @@ class GoogleManager
             // Request authorization from the user.
             $authUrl = $client->createAuthUrl();
 
-            $authCode = "4/IQFqEXkLBaVBs2Sa3IITdJZ9c_YlgW_llhyGDGakKDWm3Er6FaySYpw"; // a remplir par ce qui sera donne par $authUrl
+            $authCode = ""; // a remplir par ce qui sera donne par $authUrl
 
             if ($authCode == "") {
                 echo ("la2");
@@ -336,7 +487,6 @@ class GoogleManager
         $lastHistoryId = false;
 
         foreach ($histories as $historie) {
-
             $lastHistoryId = $historie->id;
 
             $messagesAdded = $historie->messagesAdded;
