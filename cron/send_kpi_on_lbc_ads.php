@@ -21,16 +21,41 @@ header("Pragma: no-cache");
 
 $lbcActMg = new \spamtonprof\stp_api\LbcAccountManager();
 
+$clientMg = new \spamtonprof\stp_api\LbcClientManager();
+
 $ref_clients = [
     24,
-    25
+    25,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47
 ];
 
 $nb_valid_accounts = [];
 
-$nb_free_cities = [];
+$params = [];
+
+$params['clients'] = [];
 
 foreach ($ref_clients as $ref_client) {
+
+    $client_stat = new \stdClass();
+
+    $client = $clientMg->get(array(
+        'ref_client' => $ref_client
+    ));
 
     $acts = $lbcActMg->getAll(array(
         'key' => 'valid_lbc_act',
@@ -44,18 +69,11 @@ foreach ($ref_clients as $ref_client) {
         'target_big_city' => true
     ));
 
-    $nb_valid_accounts[$ref_client] = count($acts);
-    $nb_free_cities[$ref_client] = count($communes);
-}
+    $client_stat->prenom = $client->getPrenom_client() . " " . $client->getNom_client() . "( " . $ref_client . " )";
+    $client_stat->nb_valid_account = count($acts);
+    $client_stat->nb_town = count($communes);
 
-$params = [];
-
-foreach ($nb_valid_accounts as $key => $value) {
-    $params["nb_valid_account_" . $key] = "" . $value;
-}
-
-foreach ($nb_free_cities as $key => $value) {
-    $params["nb_town_" . $key] = "" . $value;
+    $params['clients'][] = $client_stat;
 }
 
 $email = new \SendGrid\Mail\Mail();
@@ -63,6 +81,8 @@ $email->setFrom("alexandre@spamtonprof.com", "Alexandre de SpamTonProf");
 
 try {
 
+//     prettyPrint($params);
+    
     $email->addTo("alexandre@spamtonprof.com", "Alexandre", $params, 0);
 
     $email->setTemplateId("d-856c14976351439880614746290d9463");
