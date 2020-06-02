@@ -64,6 +64,7 @@ class LbcAccountManager
 						         and ref_client = :ref_client
                                  and open is true
                                  and user_id is not null
+                                 and nb_failed_campaigns = 0
                             order by nb_annonces_online, nb_failed_campaigns, date_publication desc limit 1";
 
             $q = $this->_db->prepare($query);
@@ -130,7 +131,6 @@ class LbcAccountManager
                 if ($key == "valid_lbc_act") {
                     $ref_client = $info["ref_client"];
 
-                    
                     $query = "select * from compte_lbc
                             where (controle_date > date_publication and date_publication is not null and controle_date is not null)
                                  and nb_annonces_online != 0
@@ -162,13 +162,21 @@ class LbcAccountManager
                     $q = $this->_db->prepare("select * from compte_lbc where ref_client = :ref_client");
                     $q->bindValue(":ref_client", $refClient);
                     $q->execute();
-                } else if (array_key_exists("no_cookies", $info)) {
+                } else if (array_key_exists("expired_cookie_with_ads", $info)) {
 
-                    $ref_compte = $info["no_cookies"];
+                    $q = $this->_db->prepare("
+                    select * from compte_lbc 
+                    	where cookie is not null 
+                    		and ( user_id is null or length(user_id) < 5)  
+                    		and ref_compte in (select ref_compte_lbc from lbc_ad_validation_email where date_reception >  ( now() - interval '3 months')) 
+							and date_creation < '2020-06-02 15:24:03.632708' 
+                    	order by date_creation desc;
+                        limit 100");
+                    
 
-                    $q = $this->_db->prepare("select * from compte_lbc where ref_compte >= :ref_compte and cookie is null");
-                    $q->bindValue(":ref_compte", $ref_compte);
                     $q->execute();
+                    
+                    
                 } else if (array_key_exists("like_mail", $info)) {
 
                     $mail = $info["like_mail"];
