@@ -301,6 +301,14 @@ class LbcAccountManager
         $q->execute();
     }
 
+    public function update_cookie_update(\spamtonprof\stp_api\LbcAccount $lbcAccount)
+    {
+        $q = $this->_db->prepare("update compte_lbc set cookie_update = :cookie_update where ref_compte = :ref_compte");
+        $q->bindValue(":cookie_update", $lbcAccount->getCookie_update());
+        $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
+        $q->execute();
+    }
+
     public function update_date_publication(\spamtonprof\stp_api\LbcAccount $lbcAccount)
     {
         $q = $this->_db->prepare("update compte_lbc set date_publication = :date_publication where ref_compte = :ref_compte");

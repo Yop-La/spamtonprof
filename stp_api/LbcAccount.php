@@ -11,7 +11,25 @@ use Exception;
 class LbcAccount implements \JsonSerializable
 {
 
-    protected $ref_compte, $mail, $password, $nb_annonces_online, $date_derniere_activite, $disabled, $date_of_disabling, $ref_client, $ref_expe, $expe, $code_promo, $prenom_client, $nom_client, $controle_date, $objectID, $date_creation, $telephone, $cookie, $user_id, $prenom, $date_publication, $open, $nb_successful_campaigns, $nb_failed_campaigns, $uncheckable, $cookie_expired;
+    protected $ref_compte, $mail, $password, $nb_annonces_online, $date_derniere_activite, $disabled, $date_of_disabling, $ref_client, $ref_expe, $expe, $code_promo, $prenom_client, $nom_client, $controle_date, $objectID, $date_creation, $telephone, $cookie, $user_id, $prenom, $date_publication, $open, $nb_successful_campaigns, $nb_failed_campaigns, $uncheckable, $cookie_expired, $cookie_update;
+
+    
+    
+    /**
+     * @return mixed
+     */
+    public function getCookie_update()
+    {
+        return $this->cookie_update;
+    }
+
+    /**
+     * @param mixed $cookie_update
+     */
+    public function setCookie_update($cookie_update)
+    {
+        $this->cookie_update = $cookie_update;
+    }
 
     /**
      *
