@@ -170,7 +170,7 @@ class LbcAccountManager
                     		and ( user_id is null or length(user_id) < 5)  
                     		and ref_compte in (select ref_compte_lbc from lbc_ad_validation_email where date_reception >  ( now() - interval '3 months')) 
 							and date_creation < '2020-06-02 15:24:03.632708' 
-                    	order by date_creation desc;
+                    	order by date_creation desc
                         limit 100");
                     
 
