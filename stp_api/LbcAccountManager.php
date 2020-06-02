@@ -165,18 +165,13 @@ class LbcAccountManager
                 } else if (array_key_exists("expired_cookie_with_ads", $info)) {
 
                     $q = $this->_db->prepare("
-                    select * from compte_lbc 
-                    	where cookie is not null 
-                    		and ( user_id is null or length(user_id) < 5)  
-                    		and ref_compte in (select ref_compte_lbc from lbc_ad_validation_email where date_reception >  ( now() - interval '3 months')) 
-							and date_creation < '2020-06-02 15:24:03.632708' 
-                    	order by date_creation desc
-                        limit 100");
-                    
+                        select * from compte_lbc 
+                        where cookie_expired = true
+                        order by date_creation
+                        limit 100;
+                    ");
 
                     $q->execute();
-                    
-                    
                 } else if (array_key_exists("like_mail", $info)) {
 
                     $mail = $info["like_mail"];
@@ -278,6 +273,14 @@ class LbcAccountManager
         $q = $this->_db->prepare("update compte_lbc set disabled = :disabled, date_of_disabling = :date_of_disabling where ref_compte = :ref_compte");
         $q->bindValue(":disabled", $lbcAccount->getDisabled(), PDO::PARAM_BOOL);
         $q->bindValue(":date_of_disabling", $now->format(PG_DATETIME_FORMAT));
+        $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
+        $q->execute();
+    }
+
+    public function update_cookie_expired(\spamtonprof\stp_api\LbcAccount $lbcAccount)
+    {
+        $q = $this->_db->prepare("update compte_lbc set cookie_expired = :cookie_expired where ref_compte = :ref_compte");
+        $q->bindValue(":cookie_expired", $lbcAccount->getCookie_expired(), PDO::PARAM_BOOL);
         $q->bindValue(":ref_compte", $lbcAccount->getRef_compte());
         $q->execute();
     }
@@ -429,6 +432,7 @@ class LbcAccountManager
             and (disabled = false or disabled is null) and (uncheckable = false or uncheckable is null)
             and ( now() - interval '5 hour' > controle_date or controle_date is null)
             and ref_compte not in (select ref_compte_lbc from lbc_renewal_url where statut = 1)
+            and (cookie_expired is null or cookie_expired = false)
             order by date_publication desc, nb_annonces_online limit :nb_compte");
         $q->bindValue(":nb_compte", $nbCompte);
         $q->execute();

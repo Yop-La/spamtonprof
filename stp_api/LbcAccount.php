@@ -11,11 +11,28 @@ use Exception;
 class LbcAccount implements \JsonSerializable
 {
 
-    protected $ref_compte, $mail, $password, $nb_annonces_online, $date_derniere_activite, $disabled, $date_of_disabling, $ref_client, $ref_expe, $expe, $code_promo, $prenom_client, $nom_client, $controle_date, $objectID, $date_creation, $telephone, $cookie, $user_id, $prenom, $date_publication, $open, $nb_successful_campaigns, $nb_failed_campaigns, $uncheckable;
+    protected $ref_compte, $mail, $password, $nb_annonces_online, $date_derniere_activite, $disabled, $date_of_disabling, $ref_client, $ref_expe, $expe, $code_promo, $prenom_client, $nom_client, $controle_date, $objectID, $date_creation, $telephone, $cookie, $user_id, $prenom, $date_publication, $open, $nb_successful_campaigns, $nb_failed_campaigns, $uncheckable, $cookie_expired;
 
-    
-    
     /**
+     *
+     * @return mixed
+     */
+    public function getCookie_expired()
+    {
+        return $this->cookie_expired;
+    }
+
+    /**
+     *
+     * @param mixed $cookie_expired
+     */
+    public function setCookie_expired($cookie_expired)
+    {
+        $this->cookie_expired = $cookie_expired;
+    }
+
+    /**
+     *
      * @return mixed
      */
     public function getUncheckable()
@@ -24,6 +41,7 @@ class LbcAccount implements \JsonSerializable
     }
 
     /**
+     *
      * @param mixed $uncheckable
      */
     public function setUncheckable($uncheckable)
@@ -84,7 +102,6 @@ class LbcAccount implements \JsonSerializable
     {
         $this->open = $open;
     }
-
 
     public function __construct(array $donnees = array())
 
