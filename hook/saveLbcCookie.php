@@ -126,6 +126,8 @@ if (array_key_exists("cookies", $_POST) && array_key_exists("ref_compte", $_POST
         $slack->sendMessages('log-lbc', array(
             "Can't read cookie of lbc act n° " . $ref_compte
         ));
+
+        die();
     }
 
     $luat = $cookies->cookies['luat'];
@@ -137,6 +139,11 @@ if (array_key_exists("cookies", $_POST) && array_key_exists("ref_compte", $_POST
 
     $act->setCookie($luat);
     $lbcAcctMg->updateCookie($act);
+
+    $now = new \DateTime("", new DateTimeZone('Europe/Paris'));
+
+    $act->setCookie_update($now->format(PG_DATETIME_FORMAT));
+    $lbcAcctMg->update_cookie_update($act);
 
     // $lbcApi = new \spamtonprof\stp_api\LbcApi();
     // $userId = $lbcApi->getUserId($luat);
