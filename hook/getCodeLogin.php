@@ -56,15 +56,19 @@ do {
     }
 
     $code = implode("", $liValues);
+    
+    if(strlen($code) >= 6){
+        $slack->sendMessages('log-lbc', array(
+            'Code de login récupéré : ' . $code
+        ));
+        
+        $ret->code = $code;
+        prettyPrint($ret);
+        
+    }
 
     sleep($timeBreak);
 } while ($nbTry != $indexTry);
 
 exit();
 
-$slack->sendMessages('log-lbc', array(
-    'Code de login récupéré : ' . $code
-));
-
-$ret->code = $code;
-prettyPrint($ret);
