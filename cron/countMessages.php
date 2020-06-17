@@ -2,11 +2,11 @@
 
 /**
  * ce script sert :
- * - à compter les messages envoyés par les élèves durant les 7 derniers jours
+ * - ï¿½ compter les messages envoyï¿½s par les ï¿½lï¿½ves durant les 7 derniers jours
  *
  * fonctionnement :
- * 1°) compter les messages des 7 derniers jours dans stp_message_eleve
- * 2°) mettre à jour la colonne nb_message dans stp_message_eleve
+ * 1ï¿½) compter les messages des 7 derniers jours dans stp_message_eleve
+ * 2ï¿½) mettre ï¿½ jour la colonne nb_message dans stp_message_eleve
  *
  * il tourne tous les 2 heures - en prod
  */
@@ -27,32 +27,31 @@ header("Pragma: no-cache");
 
 $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
 
-//récupérer les messages et les comptes des abonnements avec nb_messages != 0
+// rï¿½cupï¿½rer les messages et les comptes des abonnements avec nb_messages != 0
 $nbMessages = $aboMg->getNbMessage();
 
-// mettre tous les messages à zéro
+// mettre tous les messages ï¿½ zï¿½ro
 $aboMg->resetNbMessage();
 
-//reset de l'index
-$algolia = new \spamtonprof\stp_api\AlgoliaManager();
-$algolia -> resetNbMessage();
+// reset de l'index
+// $algolia = new \spamtonprof\stp_api\AlgoliaManager();
+// $algolia -> resetNbMessage();
 
-// mettre à jour les messages non nulles dans algolia : 
+// mettre ï¿½ jour les messages non nulles dans algolia :
 $refAbos = [];
 foreach ($nbMessages as $nbMessage) {
-    
+
     $abo = $aboMg->get(array(
         "ref_abonnement" => $nbMessage["ref_abonnement"]
     ));
-    
+
     $abo->setNb_message($nbMessage["nb_message"]);
     $aboMg->updateNbMessage($abo);
 
     $refAbos[] = $abo->getRef_abonnement();
-    
 }
 
-$algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
-$algoliaMg->updateAbonnements($refAbos, false);
+// $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+// $algoliaMg->updateAbonnements($refAbos, false);
 
 

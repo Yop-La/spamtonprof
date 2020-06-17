@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.9.4.1
+ * Version: 1.1.9.4.2
  *
  *
  * Author: yopla
@@ -91,6 +91,8 @@ require_once (dirname(__FILE__) . '/ajaxFunction/lbc-report.php');
 require_once (dirname(__FILE__) . '/ajaxFunction/paiement_ajax.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/facturation-prof.php');
+
+require_once (dirname(__FILE__) . '/ajaxFunction/ajax_offre_spam_express.php');
 
 add_action('template_redirect', 'handleRedirections');
 
@@ -324,6 +326,64 @@ function my_pre_population_callback($options, $settings)
         }
     }
 
+    // target "choix demande" du formulaire "commande spamexpress"
+    if ($settings['key'] == 'choix_demande_1591536866148') {
+
+        if (array_key_exists("cmd_spam_express_step1", $_SESSION)) {
+
+            $cmd = $_SESSION["cmd_spam_express_step1"];
+
+            $cmd = \spamtonprof\stp_api\StpCmdSpamExpressManager::cast($cmd);
+
+            $offres = $cmd->getOffres();
+
+            foreach ($offres as $offre) {
+
+                $offre = \spamtonprof\stp_api\StpOffreSpamExpressManager::cast($offre);
+
+                if ($offre->getMain()) {
+
+                    $options[] = array(
+                        'label' => $offre->getName(),
+                        'value' => $offre->getRef_offre()
+                    );
+                }
+            }
+        }
+    }
+
+    // target "choix niveau" du formulaire "commande spamexpress"
+    if ($settings['key'] == 'choix_niveau_1591536885566') {
+
+        $catMg = new \spamtonprof\stp_api\StpCategorieScolaireManager();
+
+        $cats = $catMg->getAll();
+
+        foreach ($cats as $cat) {
+
+            $options[] = array(
+                'label' => $cat->getName(),
+                'value' => $cat->getRef_cat_scolaire()
+            );
+        }
+    }
+
+    // target "choix matiere" du formulaire "commande spamexpress"
+    if ($settings['key'] == 'choix_matiere_1591536866148') {
+
+        $poleMg = new \spamtonprof\stp_api\StpPoleManager();
+
+        $poles = $poleMg->getAll();
+
+        foreach ($poles as $pole) {
+
+            $options[] = array(
+                'label' => $pole->getName(),
+                'value' => $pole->getRef_pole()
+            );
+        }
+    }
+
     // target "choix type titre" du formulaire "conf client leboncoin"
     if ($settings['key'] == 'type_titre_1542480076396') {
 
@@ -430,14 +490,13 @@ function my_pre_population_callback($options, $settings)
 
             if (current_user_can('client')) {
 
-
                 $current_user = wp_get_current_user();
-                
+
                 $compteMg = new \spamtonprof\stp_api\StpCompteManager();
                 $compte = $compteMg->get(array(
                     'ref_compte_wp' => $current_user->ID
                 ));
-                
+
                 $aboMg = new \spamtonprof\stp_api\StpAbonnementManager();
 
                 $constructor = array(
@@ -447,40 +506,45 @@ function my_pre_population_callback($options, $settings)
                     )
                 );
 
-                $abos = $aboMg->getAll(array('key' => 'all_actif_abos_of_account','ref_compte' => $compte->getRef_compte()), $constructor);
+                $abos = $aboMg->getAll(array(
+                    'key' => 'all_actif_abos_of_account',
+                    'ref_compte' => $compte->getRef_compte()
+                ), $constructor);
 
+                foreach ($abos as $abo) {
 
-                foreach ($abos as $abo){
-                    
                     $ref_abo = $abo->getRef_abonnement();
-                    
+
                     $eleve = $abo->getEleve();
                     $formule = $abo->getFormule();
-                    
+
                     $eleve = \spamtonprof\stp_api\StpEleve::cast($eleve);
                     $formule = \spamtonprof\stp_api\StpFormule::cast($formule);
-                    
+
                     $nom_formule = $formule->getFormule();
                     $prenom = $eleve->getPrenom();
-                    
+
                     $label = $prenom . ' - ' . $nom_formule;
 
-                    
                     $options[] = array(
                         'label' => $label,
                         'value' => $ref_abo
                     );
-                    
                 }
-                
-                
-
             }
         }
     }
 
     return $options;
 }
+
+
+
+
+
+
+
+
 
 
 

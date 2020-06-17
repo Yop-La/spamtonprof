@@ -165,10 +165,10 @@ foreach ($messages as $message) {
 
                 $abo->setTo_relaunch(false);
                 $aboMg->updateToRelaunch($abo);
-                
+
                 // mise à jour de l'index
-                $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
-                $algoliaMg->updateAbonnement($abo->getRef_abonnement(), false);
+                // $algoliaMg = new \spamtonprof\stp_api\AlgoliaManager();
+                // $algoliaMg->updateAbonnement($abo->getRef_abonnement(), false);
 
                 break;
             default:
