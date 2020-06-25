@@ -456,6 +456,56 @@ class StripeManager
         return ($session->id);
     }
 
+    public function find_customer($email)
+    {
+        $customers = \Stripe\Customer::all([
+            'limit' => 1,
+            'email' => $email
+        ]);
+
+        return ($customers->data[0]);
+    }
+
+    public function create_checkout_session_spam_express($price_id, $cmd_id, $cmd_id_encrypted, $stripe_prof_id, $ref_offre, $email_client)
+    {
+        $cus = $this->find_customer($email_client);
+
+        $params = [
+            'payment_method_types' => [
+                'card'
+            ],
+            'line_items' => [
+                [
+                    'price' => $price_id,
+                    'quantity' => 1
+                ]
+            ],
+            'mode' => 'payment',
+            'success_url' => domain_to_url() . '/merci-spam-express/',
+            'cancel_url' => domain_to_url() . '/step3-spam-express?info=' . base64_encode("Tu hésites ? Continue ta visite sur <a href='" . domain_to_url() . "'href= >spamtonprof.com</a>") . "&param=" . $cmd_id_encrypted
+        ];
+
+        $params['metadata'] = array(
+            'offer' => 'spam_express',
+            'cmd_id' => $cmd_id,
+            'ref_offre' => $ref_offre
+        );
+
+        if ($cus) {
+            $params['customer'] = $cus->id;
+        }
+
+        // $params['payment_intent_data'] = [
+        // 'transfer_data' => [
+        // 'destination' => $stripe_prof_id
+        // ]
+        // ];
+
+        $session = \Stripe\Checkout\Session::create($params);
+
+        return ($session->id);
+    }
+
     public function create_checkout_session_to_update_payment_method($cus_id)
     {
         if (! $cus_id) {
@@ -551,6 +601,35 @@ class StripeManager
         ]);
     }
 
+    public function transfert_prof($payment_intent_id, $act_id, $email_prof)
+    {
+        $payment_intent = $this->retrieve_payment_intent_id($payment_intent_id);
+
+        $charges = $payment_intent->charges->data;
+
+        $charge = $charges[0];
+
+        $charge_amt = $payment_intent->amount;
+
+        $commission = 25;
+        if ($email_prof == 'sebastien@spamtonprof.com') {
+            $commission = 20;
+        }
+        $part_prof = round($charge_amt * (1 - ($commission / 100)));
+
+        if ($part_prof > 0) {
+
+            $transfer = \Stripe\Transfer::create([
+                'amount' => $part_prof,
+                'currency' => 'eur',
+                'destination' => $act_id,
+                'source_transaction' => $charge->id
+            ]);
+        }
+
+        return ($transfer->id);
+    }
+
     public function retrieve_session($session_id)
     {
         $session = \Stripe\Checkout\Session::retrieve($session_id);
@@ -582,6 +661,13 @@ class StripeManager
         }
 
         return ($payout);
+    }
+
+    public function retrieve_balance()
+    {
+        $balance = \Stripe\Balance::retrieve();
+
+        return ($balance);
     }
 
     public function retrieve_balance_transaction($id)
@@ -678,6 +764,12 @@ class StripeManager
         }
 
         return ($charge);
+    }
+
+    public function retrieve_payment_intent_id($payment_id)
+    {
+        $payment = \Stripe\PaymentIntent::retrieve($payment_id);
+        return ($payment);
     }
 
     public function retrieve_invoice($invoice_id)
@@ -821,8 +913,8 @@ class StripeManager
             'limit' => $limit,
             'status' => 'paid'
         ];
-        
-        if($status){
+
+        if ($status) {
             $params['status'] = $status;
         }
 
@@ -953,6 +1045,44 @@ class StripeManager
             $invoice_item = \Stripe\InvoiceItem::retrieve($item->id);
             $invoice_item->delete();
         }
+    }
+
+    public function delete_draft_invoice($invoice_id)
+    {
+        $invoice = \Stripe\Invoice::retrieve($invoice_id);
+
+        $invoice->voidInvoice();
+
+        // $invoice->auto_advance=true;
+
+        // $invoice->status = "void";
+
+        $invoice->save();
+
+        // $invoice->delete();
+    }
+
+    public function retrieveAllUnpaidInvoice($email)
+    {
+        $customers = \Stripe\Customer::all([
+            "email" => $email
+        ]);
+
+        $cus = $customers->data[0];
+
+        $invoicesOpen = \Stripe\Invoice::all(array(
+            "customer" => $cus->id,
+            "status" => "open"
+        ));
+
+        $invoicesDraft = \Stripe\Invoice::all(array(
+            "customer" => $cus->id,
+            "status" => "draft"
+        ));
+
+        $invoices = array_merge($invoicesDraft->data, $invoicesOpen->data);
+
+        return ($invoices);
     }
 
     public function retrieveAllInvoice($email)
@@ -1463,7 +1593,10 @@ class StripeManager
             $acct = \Stripe\Account::create(array(
                 "country" => $pays,
                 "type" => "custom",
-                "account_token" => $tokenId
+                "account_token" => $tokenId,
+                'requested_capabilities' => [
+                    'transfers'
+                ]
             ));
             return ($acct->id);
         } catch (\Exception $e) {
@@ -1645,6 +1778,50 @@ class StripeManager
                     'installments' => $installments
                 ]
             ]);
+        }
+    }
+
+    function create_products_plans_spam_express()
+    {
+        $offreMg = new \spamtonprof\stp_api\StpOffreSpamExpressManager();
+
+        $constructor = array(
+            "construct" => array(
+                'ref_pole'
+            )
+        );
+
+        $offres = $offreMg->getAll(false, $constructor);
+
+        foreach ($offres as $offre) {
+
+            $strProduct = \Stripe\Product::create(array(
+                "name" => "Un prof t'aide à terminer/comprendre tes exercices",
+                "type" => "service",
+                'description' => $offre->getName() . ' / ' . $offre->getTitle() . ' / ' . $offre->getPole()->getName() . " / Tous le échanges avec le prof se font par email / Suite à ce paiement, tu recevras le mail de ton prof pour lui demander son aide."
+            ));
+
+            if ($this->testMode) {
+                $offre->setStripe_product_test($strProduct->id);
+                $offreMg->update_stripe_product_test($offre);
+            } else {
+                $offre->setStripe_product($strProduct->id);
+                $offreMg->update_stripe_product($offre);
+            }
+
+            $price = \Stripe\Price::create([
+                'product' => $strProduct->id,
+                'unit_amount' => $offre->getPrice() * 100,
+                'currency' => 'eur'
+            ]);
+
+            if ($this->testMode) {
+                $offre->setStripe_price_test($price->id);
+                $offreMg->update_stripe_price_test($offre);
+            } else {
+                $offre->setStripe_price($price->id);
+                $offreMg->update_stripe_price($offre);
+            }
         }
     }
 
