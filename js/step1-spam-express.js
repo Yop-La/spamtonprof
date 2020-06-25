@@ -2,7 +2,7 @@
 ajaxEnCours = 0;
 
 
-idFormCmdSpamExpress = 90;
+idFormCmdSpamExpress = 94;
 
 if(domain != 'spamtonprof'){
 	idFormCmdSpamExpress = 90;
