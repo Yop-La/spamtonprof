@@ -154,15 +154,6 @@ class Google_Service_Classroom extends Google_Service
               'path' => 'v1/courses',
               'httpMethod' => 'GET',
               'parameters' => array(
-                'teacherId' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
-                'courseStates' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                  'repeated' => true,
-                ),
                 'studentId' => array(
                   'location' => 'query',
                   'type' => 'string',
@@ -174,6 +165,15 @@ class Google_Service_Classroom extends Google_Service
                 'pageSize' => array(
                   'location' => 'query',
                   'type' => 'integer',
+                ),
+                'teacherId' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
+                'courseStates' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                  'repeated' => true,
                 ),
               ),
             ),'patch' => array(
@@ -519,6 +519,10 @@ class Google_Service_Classroom extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
+                'late' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
                 'pageToken' => array(
                   'location' => 'query',
                   'type' => 'string',
@@ -533,10 +537,6 @@ class Google_Service_Classroom extends Google_Service
                   'repeated' => true,
                 ),
                 'userId' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
-                'late' => array(
                   'location' => 'query',
                   'type' => 'string',
                 ),

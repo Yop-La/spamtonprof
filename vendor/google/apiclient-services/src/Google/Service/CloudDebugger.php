@@ -87,6 +87,10 @@ class Google_Service_CloudDebugger extends Google_Service
                   'type' => 'string',
                   'required' => true,
                 ),
+                'agentId' => array(
+                  'location' => 'query',
+                  'type' => 'string',
+                ),
                 'successOnTimeout' => array(
                   'location' => 'query',
                   'type' => 'boolean',
@@ -125,10 +129,6 @@ class Google_Service_CloudDebugger extends Google_Service
               'path' => 'v2/debugger/debuggees',
               'httpMethod' => 'GET',
               'parameters' => array(
-                'project' => array(
-                  'location' => 'query',
-                  'type' => 'string',
-                ),
                 'clientVersion' => array(
                   'location' => 'query',
                   'type' => 'string',
@@ -136,6 +136,10 @@ class Google_Service_CloudDebugger extends Google_Service
                 'includeInactive' => array(
                   'location' => 'query',
                   'type' => 'boolean',
+                ),
+                'project' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
               ),
             ),
@@ -228,6 +232,10 @@ class Google_Service_CloudDebugger extends Google_Service
                   'location' => 'path',
                   'type' => 'string',
                   'required' => true,
+                ),
+                'canaryOption' => array(
+                  'location' => 'query',
+                  'type' => 'string',
                 ),
                 'clientVersion' => array(
                   'location' => 'query',

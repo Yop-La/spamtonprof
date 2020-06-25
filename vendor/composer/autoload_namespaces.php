@@ -7,7 +7,6 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Sunra\\PhpSimple\\HtmlDomParser' => array($vendorDir . '/sunra/php-simple-html-dom-parser/Src'),
-    'PayPal' => array($vendorDir . '/paypal/rest-api-sdk-php/lib'),
     'Mailgun' => array($vendorDir . '/mailgun/mailgun-php/src'),
     'Hashids' => array($vendorDir . '/hashids/hashids/lib'),
     'Gufy\\CpanelPhp\\' => array($vendorDir . '/gufy/cpanel-php/src'),

@@ -103,6 +103,8 @@ class Google_Service_CloudDebugger_Resource_DebuggerDebuggeesBreakpoints extends
    * @param Google_Service_CloudDebugger_Breakpoint $postBody
    * @param array $optParams Optional parameters.
    *
+   * @opt_param string canaryOption The canary option set by the user upon setting
+   * breakpoint.
    * @opt_param string clientVersion Required. The client version making the call.
    * Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
    * @return Google_Service_CloudDebugger_SetBreakpointResponse

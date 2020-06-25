@@ -1,15 +1,6 @@
 <?php
 /**
  * This helper builds the Personalization object for a /mail/send API call
- *
- * PHP Version - 5.6, 7.0, 7.1, 7.2
- *
- * @package   SendGrid\Mail
- * @author    Elmer Thomas <dx@sendgrid.com>
- * @copyright 2018-19 Twilio SendGrid
- * @license   https://opensource.org/licenses/MIT The MIT License
- * @version   GIT: <git_id>
- * @link      http://packagist.org/packages/sendgrid/sendgrid
  */
 
 namespace SendGrid\Mail;
@@ -109,16 +100,20 @@ class Personalization implements \JsonSerializable
     /**
      * Add a subject object to a Personalization object
      *
-     * @param Subject $subject Subject object
+     * @param Subject|string $subject Subject object or string
      *
-     * @throws \SendGrid\Mail\TypeException
+     * @throws TypeException
      */
     public function setSubject($subject)
     {
         if (!($subject instanceof Subject)) {
-            throw new TypeException(
-                '$subject must be an instance of SendGrid\Mail\Subject'
-            );
+            //  If not a string, Subject can't be created
+            if (!is_string($subject)) {
+                throw new TypeException(
+                    '$subject must be an instance of SendGrid\Mail\Subject or of type string.'
+                );
+            }
+            $subject = new Subject($subject);
         }
         $this->subject = $subject;
     }
@@ -126,7 +121,7 @@ class Personalization implements \JsonSerializable
     /**
      * Retrieve a Subject object from a Personalization object
      *
-     * @return Subject
+     * @return Subject|null
      */
     public function getSubject()
     {

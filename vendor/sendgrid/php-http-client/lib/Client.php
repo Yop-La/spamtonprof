@@ -2,13 +2,6 @@
 
 /**
  * HTTP Client library
- *
- * @author    Matt Bernier <dx@sendgrid.com>
- * @author    Elmer Thomas <dx@sendgrid.com>
- * @copyright 2018 SendGrid
- * @license   https://opensource.org/licenses/MIT The MIT License
- * @version   GIT: <git_id>
- * @link      http://packagist.org/packages/sendgrid/php-http-client
  */
 
 namespace SendGrid;
@@ -20,7 +13,7 @@ use SendGrid\Exception\InvalidRequest;
  * Class Client
  * @package SendGrid
  * @version 3.9.5
- * 
+ *
  * Quickly and easily access any REST or REST-like API.
  *
  * @method Response get($body = null, $query = null, $headers = null)
@@ -56,6 +49,7 @@ use SendGrid\Exception\InvalidRequest;
  * ASM
  * @method Client asm()
  * @method Client groups()
+ * @method Client suppressions()
  *
  * Browsers
  * @method Client browsers()
@@ -130,7 +124,7 @@ use SendGrid\Exception\InvalidRequest;
  * @method Client reputations()
  *
  * Supressions
- * @method Client suppressions()
+ * @method Client suppression()
  * @method Client global()
  * @method Client blocks()
  * @method Client bounces()
