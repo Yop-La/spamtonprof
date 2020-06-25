@@ -20,7 +20,7 @@
  *
  *
  *
- * Version: 1.1.9.4.3
+ * Version: 1.1.9.4.4
  *
  *
  * Author: yopla
@@ -92,7 +92,7 @@ require_once (dirname(__FILE__) . '/ajaxFunction/paiement_ajax.php');
 
 require_once (dirname(__FILE__) . '/ajaxFunction/facturation-prof.php');
 
-// require_once (dirname(__FILE__) . '/ajaxFunction/ajax_offre_spam_express.php');
+require_once (dirname(__FILE__) . '/ajaxFunction/ajax_offre_spam_express.php');
 
 add_action('template_redirect', 'handleRedirections');
 
