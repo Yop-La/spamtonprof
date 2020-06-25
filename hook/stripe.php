@@ -90,8 +90,10 @@ if ($event_json->type == "customer.subscription.updated") {
     }
 }
 
-// pour mettre à jour la cb
+// pour mettre à jour la cb et traiter les cmds spam express
 if ($event_json->type == "checkout.session.completed") {
+
+    serializeTemp($event_json, "/tempo/events");
 
     $session_id = $event_json->data->object->id;
 
@@ -99,17 +101,31 @@ if ($event_json->type == "checkout.session.completed") {
 
     $setup_intent_id = $session->setup_intent;
 
-    $setup_intent = $stripeMg->retrieve_setup_intent($setup_intent_id);
+    if ($setup_intent_id) {
 
-    $customer = $setup_intent->metadata['customer_id'];
-    $payment_method = $setup_intent->payment_method;
+        $setup_intent = $stripeMg->retrieve_setup_intent($setup_intent_id);
 
-    $stripeMg->attach_payment_method($payment_method, $customer);
-    $stripeMg->set_default_payment_method($payment_method, $customer);
+        $customer = $setup_intent->metadata['customer_id'];
+        $payment_method = $setup_intent->payment_method;
 
-    $slack->sendMessages('log-stripe', array(
-        'Mise à jour du moyen de paiement de ' . $customer
-    ));
+        $stripeMg->attach_payment_method($payment_method, $customer);
+        $stripeMg->set_default_payment_method($payment_method, $customer);
+
+        $slack->sendMessages('log-stripe', array(
+            'Mise à jour du moyen de paiement de ' . $customer
+        ));
+    }
+
+    // si paiement spam express
+    if (strpos(json_encode($event_json), 'spam_express') !== false) {
+
+        $test_mode = ! $event_json->livemode;
+
+        $session_id = $event_json->data->object->id;
+
+        $spam_express_controler = new \spamtonprof\stp_api\StpSpamExpressControler($test_mode);
+        $spam_express_controler->process_paid_order($session_id);
+    }
 }
 
 if ($event_json->type == 'invoice.payment_failed') {
