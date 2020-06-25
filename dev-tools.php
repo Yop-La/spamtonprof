@@ -8,14 +8,13 @@ function str_to_bool($bool_str)
     return (false);
 }
 
-function getCurrentDomain(){
-    
+function getCurrentDomain()
+{
     $host_split = explode('.', $_SERVER['HTTP_HOST']);
-    
+
     $domain = $host_split[0];
-    
-    return($domain);
-    
+
+    return ($domain);
 }
 
 function domain_to_url()
@@ -38,7 +37,7 @@ function extract_cookies($curl_result)
     $matches = [];
     preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $curl_result, $matches);
     $cookies = array();
-    
+
     foreach ($matches[1] as $item) {
 
         parse_str($item, $cookie);
@@ -691,6 +690,32 @@ function serializeTemp($object, $file = "/tempo/tempoObject", $rel = true)
     file_put_contents($file, $s);
 }
 
+function is_base64_encoded($data)
+{
+    if (empty(htmlspecialchars(base64_decode($data, true)))) {
+        return (false);
+    }
+    return (true);
+}
+
+function encrypt_decrypt($action, $string, $secret_key, $secret_iv)
+{
+    $output = false;
+    $encrypt_method = "AES-256-CBC";
+
+    $key = hash('sha256', $secret_key);
+
+    // iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
+    $iv = substr(hash('sha256', $secret_iv), 0, 16);
+    if ($action == 'encrypt') {
+        $output = openssl_encrypt($string, $encrypt_method, $key, 0, $iv);
+        $output = base64_encode($output);
+    } else if ($action == 'decrypt') {
+        $output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
+    }
+    return $output;
+}
+
 function extract_text_from_node($classname, $body)
 {
     $dom = new DomDocument();
@@ -740,29 +765,29 @@ function prettyPrintArray(array $arr)
     exit(0);
 }
 
-function outputCSV($data,$file_name = 'file.csv') {
-    # output headers so that the file is downloaded rather than displayed
+function outputCSV($data, $file_name = 'file.csv')
+{
+    // output headers so that the file is downloaded rather than displayed
     header("Content-Type: text/csv");
     header("Content-Disposition: attachment; filename=$file_name");
-    # Disable caching - HTTP 1.1
+    // Disable caching - HTTP 1.1
     header("Cache-Control: no-cache, no-store, must-revalidate");
-    # Disable caching - HTTP 1.0
+    // Disable caching - HTTP 1.0
     header("Pragma: no-cache");
-    # Disable caching - Proxies
+    // Disable caching - Proxies
     header("Expires: 0");
-    
-    # Start the ouput
+
+    // Start the ouput
     $output = fopen("php://output", "w");
-    
-    # Then loop through the rows
+
+    // Then loop through the rows
     foreach ($data as $row) {
-        # Add the rows to the body
+        // Add the rows to the body
         fputcsv($output, $row); // here you can change delimiter/enclosure
     }
-    # Close the stream off
+    // Close the stream off
     fclose($output);
 }
-
 
 function saveArrayAsCsv($array, $filename, $delimiter = ";")
 {
@@ -1075,9 +1100,9 @@ function toPgArray(array $elements, $parenthese = false)
 
     $nbElem = count($elements);
     $arrayPar = "";
-    
-    if($nbElem == 0){
-        return($lBracket. "0" . $rBracket);
+
+    if ($nbElem == 0) {
+        return ($lBracket . "0" . $rBracket);
     }
 
     for ($i = 0; $i < $nbElem; $i ++) {
@@ -1305,88 +1330,115 @@ function url_get_contents($url)
     return $output;
 }
 
-
-function quote($word){
-    return('"' . $word . '"');
+function quote($word)
+{
+    return ('"' . $word . '"');
 }
-
 
 // le fichier doit être un export des inscription du formulaire à l'inscription de la semaine d'essai
 // le code est nathalie ou natali pour le moment, c'est configurable
 // exemple d'appel: count_inscription_teleprospecteur("inscription-decembre.csv");
-function count_inscription_teleprospecteur($path_csv_file){
-    
-    
+function count_inscription_teleprospecteur($path_csv_file)
+{
     $rows = readCsv($path_csv_file, ",");
-    
-    $targets = [];
-    
-    $nb_cols = [];
-    
-    foreach ($rows as $row) {
-        
-        
-        $rmqs = [];
-        
-        $nb_col = count($row);
-        
-        if ($nb_col <= 15) {
-            continue;
-            // prettyPrint($row);
-        }
-        
-        //email eleve
-        $rmqs[] = $row[4];
-        
-        if ($nb_col == 21) {
 
-            $rmqs["rmq matiere 1"] = $row[2];
-            $rmqs["rmq matiere 2"] = $row[4];
-            $rmqs["rmq matiere 3"] = $row[8];
-            $rmqs["rmq matiere 4"] = $row[10];
-            $rmqs["rmqs"] = $row[16];
-            $rmqs["code"] = $row[19];
-            $targets[] = $rmqs;
-        }
-        
-        if ($nb_col == 33) {
-            
-            
-            $rmqs["rmq matiere 1"] = $row[13];
-            $rmqs["rmq matiere 2"] = $row[15];
-            $rmqs["rmq matiere 3"] = $row[17];
-            $rmqs["rmq matiere 4"] = $row[19];
-            $rmqs["rmqs"] = $row[28];
-            $rmqs["code"] = $row[31];
-            $targets[] = $rmqs;
-        }
-        
-        $nb_cols[] = $nb_col;
-        
+    $cols_to_keep = [
+        "remarques_matiere1",
+        "remarques_matiere2",
+        "remarques_matiere3",
+        "remarques_matiere4",
+        "remarques_matiere5",
+        "remarques",
+        "code_promo"
+    ];
+
+    $header = $rows[0];
+
+    $cols_idx_to_keep = [];
+
+    array_shift($rows);
+
+    foreach ($cols_to_keep as $col_to_keep) {
+        $cols_idx_to_keep[$col_to_keep] = array_search($col_to_keep, $header);
     }
-    
+
+    // prettyPrint($cols_idx_to_keep);
+
+    $targets = [];
+
+    $nb_cols = [];
+
+    foreach ($rows as $row) {
+
+        $rmqs = [];
+
+        // prettyPrint($rmqs);
+
+        foreach ($cols_idx_to_keep as $key => $value) {
+
+            if (! array_key_exists($value, $row)) {
+                $rmqs[$key] = "";
+            } else {
+                $rmqs[$key] = $row[$value];
+            }
+        }
+        $targets[] = $rmqs;
+
+        // $nb_col = count($row);
+
+        // if ($nb_col <= 15) {
+        // continue;
+        // // prettyPrint($row);
+        // }
+
+        // // email eleve
+        // $rmqs[] = $row[4];
+
+        // if ($nb_col == 21) {
+
+        // $rmqs["rmq matiere 1"] = $row[2];
+        // $rmqs["rmq matiere 2"] = $row[4];
+        // $rmqs["rmq matiere 3"] = $row[8];
+        // $rmqs["rmq matiere 4"] = $row[10];
+        // $rmqs["rmqs"] = $row[16];
+        // $rmqs["code"] = $row[19];
+        // $targets[] = $rmqs;
+        // }
+
+        // if ($nb_col == 33) {
+
+        // $rmqs["rmq matiere 1"] = $row[13];
+        // $rmqs["rmq matiere 2"] = $row[15];
+        // $rmqs["rmq matiere 3"] = $row[17];
+        // $rmqs["rmq matiere 4"] = $row[19];
+        // $rmqs["rmqs"] = $row[28];
+        // $rmqs["code"] = $row[31];
+        // $targets[] = $rmqs;
+        // }
+
+        // $nb_cols[] = $nb_col;
+    }
+
     $res = [];
-    
-    foreach ($targets as $target){
-        
+
+    foreach ($targets as $target) {
+
         $target = array_map('strtolower', $target);
-        
+
         $email = array_shift($target);
-        
-        $matches  = preg_grep ('/.*nathali.*|.*natali.*/', $target);
-        
-        if($matches){
+
+        $matches = preg_grep('/.*nathali.*|.*natali.*/', $target);
+
+        if ($matches) {
             $matches[] = $email;
             $res[] = $matches;
         }
-        
-        
     }
-    
-    prettyPrint(array(count($res),$res));
-    
-    
-    
+
+    prettyPrint(array(
+        count($res),
+        $res
+    ));
 }
 
 
