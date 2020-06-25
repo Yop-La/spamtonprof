@@ -25,6 +25,12 @@ function isEmail(email) {
 }
 
 function redirectTo(slug ,info = "" ){
+
+
+	if(!jQuery('#info').length){
+		jQuery('body').append("<form id=\"hidden-form\" method=POST action=\"\'.get_home_url().\'\/abonnement-apres-essai\'.\'\/\"><input type=\"hidden\" id=\"info\" name=\"info\" value=\"\" \/><\/form>");
+	}
+
 	info = htmlentities.encode(info);
 	waitForEl("#info",function(){
 		jQuery("#hidden-form").attr("action", homeUrl.concat("/",slug) );
@@ -33,9 +39,24 @@ function redirectTo(slug ,info = "" ){
 	});
 }
 
+function showLoader(){
+	jQuery('.loader').fadeIn('slow');
+
+}
+
+function hideLoader(){
+	jQuery('.loader').fadeOut();
+}
+
+
 function showMessage(message){
 	waitForEl("#top-message", function() {
-		jQuery("#band-message").html(message);
+
+		if(jQuery("#band-message .elementor-heading-title").length){
+			jQuery("#band-message .elementor-heading-title").html(message);
+		}else{
+			jQuery("#band-message").html(message);
+		}
 		jQuery("#top-message").removeClass("hide");
 		window.scrollTo(0, 0);
 	});
