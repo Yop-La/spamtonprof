@@ -14,8 +14,6 @@ function ajax_facturation_par_prof()
     $retour = new \stdClass();
     $retour->error = false;
 
-    serializeTemp($_POST);
-
     $test_mode = $_POST['test_mode'];
     $fields = $_POST['fields'];
     $fields = json_decode(stripslashes($fields));
