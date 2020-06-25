@@ -55,7 +55,13 @@ class PageManager
         $this->pagesVariables["message"] = false;
         if (isset($_GET['info'])) {
 
-            $this->pagesVariables["message"] = $_GET['info'];
+            $message = $_GET['info'];
+
+            if (is_base64_encoded($message)) {
+                $this->pagesVariables["message"] = base64_decode($message);
+            } else {
+                $this->pagesVariables["message"] = $message;
+            }
         }
 
         $this->testMode = $testMode;
@@ -418,7 +424,32 @@ class PageManager
 
             $this->facturation_prof();
         }
+
+        if ($this->pageSlug == 'step1-spam-express') {
+
+            $this->step1_spam_express();
+        }
+
+        if ($this->pageSlug == 'step2-spam-express') {
+
+            $this->step2_spam_express();
+        }
+
+        if ($this->pageSlug == 'step3-spam-express') {
+
+            $this->step3_spam_express();
+        }
+
+        if ($this->pageSlug == 'spam-express') {
+
+            $this->spam_express();
+        }
+
+        $this->common();
     }
+
+    public function common()
+    {}
 
     public function abonnementApresEssaiLoader()
 
@@ -462,7 +493,7 @@ class PageManager
         ), time());
 
         $slack = new \spamtonprof\slack\Slack();
-        
+
         if (isset($_GET['state']) && isset($_GET['code'])) {
 
             $email_prof = $_GET['state'];
@@ -951,6 +982,165 @@ class PageManager
 
             'nf-front-end'
         ), time());
+    }
+
+    public function step3_spam_express()
+
+    {
+        wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/hello-elementor-child/css/pages/spam-express-offre.css');
+
+        wp_enqueue_style('css_main', get_home_url() . '/wp-content/themes/hello-elementor-child/style.css');
+
+        wp_enqueue_script('stripe_main_js', 'https://js.stripe.com/v3/');
+
+        wp_enqueue_script('formule_js', plugins_url() . '/spamtonprof/js/step3-spam-express.js', array(
+
+            'nf-front-end'
+        ), time());
+
+        if (array_key_exists("param", $_GET)) {
+
+            $cmd_id_encrypted = $_GET["param"];
+
+            $cmd_id = encrypt_decrypt('decrypt', $cmd_id_encrypted, SECRET_KEY_URL_PAREMETER, SECRET_IV_URL_PAREMETER);
+
+            $constructor = array(
+                "construct" => array(
+                    'ref_lead',
+                    'specified_offers',
+                    'ref_pole',
+                    'ref_prof'
+                )
+            );
+
+            // $stripe = new \spamtonprof\stp_api\StripeManager($this->testMode);
+
+            $cmd_mg = new \spamtonprof\stp_api\StpCmdSpamExpressManager();
+            $cmd = $cmd_mg->get($cmd_id, $constructor);
+
+            // $prof = $cmd->getProf();
+
+            // $stripe_prof_id = $prof->get_stripe_id($this->testMode);
+
+            // $offres = $cmd->getOffres();
+
+            // for ($i = 0; $i < count($offres); $i ++) {
+
+            // $offre = $offres[$i];
+            // $offre = StpOffreSpamExpressManager::cast($offre);
+
+            // $checkout_session_id = "none";
+
+            // $stripe_price = $offre->getStripe_price();
+            // if ($this->testMode) {
+            // $stripe_price = $offre->getStripe_price_test();
+            // $checkout_session_id = $stripe->create_checkout_session_spam_express($stripe_price, $cmd_id, $cmd_id_encrypted, $stripe_prof_id, $offre->getRef_offre());
+            // } else {
+            // $checkout_session_id = $stripe->create_checkout_session_spam_express($stripe_price, $cmd_id, $cmd_id_encrypted, $stripe_prof_id, $offre->getRef_offre());
+            // }
+
+            // $slack = new \spamtonprof\slack\Slack();
+            // $slack->sendMessages('spam-express', array(
+            // $checkout_session_id,
+            // $offre->getRef_offre(),
+            // $offre->getName(),
+            // $offre->getTitle()
+            // ));
+
+            // $offre->setCheckout_session_id($checkout_session_id);
+            // }
+
+            // $cmd->setOffres($offres);
+
+            $this->pagesVariables['cmd'] = json_decode(json_encode($cmd), true);
+            $this->pagesVariables["param_encrypted"] = $cmd_id_encrypted;
+        }
+    }
+
+    public function step2_spam_express()
+
+    {
+        wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/hello-elementor-child/css/pages/spam-express-offre.css');
+
+        wp_enqueue_style('css_main', get_home_url() . '/wp-content/themes/hello-elementor-child/style.css');
+
+        wp_enqueue_script('formule_js', plugins_url() . '/spamtonprof/js/step2-spam-express.js', array(
+
+            'nf-front-end'
+        ), time());
+
+        if (array_key_exists("param", $_GET)) {
+
+            $cmd_id_encrypted = $_GET["param"];
+
+            $cmd_id = encrypt_decrypt('decrypt', $cmd_id_encrypted, SECRET_KEY_URL_PAREMETER, SECRET_IV_URL_PAREMETER);
+
+            $constructor = array(
+                "construct" => array(
+                    'ref_lead',
+                    'offres'
+                )
+            );
+
+            $cmd_mg = new \spamtonprof\stp_api\StpCmdSpamExpressManager();
+            $cmd = $cmd_mg->get($cmd_id, $constructor);
+
+            $_SESSION["cmd_spam_express_step1"] = $cmd;
+
+            $this->pagesVariables['cmd'] = json_decode(json_encode($cmd), true);
+            $this->pagesVariables["param_encrypted"] = $cmd_id_encrypted;
+        }
+
+        // récupérer la commande, le lead, toutes les offres,
+        //
+    }
+
+    public function spam_express()
+
+    {
+        wp_enqueue_style('css_main', get_home_url() . '/wp-content/themes/hello-elementor-child/style.css');
+
+        wp_enqueue_script('formule_js', plugins_url() . '/spamtonprof/js/step1-spam-express.js', array(
+
+            'nf-front-end'
+        ), time());
+
+        if (array_key_exists("param", $_GET)) {}
+    }
+
+    public function step1_spam_express()
+
+    {
+        wp_enqueue_style('css_form', get_home_url() . '/wp-content/themes/hello-elementor-child/css/pages/spam-express-offre.css');
+
+        wp_enqueue_style('css_main', get_home_url() . '/wp-content/themes/hello-elementor-child/style.css');
+
+        wp_enqueue_script('formule_js', plugins_url() . '/spamtonprof/js/step1-spam-express.js', array(
+
+            'nf-front-end'
+        ), time());
+
+        if (array_key_exists("param", $_GET)) {
+
+            $cmd_id_encrypted = $_GET["param"];
+
+            $cmd_id = encrypt_decrypt('decrypt', $cmd_id_encrypted, SECRET_KEY_URL_PAREMETER, SECRET_IV_URL_PAREMETER);
+
+            $constructor = array(
+                "construct" => array(
+                    'ref_lead',
+                    'offres'
+                )
+            );
+
+            $cmd_mg = new \spamtonprof\stp_api\StpCmdSpamExpressManager();
+            $cmd = $cmd_mg->get($cmd_id, $constructor);
+
+            $_SESSION["cmd_spam_express_step1"] = $cmd;
+
+            $this->pagesVariables['cmd'] = json_decode(json_encode($cmd), true);
+            $this->pagesVariables['param_encrypted'] = $cmd_id_encrypted;
+        }
     }
 
     public function lbcReport()
