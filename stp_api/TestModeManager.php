@@ -38,7 +38,7 @@ class TestModeManager
 
 {
 
-    static $pagesSlugInTest = [];
+    static $pagesSlugInTest = ["step3-spam-express","inscription-prof","onboarding-prof"];
 
     private $testMode;
 
