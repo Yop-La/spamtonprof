@@ -5,7 +5,7 @@ class WpMg
 
 {
 
-    public $sh = "";
+    public $sh = "", $ssh = false, $sftp = false;
 
     public function __construct()
 
@@ -55,16 +55,29 @@ class WpMg
     }
 
     // pour installer en clonant un nouveau wordpress et configurer catégories, blog description , blog title
-    public function install_wp_new_domains($domains, $target_subdomains, $categories,$slug_menus,$blog_description,$blog_name)
+    public function delete_wp_install($domain)
     {
+        $cpanel = new \spamtonprof\stp_api\CpanelMg();
 
+        $dbname = "yopla_" . str_replace(".", "_", $domain);
+
+        $cpanel->delete_database($dbname);
+        $cpanel->delete_user($dbname);
+
+        $this->remove_wp_folder($domain);
+    }
+
+    // pour installer en clonant un nouveau wordpress et configurer catégories, blog description , blog title
+    public function install_wp_new_domains($domains, $target_subdomains, $categories, $slug_menus, $blog_description, $blog_name)
+    {
         for ($i = 0; $i < count($categories); $i ++) {
             $categories[$i] = quote($categories[$i]);
         }
-        
+
         $domains = array_map('strtolower', $domains);
         $domains = array_map('trim', $domains);
-        
+
+        // prettyPrint($domains);
 
         $blog_description = quote($blog_description);
         $blog_name = quote($blog_name);
@@ -105,7 +118,6 @@ class WpMg
                 // // $this->create_bhm_campaigns($domain);
             }
         }
-        
     }
 
     // $domain est le nom de domaine principale
@@ -174,7 +186,7 @@ class WpMg
         return ($sh);
     }
 
-    public function get_all_categories($domain, $dir = false)
+    public function get_all_categories($domain, $dir = false, $list = False)
     {
         if (! $dir) {
             $dir = "/home/yopla/" . $domain;
@@ -188,6 +200,16 @@ class WpMg
         $res = $this->execute_remote(true);
 
         $categories = json_decode($res);
+
+        $cats = [];
+        if ($list) {
+
+            foreach ($categories as $categorie) {
+                $cat = $categorie->slug;
+                $cats[] = $cat;
+            }
+            return ($cats);
+        }
 
         return ($categories);
     }
@@ -230,11 +252,11 @@ class WpMg
      * Exemple d'utlisation
      *
      *
-     
-            $domains = ["claire-desbois.fr"];
-            $wpMg->activate_all_bhm_campaigns($domains[0]);
-            $wpMg->execute_remote(true,true);
-
+     *
+     * $domains = ["claire-desbois.fr"];
+     * $wpMg->activate_all_bhm_campaigns($domains[0]);
+     * $wpMg->execute_remote(true,true);
+     *
      *
      *
      */
@@ -244,18 +266,42 @@ class WpMg
             $dir = "/home/yopla/" . $domain;
         }
 
-        $options_bhm = $this->get_bhm_options($domain, $dir);
+        $options_bhm = false;
+        do {
+            $options_bhm = $this->get_bhm_options($domain, $dir);
+        } while (! $options_bhm);
 
-        prettyPrint($options_bhm);
-        
         $campaigns_categories = $options_bhm->generator->category;
 
         foreach ($campaigns_categories as $campaign_categorie) {
+
             $campaign_categorie->activated = 1;
         }
 
         $this->update_options($domain, 'bhs_generator_settings', json_encode($options_bhm), $dir);
-        
+    }
+
+    /* reset bhm options */
+    public function reset_bhm_plugin_options($domain, $dir = false)
+    {
+        if (! $dir) {
+            $dir = "/home/yopla/" . $domain;
+        }
+
+        $options_bhm = $this->get_bhm_options($domain, $dir);
+
+        $categories = $options_bhm->generator->category;
+
+        foreach ($categories as $categorie) {
+
+            $categorie->thematic = "";
+        }
+
+        prettyPrint($categories);
+
+        prettyPrint($options_bhm);
+
+        $this->update_options($domain, 'bhs_generator_settings', json_encode($options_bhm), $dir);
     }
 
     /*
@@ -271,23 +317,34 @@ class WpMg
      *
      *
      */
-    public function add_bhm_campaigns($domain, $categorie_names, $bhm_campaigns, $dir = false)
+    public function add_bhm_campaigns($domain, $nb_post_by_category_names, $bhm_campaigns, $dir = false)
     {
-        $bhm_ids_by_cat = [];
+        $bhm_params_by_cat = [];
+
+        $categorie_names = array_keys($nb_post_by_category_names);
 
         for ($i = 0; $i < count($categorie_names); $i ++) {
             $categorie_name = $categorie_names[$i];
-            $bhm_ids_by_cat[$categorie_name] = $bhm_campaigns[$i];
+            $params = [];
+            $params['bhm_campaign'] = $bhm_campaigns[$i];
+            $params['nb_post'] = $nb_post_by_category_names[$categorie_name];
+
+            $bhm_params_by_cat[$categorie_name] = $params;
         }
 
         if (! $dir) {
             $dir = "/home/yopla/" . $domain;
         }
 
-        $options_bhm = $this->get_bhm_options($domain, $dir);
-        $categories = $this->get_all_categories($domain, $dir);
+        $options_bhm = false;
+        do {
+            $options_bhm = $this->get_bhm_options($domain, $dir);
+        } while (! $options_bhm);
 
-        // prettyPrint($options_bhm->generator->category);
+        $categories = false;
+        do {
+            $categories = $this->get_all_categories($domain, $dir);
+        } while (! $categories);
 
         $campaigns_categories = new \stdClass();
 
@@ -299,28 +356,33 @@ class WpMg
             $best_score = 0;
             $url_winner = false;
             $cat_id_winner = false;
-            foreach ($bhm_ids_by_cat as $categorie_name => $bhm_id) {
+            $post_number = false;
+
+            foreach ($bhm_params_by_cat as $categorie_name => $bhm_param) {
                 $score = similar_text($slug, sanitize_text_field($categorie_name));
                 if ($score > $best_score) {
-                    $url_winner = $bhm_id;
+                    $url_winner = $bhm_param['bhm_campaign'];
+                    $post_number = $bhm_param['nb_post'];
                     $cat_id_winner = $term_id;
                     $best_score = $score;
                 }
             }
 
+            if ($term_id == 1) {
+                $url_winner = 0;
+                $post_number = 0;
+            }
+
             $raw_campaign = new \stdClass();
             $raw_campaign->thematic = $url_winner;
-            $raw_campaign->post_number = 150;
+            $raw_campaign->post_number = $post_number;
             $raw_campaign->activated = 0;
 
             $campaigns_categories->{strval($cat_id_winner)} = $raw_campaign;
         }
 
-        // prettyPrint($campaigns_categories);
-
+        $options_bhm->generator = new \stdClass();
         $options_bhm->generator->category = $campaigns_categories;
-
-        // prettyPrint($options_bhm);
 
         $this->update_options($domain, 'bhs_generator_settings', json_encode($options_bhm), $dir);
     }
@@ -347,8 +409,15 @@ class WpMg
             $dir = "/home/yopla/" . $domain;
         }
 
-        $options_bhm = $this->get_bhm_options($domain, $dir);
-        $categories = $this->get_all_categories($domain, $dir);
+        $options_bhm = false;
+        do {
+            $options_bhm = $this->get_bhm_options($domain, $dir);
+        } while (! $options_bhm);
+
+        $categories = false;
+        do {
+            $categories = $this->get_all_categories($domain, $dir);
+        } while (! $categories);
 
         $url_categories = new \stdClass();
 
@@ -482,6 +551,20 @@ class WpMg
         return ($sh);
     }
 
+    public function execute_wp_cli_cmd($sh, $domain = false, $dir = false)
+    {
+        if ($domain) {
+
+            if (! $dir) {
+                $dir = "/home/yopla/" . $domain;
+            }
+
+            $this->add_to_sh("cd " . $dir);
+        }
+
+        $this->add_to_sh($sh);
+    }
+
     public function remove_cache($domain, $dir = false)
     {
         if (! $dir) {
@@ -583,15 +666,33 @@ class WpMg
         return ($sh);
     }
 
-    public function count_post($domain)
+    public function count_post($domain, $dir = false)
     {
-        $sh = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/sh/template/count_post.sh");
+        $categories = false;
+        do {
+            $categories = $this->get_all_categories($domain, $dir);
+        } while (! $categories);
 
-        $sh = str_replace("[[domain]]", $domain, $sh);
+        echo ($domain . '<br>');
 
-        $this->add_to_sh($sh);
+        $total = 0;
 
-        return ($sh);
+        foreach ($categories as $categorie) {
+
+            $total = $total + $categorie->count;
+
+            echo ($categorie->name . ": " . $categorie->count . '<br>');
+        }
+        echo ("Total: " . $total . '<br>');
+        echo ('------' . '<br><br>');
+
+        // $sh = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/sh/template/count_post.sh");
+
+        // $sh = str_replace("[[domain]]", $domain, $sh);
+
+        // $this->add_to_sh($sh);
+
+        // return ($sh);
     }
 
     public function add_cron($domain)
@@ -649,6 +750,19 @@ class WpMg
         $sh = str_replace("[[maillage]]", $maillage, $sh);
 
         $this->add_to_sh($sh);
+    }
+
+    public function remove_wp_folder($domain)
+    {
+        $pathtoinstall = "/home/yopla/$domain";
+
+        $sh = file_get_contents(ABSPATH . "wp-content/plugins/spamtonprof/sh/template/remove_wordpress_install.sh");
+
+        $sh = str_replace("[[pathtoinstall]]", $pathtoinstall, $sh);
+
+        $this->add_to_sh($sh);
+
+        return ($sh);
     }
 
     public function clone_wp($domain, $domain_to_clone, $path_to_clone, $pathtoinstall = false)
@@ -714,27 +828,39 @@ class WpMg
 
         if ($execute) {
 
-            $ssh = new \phpseclib\Net\SSH2('hybrid2313.fr.ns.planethoster.net', 2908);
-            if (! $ssh->login('yopla', 'H.Rcj>m6pBfh')) {
-                exit('Login Failed');
+            if (! $this->ssh) {
+                $this->ssh = new \phpseclib\Net\SSH2('hybrid2313.fr.ns.planethoster.net', 2908);
+                if (! $this->ssh->login('yopla', 'H.Rcj>m6pBfh')) {
+
+                    exit('Login SSH2 Failed');
+                }
             }
 
-            $sftp = new \phpseclib\Net\SFTP('hybrid2313.fr.ns.planethoster.net', 2908);
-            if (! $sftp->login('yopla', 'H.Rcj>m6pBfh')) {
-                exit('Login Failed');
+            $this->sftp = new \phpseclib\Net\SFTP('hybrid2313.fr.ns.planethoster.net', 2908, 10000);
+
+            $res = $this->sftp->login('yopla', 'H.Rcj>m6pBfh');
+
+            if (! $res) {
+
+                print_r($this->sftp->errors);
+
+                exit('Login SFTP Failed');
             }
 
-            $sftp->put('/home/yopla/sh/tempo.sh', $sh1);
+            $res = $this->ssh->exec('/home/yopla/sh/tempo.sh');
 
-            $ssh->setTimeout(10000000);
-            
-            $res = $ssh->exec('/home/yopla/sh/tempo.sh');
+            $this->sftp->put('/home/yopla/sh/tempo.sh', $sh1);
 
-            echo (nl2br($res));
+            $res = $this->ssh->exec('/home/yopla/sh/tempo.sh');
+
+            if ($verbose) {
+                echo (nl2br($res));
+            }
 
             $this->sh = "";
 
             return ($res);
         }
+        // sleep(30);
     }
 }
