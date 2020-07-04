@@ -13,11 +13,13 @@ class PrenomLbcManager
 
     public function add(PrenomLbc $prenomLbc)
     {
-        $q = $this->_db->prepare('insert into prenom_lbc(prenom, nb_use) values(:prenom,0)');
+        $q = $this->_db->prepare('insert into prenom_lbc(cat,prenom, nb_use) values(:cat,:prenom,0)');
 
         $q->bindValue(':prenom', $prenomLbc->getPrenom());
+        $q->bindValue(':cat', $prenomLbc->getCat());
         $q->execute();
 
+        
         $prenomLbc->setRef_prenom($this->_db->lastInsertId());
 
         return ($prenomLbc);
@@ -39,9 +41,10 @@ class PrenomLbcManager
 
             $ref_cat_prenom = $info["ref_cat_prenom"];
 
+
             $q = $this->_db->prepare("select * from prenom_lbc 
                 where cat = :ref_cat_prenom
-                order by nb_use");
+                order by nb_use ");
 
             $q->bindValue(":ref_cat_prenom", $ref_cat_prenom);
         }
