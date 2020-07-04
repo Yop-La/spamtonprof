@@ -96,7 +96,7 @@ class DomainProcessMg
     /*
      * cette fonction recupere tous les noms de domaines sans configuration dns adapte a mailgun
      * conf_done -> true or false ( va remplacer la colonne mx_ok ) -> changement a faire dans le select
-     * conf_valid -> true or false
+     * conf_valid -> true orun false
      *
      */
     function configureMailGunDns()
@@ -289,6 +289,27 @@ class DomainProcessMg
         ));
     }
 
+    function add_txt_dns_planethoster($domain, $name, $value)
+    {
+        $cpanel = new \Gufy\CpanelPhp\Cpanel($this->cpanel_credentials);
+
+        if ($name == $domain) {
+            $name = $name . ".";
+        } else {
+            $name = str_replace("." . $domain, "", $name);
+        }
+
+        $ret = $cpanel->execute_action(2, 'ZoneEdit', 'add_zone_record', 'yopla', array(
+            'domain' => $domain,
+            'name' => $name,
+            'type' => "TXT",
+            'txtdata' => $value,
+            'target' => $domain
+        ));
+
+        return ($ret);
+    }
+
     function move_to_planethost_from_internet_bs_and_set_mail_gun_dns($domain)
     {
         $slack = new \spamtonprof\slack\Slack();
@@ -365,11 +386,8 @@ class DomainProcessMg
             'type' => 'MX'
         ));
 
-        
-        
         $mxRecords = $mxRecords['cpanelresult']['data'];
 
-        
         do {
 
             foreach ($mxRecords as $mxRecord) {
@@ -386,7 +404,7 @@ class DomainProcessMg
             ));
 
             $dnsRecords = $dnsRecords['cpanelresult']['data'];
-            
+
             $dns_with_mail_in_name = [];
 
             foreach ($dnsRecords as $dnsRecord) {
