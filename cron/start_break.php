@@ -60,7 +60,7 @@ foreach ($interruptions as $interruption) {
 
         // -------------------- notis emails ------------------
 
-        $proche = $abo->getProche(); 
+        $proche = $abo->getProche();
         if ($proche) {
             $proche = \spamtonprof\stp_api\StpProche::cast($proche);
         }
