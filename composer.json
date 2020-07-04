@@ -16,6 +16,7 @@
 		"phpseclib/phpseclib" : "^2.0",
 		"gufy/cpanel-php" : "~2.0",
 		"sendgrid/sendgrid": "~7",
-		"stripe/stripe-php": "^7.37"
+		"stripe/stripe-php": "^7.37",
+		"cloudinary/cloudinary_php": "^1.17"
 	}
 }
