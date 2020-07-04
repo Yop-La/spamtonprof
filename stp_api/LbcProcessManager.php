@@ -631,6 +631,7 @@ class LbcProcessManager
             if (! $user_id) {
 
                 $lbcApi = new \spamtonprof\stp_api\LbcApi();
+
                 $user_id = $lbcApi->getUserId($cookie);
 
                 if (! $user_id) {
@@ -1051,11 +1052,11 @@ class LbcProcessManager
             }
             $msgs = array_merge($msgs_inter, $msgs);
 
-            if ($i % 20 == 0 || $i == ($nb_acts - 1)) {
-                $slack->sendMessages("log-lbc-check", $msgs);
-                $msgs = [];
-            }
-            $i ++;
+            // if ($i % 20 == 0 || $i == ($nb_acts - 1)) {
+            // $slack->sendMessages("log-lbc-check", $msgs);
+            // $msgs = [];
+            // }
+            // $i ++;
         }
     }
 
@@ -1078,7 +1079,7 @@ class LbcProcessManager
         $nbTextes = 0;
         $lbcAdsMg = new \spamtonprof\stp_api\LbcAdManager();
 
-        if (false && $nbAds == 1) {
+        if (false && $refClient = 25) {
             $client->setAds_from_lbc_ad(true);
         }
 
@@ -1302,11 +1303,9 @@ class LbcProcessManager
                 $lbcApi = new \spamtonprof\stp_api\LbcApi();
                 $ad = $lbcApi->get_local_ad($client->getImg_folder());
 
-                
                 $title_str = $ad->subject;
                 $texte->setTexte($ad->body);
 
-                
                 $image = 'http://' . DOMAIN . $ad->image;
             }
 
