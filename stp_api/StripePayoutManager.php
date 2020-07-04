@@ -67,11 +67,21 @@ class StripePayoutManager
                     $q = $this->_db->prepare("select * from stripe_payout where ref_prof = :ref_prof order by created limit 1");
                     $q->bindValue('ref_prof', $ref_prof);
                 }
-                
+
                 if ($key == 'payout_to_push_in_algolia') {
-                    
+
                     $q = $this->_db->prepare("select * from stripe_payout where transactions_status in ('transactions_retrieved','pushing_to_algolia') order by ref limit 1");
-                    
+                }
+
+                if ($key == 'payout_with_no_prof_invoice') {
+
+                    $test_mode = $params['test_mode'];
+
+                    if ($test_mode) {
+                        $q = $this->_db->prepare("select * from stripe_payout where transactions_status not in ('transactions_retrieved','pushing_to_algolia') and invoice_prof_test is null order by ref limit 1");
+                    } else {
+                        $q = $this->_db->prepare("select * from stripe_payout where transactions_status not in ('transactions_retrieved','pushing_to_algolia') and invoice_prof_prod is null order by ref limit 1");
+                    }
                 }
 
                 if ($key == 'ref') {
@@ -84,7 +94,6 @@ class StripePayoutManager
         }
 
         $q->execute();
-        
 
         $data = $q->fetch(\PDO::FETCH_ASSOC);
 
@@ -152,6 +161,41 @@ class StripePayoutManager
         return ($object);
     }
 
+    public function updateInvoiceProfProd(\spamtonprof\stp_api\StripePayout $payout)
+    {
+        $q = null;
+
+        $q = $this->_db->prepare('update stripe_payout set invoice_prof_prod = :invoice_prof_prod where ref = :ref');
+        $q->bindValue(':invoice_prof_prod', $payout->getInvoice_prof_prod());
+        $q->bindValue(':ref', $payout->getRef());
+
+        $q->execute();
+
+        return ($payout);
+    }
+
+    public function updateInvoiceProfTest(\spamtonprof\stp_api\StripePayout $payout)
+    {
+        $q = null;
+
+        $q = $this->_db->prepare('update stripe_payout set invoice_prof_test = :invoice_prof_test where ref = :ref');
+        $q->bindValue(':invoice_prof_test', $payout->getInvoice_prof_test());
+        $q->bindValue(':ref', $payout->getRef());
+
+        $q->execute();
+
+        return ($payout);
+    }
+
+    public function updateInvoiceProf(\spamtonprof\stp_api\StripePayout $payout, $test_mode)
+    {
+        if ($test_mode) {
+            $this->updateInvoiceProfTest($payout);
+        } else {
+            $this->updateInvoiceProfProd($payout);
+        }
+    }
+
     public function construct($constructor)
     {
         $payout = $this->cast($constructor["objet"]);
@@ -170,7 +214,6 @@ class StripePayoutManager
                     if (array_key_exists("transactions", $constructor)) {
                         $constructorTransaction = $constructor["transactions"];
                     }
-                    
 
                     $transactions = $transactionMg->getAll(array(
                         'key' => 'by_ref_payout',

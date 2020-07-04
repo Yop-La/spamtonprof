@@ -4,9 +4,63 @@ namespace spamtonprof\stp_api;
 class StripePayout implements \JsonSerializable
 {
 
-    protected $ref, $ref_stripe, $ref_prof, $amount, $date_versement, $test_mode, $created, $transactions_status, $transactions;
+    protected $ref, $ref_stripe, $ref_prof, $amount, $date_versement, $test_mode, $created, $transactions_status, $transactions, $invoice_prof_prod, $invoice_prof_test;
 
     const cant_retrieve_transactions = 'cant_retrieve_transactions', transactions_retrieved = 'transactions_retrieved', not_all_transactions_retrieved = 'not_all_transactions_retrieved';
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getInvoice_prof_prod()
+    {
+        return $this->invoice_prof_prod;
+    }
+
+    /**
+     *
+     * @param mixed $invoice_prof_prod
+     */
+    public function setInvoice_prof_prod($invoice_prof_prod)
+    {
+        $this->invoice_prof_prod = $invoice_prof_prod;
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function getInvoice_prof_test()
+    {
+        return $this->invoice_prof_test;
+    }
+
+    /**
+     *
+     * @param mixed $invoice_prof_test
+     */
+    public function setInvoice_prof_test($invoice_prof_test)
+    {
+        $this->invoice_prof_test = $invoice_prof_test;
+    }
+
+    public function setInvoice_prof($invoice_prof, $test_mode)
+    {
+        if ($test_mode) {
+            $this->setInvoice_prof_test($invoice_prof);
+        } else {
+            $this->setInvoice_prof_prod($invoice_prof);
+        }
+    }
+
+    public function getInvoice_prof($test_mode)
+    {
+        if ($test_mode) {
+            return ($this->getInvoice_prof_test());
+        }
+
+        return ($this->getInvoice_prof_prod());
+    }
 
     /**
      *
