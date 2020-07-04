@@ -21,13 +21,11 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-// define('PROBLEME_CLIENT', true);
+// toujours avoir un cron sur cette tâche sinon le cookie expire et cela devient impossible de checker la page
 
+// toujours mettre analyse_campagaigns pour éviter de republier sur des comptes bloqués avec des annonces en ligne
 
 $lbc = new \spamtonprof\stp_api\LbcProcessManager();
-
-$lbc->checkAds(20);
-
-// $lbc->analyse_campaigns();
-
-// $lbc->publish_campaigns_reporting();
+$lbc->checkAds(5);
+$lbc->analyse_campaigns();
+$lbc->publish_campaigns_reporting();
