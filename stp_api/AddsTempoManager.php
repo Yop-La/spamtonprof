@@ -11,10 +11,10 @@ class AddsTempoManager
     const no_ref_texte_or_no_ref_titre = "no_ref_texte_or_no_ref_titre", nearest_title_ad = "nearest_title_ad";
 
     const update_statut_ad_refuse = 'update_statut_ad_refuse';
-    
+
     const block_ads_of_act = 'block_ads_of_act';
 
-    const get_ads_online = "get_ads_online", get_ads_online_in_campaign = "get_ads_online_in_campaign",get_ads_to_block_during_check = "get_ads_to_block_during_check";
+    const get_ads_online = "get_ads_online", get_ads_online_in_campaign = "get_ads_online_in_campaign", get_ads_to_block_during_check = "get_ads_to_block_during_check";
 
     public function __construct()
     {
@@ -53,10 +53,10 @@ class AddsTempoManager
 
                     $q = $this->_db->prepare("
                     delete from adds_tempo where
-                    ref_commune in (select ref_commune from lbc_commune where population >= 20 and population <= 40)
-                    and statut = 'online' 
+                    ref_commune in (select ref_commune from lbc_commune where population >= 20 and population <= 70)
+                    and ((statut in ( 'online' , 'bloque' ) 
                     and first_publication_date < ( now() - interval '7 days' )
-                    and first_publication_date is not null
+                    and first_publication_date is not null ) or first_publication_date is null ) 
                     and ref_compte in (select ref_compte from compte_lbc where ref_client = :ref_client);");
                     $q->bindValue(":ref_client", $ref_client);
 
@@ -145,16 +145,15 @@ class AddsTempoManager
                 $q->bindValue(":ref_compte", $refCompte);
                 $q->execute();
             }
-            
+
             if ($key == $this::block_ads_of_act) {
-                
+
                 $refCompte = $info["ref_compte"];
                 $req = "update adds_tempo set statut = '" . $this::bloque . "' where ref_compte = :ref_compte";
                 $q = $this->_db->prepare($req);
                 $q->bindValue(":ref_compte", $refCompte);
                 $q->execute();
             }
-            
         }
 
         $q->execute();
@@ -169,7 +168,7 @@ class AddsTempoManager
         return ($ads);
     }
 
-    public function getAll($info) 
+    public function getAll($info)
     {
         $q = null;
         if (is_array($info)) {
@@ -186,16 +185,15 @@ class AddsTempoManager
                     $q->bindValue(":ref_compte", $refCompte);
                     $q->execute();
                 }
-                
+
                 if ($key == $this::get_ads_to_block_during_check) {
-                    
+
                     $refCompte = $info["ref_compte"];
-                    
+
                     $q = $this->_db->prepare("select * from adds_tempo where ref_compte = :ref_compte and ( now() - interval '2 minutes' < first_publication_date )");
                     $q->bindValue(":ref_compte", $refCompte);
                     $q->execute();
                 }
-                
 
                 if ($key == $this::get_ads_online_in_campaign) {
 
@@ -204,7 +202,6 @@ class AddsTempoManager
                     $q = $this->_db->prepare("select * from adds_tempo where ref_campaign = :ref_campaign and statut = '" . $this::online . "'");
                     $q->bindValue(":ref_campaign", $ref_campaign);
                     $q->execute();
-                    
                 }
             } else {
 
