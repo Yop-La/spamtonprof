@@ -51,3 +51,5 @@ tempo/datadome
 tempo/consumerKey
 
 tempo/res
+
+sh/run/tempo\.sh
