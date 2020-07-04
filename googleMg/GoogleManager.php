@@ -56,23 +56,22 @@ class GoogleManager
         $this->userId = 'me';
     }
 
-//     public function webResourceGetToken()
-//     {
-//         try {
-//             $ret = $this->site_verfication->webResource->(, array(
-//                 "site" => array(
-//                     'type' => 'SITE',
-//                     "identifier" => 'maitrepain.fr'
-//                 ),
-//                 "verificationMethod" => "DNS_TXT"
-//             ));
-//             prettyPrint($ret);
-//         } catch (Exception $e) {
+    // public function webResourceGetToken()
+    // {
+    // try {
+    // $ret = $this->site_verfication->webResource->(, array(
+    // "site" => array(
+    // 'type' => 'SITE',
+    // "identifier" => 'maitrepain.fr'
+    // ),
+    // "verificationMethod" => "DNS_TXT"
+    // ));
+    // prettyPrint($ret);
+    // } catch (Exception $e) {
 
-//             echo ($e->getMessage());
-//         }
-//     }
-
+    // echo ($e->getMessage());
+    // }
+    // }
     public function webResourceList()
     {
         try {
@@ -84,10 +83,24 @@ class GoogleManager
         }
     }
 
-    public function testSearchConsole($siteUrl, $feedpath = false)
+    
+    
+    public function add_site($siteUrl)
     {
         try {
-            $ret = $this->service_webamster->sites->prettyPrint($ret);
+            $ret = $this->service_webamster->sites->add($siteUrl);
+        } catch (Exception $e) {
+
+            echo ($e->getMessage());
+        }
+    }
+
+    public function list_sites()
+    {
+        try {
+            $ret = $this->service_webamster->sites->listSites();
+            // GET https://www.googleapis.com/webmasters/v3/sites/siteUrl
+            prettyPrint($ret);
         } catch (Exception $e) {
 
             echo ($e->getMessage());
@@ -97,6 +110,7 @@ class GoogleManager
     public function addSiteMap($siteUrl, $feedpath)
     {
         try {
+            // PUT https://www.googleapis.com/webmasters/v3/sites/siteUrl
             $this->service_webamster->sitemaps->submit($siteUrl, $feedpath);
         } catch (Exception $e) {
 
