@@ -22,6 +22,8 @@ admin="[[username]]"
 # path to install your WPs
 pathtoinstall="[[pathtoinstall]]"
 
+mkdir $pathtoinstall;
+
 dbname="[[dbname]]"
 dbpass="[[dbpass]]"
 
