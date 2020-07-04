@@ -2,8 +2,8 @@ jQuery( document ).ready( function( jQuery ) {
 
 	
 	
-//	showMessage("Psss, on offre 7 jours d'essai en ce moment: <a class = 'link_msg' href = 'http://spamtonprof.com/semaine-decouverte/' > c'est là que ça ce passe !</a>")
-	showMessage("Covid-19: Nous sommes toujours là pour nos élèves. <a class = 'link_msg' href = 'http://spamtonprof.com/semaine-decouverte/' > 7 jours de cours en ligne offerts</a>")
+	showMessage("Psss, on offre 7 jours d'essai en ce moment: <a class = 'link_msg' href = 'http://spamtonprof.com/semaine-decouverte/' > c'est là que ça ce passe !</a>")
+//	showMessage("Covid-19: Nous sommes toujours là pour nos élèves. <a class = 'link_msg' href = 'http://spamtonprof.com/semaine-decouverte/' > 7 jours de cours en ligne offerts</a>")
 
 //	//debut timer essai	
 //
