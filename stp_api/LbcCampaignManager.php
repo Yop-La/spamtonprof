@@ -6,7 +6,7 @@ class LbcCampaignManager
 
     private $_db;
 
-    const campaign_to_analyse = 'campaign_to_analyse', clients_campaigns_to_analyse = 'clients_campaigns_to_analyse',succeed_compte_campaigns = 'succeed_compte_campaigns';
+    const campaign_to_analyse = 'campaign_to_analyse', clients_campaigns_to_analyse = 'clients_campaigns_to_analyse', succeed_compte_campaigns = 'succeed_compte_campaigns';
 
     public function __construct()
     {
@@ -20,7 +20,7 @@ class LbcCampaignManager
         $q->bindValue(":ref_campaign", $campaign->getRef_campaign());
         $q->execute();
     }
-    
+
     public function update_fail(\spamtonprof\stp_api\LbcCampaign $campaign)
     {
         $q = $this->_db->prepare('update lbc_campaign set fail = :fail where ref_campaign = :ref_campaign');
@@ -28,7 +28,7 @@ class LbcCampaignManager
         $q->bindValue(":ref_campaign", $campaign->getRef_campaign());
         $q->execute();
     }
-    
+
     public function update_nb_ad_online(\spamtonprof\stp_api\LbcCampaign $campaign)
     {
         $q = $this->_db->prepare('update lbc_campaign set nb_ad_online = :nb_ad_online where ref_campaign = :ref_campaign');
@@ -67,15 +67,15 @@ class LbcCampaignManager
 		              ref_compte not in (select distinct(ref_compte) from adds_tempo where statut = 'publie')
 		              and ref_compte in (select distinct(ref_compte) from adds_tempo )
 		              and checked = false
-                      order by date desc;");
+                      order by date desc limit 50;");
                 }
-                
+
                 if ($key == $this::succeed_compte_campaigns) {
-                    
-                    $ref_compte = $info['ref_compte'];                    
+
+                    $ref_compte = $info['ref_compte'];
                     $q = $this->_db->prepare("select * from lbc_campaign
                         where ref_compte = :ref_compte and checked is true and fail is false");
-                    
+
                     $q->bindValue(':ref_compte', $ref_compte);
                 }
 
