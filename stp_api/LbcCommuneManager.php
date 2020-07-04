@@ -132,20 +132,34 @@ class LbcCommuneManager
                 				where row_num = 1 ";
 
                 $pop = '';
-                if($target_big_city){
+                if ($target_big_city) {
                     $pop = "and population <= 70 and population >= 20";
                 }
-                
-                
+
                 $req = str_replace("[pop]", $pop, $req);
-                
 
                 $q = $this->_db->prepare($req);
                 $q->bindValue(":ref_client", $refClient);
             }
+
+            if (array_key_exists('pop_inf', $info) && array_key_exists('pop_sup', $info)  && array_key_exists('offset', $info)) {
+
+                
+                $pop_inf = $info["pop_inf"]/1000;
+                $pop_sup = $info["pop_sup"]/1000;
+                $offset = $info["offset"];
+
+                $req = "select * from lbc_commune where population >= :pop_inf and population < :pop_sup order by population desc limit 50 offset :offset ";
+
+                $q = $this->_db->prepare($req);
+                $q->bindValue(":pop_inf", $pop_inf);
+                $q->bindValue(":pop_sup", $pop_sup);
+                $q->bindValue(":offset", $offset);
+            }
         }
         //
         $q->execute();
+        
 
         while ($data = $q->fetch(\PDO::FETCH_ASSOC)) {
             $communes[] = new \spamtonprof\stp_api\LbcCommune($data);
