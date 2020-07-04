@@ -53,3 +53,5 @@ tempo/consumerKey
 tempo/res
 
 sh/run/tempo\.sh
+
+tempo/
