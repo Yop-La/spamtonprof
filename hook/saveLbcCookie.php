@@ -114,23 +114,29 @@ if (array_key_exists("cookies", $_POST) && array_key_exists("ref_compte", $_POST
         $raw_cookies
     ));
 
-    $cookies = http_parse_cookie($raw_cookies);
+    // $cookies = http_parse_cookie($raw_cookies);
 
-    if (! property_exists($cookies, "cookies")) {
+    // if (! property_exists($cookies, "cookies")) {
 
-        $cookies = base64_decode($raw_cookies);
-        $cookies = http_parse_cookie($cookies);
-    }
-    if (! property_exists($cookies, "cookies")) {
+    // $cookies = base64_decode($raw_cookies);
+    // $cookies = http_parse_cookie($cookies);
+    // }
+    // if (! property_exists($cookies, "cookies")) {
 
-        $slack->sendMessages('log-lbc', array(
-            "Can't read cookie of lbc act n° " . $ref_compte
-        ));
+    // $slack->sendMessages('log-lbc', array(
+    // "Can't read cookie of lbc act n° " . $ref_compte
+    // ));
 
-        die();
-    }
+    // die();
+    // }
 
-    $luat = $cookies->cookies['luat'];
+    // $slack->sendMessages('log-lbc', array(
+    // "Can't read cookie of lbc act n° " . $ref_compte
+    // ));
+
+    // $luat = $cookies->cookies['luat'];
+
+    $luat = $raw_cookies;
 
     $lbcAcctMg = new \spamtonprof\stp_api\LbcAccountManager();
     $act = $lbcAcctMg->get(array(
@@ -159,6 +165,7 @@ if (array_key_exists("cookies", $_POST) && array_key_exists("ref_compte", $_POST
     if ($act->getCookie()) {
         $ret->ret = $act;
     }
+
 }
 
 prettyPrint($ret);
